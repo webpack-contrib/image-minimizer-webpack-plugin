@@ -1,169 +1,30 @@
-# imagemin-webpack
+# imagemin-webpack-loader
 
-[![NPM version](https://img.shields.io/npm/v/imagemin-webpack.svg)](https://www.npmjs.org/package/imagemin-webpack) 
-[![Travis Build Status](https://img.shields.io/travis/itgalaxy/imagemin-webpack/master.svg?label=build)](https://travis-ci.org/itgalaxy/imagemin-webpack) 
-[![dependencies Status](https://david-dm.org/itgalaxy/imagemin-webpack/status.svg)](https://david-dm.org/itgalaxy/imagemin-webpack) 
-[![devDependencies Status](https://david-dm.org/itgalaxy/imagemin-webpack/dev-status.svg)](https://david-dm.org/itgalaxy/imagemin-webpack?type=dev)
-[![peerDependencies Status](https://david-dm.org/itgalaxy/imagemin-webpack/peer-status.svg)](https://david-dm.org/itgalaxy/imagemin-webpack?type=peer)
-
-Webpack loader and plugin to compress all images using [imagemin](https://github.com/imagemin/imagemin).
-Do not worry about size of images, now they are always compressed.
+Do not worry about the size of the images, now they are always compressed :box:.
 
 ## Why
 
--   Supported `webpack` `1` and `2` versions.
+Coming soon...
 
--   No extra dependencies (`imagemin-gifsicle`, `imagemin-pngquant`) in `dependencies` section into `package.json`.
-    You decide for yourself what plugins to use.
-
--   This loader and plugin will optimize ANY images regardless of how they were added to webpack.
-    `image-webpack-loader` don't optimize some images generating `favicons-webpack-plugin` or `copy-webpack-plugin`.
-
--   Images optimized when inlined with `url-loader`. This can not be done with `imagemin-webpack-plugin`.
-
--   Throttle asynchronous images optimization (using `maxConcurrency` plugin option).
-    This allows you to not overload the server when building.
-
--   All tested.
-
--   (Optional) Don't crash building process if your have corrupted image(s).
-
-## Install
+## Install 
 
 ```shell
-npm install imagemin-webpack --save-dev
+npm install imagemin-webpack-loader --save-dev
 ```
 
 ## Usage
 
-### Loader And Plugin
+Coming soon...
 
-If you want to use `loader` or `plugin` standalone see sections below, but this is not recommended.
+## API
 
-**By default plugin optimize only assets don't have chunks.**
-**Make sure that plugin place after any plugins that add images or other assets which you want to optimized.**
-
-```js
-import { imageminloader, ImageminWebpackPlugin } from 'imagemin-webpack';
-// Before importing imagemin plugin make sure you add it in `package.json` (`dependencies`) and install.
-import imageminGifsicle from 'imagemin-gifsicle';
-
-const plugins = [
-    imageminGifsicle()
-];
-
-export default {
-    module: {
-        rules: [
-            {
-                test: /\.(jpe?g|png|gif|svg)$/i,
-                loaders: [
-                    {
-                        loader: 'file-loader' // or `url-loader`
-                    },
-                    {
-                        loader: imageminloader,
-                        options: {
-                            plugins
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-     plugins: [
-        // Make sure that the plugin is after any plugins that add images
-        new ImageminWebpackPlugin({
-            imageminOptions: {
-                plugins
-            }
-        })
-    ]
-}
-```
-
-### Standalone Loader
-
-[Documentation: Using loaders](https://webpack.js.org/concepts/loaders/)
-
-In your `webpack.config.js`, add the `imagemin-webpack`, 
-chained with the [file-loader](https://github.com/webpack/file-loader) 
-or [url-loader](https://github.com/webpack-contrib/url-loader):
-
-```js
-import { imageminloader } from 'imagemin-webpack';
-// Before importing imagemin plugin make sure you add it in `package.json` (`dependencies`) and install.
-import imageminGifsicle from 'imagemin-gifsicle';
-
-export default {
-    module: {
-        rules: [
-            {
-                test: /\.(jpe?g|png|gif|svg)$/i,
-                loaders: [
-                    {
-                        loader: 'file-loader' // or `url-loader`
-                    },
-                    {
-                        loader: imageminloader,
-                        options: {
-                            bail: false, // ignore errors on corrupted images
-                            plugins: [
-                                imageminGifsicle()
-                            ]
-                        }
-                    }
-                ]
-            }
-        ]
-    }
-}
-```
-
-### Standalone Plugin
-
-[Documentation: Using plugins](https://webpack.js.org/concepts/plugins/)
-
-```js
-import { ImageminWebpackPlugin } from 'imagemin-webpack';
-// Before importing imagemin plugin make sure you add it in `package.json` (`dependencies`) and install.
-import imageminGifsicle from 'imagemin-gifsicle';
-
-export default {
-    // 
-    module: {
-        rules: [
-            {
-                loader: 'file-loader',
-                options: {
-                    emitFile: true, // Don't forget emit images
-                    name: '[path][name].[ext]'
-                },
-                test: /\.(jpe?g|png|gif|svg)$/i
-            }
-        ]
-    },
-    plugins: [
-        // Make sure that the plugin is after any plugins that add images
-        new ImageminWebpackPlugin({
-            bail: false,
-            excludeChunksAssets: true,
-            plugins: [
-                imageminGifsicle()
-            ],
-            maxConcurrency: os.cpus().length,
-            name: '[hash].[ext]',
-            test: /\.(jpe?g|png|gif|svg)$/i
-        })
-    ]
-}
-```
+Coming soon...
 
 ## Related
 
--   [imagemin](https://github.com/imagemin/imagemin) - API for this module.
--   [image-webpack-loader](https://github.com/tcoopman/image-webpack-loader) - inspiration, thanks.
--   [imagemin-webpack-plugin](https://github.com/Klathmon/imagemin-webpack-plugin) - inspiration, thanks.
+- [imagemin](https://github.com/imagemin/imagemin) - API for this module.
+- [image-webpack-loader](https://github.com/tcoopman/image-webpack-loader) - inspiration, thanks.
+- [imagemin-webpack-plugin](https://github.com/Klathmon/imagemin-webpack-plugin) - inspiration, thanks.
 
 ## Contribution
 
