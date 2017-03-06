@@ -1,5 +1,7 @@
 # imagemin-webpack-loader
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/itgalaxy/imagemin-webpack-loader.svg)](https://greenkeeper.io/)
+
 Do not worry about the size of the images, now they are always compressed :box:.
 
 ## Why
