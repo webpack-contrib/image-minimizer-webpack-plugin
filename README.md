@@ -147,7 +147,7 @@ export default {
         // Make sure that the plugin is after any plugins that add images
         new ImageminWebpackPlugin({
             bail: false,
-            excludeChunksAssets: true,
+            excludeChunksAssets: false,
             plugins: [
                 imageminGifsicle()
             ],
