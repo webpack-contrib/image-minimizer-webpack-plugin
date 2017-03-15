@@ -16,6 +16,7 @@ class ImageminWebpackPlugin {
             imageminOptions: {
                 plugins: []
             },
+            manifest: null,
             maxConcurrency: os.cpus().length,
             name: '[hash].[ext]',
             test: /\.(jpe?g|png|gif|svg)$/i
@@ -118,6 +119,10 @@ class ImageminWebpackPlugin {
 
                                         if (interpolatedName !== filename) {
                                             delete compilation.assets[filename];
+                                        }
+
+                                        if (this.options.manifest) {
+                                            this.options.manifest[filename] = interpolatedName;
                                         }
 
                                         return Promise.resolve(compressedAsset);

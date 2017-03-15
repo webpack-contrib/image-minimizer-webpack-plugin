@@ -59,7 +59,7 @@ export default {
                 test: /\.(jpe?g|png|gif|svg)$/i,
                 use: [
                     {
-                        loader: 'file-loader' // or `url-loader`
+                        loader: 'file-loader' // Or `url-loader`.
                     },
                     {
                         loader: imageminloader,
@@ -72,7 +72,7 @@ export default {
         ]
     },
      plugins: [
-        // Make sure that the plugin is after any plugins that add images
+        // Make sure that the plugin is after any plugins that add images.
         new ImageminWebpackPlugin({
             imageminOptions: {
                 plugins
@@ -102,12 +102,12 @@ export default {
                 test: /\.(jpe?g|png|gif|svg)$/i,
                 use: [
                     {
-                        loader: 'file-loader' // or `url-loader`
+                        loader: 'file-loader' // Or `url-loader`.
                     },
                     {
                         loader: imageminloader,
                         options: {
-                            bail: false, // ignore errors on corrupted images
+                            bail: false, // Ignore errors on corrupted images.
                             plugins: [
                                 imageminGifsicle()
                             ]
@@ -129,6 +129,8 @@ import { ImageminWebpackPlugin } from 'imagemin-webpack';
 // Before importing imagemin plugin make sure you add it in `package.json` (`dependencies`) and install.
 import imageminGifsicle from 'imagemin-gifsicle';
 
+const imageminManifest = {};
+
 export default {
     // 
     module: {
@@ -136,7 +138,7 @@ export default {
             {
                 loader: 'file-loader',
                 options: {
-                    emitFile: true, // Don't forget emit images
+                    emitFile: true, // Don't forget emit images.
                     name: '[path][name].[ext]'
                 },
                 test: /\.(jpe?g|png|gif|svg)$/i
@@ -144,7 +146,7 @@ export default {
         ]
     },
     plugins: [
-        // Make sure that the plugin is after any plugins that add images
+        // Make sure that the plugin is after any plugins that add images.
         new ImageminWebpackPlugin({
             bail: false,
             excludeChunksAssets: false,
@@ -153,6 +155,7 @@ export default {
                     imageminGifsicle()
                 ],
             },
+            manifest: imageminManifest, // This object will contain source and interpolated filenames.
             maxConcurrency: os.cpus().length,
             name: '[hash].[ext]',
             test: /\.(jpe?g|png|gif|svg)$/i
