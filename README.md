@@ -148,9 +148,11 @@ export default {
         new ImageminWebpackPlugin({
             bail: false,
             excludeChunksAssets: false,
-            plugins: [
-                imageminGifsicle()
-            ],
+            imageminOptions: {
+                plugins: [
+                    imageminGifsicle()
+                ],
+            },
             maxConcurrency: os.cpus().length,
             name: '[hash].[ext]',
             test: /\.(jpe?g|png|gif|svg)$/i
