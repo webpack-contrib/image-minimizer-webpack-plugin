@@ -73,7 +73,7 @@ class ImageminWebpackPlugin {
             compiler.plugin('compilation', (compilation) => {
                 compilation.plugin('after-optimize-assets', (assets) => {
                     Object.keys(assets).forEach((name) => {
-                        if (this.testFile(name, this.testRegexes)) {
+                        if (this.testFile(name, this.testRegexes) && excludeChunksAssets.indexOf(name) === -1) {
                             excludeChunksAssets.push(name);
                         }
                     });
