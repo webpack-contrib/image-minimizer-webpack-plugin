@@ -1,6 +1,6 @@
 {
     "name": "imagemin-webpack",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Webpack loader and plugin to optimize images using imagemin",
     "repository": {
         "type": "git",
