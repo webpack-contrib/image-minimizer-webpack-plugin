@@ -57,7 +57,7 @@ export default {
         rules: [
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
-                loaders: [
+                use: [
                     {
                         loader: 'file-loader' // or `url-loader`
                     },
@@ -100,7 +100,7 @@ export default {
         rules: [
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
-                loaders: [
+                use: [
                     {
                         loader: 'file-loader' // or `url-loader`
                     },
