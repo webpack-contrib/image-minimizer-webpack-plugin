@@ -64,7 +64,7 @@
         "npmpub": "^3.1.0",
         "nyc": "^10.1.0",
         "pify": "^2.3.0",
-        "tmp": "^0.0.31",
+        "tempy": "^0.1.0",
         "imagemin-gifsicle": "5.1.0",
         "imagemin-mozjpeg": "^6.0.0",
         "imagemin-pngquant": "^5.0.0",
