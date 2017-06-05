@@ -8,7 +8,7 @@ const nodeify = require('nodeify');
 // Public API
 //------------------------------------------------------------------------------
 
-module.exports = function (content) {
+module.exports = function(content) {
     if (typeof this.cacheable === 'function') {
         this.cacheable();
     }
@@ -16,8 +16,13 @@ module.exports = function (content) {
     const options = Object.assign(
         {},
         {
-            // eslint-disable-next-line no-underscore-dangle
-            bail: (this._compiler && this._compiler.options && this._compiler.options.bail) || false,
+            /* eslint-disable no-underscore-dangle */
+            bail:
+                (this._compiler &&
+                    this._compiler.options &&
+                    this._compiler.options.bail) ||
+                    false,
+            /* eslint-enable no-underscore-dangle */
             plugins: []
         },
         loaderUtils.getOptions(this) || {}

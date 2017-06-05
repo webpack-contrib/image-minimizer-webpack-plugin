@@ -42,7 +42,7 @@ module.exports = (name, template, options) => {
     }
 
     // Remove extra path separation
-    if (pathSepAdded && (/\[path\]/).test(template)) {
+    if (pathSepAdded && /\[path\]/.test(template)) {
         interpolateName = interpolateName.slice(2);
     }
 

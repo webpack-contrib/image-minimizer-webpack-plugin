@@ -2,10 +2,10 @@
 
 const minimatch = require('minimatch');
 
-module.exports = (rawTestValue) => {
+module.exports = rawTestValue => {
     const tests = Array.isArray(rawTestValue) ? rawTestValue : [rawTestValue];
 
-    return tests.map((test) => {
+    return tests.map(test => {
         if (test instanceof RegExp) {
             // If it's a regex, just return it
             return test;
@@ -14,6 +14,8 @@ module.exports = (rawTestValue) => {
             return minimatch.makeRe(test);
         }
 
-        throw new Error('test parameter must be a regex, glob string, or an array of regexes or glob strings');
+        throw new Error(
+            'test parameter must be a regex, glob string, or an array of regexes or glob strings'
+        );
     });
 };

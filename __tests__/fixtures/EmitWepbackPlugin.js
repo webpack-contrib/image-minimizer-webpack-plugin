@@ -6,9 +6,13 @@ import pify from 'pify';
 
 export default class EmitWepbackPlugin {
     constructor(options = {}) {
-        this.options = Object.assign({}, {
-            filename: 'emit-test.jpg'
-        }, options);
+        this.options = Object.assign(
+            {},
+            {
+                filename: 'emit-test.jpg'
+            },
+            options
+        );
     }
 
     apply(compiler) {
@@ -17,12 +21,11 @@ export default class EmitWepbackPlugin {
             const filePath = path.join(__dirname, filename);
 
             return nodeify(
-                pify(fs.readFile)(filePath)
-                    .then((data) => {
-                        compilation.assets[filename] = new RawSource(data);
+                pify(fs.readFile)(filePath).then(data => {
+                    compilation.assets[filename] = new RawSource(data);
 
-                        return data;
-                    }),
+                    return data;
+                }),
                 callback
             );
         });

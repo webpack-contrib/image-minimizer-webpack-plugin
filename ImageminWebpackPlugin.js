@@ -10,21 +10,26 @@ const interpolateName = require('./utils/interpolate-name');
 
 class ImageminWebpackPlugin {
     constructor(options = {}) {
-        this.options = Object.assign({}, {
-            bail: false,
-            excludeChunksAssets: true,
-            imageminOptions: {
-                plugins: []
+        this.options = Object.assign(
+            {},
+            {
+                bail: false,
+                excludeChunksAssets: true,
+                imageminOptions: {
+                    plugins: []
+                },
+                manifest: null,
+                maxConcurrency: os.cpus().length,
+                name: '[hash].[ext]',
+                test: /\.(jpe?g|png|gif|svg)$/i
             },
-            manifest: null,
-            maxConcurrency: os.cpus().length,
-            name: '[hash].[ext]',
-            test: /\.(jpe?g|png|gif|svg)$/i
-        }, options);
+            options
+        );
 
-        if (!this.options.imageminOptions
-            || !this.options.imageminOptions.plugins
-            || this.options.imageminOptions.plugins.length === 0
+        if (
+            !this.options.imageminOptions ||
+            !this.options.imageminOptions.plugins ||
+            this.options.imageminOptions.plugins.length === 0
         ) {
             throw new Error('No plugins found for imagemin');
         }
@@ -50,8 +55,9 @@ class ImageminWebpackPlugin {
                 : Buffer.from(assetSource, 'utf8');
 
             // Await for imagemin to do the compression
-            return imagemin.buffer(assetContents, imageminOptions)
-                .then((optimizedAssetContents) => {
+            return imagemin
+                .buffer(assetContents, imageminOptions)
+                .then(optimizedAssetContents => {
                     if (optimizedAssetContents.length < assetOrigSize) {
                         return new RawSource(optimizedAssetContents);
                     }
@@ -71,10 +77,13 @@ class ImageminWebpackPlugin {
         }
 
         if (this.options.excludeChunksAssets) {
-            compiler.plugin('compilation', (compilation) => {
-                compilation.plugin('after-optimize-assets', (assets) => {
-                    Object.keys(assets).forEach((name) => {
-                        if (this.testFile(name, this.testRegexes) && excludeChunksAssets.indexOf(name) === -1) {
+            compiler.plugin('compilation', compilation => {
+                compilation.plugin('after-optimize-assets', assets => {
+                    Object.keys(assets).forEach(name => {
+                        if (
+                            this.testFile(name, this.testRegexes) &&
+                            excludeChunksAssets.indexOf(name) === -1
+                        ) {
                             excludeChunksAssets.push(name);
                         }
                     });
@@ -88,8 +97,8 @@ class ImageminWebpackPlugin {
 
             return nodeify(
                 Promise.all(
-                    Object.keys(assets).map(
-                        (filename) => throttle(() => {
+                    Object.keys(assets).map(filename =>
+                        throttle(() => {
                             const asset = assets[filename];
 
                             if (excludeChunksAssets.indexOf(filename) !== -1) {
@@ -98,15 +107,18 @@ class ImageminWebpackPlugin {
 
                             // Skip the image if it's not a match for the regex
                             if (this.testFile(filename, this.testRegexes)) {
-                                return this.optimizeImage(asset, this.options.imageminOptions)
-                                    .catch((error) => {
+                                return this.optimizeImage(
+                                    asset,
+                                    this.options.imageminOptions
+                                )
+                                    .catch(error => {
                                         if (this.options.bail) {
                                             throw error;
                                         }
 
                                         return new RawSource('');
                                     })
-                                    .then((compressedAsset) => {
+                                    .then(compressedAsset => {
                                         const interpolatedName = interpolateName(
                                             filename,
                                             this.options.name,
@@ -115,14 +127,18 @@ class ImageminWebpackPlugin {
                                             }
                                         );
 
-                                        compilation.assets[interpolatedName] = compressedAsset;
+                                        compilation.assets[
+                                            interpolatedName
+                                        ] = compressedAsset;
 
                                         if (interpolatedName !== filename) {
                                             delete compilation.assets[filename];
                                         }
 
                                         if (this.options.manifest) {
-                                            this.options.manifest[filename] = interpolatedName;
+                                            this.options.manifest[
+                                                filename
+                                            ] = interpolatedName;
                                         }
 
                                         return Promise.resolve(compressedAsset);

@@ -1,7 +1,7 @@
 import interpolateName from '../../utils/interpolate-name';
 import test from 'ava';
 
-test('interpolateName', (t) => {
+test('interpolateName', t => {
     [
         [
             '/app/js/javascript.js',
@@ -35,7 +35,7 @@ test('interpolateName', (t) => {
         ],
         [
             '/vendor/test/images/loading.gif',
-            (path) => path.replace(/\/?vendor\/?/, ''),
+            path => path.replace(/\/?vendor\/?/, ''),
             'test content',
             'test/images/loading.gif'
         ],
@@ -63,7 +63,7 @@ test('interpolateName', (t) => {
             'test content',
             '.test.9473fdd0d880a43c21b7778d34872157.js'
         ]
-    ].forEach((testTemplate) => {
+    ].forEach(testTemplate => {
         const interpolatedName = interpolateName(
             testTemplate[0],
             testTemplate[1],
@@ -72,6 +72,9 @@ test('interpolateName', (t) => {
             }
         );
 
-        t.true(interpolatedName === testTemplate[3], `should interpolate ${testTemplate[0]} ${testTemplate[1]}`);
+        t.true(
+            interpolatedName === testTemplate[3],
+            `should interpolate ${testTemplate[0]} ${testTemplate[1]}`
+        );
     });
 });

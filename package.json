@@ -1,6 +1,6 @@
 {
     "name": "imagemin-webpack",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "Webpack loader and plugin to optimize images using imagemin",
     "repository": {
         "type": "git",
@@ -49,10 +49,12 @@
         "eslint": "^3.17.0",
         "eslint-plugin-ava": "^4.2.0",
         "eslint-plugin-import": "^2.2.0",
-        "eslint-plugin-itgalaxy": "^46.0.0",
+        "eslint-plugin-itgalaxy": "^47.0.0",
         "eslint-plugin-jsx-a11y": "^5.0.1",
+        "eslint-plugin-jest": "^20.0.3",
         "eslint-plugin-lodash": "^2.3.0",
-        "eslint-plugin-node": "^4.1.0",
+        "eslint-plugin-node": "^5.0.0",
+        "eslint-plugin-prettier": "^2.1.1",
         "eslint-plugin-promise": "^3.5.0",
         "eslint-plugin-react": "^7.0.0",
         "eslint-plugin-unicorn": "^2.0.0",
@@ -62,7 +64,9 @@
         "webpack": "^2.2.0",
         "package-schema": "^1.0.0",
         "npmpub": "^3.1.0",
+        "husky": "~0.13.0",
         "nyc": "^11.0.0",
+        "prettier": "^1.4.2",
         "pify": "^3.0.0",
         "tempy": "^0.1.0",
         "imagemin-gifsicle": "5.1.0",
@@ -70,16 +74,21 @@
         "imagemin-pngquant": "^5.0.0",
         "imagemin-svgo": "^5.2.0",
         "file-loader": "^0.11.1",
-        "lodash.defaultsdeep": "^4.6.0"
+        "lodash.defaultsdeep": "^4.6.0",
+        "lint-staged": "~3.6.0"
     },
     "peerDependencies": {
         "webpack": "^2.2.0"
     },
     "scripts": {
+        "precommit": "lint-staged",
+
         "lint:eslint": "eslint . --cache --ignore-path .gitignore",
-        "lint:package": "ajv -s ./node_modules/package-schema/schema.json -d package.json --errors=text",
         "lint:remark": "remark . -f -i .gitignore -q",
         "lint": "npm-run-all -l -p 'lint:**'",
+
+        "formatter:prettier": "eslint . --fix --ignore-path .gitignore",
+        "formatter": "npm-run-all -l -p formatter:**",
 
         "ava": "nyc ava --verbose",
         "pretest": "npm run lint",
@@ -102,10 +111,14 @@
         "parserOptions": {
             "sourceType": "script"
         },
+        "rules": {
+            "node/no-unsupported-features": "off"
+        },
         "extends": [
             "plugin:itgalaxy/ava",
+            "plugin:itgalaxy/node",
             "plugin:itgalaxy/esnext",
-            "plugin:itgalaxy/node"
+            "plugin:itgalaxy/prettier"
         ],
         "root": true
     },
