@@ -12,8 +12,6 @@ Do not worry about size of images, now they are always compressed.
 
 ## Why
 
--   Supported `webpack` `1` and `2` versions.
-
 -   No extra dependencies (`imagemin-gifsicle`, `imagemin-pngquant`) in `dependencies` section into `package.json`.
     You decide for yourself what plugins to use.
 
