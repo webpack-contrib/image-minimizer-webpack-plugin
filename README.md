@@ -19,6 +19,7 @@ Do not worry about size of images, now they are always compressed.
 
 -   This loader and plugin will optimize ANY images regardless of how they were added to webpack.
     `image-webpack-loader` don't optimize some images generating `favicons-webpack-plugin` or `copy-webpack-plugin`.
+    `ImageminWebpackPlugin` don't optimize inlined images with `url-loader`.
 
 -   Images optimized when inlined with `url-loader`. This can not be done with `imagemin-webpack-plugin`.
 
