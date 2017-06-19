@@ -78,7 +78,7 @@
         "lint-staged": "^4.0.0"
     },
     "peerDependencies": {
-        "webpack": "^2.2.0"
+        "webpack": "^3.0.0"
     },
     "scripts": {
         "precommit": "lint-staged",
