@@ -9,10 +9,6 @@ const nodeify = require('nodeify');
 //------------------------------------------------------------------------------
 
 module.exports = function(content) {
-    if (typeof this.cacheable === 'function') {
-        this.cacheable();
-    }
-
     const options = Object.assign(
         {},
         {
