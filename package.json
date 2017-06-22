@@ -59,7 +59,7 @@
         "eslint-plugin-react": "^7.1.0",
         "eslint-plugin-unicorn": "^2.1.2",
         "file-loader": "^0.11.1",
-        "husky": "^0.13.0",
+        "husky": "^0.14.0",
         "imagemin-gifsicle": "5.1.0",
         "imagemin-mozjpeg": "^6.0.0",
         "imagemin-pngquant": "^5.0.0",
