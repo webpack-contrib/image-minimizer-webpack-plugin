@@ -46,14 +46,14 @@
         "babel-preset-es2015": "^6.22.0",
         "babel-preset-stage-0": "^6.22.0",
         "babel-register": "^6.23.0",
-        "eslint": "^3.17.0",
+        "eslint": "^4.1.1",
         "eslint-plugin-ava": "^4.2.1",
-        "eslint-plugin-import": "^2.2.0",
-        "eslint-plugin-itgalaxy": "^47.0.0",
+        "eslint-plugin-import": "^2.6.0",
+        "eslint-plugin-itgalaxy": "^48.0.0",
         "eslint-plugin-jest": "^20.0.3",
-        "eslint-plugin-jsx-a11y": "^5.0.1",
+        "eslint-plugin-jsx-a11y": "^6.0.0",
         "eslint-plugin-lodash": "^2.4.3",
-        "eslint-plugin-node": "^5.0.0",
+        "eslint-plugin-node": "^5.1.0",
         "eslint-plugin-prettier": "^2.1.2",
         "eslint-plugin-promise": "^3.5.0",
         "eslint-plugin-react": "^7.1.0",
@@ -113,8 +113,7 @@
         "extends": [
             "plugin:itgalaxy/ava",
             "plugin:itgalaxy/node",
-            "plugin:itgalaxy/esnext",
-            "plugin:itgalaxy/prettier"
+            "plugin:itgalaxy/esnext"
         ],
         "root": true
     },

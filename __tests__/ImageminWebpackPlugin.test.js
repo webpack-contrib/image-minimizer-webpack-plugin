@@ -164,6 +164,7 @@ test('should execute successfully and optimize all images', t => {
                 typeof assets[testedImageName] === 'object',
                 'tested image exists in assets'
             );
+
             const pathToTestedImage = path.join(fixturesPath, testedImage);
 
             promises.push(
