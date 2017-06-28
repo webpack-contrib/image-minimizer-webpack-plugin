@@ -1,18 +1,18 @@
 export default {
     context: __dirname,
-    entry: './loader.js',
+    entry: "./loader.js",
     module: {
         rules: [
             {
-                loader: 'file-loader',
+                loader: "file-loader",
                 options: {
-                    name: '[path][name].[ext]'
+                    name: "[path][name].[ext]"
                 },
                 test: /\.txt$/i
             }
         ]
     },
     output: {
-        filename: 'bundle.js'
+        filename: "bundle.js"
     }
 };

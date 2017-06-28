@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
-const os = require('os');
-const RawSource = require('webpack-sources/lib/RawSource');
-const imagemin = require('imagemin');
-const createThrottle = require('async-throttle');
-const nodeify = require('nodeify');
-const compileTestOption = require('./utils/compile-test-option');
-const interpolateName = require('./utils/interpolate-name');
+const os = require("os");
+const RawSource = require("webpack-sources/lib/RawSource");
+const imagemin = require("imagemin");
+const createThrottle = require("async-throttle");
+const nodeify = require("nodeify");
+const compileTestOption = require("./utils/compile-test-option");
+const interpolateName = require("./utils/interpolate-name");
 
 class ImageminWebpackPlugin {
     constructor(options = {}) {
@@ -20,7 +20,7 @@ class ImageminWebpackPlugin {
                 },
                 manifest: null,
                 maxConcurrency: os.cpus().length,
-                name: '[hash].[ext]',
+                name: "[hash].[ext]",
                 test: /\.(jpe?g|png|gif|svg)$/i
             },
             options
@@ -31,7 +31,7 @@ class ImageminWebpackPlugin {
             !this.options.imageminOptions.plugins ||
             this.options.imageminOptions.plugins.length === 0
         ) {
-            throw new Error('No plugins found for imagemin');
+            throw new Error("No plugins found for imagemin");
         }
 
         this.testFile = (filename, regexes) => {
@@ -52,7 +52,7 @@ class ImageminWebpackPlugin {
             // Ensure that the contents i have are in the form of a buffer
             const assetContents = Buffer.isBuffer(assetSource)
                 ? assetSource
-                : Buffer.from(assetSource, 'utf8');
+                : Buffer.from(assetSource, "utf8");
 
             // Await for imagemin to do the compression
             return imagemin
@@ -77,8 +77,8 @@ class ImageminWebpackPlugin {
         }
 
         if (this.options.excludeChunksAssets) {
-            compiler.plugin('compilation', compilation => {
-                compilation.plugin('after-optimize-assets', assets => {
+            compiler.plugin("compilation", compilation => {
+                compilation.plugin("after-optimize-assets", assets => {
                     Object.keys(assets).forEach(name => {
                         if (
                             this.testFile(name, this.testRegexes) &&
@@ -91,7 +91,7 @@ class ImageminWebpackPlugin {
             });
         }
 
-        compiler.plugin('emit', (compilation, callback) => {
+        compiler.plugin("emit", (compilation, callback) => {
             const { assets } = compilation;
             const throttle = createThrottle(this.options.maxConcurrency);
 
@@ -116,7 +116,7 @@ class ImageminWebpackPlugin {
                                             throw error;
                                         }
 
-                                        return new RawSource('');
+                                        return new RawSource("");
                                     })
                                     .then(compressedAsset => {
                                         const interpolatedName = interpolateName(

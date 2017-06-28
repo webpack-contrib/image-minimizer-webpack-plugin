@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-const path = require('path');
-const loaderUtils = require('loader-utils');
+const path = require("path");
+const loaderUtils = require("loader-utils");
 
 module.exports = (name, template, options) => {
     let resourcePath = name;
@@ -10,7 +10,7 @@ module.exports = (name, template, options) => {
     const basename = path.basename(resourcePath);
     let dotRemoved = false;
 
-    if (basename[0] === '.') {
+    if (basename[0] === ".") {
         dotRemoved = true;
         resourcePath = path.join(path.dirname(resourcePath), basename.slice(1));
     }

@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-const ImageminWebpackPlugin = require('./ImageminWebpackPlugin');
+const ImageminWebpackPlugin = require("./ImageminWebpackPlugin");
 
 module.exports = {
-    imageminLoader: require.resolve('./imagemin-loader'),
+    imageminLoader: require.resolve("./imagemin-loader"),
     ImageminWebpackPlugin
 };

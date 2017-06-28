@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-const loaderUtils = require('loader-utils');
-const imagemin = require('imagemin');
-const nodeify = require('nodeify');
+const loaderUtils = require("loader-utils");
+const imagemin = require("imagemin");
+const nodeify = require("nodeify");
 
 //------------------------------------------------------------------------------
 // Public API
@@ -17,7 +17,7 @@ module.exports = function(content) {
                 (this._compiler &&
                     this._compiler.options &&
                     this._compiler.options.bail) ||
-                    false,
+                false,
             /* eslint-enable no-underscore-dangle */
             plugins: []
         },
@@ -25,7 +25,7 @@ module.exports = function(content) {
     );
 
     if (options.plugins.length === 0) {
-        throw new Error('No plugins found for imagemin');
+        throw new Error("No plugins found for imagemin");
     }
 
     const callback = this.async();
