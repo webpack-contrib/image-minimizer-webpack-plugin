@@ -72,7 +72,7 @@
         "pify": "^3.0.0",
         "prettier": "^1.5.2",
         "remark-cli": "^4.0.0",
-        "remark-preset-lint-itgalaxy": "^7.0.1",
+        "remark-preset-lint-itgalaxy": "^8.0.0",
         "tempy": "^0.1.0",
         "webpack": "^3.0.0"
     },
