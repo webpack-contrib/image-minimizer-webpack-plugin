@@ -44,7 +44,7 @@ If you want to use `loader` or `plugin` standalone see sections below, but this 
 **Make sure that plugin place after any plugins that add images or other assets which you want to optimized.**
 
 ```js
-import { imageminloader, ImageminWebpackPlugin } from 'imagemin-webpack';
+import { imageminLoader, ImageminWebpackPlugin } from 'imagemin-webpack';
 // Before importing imagemin plugin make sure you add it in `package.json` (`dependencies`) and install.
 import imageminGifsicle from 'imagemin-gifsicle';
 
@@ -62,7 +62,7 @@ export default {
                         loader: 'file-loader' // Or `url-loader`.
                     },
                     {
-                        loader: imageminloader,
+                        loader: imageminLoader,
                         options: {
                             plugins
                         }
@@ -91,7 +91,7 @@ chained with the [file-loader](https://github.com/webpack/file-loader)
 or [url-loader](https://github.com/webpack-contrib/url-loader):
 
 ```js
-import { imageminloader } from 'imagemin-webpack';
+import { imageminLoader } from 'imagemin-webpack';
 // Before importing imagemin plugin make sure you add it in `package.json` (`dependencies`) and install.
 import imageminGifsicle from 'imagemin-gifsicle';
 
@@ -105,7 +105,7 @@ export default {
                         loader: 'file-loader' // Or `url-loader`.
                     },
                     {
-                        loader: imageminloader,
+                        loader: imageminLoader,
                         options: {
                             bail: false, // Ignore errors on corrupted images.
                             plugins: [
