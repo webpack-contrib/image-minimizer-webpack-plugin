@@ -74,7 +74,7 @@
         "remark-cli": "^4.0.0",
         "remark-preset-lint-itgalaxy": "^7.0.1",
         "tempy": "^0.2.0",
-        "webpack": "^3.0.0"
+        "webpack": "^4.0.0"
     },
     "peerDependencies": {
         "webpack": "^2.0.0 || ^3.0.0"
