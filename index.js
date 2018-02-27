@@ -3,6 +3,6 @@
 const ImageminWebpackPlugin = require("./ImageminWebpackPlugin");
 
 module.exports = {
-    imageminLoader: require.resolve("./imagemin-loader"),
-    ImageminWebpackPlugin
+  ImageminWebpackPlugin,
+  imageminLoader: require.resolve("./imagemin-loader")
 };
