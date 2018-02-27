@@ -16,7 +16,9 @@ export default class EmitWepbackPlugin {
   }
 
   apply(compiler) {
-    compiler.plugin("emit", (compilation, callback) => {
+    const plugin = { name: "EmitPlugin" };
+
+    const emitFn = (compilation, callback) => {
       const { filename } = this.options;
       const filePath = path.join(__dirname, filename);
 
@@ -28,6 +30,12 @@ export default class EmitWepbackPlugin {
         }),
         callback
       );
-    });
+    };
+
+    if (compiler.hooks) {
+      compiler.hooks.emit.tapAsync(plugin, emitFn);
+    } else {
+      compiler.plugin("emit", emitFn);
+    }
   }
 }

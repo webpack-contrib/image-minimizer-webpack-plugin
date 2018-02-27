@@ -9,33 +9,25 @@ const nodeify = require("nodeify");
 //------------------------------------------------------------------------------
 
 module.exports = function(content) {
-  const options = Object.assign(
-    {},
-    {
-      /* eslint-disable no-underscore-dangle */
-      bail:
-        (this._compiler &&
-          this._compiler.options &&
-          this._compiler.options.bail) ||
-        false,
-      /* eslint-enable no-underscore-dangle */
-      plugins: []
-    },
-    loaderUtils.getOptions(this) || {}
-  );
-
-  if (options.plugins.length === 0) {
-    throw new Error("No plugins found for imagemin");
-  }
-
+  const options = loaderUtils.getOptions(this) || {};
+  const bail =
+    options.bail ||
+    /* eslint-disable-next-line no-underscore-dangle */
+    (this._compiler && this._compiler.options && this._compiler.options.bail) ||
+    false;
+  const plugins = options.plugins || [];
   const callback = this.async();
 
+  if (plugins.length === 0) {
+    return callback(new Error("No plugins found for `imagemin-loader`"));
+  }
+
   return nodeify(
-    imagemin.buffer(content, options),
+    imagemin.buffer(content, { plugins }),
     (error, optimizedContent) => {
       const handledContent = error ? content : optimizedContent;
 
-      return callback(options.bail ? error : null, handledContent);
+      return callback(bail ? error : null, handledContent);
     }
   );
 };

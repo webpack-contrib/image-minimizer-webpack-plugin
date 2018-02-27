@@ -56,6 +56,7 @@ test("should execute successfully", t => {
   return pify(webpack)(webpackConfig).then(stats => {
     const promises = [];
 
+    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
     t.true(stats.compilation.errors.length === 0, "no compilation error");
 
     const { assets } = stats.compilation;
@@ -106,12 +107,13 @@ test("should throw the error if imagemin plugins don't setup", t => {
   webpackConfig.module.rules = webpackConfig.module.rules.concat(imageminRule);
 
   return pify(webpack)(webpackConfig).then(stats => {
+    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
     t.true(stats.compilation.errors.length === 4, "4 compilation error");
 
     stats.compilation.errors.forEach(error => {
       t.regex(
         error.message,
-        /No\splugins\sfound\sfor\simagemin/,
+        /No\splugins\sfound\sfor\s`imagemin-loader`/,
         "message error"
       );
     });
@@ -141,6 +143,7 @@ test("should throw the error on corrupted images using `loader.bail` option", t 
   webpackConfig.module.rules[1].use[1].options.bail = true;
 
   return pify(webpack)(webpackConfig).then(stats => {
+    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
     t.true(stats.compilation.errors.length === 1, "no compilation error");
     t.regex(stats.compilation.errors[0].message, /Corrupt\sJPEG\sdata/);
 
@@ -169,6 +172,7 @@ test("should throw the error on corrupted images using `webpack.bail` option", t
   ]);
 
   return pify(webpack)(webpackConfig).then(stats => {
+    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
     t.true(stats.compilation.errors.length === 1, "no compilation error");
     t.regex(stats.compilation.errors[0].message, /Corrupt\sJPEG\sdata/);
 
@@ -197,6 +201,7 @@ test("should execute successfully and ignore corrupted images using `loader.bail
   webpackConfig.module.rules[1].use[1].options.bail = false;
 
   return pify(webpack)(webpackConfig).then(stats => {
+    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
     t.true(stats.compilation.errors.length === 0, "no compilation error");
 
     return stats;
@@ -224,6 +229,7 @@ test("should execute successfully and ignore corrupted images using `webpack.bai
   ]);
 
   return pify(webpack)(webpackConfig).then(stats => {
+    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
     t.true(stats.compilation.errors.length === 0, "no compilation error");
 
     return stats;

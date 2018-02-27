@@ -5,146 +5,169 @@ const RawSource = require("webpack-sources/lib/RawSource");
 const imagemin = require("imagemin");
 const createThrottle = require("async-throttle");
 const nodeify = require("nodeify");
-const compileTestOption = require("./utils/compile-test-option");
 const interpolateName = require("./utils/interpolate-name");
+const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
 
 class ImageminWebpackPlugin {
   constructor(options = {}) {
-    this.options = Object.assign(
-      {},
-      {
-        bail: false,
-        excludeChunksAssets: true,
-        imageminOptions: {
-          plugins: []
-        },
-        manifest: null,
-        maxConcurrency: os.cpus().length,
-        name: "[hash].[ext]",
-        test: /\.(jpe?g|png|gif|svg)$/i
+    const {
+      test = /\.(jpe?g|png|gif|svg)$/i,
+      include,
+      exclude,
+      bail = null,
+      excludeChunksAssets = true,
+      imageminOptions = {
+        plugins: []
       },
-      options
-    );
+      manifest = null,
+      maxConcurrency = os.cpus().length,
+      name = "[hash].[ext]"
+    } = options;
+
+    this.options = {
+      bail,
+      exclude,
+      excludeChunksAssets,
+      imageminOptions,
+      include,
+      manifest,
+      maxConcurrency,
+      name,
+      test
+    };
 
     if (
-      !this.options.imageminOptions ||
-      !this.options.imageminOptions.plugins ||
-      this.options.imageminOptions.plugins.length === 0
+      !imageminOptions ||
+      !imageminOptions.plugins ||
+      imageminOptions.plugins.length === 0
     ) {
       throw new Error("No plugins found for imagemin");
     }
+  }
 
-    this.testFile = (filename, regexes) => {
-      for (const regex of regexes) {
-        if (regex.test(filename)) {
-          return true;
-        }
+  apply(compiler) {
+    const excludeChunksAssets = [];
+    const plugin = { name: "ImageminPlugin" };
+
+    if (typeof this.options.bail !== "boolean" && compiler.options.bail) {
+      this.options.bail = compiler.options.bail;
+    }
+
+    if (this.options.excludeChunksAssets) {
+      const afterOptimizeAssetsFn = assets => {
+        Object.keys(assets).forEach(file => {
+          if (
+            ModuleFilenameHelpers.matchObject(this.options, file) &&
+            excludeChunksAssets.indexOf(file) === -1
+          ) {
+            excludeChunksAssets.push(file);
+          }
+        });
+      };
+
+      if (compiler.hooks) {
+        compiler.hooks.compilation.tap(plugin, compilation => {
+          compilation.hooks.afterOptimizeAssets.tap(
+            plugin,
+            afterOptimizeAssetsFn
+          );
+        });
+      } else {
+        compiler.plugin("compilation", compilation => {
+          compilation.plugin("after-optimize-assets", afterOptimizeAssetsFn);
+        });
       }
+    }
 
-      return false;
+    const emitFn = (compilation, callback) => {
+      const { assets } = compilation;
+      const {
+        maxConcurrency,
+        imageminOptions,
+        bail,
+        name,
+        manifest
+      } = this.options;
+      const throttle = createThrottle(maxConcurrency);
+
+      return nodeify(
+        Promise.all(
+          Object.keys(assets).map(file =>
+            throttle(() => {
+              const asset = assets[file];
+
+              if (excludeChunksAssets.indexOf(file) !== -1) {
+                return Promise.resolve(asset);
+              }
+
+              if (!ModuleFilenameHelpers.matchObject(this.options, file)) {
+                return Promise.resolve(asset);
+              }
+
+              return Promise.resolve().then(() =>
+                this.optimizeImage(asset, imageminOptions)
+                  .catch(error => {
+                    if (bail) {
+                      throw error;
+                    }
+
+                    return Promise.resolve(asset);
+                  })
+                  .then(compressedAsset => {
+                    const interpolatedName = interpolateName(file, name, {
+                      content: compressedAsset.source()
+                    });
+
+                    compilation.assets[interpolatedName] = compressedAsset;
+
+                    if (interpolatedName !== file) {
+                      delete compilation.assets[file];
+                    }
+
+                    if (manifest) {
+                      manifest[file] = interpolatedName;
+                    }
+
+                    return Promise.resolve(compressedAsset);
+                  })
+              );
+            })
+          )
+        ),
+        callback
+      );
     };
 
-    this.optimizeImage = (asset, imageminOptions) => {
-      // Grab the orig source and size
-      const assetSource = asset.source();
-      const assetOrigSize = asset.size();
+    if (compiler.hooks) {
+      compiler.hooks.emit.tapAsync(plugin, emitFn);
+    } else {
+      compiler.plugin("emit", emitFn);
+    }
+  }
 
-      // Ensure that the contents i have are in the form of a buffer
-      const assetContents = Buffer.isBuffer(assetSource)
-        ? assetSource
-        : Buffer.from(assetSource, "utf8");
+  optimizeImage(input) {
+    const { imageminOptions } = this.options;
+    // Grab the orig source and size
+    const assetSource = input.source();
+    const assetOrigSize = input.size();
 
-      // Await for imagemin to do the compression
-      return imagemin
+    // Ensure that the contents i have are in the form of a buffer
+    const assetContents = Buffer.isBuffer(assetSource)
+      ? assetSource
+      : Buffer.from(assetSource);
+
+    // Await for imagemin to do the compression
+    return Promise.resolve().then(() =>
+      imagemin
         .buffer(assetContents, imageminOptions)
         .then(optimizedAssetContents => {
           if (optimizedAssetContents.length < assetOrigSize) {
             return new RawSource(optimizedAssetContents);
           }
 
-          return asset;
-        });
-    };
-
-    this.testRegexes = compileTestOption(this.options.test);
-  }
-
-  apply(compiler) {
-    const excludeChunksAssets = [];
-
-    if (compiler.options.bail) {
-      this.options.bail = compiler.options.bail;
-    }
-
-    if (this.options.excludeChunksAssets) {
-      compiler.plugin("compilation", compilation => {
-        compilation.plugin("after-optimize-assets", assets => {
-          Object.keys(assets).forEach(name => {
-            if (
-              this.testFile(name, this.testRegexes) &&
-              excludeChunksAssets.indexOf(name) === -1
-            ) {
-              excludeChunksAssets.push(name);
-            }
-          });
-        });
-      });
-    }
-
-    compiler.plugin("emit", (compilation, callback) => {
-      const { assets } = compilation;
-      const throttle = createThrottle(this.options.maxConcurrency);
-
-      return nodeify(
-        Promise.all(
-          Object.keys(assets).map(filename =>
-            throttle(() => {
-              const asset = assets[filename];
-
-              if (excludeChunksAssets.indexOf(filename) !== -1) {
-                return Promise.resolve(asset);
-              }
-
-              // Skip the image if it's not a match for the regex
-              if (this.testFile(filename, this.testRegexes)) {
-                return this.optimizeImage(asset, this.options.imageminOptions)
-                  .catch(error => {
-                    if (this.options.bail) {
-                      throw error;
-                    }
-
-                    return new RawSource("");
-                  })
-                  .then(compressedAsset => {
-                    const interpolatedName = interpolateName(
-                      filename,
-                      this.options.name,
-                      {
-                        content: compressedAsset.source()
-                      }
-                    );
-
-                    compilation.assets[interpolatedName] = compressedAsset;
-
-                    if (interpolatedName !== filename) {
-                      delete compilation.assets[filename];
-                    }
-
-                    if (this.options.manifest) {
-                      this.options.manifest[filename] = interpolatedName;
-                    }
-
-                    return Promise.resolve(compressedAsset);
-                  });
-              }
-
-              return Promise.resolve(asset);
-            })
-          )
-        ),
-        callback
-      );
-    });
+          return input;
+        })
+    );
   }
 }
 

@@ -152,7 +152,9 @@ export default {
       manifest: imageminManifest, // This object will contain source and interpolated filenames.
       maxConcurrency: os.cpus().length,
       name: "[hash].[ext]",
-      test: /\.(jpe?g|png|gif|svg)$/i
+      test: /\.(jpe?g|png|gif|svg)$/i,
+      include: undefined,
+      exclude: undefined
     })
   ]
 };

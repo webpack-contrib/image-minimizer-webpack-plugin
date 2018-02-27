@@ -1,146 +1,146 @@
 {
-    "name": "imagemin-webpack",
-    "version": "1.1.2",
-    "description": "Webpack loader and plugin to optimize (compress) images using imagemin",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/itgalaxy/imagemin-webpack.git"
+  "name": "imagemin-webpack",
+  "version": "2.0.0",
+  "description": "Webpack loader and plugin to optimize (compress) images using imagemin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/itgalaxy/imagemin-webpack.git"
+  },
+  "homepage": "https://github.com/itgalaxy/imagemin-webpack",
+  "keywords": [
+    "webpack",
+    "loader",
+    "plugin",
+    "imagemin",
+    "images",
+    "minify",
+    "compress",
+    "optimize"
+  ],
+  "author": "Itgalaxy <development@itgalaxy.company>",
+  "bugs": {
+    "url": "https://github.com/itgalaxy/imagemin-webpack/issues"
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "files": [
+    "utils",
+    "imagemin-loader.js",
+    "ImageminWebpackPlugin.js",
+    "index.js"
+  ],
+  "engines": {
+    "node": ">= 6.9.0 || >= 8.9.0"
+  },
+  "dependencies": {
+    "async-throttle": "^1.1.0",
+    "loader-utils": "^1.0.0",
+    "imagemin": "^5.3.1",
+    "nodeify": "^1.0.0",
+    "minimatch": "^3.0.3",
+    "webpack-sources": "^1.0.0"
+  },
+  "devDependencies": {
+    "ava": "^0.25.0",
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-register": "^6.9.0",
+    "eslint": "^4.1.1",
+    "eslint-plugin-ava": "^4.2.1",
+    "eslint-plugin-import": "^2.6.0",
+    "eslint-plugin-itgalaxy": "^65.0.0",
+    "eslint-plugin-jest": "^21.12.2",
+    "eslint-plugin-jsx-a11y": "^6.0.0",
+    "eslint-plugin-lodash": "^2.4.3",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-prettier": "^2.1.2",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-react": "^7.1.0",
+    "eslint-plugin-unicorn": "^4.0.2",
+    "file-loader": "^1.1.10",
+    "husky": "^0.14.0",
+    "imagemin-gifsicle": "5.2.0",
+    "imagemin-mozjpeg": "^7.0.0",
+    "imagemin-pngquant": "^5.0.0",
+    "imagemin-svgo": "^6.0.0",
+    "lint-staged": "^7.0.0",
+    "lodash.defaultsdeep": "^4.6.0",
+    "npm-run-all": "^4.0.0",
+    "npmpub": "^3.1.0",
+    "nyc": "^11.0.0",
+    "pify": "^3.0.0",
+    "prettier": "^1.5.2",
+    "remark-cli": "^5.0.0",
+    "remark-preset-lint-itgalaxy": "^12.0.0",
+    "tempy": "^0.2.0",
+    "webpack": "^4.0.1"
+  },
+  "peerDependencies": {
+    "webpack": "^2.0.0 || ^3.0.0 || ^4.0.0"
+  },
+  "scripts": {
+    "precommit": "lint-staged",
+    "lint:prettify": "prettier --list-different '{**/*,*}.{js,mjs,jsx,json,md}' '!{package,composer}*.json' --ignore-path .gitignore",
+    "lint:markdown": "remark . LICENSE -f -q -i .gitignore",
+    "lint:script": "eslint . '.*.{js,mjs}' --cache --cache-location 'node_modules/.cache/eslint/.eslintcache' --report-unused-disable-directives --ignore-path .gitignore --ext '.js,.mjs,.jsx'",
+    "lint": "npm-run-all -l -p 'lint:**'",
+    "prettify": "npm run lint:prettify -- --write",
+    "fix:script": "npm run lint:script -- --fix",
+    "fix": "npm-run-all -l prettify -p 'fix:**'",
+    "pretest": "npm run lint",
+    "test-only": "nyc ava --verbose '**/__tests__/*.js'",
+    "test": "npm run test-only",
+    "release": "npmpub"
+  },
+  "ava": {
+    "require": "babel-register",
+    "concurrency": 5,
+    "babel": "inherit"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": "6.9"
+          }
+        }
+      ]
+    ]
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "sourceType": "script"
     },
-    "homepage": "https://github.com/itgalaxy/imagemin-webpack",
-    "keywords": [
-        "webpack",
-        "loader",
-        "plugin",
-        "imagemin",
-        "images",
-        "minify",
-        "compress",
-        "optimize"
+    "rules": {
+      "node/no-unsupported-features": "off"
+    },
+    "extends": [
+      "plugin:itgalaxy/ava",
+      "plugin:itgalaxy/esnext",
+      "plugin:itgalaxy/node"
     ],
-    "author": "Itgalaxy <development@itgalaxy.company>",
-    "bugs": {
-        "url": "https://github.com/itgalaxy/imagemin-webpack/issues"
-    },
-    "license": "MIT",
-    "main": "index.js",
-    "files": [
-        "utils",
-        "imagemin-loader.js",
-        "ImageminWebpackPlugin.js",
-        "index.js"
-    ],
-    "engines": {
-        "node": ">= 4.3 < 5.0.0 || >= 5.10"
-    },
-    "dependencies": {
-        "async-throttle": "^1.1.0",
-        "loader-utils": "^1.0.0",
-        "imagemin": "^5.3.1",
-        "nodeify": "^1.0.0",
-        "minimatch": "^3.0.3",
-        "webpack-sources": "^1.0.0"
-    },
-    "devDependencies": {
-        "ava": "^0.25.0",
-        "babel-cli": "^6.26.0",
-        "babel-eslint": "^8.2.2",
-        "babel-preset-env": "^1.6.0",
-        "babel-register": "^6.9.0",
-        "eslint": "^4.1.1",
-        "eslint-plugin-ava": "^4.2.1",
-        "eslint-plugin-import": "^2.6.0",
-        "eslint-plugin-itgalaxy": "^65.0.0",
-        "eslint-plugin-jest": "^21.12.2",
-        "eslint-plugin-jsx-a11y": "^6.0.0",
-        "eslint-plugin-lodash": "^2.4.3",
-        "eslint-plugin-node": "^6.0.1",
-        "eslint-plugin-prettier": "^2.1.2",
-        "eslint-plugin-promise": "^3.5.0",
-        "eslint-plugin-react": "^7.1.0",
-        "eslint-plugin-unicorn": "^4.0.2",
-        "file-loader": "^1.1.10",
-        "husky": "^0.14.0",
-        "imagemin-gifsicle": "5.2.0",
-        "imagemin-mozjpeg": "^7.0.0",
-        "imagemin-pngquant": "^5.0.0",
-        "imagemin-svgo": "^6.0.0",
-        "lint-staged": "^7.0.0",
-        "lodash.defaultsdeep": "^4.6.0",
-        "npm-run-all": "^4.0.0",
-        "npmpub": "^3.1.0",
-        "nyc": "^11.0.0",
-        "pify": "^3.0.0",
-        "prettier": "^1.5.2",
-        "remark-cli": "^5.0.0",
-        "remark-preset-lint-itgalaxy": "^12.0.0",
-        "tempy": "^0.2.0",
-        "webpack": "^3.0.0"
-    },
-    "peerDependencies": {
-        "webpack": "^2.0.0 || ^3.0.0 || ^4.0.0"
-    },
-    "scripts": {
-        "precommit": "lint-staged",
-        "lint:prettify": "prettier --list-different '{**/*,*}.{js,mjs,jsx,json,md}' '!{package,composer}*.json' --ignore-path .gitignore",
-        "lint:markdown": "remark . LICENSE -f -q -i .gitignore",
-        "lint:script": "eslint . '.*.{js,mjs}' --cache --cache-location 'node_modules/.cache/eslint/.eslintcache' --report-unused-disable-directives --ignore-path .gitignore --ext '.js,.mjs,.jsx'",
-        "lint": "npm-run-all -l -p 'lint:**'",
-        "prettify": "npm run lint:prettify -- --write",
-        "fix:script": "npm run lint:script -- --fix",
-        "fix": "npm-run-all -l prettify -p 'fix:**'",
-        "pretest": "npm run lint",
-        "test-only": "nyc ava --verbose '**/__tests__/*.js'",
-        "test": "npm run test-only",
-        "release": "npmpub"
-    },
-    "ava": {
-        "require": "babel-register",
-        "concurrency": 5,
-        "babel": "inherit"
-    },
-    "babel": {
-        "presets": [
-            [
-                "env",
-                {
-                    "targets": {
-                        "node": "4.3"
-                    }
-                }
-            ]
-        ]
-    },
-    "eslintConfig": {
+    "overrides": [
+      {
+        "files": [
+          "**/__tests__/**/*.js",
+          "src/**/*.js"
+        ],
         "parserOptions": {
-            "sourceType": "script"
+          "sourceType": "module"
         },
         "rules": {
-            "node/no-unsupported-features": "off"
-        },
-        "extends": [
-            "plugin:itgalaxy/ava",
-            "plugin:itgalaxy/esnext",
-            "plugin:itgalaxy/node"
-        ],
-        "overrides": [
-            {
-                "files": [
-                    "**/__tests__/**/*.js",
-                    "src/**/*.js"
-                ],
-                "parserOptions": {
-                    "sourceType": "module"
-                },
-                "rules": {
-                    "node/no-unsupported-features": "off"
-                }
-            }
-        ],
-        "root": true
-    },
-    "remarkConfig": {
-        "plugins": [
-            "remark-preset-lint-itgalaxy"
-        ]
-    }
+          "node/no-unsupported-features": "off"
+        }
+      }
+    ],
+    "root": true
+  },
+  "remarkConfig": {
+    "plugins": [
+      "remark-preset-lint-itgalaxy"
+    ]
+  }
 }

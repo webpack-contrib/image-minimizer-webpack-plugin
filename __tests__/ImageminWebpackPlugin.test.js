@@ -54,10 +54,10 @@ test("should execute successfully and optimize only emitted", t => {
 
   return pify(webpack)(webpackConfig).then(stats => {
     const promises = [];
+    const { warnings, errors, assets } = stats.compilation;
 
-    t.true(stats.compilation.errors.length === 0, "no compilation error");
-
-    const { assets } = stats.compilation;
+    t.true(warnings.length === 0, "no compilation warnings");
+    t.true(errors.length === 0, "no compilation error");
 
     const testedNotOptimizedImages = [
       "test.gif",
@@ -138,10 +138,11 @@ test("should execute successfully and optimize all images", t => {
 
   return pify(webpack)(webpackConfig).then(stats => {
     const promises = [];
+    const { warnings, errors, assets } = stats.compilation;
 
-    t.true(stats.compilation.errors.length === 0, "no compilation error");
+    t.true(warnings.length === 0, "no compilation warnings");
+    t.true(errors.length === 0, "no compilation error");
 
-    const { assets } = stats.compilation;
     const testedImages = [
       "test.gif",
       "test.jpg",
@@ -271,7 +272,10 @@ test("should execute successfully and ignore corrupted images using `plugin.bail
   ];
 
   return pify(webpack)(webpackConfig).then(stats => {
-    t.true(stats.compilation.errors.length === 0, "no compilation error");
+    const { warnings, errors } = stats.compilation;
+
+    t.true(warnings.length === 0, "no compilation warnings");
+    t.true(errors.length === 0, "no compilation error");
 
     return stats;
   });
@@ -302,6 +306,7 @@ test("should execute successfully and ignore corrupted images using `webpack.bai
   ];
 
   return pify(webpack)(webpackConfig).then(stats => {
+    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
     t.true(stats.compilation.errors.length === 0, "no compilation error");
 
     return stats;

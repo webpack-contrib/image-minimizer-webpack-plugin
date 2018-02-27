@@ -1,6 +1,7 @@
 export default {
   context: __dirname,
   entry: "./loader.js",
+  mode: "development",
   module: {
     rules: [
       {
