@@ -2,11 +2,11 @@
 
 const os = require("os");
 const RawSource = require("webpack-sources/lib/RawSource");
-const imagemin = require("imagemin");
 const createThrottle = require("async-throttle");
 const nodeify = require("nodeify");
-const interpolateName = require("./utils/interpolate-name");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
+const minify = require("./minify/minify");
+const interpolateName = require("./utils/interpolate-name");
 
 class ImageminWebpackPlugin {
   constructor(options = {}) {
@@ -35,14 +35,6 @@ class ImageminWebpackPlugin {
       name,
       test
     };
-
-    if (
-      !imageminOptions ||
-      !imageminOptions.plugins ||
-      imageminOptions.plugins.length === 0
-    ) {
-      throw new Error("No plugins found for imagemin");
-    }
   }
 
   apply(compiler) {
@@ -81,13 +73,7 @@ class ImageminWebpackPlugin {
 
     const emitFn = (compilation, callback) => {
       const { assets } = compilation;
-      const {
-        maxConcurrency,
-        imageminOptions,
-        bail,
-        name,
-        manifest
-      } = this.options;
+      const { maxConcurrency, name, manifest } = this.options;
       const throttle = createThrottle(maxConcurrency);
 
       return nodeify(
@@ -104,32 +90,26 @@ class ImageminWebpackPlugin {
                 return Promise.resolve(asset);
               }
 
-              return Promise.resolve().then(() =>
-                this.optimizeImage(asset, imageminOptions)
-                  .catch(error => {
-                    if (bail) {
-                      throw error;
-                    }
+              return minify(asset.source(), this.options).then(
+                optimizedSource => {
+                  const source = new RawSource(optimizedSource);
 
-                    return Promise.resolve(asset);
-                  })
-                  .then(compressedAsset => {
-                    const interpolatedName = interpolateName(file, name, {
-                      content: compressedAsset.source()
-                    });
+                  const interpolatedName = interpolateName(file, name, {
+                    content: source.source()
+                  });
 
-                    compilation.assets[interpolatedName] = compressedAsset;
+                  compilation.assets[interpolatedName] = source;
 
-                    if (interpolatedName !== file) {
-                      delete compilation.assets[file];
-                    }
+                  if (interpolatedName !== file) {
+                    delete compilation.assets[file];
+                  }
 
-                    if (manifest) {
-                      manifest[file] = interpolatedName;
-                    }
+                  if (manifest) {
+                    manifest[file] = interpolatedName;
+                  }
 
-                    return Promise.resolve(compressedAsset);
-                  })
+                  return Promise.resolve(source);
+                }
               );
             })
           )
@@ -143,31 +123,6 @@ class ImageminWebpackPlugin {
     } else {
       compiler.plugin("emit", emitFn);
     }
-  }
-
-  optimizeImage(input) {
-    const { imageminOptions } = this.options;
-    // Grab the orig source and size
-    const assetSource = input.source();
-    const assetOrigSize = input.size();
-
-    // Ensure that the contents i have are in the form of a buffer
-    const assetContents = Buffer.isBuffer(assetSource)
-      ? assetSource
-      : Buffer.from(assetSource);
-
-    // Await for imagemin to do the compression
-    return Promise.resolve().then(() =>
-      imagemin
-        .buffer(assetContents, imageminOptions)
-        .then(optimizedAssetContents => {
-          if (optimizedAssetContents.length < assetOrigSize) {
-            return new RawSource(optimizedAssetContents);
-          }
-
-          return input;
-        })
-    );
   }
 }
 

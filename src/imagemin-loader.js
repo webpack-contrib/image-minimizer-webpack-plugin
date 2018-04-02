@@ -1,12 +1,8 @@
 "use strict";
 
 const loaderUtils = require("loader-utils");
-const imagemin = require("imagemin");
 const nodeify = require("nodeify");
-
-//------------------------------------------------------------------------------
-// Public API
-//------------------------------------------------------------------------------
+const minify = require("./minify/minify");
 
 module.exports = function(content) {
   const options = loaderUtils.getOptions(this) || {};
@@ -18,17 +14,9 @@ module.exports = function(content) {
   const plugins = options.plugins || [];
   const callback = this.async();
 
-  if (plugins.length === 0) {
-    return callback(new Error("No plugins found for `imagemin-loader`"));
-  }
-
   return nodeify(
-    imagemin.buffer(content, { plugins }),
-    (error, optimizedContent) => {
-      const handledContent = error ? content : optimizedContent;
-
-      return callback(bail ? error : null, handledContent);
-    }
+    minify(content, { bail, imageminOptions: { plugins } }),
+    callback
   );
 };
 

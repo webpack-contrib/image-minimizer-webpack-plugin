@@ -113,7 +113,7 @@ test("should throw the error if imagemin plugins don't setup", t => {
     stats.compilation.errors.forEach(error => {
       t.regex(
         error.message,
-        /No\splugins\sfound\sfor\s`imagemin-loader`/,
+        /No\splugins\sfound\sfor\s`imagemin`/,
         "message error"
       );
     });

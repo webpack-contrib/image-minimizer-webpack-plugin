@@ -186,11 +186,35 @@ test("should execute successfully and optimize all images", t => {
   });
 });
 
-test("should throw the error if imagemin plugins don't setup", t =>
-  t.throws(
-    () => new ImageminWebpackPlugin(),
-    /No\splugins\sfound\sfor\simagemin/
-  ));
+test("should throw the error if imagemin plugins don't setup", t => {
+  const tmpDirectory = tempy.directory();
+  const webpackConfig = defaultsDeep(
+    {
+      output: {
+        path: tmpDirectory
+      }
+    },
+    basicWebpackConfig
+  );
+
+  webpackConfig.entry = "./empty-entry.js";
+  webpackConfig.plugins = [
+    new EmitPlugin({
+      filename: "test-corrupted.jpg"
+    }),
+    new ImageminWebpackPlugin({
+      bail: true,
+      imageminOptions: {
+        plugins: []
+      }
+    })
+  ];
+
+  return t.throws(
+    pify(webpack)(webpackConfig),
+    /No\splugins\sfound\sfor\s`imagemin`/
+  );
+});
 
 test("should throw error on corrupted images using `plugin.bail` option", t => {
   const tmpDirectory = tempy.directory();

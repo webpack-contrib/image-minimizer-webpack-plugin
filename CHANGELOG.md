@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org).
 
+## HEAD
+
+* Chore: refactor all plugin (all source code now in `src` directory).
+
 ## 2.0.0 - 2018-02-28
 
 * Changed: use `ModuleFilenameHelpers.matchObject` for `test` option (only `regex` now allowed).
