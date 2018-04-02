@@ -10,6 +10,8 @@ const interpolateName = require("./utils/interpolate-name");
 
 class ImageminWebpackPlugin {
   constructor(options = {}) {
+    // Strange in test with value `1`
+    const cpusLength = os.cpus().length;
     const {
       test = /\.(jpe?g|png|gif|svg)$/i,
       include,
@@ -20,7 +22,7 @@ class ImageminWebpackPlugin {
         plugins: []
       },
       manifest = null,
-      maxConcurrency = os.cpus().length,
+      maxConcurrency = cpusLength > 1 ? cpusLength - 1 : cpusLength,
       name = "[hash].[ext]"
     } = options;
 
