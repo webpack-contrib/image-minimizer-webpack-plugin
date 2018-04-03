@@ -77,20 +77,29 @@ class ImageminWebpackPlugin {
       const { assets } = compilation;
       const { maxConcurrency, name, manifest } = this.options;
       const throttle = createThrottle(maxConcurrency);
+      const assetsForMinify = {};
+
+      Object.keys(assets).forEach(file => {
+        if (excludeChunksAssets.indexOf(file) !== -1) {
+          return;
+        }
+
+        if (!ModuleFilenameHelpers.matchObject(this.options, file)) {
+          return;
+        }
+
+        assetsForMinify[file] = assets[file];
+      });
+
+      if (Object.keys(assetsForMinify).length === 0) {
+        return callback();
+      }
 
       return nodeify(
         Promise.all(
-          Object.keys(assets).map(file =>
+          Object.keys(assetsForMinify).map(file =>
             throttle(() => {
               const asset = assets[file];
-
-              if (excludeChunksAssets.indexOf(file) !== -1) {
-                return Promise.resolve(asset);
-              }
-
-              if (!ModuleFilenameHelpers.matchObject(this.options, file)) {
-                return Promise.resolve(asset);
-              }
 
               return minify(asset.source(), this.options).then(
                 optimizedSource => {
