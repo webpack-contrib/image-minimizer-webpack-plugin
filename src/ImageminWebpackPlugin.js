@@ -115,7 +115,7 @@ class ImageminWebpackPlugin {
                     delete compilation.assets[file];
                   }
 
-                  if (manifest) {
+                  if (manifest && !manifest.includes(file)) {
                     manifest[file] = interpolatedName;
                   }
 
