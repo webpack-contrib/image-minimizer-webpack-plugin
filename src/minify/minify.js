@@ -4,10 +4,8 @@ const imagemin = require("imagemin");
 
 function minify(input, options) {
   const { imageminOptions, bail } = options;
-
   // Ensure that the contents i have are in the form of a buffer
   const source = Buffer.isBuffer(input) ? input : Buffer.from(input);
-
   const originalSize = source.length;
 
   if (imageminOptions.plugins.length === 0) {
