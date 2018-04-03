@@ -48,7 +48,7 @@ test("should execute successfully", t => {
   );
   const imageminRule = defaultsDeep({}, baseImageminRule);
 
-  imageminRule.use[1].options.plugins = plugins;
+  imageminRule.use[1].options.imageminOptions = { plugins };
   webpackConfig.module.rules = webpackConfig.module.rules.concat([
     imageminRule
   ]);
@@ -134,7 +134,7 @@ test("should throw the error on corrupted images using `loader.bail` option", t 
   );
   const imageminRule = defaultsDeep({}, baseImageminRule);
 
-  imageminRule.use[1].options.plugins = plugins;
+  imageminRule.use[1].options.imageminOptions = { plugins };
 
   webpackConfig.entry = "./loader-corrupted.js";
   webpackConfig.module.rules = webpackConfig.module.rules.concat([
@@ -163,7 +163,7 @@ test("should throw the error on corrupted images using `webpack.bail` option", t
   );
   const imageminRule = defaultsDeep({}, baseImageminRule);
 
-  imageminRule.use[1].options.plugins = plugins;
+  imageminRule.use[1].options.imageminOptions = { plugins };
 
   webpackConfig.bail = true;
   webpackConfig.entry = "./loader-corrupted.js";
@@ -192,7 +192,7 @@ test("should execute successfully and ignore corrupted images using `loader.bail
   );
   const imageminRule = defaultsDeep({}, baseImageminRule);
 
-  imageminRule.use[1].options.plugins = plugins;
+  imageminRule.use[1].options.imageminOptions = { plugins };
 
   webpackConfig.entry = "./loader-corrupted.js";
   webpackConfig.module.rules = webpackConfig.module.rules.concat([
@@ -220,7 +220,7 @@ test("should execute successfully and ignore corrupted images using `webpack.bai
   );
   const imageminRule = defaultsDeep({}, baseImageminRule);
 
-  imageminRule.use[1].options.plugins = plugins;
+  imageminRule.use[1].options.imageminOptions = { plugins };
 
   webpackConfig.bail = false;
   webpackConfig.entry = "./loader-corrupted.js";

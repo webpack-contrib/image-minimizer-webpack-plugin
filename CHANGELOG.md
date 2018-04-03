@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org).
 
 ## HEAD
 
+* Changed: `imagemin` plugins for `loader` should be placed in `imageminOptions` options (look example in `README.md`).
 * Chore: refactor all plugin (all source code now in `src` directory).
 * Fixed: use `maxConcurrency`, use `os.cpus().length - 1` for multi core systems and `1` for single core system.
 

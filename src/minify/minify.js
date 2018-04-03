@@ -8,7 +8,11 @@ function minify(input, options) {
   const source = Buffer.isBuffer(input) ? input : Buffer.from(input);
   const originalSize = source.length;
 
-  if (imageminOptions.plugins.length === 0) {
+  if (
+    !imageminOptions ||
+    !imageminOptions.plugins ||
+    imageminOptions.plugins.length === 0
+  ) {
     throw new Error("No plugins found for `imagemin`");
   }
 

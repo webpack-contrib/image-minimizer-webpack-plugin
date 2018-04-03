@@ -62,7 +62,9 @@ export default {
           {
             loader: imageminLoader,
             options: {
-              plugins
+              imageminOptions: {
+                plugins: [imageminGifsicle()]
+              }
             }
           }
         ]
@@ -106,7 +108,9 @@ export default {
             loader: imageminLoader,
             options: {
               bail: false, // Ignore errors on corrupted images.
-              plugins: [imageminGifsicle()]
+              imageminOptions: {
+                plugins: [imageminGifsicle()]
+              }
             }
           }
         ]
