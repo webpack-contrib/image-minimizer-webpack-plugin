@@ -43,7 +43,7 @@ class ImageminWebpackPlugin {
     const excludeChunksAssets = [];
     const plugin = { name: "ImageminPlugin" };
 
-    if (typeof this.options.bail !== "boolean" && compiler.options.bail) {
+    if (typeof this.options.bail !== "boolean") {
       this.options.bail = compiler.options.bail;
     }
 
@@ -100,10 +100,31 @@ class ImageminWebpackPlugin {
           Object.keys(assetsForMinify).map(file =>
             throttle(() => {
               const asset = assets[file];
+              const task = {
+                bail: this.options.bail,
+                file,
+                imageminOptions: this.options.imageminOptions,
+                input: asset.source()
+              };
 
-              return minify(asset.source(), this.options).then(
-                optimizedSource => {
-                  const source = new RawSource(optimizedSource);
+              return Promise.resolve()
+                .then(() => minify(task))
+                .then(result => {
+                  const source = result.output
+                    ? new RawSource(result.output)
+                    : asset;
+
+                  if (result.warnings && result.warnings.size > 0) {
+                    result.warnings.forEach(warning => {
+                      compilation.warnings.push(warning);
+                    });
+                  }
+
+                  if (result.errors && result.errors.size > 0) {
+                    result.errors.forEach(warning => {
+                      compilation.errors.push(warning);
+                    });
+                  }
 
                   const interpolatedName = interpolateName(file, name, {
                     content: source.source()
@@ -115,13 +136,12 @@ class ImageminWebpackPlugin {
                     delete compilation.assets[file];
                   }
 
-                  if (manifest && !manifest.includes(file)) {
+                  if (manifest && !manifest[file]) {
                     manifest[file] = interpolatedName;
                   }
 
                   return Promise.resolve(source);
-                }
-              );
+                });
             })
           )
         ),

@@ -92,10 +92,11 @@ test("should execute successfully", t => {
   });
 });
 
-test("should throw the error if imagemin plugins don't setup", t => {
+test("should throw errors if imagemin plugins don't setup", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
+      bail: true,
       output: {
         path: tmpDirectory
       }
@@ -108,7 +109,7 @@ test("should throw the error if imagemin plugins don't setup", t => {
 
   return pify(webpack)(webpackConfig).then(stats => {
     t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
-    t.true(stats.compilation.errors.length === 4, "4 compilation error");
+    t.true(stats.compilation.errors.length === 4, "4 compilation errors");
 
     stats.compilation.errors.forEach(error => {
       t.regex(
@@ -122,7 +123,7 @@ test("should throw the error if imagemin plugins don't setup", t => {
   });
 });
 
-test("should throw the error on corrupted images using `loader.bail` option", t => {
+test("should throw errors on corrupted images using `loader.bail: true` option", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
@@ -151,7 +152,7 @@ test("should throw the error on corrupted images using `loader.bail` option", t 
   });
 });
 
-test("should throw the error on corrupted images using `webpack.bail` option", t => {
+test("should throw errors on corrupted images using `webpack.bail: true` option", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
@@ -180,7 +181,7 @@ test("should throw the error on corrupted images using `webpack.bail` option", t
   });
 });
 
-test("should execute successfully and ignore corrupted images using `loader.bail` option", t => {
+test("should execute successfully and throw warnings on corrupted images using `loader.bail: false` option", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
@@ -201,14 +202,15 @@ test("should execute successfully and ignore corrupted images using `loader.bail
   webpackConfig.module.rules[1].use[1].options.bail = false;
 
   return pify(webpack)(webpackConfig).then(stats => {
-    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
+    t.true(stats.compilation.warnings.length === 1, "no compilation warnings");
+    t.regex(stats.compilation.warnings[0].message, /Corrupt\sJPEG\sdata/);
     t.true(stats.compilation.errors.length === 0, "no compilation error");
 
     return stats;
   });
 });
 
-test("should execute successfully and ignore corrupted images using `webpack.bail` option", t => {
+test("should execute successfully and throw warnings on corrupted images using `webpack.bail: false` option", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
@@ -229,7 +231,8 @@ test("should execute successfully and ignore corrupted images using `webpack.bai
   ]);
 
   return pify(webpack)(webpackConfig).then(stats => {
-    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
+    t.true(stats.compilation.warnings.length === 1, "no compilation warnings");
+    t.regex(stats.compilation.warnings[0].message, /Corrupt\sJPEG\sdata/);
     t.true(stats.compilation.errors.length === 0, "no compilation error");
 
     return stats;

@@ -22,7 +22,7 @@ const plugins = [
 ];
 const fixturesPath = path.join(__dirname, "fixtures");
 
-test("should execute successfully and optimize only emitted", t => {
+test("should execute successfully and optimize only emitted iamges", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
@@ -186,7 +186,36 @@ test("should execute successfully and optimize all images", t => {
   });
 });
 
-test("should throw the error if imagemin plugins don't setup", t => {
+test("should execute successfully without any assets", t => {
+  const tmpDirectory = tempy.directory();
+  const webpackConfig = defaultsDeep(
+    {
+      output: {
+        path: tmpDirectory
+      }
+    },
+    basicWebpackConfig
+  );
+
+  webpackConfig.entry = "./empty-entry.js";
+  webpackConfig.plugins = [
+    new ImageminWebpackPlugin({
+      bail: true,
+      imageminOptions: {
+        plugins
+      }
+    })
+  ];
+
+  return pify(webpack)(webpackConfig).then(stats => {
+    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
+    t.true(stats.compilation.errors.length === 0, "no compilation error");
+
+    return stats;
+  });
+});
+
+test("should throw errors if imagemin plugins don't setup", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
@@ -200,7 +229,7 @@ test("should throw the error if imagemin plugins don't setup", t => {
   webpackConfig.entry = "./empty-entry.js";
   webpackConfig.plugins = [
     new EmitPlugin({
-      filename: "test-corrupted.jpg"
+      filename: "test.jpg"
     }),
     new ImageminWebpackPlugin({
       bail: true,
@@ -210,13 +239,23 @@ test("should throw the error if imagemin plugins don't setup", t => {
     })
   ];
 
-  return t.throws(
-    pify(webpack)(webpackConfig),
-    /No\splugins\sfound\sfor\s`imagemin`/
-  );
+  return pify(webpack)(webpackConfig).then(stats => {
+    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
+    t.true(stats.compilation.errors.length === 1, "1 compilation errors");
+
+    stats.compilation.errors.forEach(error => {
+      t.regex(
+        error.message,
+        /No\splugins\sfound\sfor\s`imagemin`/,
+        "message error"
+      );
+    });
+
+    return stats;
+  });
 });
 
-test("should throw error on corrupted images using `plugin.bail` option", t => {
+test("should throw errors on corrupted images using `plugin.bail: true` option", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
@@ -240,10 +279,16 @@ test("should throw error on corrupted images using `plugin.bail` option", t => {
     })
   ];
 
-  return t.throws(pify(webpack)(webpackConfig), /Corrupt\sJPEG\sdata/);
+  return pify(webpack)(webpackConfig).then(stats => {
+    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
+    t.true(stats.compilation.errors.length === 1, "no compilation error");
+    t.regex(stats.compilation.errors[0].message, /Corrupt\sJPEG\sdata/);
+
+    return stats;
+  });
 });
 
-test("should throw the error on corrupted images using `webpack.bail` option", t => {
+test("should throw errors on corrupted images using `webpack.bail: true` option", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
@@ -268,10 +313,16 @@ test("should throw the error on corrupted images using `webpack.bail` option", t
     })
   ];
 
-  return t.throws(pify(webpack)(webpackConfig), /Corrupt\sJPEG\sdata/);
+  return pify(webpack)(webpackConfig).then(stats => {
+    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
+    t.true(stats.compilation.errors.length === 1, "no compilation error");
+    t.regex(stats.compilation.errors[0].message, /Corrupt\sJPEG\sdata/);
+
+    return stats;
+  });
 });
 
-test("should execute successfully and ignore corrupted images using `plugin.bail` option", t => {
+test("should execute successfully and throw warnings on corrupted images using `plugin.bail: false` option", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
@@ -296,19 +347,19 @@ test("should execute successfully and ignore corrupted images using `plugin.bail
   ];
 
   return pify(webpack)(webpackConfig).then(stats => {
-    const { warnings, errors } = stats.compilation;
-
-    t.true(warnings.length === 0, "no compilation warnings");
-    t.true(errors.length === 0, "no compilation error");
+    t.true(stats.compilation.warnings.length === 1, "1 compilation warnings");
+    t.regex(stats.compilation.warnings[0].message, /Corrupt\sJPEG\sdata/);
+    t.true(stats.compilation.errors.length === 0, "no compilation error");
 
     return stats;
   });
 });
 
-test("should execute successfully and ignore corrupted images using `webpack.bail` option", t => {
+test("should execute successfully and throw warnings on corrupted images using `webpack.bail: false` option", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
+      bail: false,
       output: {
         path: tmpDirectory
       }
@@ -330,8 +381,46 @@ test("should execute successfully and ignore corrupted images using `webpack.bai
   ];
 
   return pify(webpack)(webpackConfig).then(stats => {
+    t.true(stats.compilation.warnings.length === 1, "1 compilation warnings");
+    t.regex(stats.compilation.warnings[0].message, /Corrupt\sJPEG\sdata/);
+    t.true(stats.compilation.errors.length === 0, "no compilation error");
+
+    return stats;
+  });
+});
+
+test("should execute successfully and contains not empty manifest", t => {
+  const tmpDirectory = tempy.directory();
+  const webpackConfig = defaultsDeep(
+    {
+      output: {
+        path: tmpDirectory
+      }
+    },
+    basicWebpackConfig
+  );
+  const manifest = {};
+
+  webpackConfig.entry = "./empty-entry.js";
+  webpackConfig.plugins = [
+    new EmitPlugin({
+      filename: "test.jpg"
+    }),
+    new ImageminWebpackPlugin({
+      bail: true,
+      imageminOptions: {
+        plugins
+      },
+      manifest
+    })
+  ];
+
+  return pify(webpack)(webpackConfig).then(stats => {
     t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
     t.true(stats.compilation.errors.length === 0, "no compilation error");
+    t.deepEqual(manifest, {
+      "test.jpg": "82bc921bd1ff78cfda2eee090ee32afd.jpg"
+    });
 
     return stats;
   });

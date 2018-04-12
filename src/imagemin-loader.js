@@ -12,11 +12,39 @@ module.exports = function(content) {
     (this._compiler && this._compiler.options && this._compiler.options.bail) ||
     false;
 
-  if (typeof options.bail !== "boolean" && bail) {
+  if (typeof options.bail !== "boolean") {
     options.bail = bail;
   }
 
-  return nodeify(minify(content, options), callback);
+  const task = {
+    bail: options.bail,
+    file: this.resourcePath,
+    imageminOptions: options.imageminOptions,
+    input: content
+  };
+
+  return nodeify(
+    Promise.resolve().then(() => minify(task)),
+    (error, result) => {
+      if (error) {
+        return callback(error);
+      }
+
+      if (result.warnings && result.warnings.size > 0) {
+        result.warnings.forEach(warning => {
+          this.emitWarning(warning);
+        });
+      }
+
+      if (result.errors && result.errors.size > 0) {
+        result.errors.forEach(warning => {
+          this.emitError(warning);
+        });
+      }
+
+      return callback(null, result.output ? result.output : content);
+    }
+  );
 };
 
 module.exports.raw = true;

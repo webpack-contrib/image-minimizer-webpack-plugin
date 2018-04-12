@@ -86,7 +86,7 @@
     "fix:script": "npm run lint:script -- --fix",
     "fix": "npm-run-all -l prettify -p 'fix:**'",
     "pretest": "npm run lint",
-    "test-only": "nyc ava --verbose '**/__tests__/*.js'",
+    "test-only": "nyc ava --verbose '**/__tests__/**/*.test.js'",
     "test": "npm run test-only",
     "release": "npmpub"
   },
