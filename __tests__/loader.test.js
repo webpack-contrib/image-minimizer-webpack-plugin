@@ -60,7 +60,12 @@ test("should execute successfully", t => {
     t.true(stats.compilation.errors.length === 0, "no compilation error");
 
     const { assets } = stats.compilation;
-    const testedImages = ["test.gif", "test.jpg", "test.png", "test.svg"];
+    const testedImages = [
+      "loader-test.gif",
+      "loader-test.jpg",
+      "loader-test.png",
+      "loader-test.svg"
+    ];
 
     testedImages.forEach(testedImage => {
       t.true(

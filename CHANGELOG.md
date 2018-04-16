@@ -6,9 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org).
 
 ## HEAD
 
+* Changed: `imagemin-loader` now dynamically added in loaders list as `pre` loader (i.e. no need setup `imagemin-loader` in `webpack.config.js`).
 * Changed: use `webpack` errors and warnings `api`.
 * Changed: `imagemin` plugins for `loader` should be placed in `imageminOptions` options (look example in `README.md`).
 * Chore: refactor all plugin code (all source code now in `src` directory).
+* Deleted: `excludeChunksAssets` options (use `loader` options for plugin instead).
 * Fixed: use `maxConcurrency`, use `os.cpus().length - 1` for multi core systems and `1` for single core system.
 * Fixed: don't add same file paths in `manifest`.
 

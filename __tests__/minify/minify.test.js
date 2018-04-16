@@ -19,25 +19,26 @@ test("minify should be is function", t => {
 });
 
 test("should execute successfully", t =>
-  pify(fs.readFile)(path.resolve(__dirname, "../fixtures/test.jpg")).then(
-    data =>
-      minify({
-        imageminOptions: {
+  pify(fs.readFile)(
+    path.resolve(__dirname, "../fixtures/loader-test.jpg")
+  ).then(data =>
+    minify({
+      imageminOptions: {
+        plugins: [imageminMozjpeg()]
+      },
+      input: data
+    }).then(result =>
+      imagemin
+        .buffer(data, {
           plugins: [imageminMozjpeg()]
-        },
-        input: data
-      }).then(result =>
-        imagemin
-          .buffer(data, {
-            plugins: [imageminMozjpeg()]
-          })
-          .then(compressedImage => {
-            t.true(result.output.length === compressedImage.length);
+        })
+        .then(compressedImage => {
+          t.true(result.output.length === compressedImage.length);
 
-            return compressedImage;
-          })
-          .then(() => result)
-      )
+          return compressedImage;
+        })
+        .then(() => result)
+    )
   ));
 
 test("should return `Promise`", t => {

@@ -19,7 +19,7 @@ Do not worry about size of images, now they are always compressed.
   `image-webpack-loader` don't optimize some images generating `favicons-webpack-plugin` or `copy-webpack-plugin`.
   `ImageminWebpackPlugin` don't optimize inlined images with `url-loader`.
 
-* Images optimized when inlined with `url-loader`. This can not be done with `imagemin-webpack-plugin`.
+* Images optimized when inlined with `url-loader`. This can't be done with `imagemin-webpack-plugin`.
 
 * Throttle asynchronous images optimization (using `maxConcurrency` plugin option).
   This allows you to not overload the server when building.
@@ -36,11 +36,10 @@ npm install imagemin-webpack --save-dev
 
 ## Usage
 
-### Loader And Plugin
+### Basic
 
 If you want to use `loader` or `plugin` standalone see sections below, but this is not recommended.
 
-**By default plugin optimize only assets don't have chunks.**
 **Make sure that plugin place after any plugins that add images or other assets which you want to optimized.**
 
 ```js
@@ -58,14 +57,6 @@ export default {
         use: [
           {
             loader: "file-loader" // Or `url-loader`.
-          },
-          {
-            loader: imageminLoader,
-            options: {
-              imageminOptions: {
-                plugins: [imageminGifsicle()]
-              }
-            }
           }
         ]
       }
@@ -149,12 +140,12 @@ export default {
     // Make sure that the plugin is after any plugins that add images.
     new ImageminWebpackPlugin({
       bail: false,
-      excludeChunksAssets: false,
+      loader: false,
       imageminOptions: {
         plugins: [imageminGifsicle()]
       },
       manifest: imageminManifest, // This object will contain source and interpolated filenames.
-      maxConcurrency: os.cpus().length,
+      maxConcurrency: os.cpus().length - 1,
       name: "[hash].[ext]",
       test: /\.(jpe?g|png|gif|svg)$/i,
       include: undefined,

@@ -5,6 +5,7 @@ const RawSource = require("webpack-sources/lib/RawSource");
 const createThrottle = require("async-throttle");
 const nodeify = require("nodeify");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
+const path = require("path");
 const minify = require("./minify/minify");
 const interpolateName = require("./utils/interpolate-name");
 
@@ -17,10 +18,10 @@ class ImageminWebpackPlugin {
       include,
       exclude,
       bail = null,
-      excludeChunksAssets = true,
       imageminOptions = {
         plugins: []
       },
+      loader = true,
       manifest = null,
       maxConcurrency = cpusLength > 1 ? cpusLength - 1 : cpusLength,
       name = "[hash].[ext]"
@@ -29,9 +30,9 @@ class ImageminWebpackPlugin {
     this.options = {
       bail,
       exclude,
-      excludeChunksAssets,
       imageminOptions,
       include,
+      loader,
       manifest,
       maxConcurrency,
       name,
@@ -40,6 +41,7 @@ class ImageminWebpackPlugin {
   }
 
   apply(compiler) {
+    // Need use map
     const excludeChunksAssets = [];
     const plugin = { name: "ImageminPlugin" };
 
@@ -47,30 +49,74 @@ class ImageminWebpackPlugin {
       this.options.bail = compiler.options.bail;
     }
 
-    if (this.options.excludeChunksAssets) {
-      const afterOptimizeAssetsFn = assets => {
-        Object.keys(assets).forEach(file => {
-          if (
-            ModuleFilenameHelpers.matchObject(this.options, file) &&
-            excludeChunksAssets.indexOf(file) === -1
-          ) {
-            excludeChunksAssets.push(file);
+    const getAfter = (str, token) => {
+      const idx = str.indexOf(token);
+
+      return idx < 0 ? "" : str.substr(idx);
+    };
+
+    if (this.options.loader) {
+      const afterResolveFn = (data, callback) => {
+        const query = getAfter(data.resource, "?");
+        const resourcePath = data.resource.substr(
+          0,
+          data.resource.length - query.length
+        );
+
+        if (!ModuleFilenameHelpers.matchObject(this.options, resourcePath)) {
+          return callback(null, data);
+        }
+
+        // Search solutoin how to be pre loader
+        data.loaders.push({
+          enforce: "pre",
+          loader: path.join(__dirname, "imagemin-loader.js"),
+          options: {
+            bail: this.options.bail,
+            imageminOptions: this.options.imageminOptions,
+            name: this.options.name
           }
         });
+
+        return callback(null, data);
       };
 
       if (compiler.hooks) {
-        compiler.hooks.compilation.tap(plugin, compilation => {
-          compilation.hooks.afterOptimizeAssets.tap(
+        compiler.hooks.normalModuleFactory.tap(plugin, normalModuleFactory => {
+          normalModuleFactory.hooks.afterResolve.tapAsync(
             plugin,
-            afterOptimizeAssetsFn
+            afterResolveFn
           );
         });
       } else {
-        compiler.plugin("compilation", compilation => {
-          compilation.plugin("after-optimize-assets", afterOptimizeAssetsFn);
+        compiler.plugin("normal-module-factory", normalModuleFactory => {
+          normalModuleFactory.plugin("after-resolve", afterResolveFn);
         });
       }
+    }
+
+    const afterOptimizeAssetsFn = assets => {
+      Object.keys(assets).forEach(file => {
+        if (
+          ModuleFilenameHelpers.matchObject(this.options, file) &&
+          excludeChunksAssets.indexOf(file) === -1
+        ) {
+          excludeChunksAssets.push(file);
+        }
+      });
+    };
+
+    if (compiler.hooks) {
+      compiler.hooks.compilation.tap(plugin, compilation => {
+        compilation.hooks.afterOptimizeAssets.tap(
+          plugin,
+          afterOptimizeAssetsFn
+        );
+      });
+    } else {
+      compiler.plugin("compilation", compilation => {
+        compilation.plugin("after-optimize-assets", afterOptimizeAssetsFn);
+      });
     }
 
     const emitFn = (compilation, callback) => {

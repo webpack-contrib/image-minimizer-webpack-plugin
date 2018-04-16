@@ -9,7 +9,7 @@ export default class EmitWepbackPlugin {
     this.options = Object.assign(
       {},
       {
-        filename: "emit-test.jpg"
+        filename: "plugin-test.jpg"
       },
       options
     );
