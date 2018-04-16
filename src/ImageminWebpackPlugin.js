@@ -60,9 +60,7 @@ class ImageminWebpackPlugin {
           return callback(null, data);
         }
 
-        // Search solutoin how to be pre loader
         data.loaders.push({
-          enforce: "pre",
           loader: path.join(__dirname, "imagemin-loader.js"),
           options: {
             bail: this.options.bail,
