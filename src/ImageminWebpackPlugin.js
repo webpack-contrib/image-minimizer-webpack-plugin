@@ -7,7 +7,7 @@ const nodeify = require("nodeify");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
 const path = require("path");
 const minify = require("./minify/minify");
-const interpolateName = require("./utils/interpolate-name");
+const { interpolateName, getAfter } = require("./utils");
 
 class ImageminWebpackPlugin {
   constructor(options = {}) {
@@ -47,12 +47,6 @@ class ImageminWebpackPlugin {
     if (typeof this.options.bail !== "boolean") {
       this.options.bail = compiler.options.bail;
     }
-
-    const getAfter = (str, token) => {
-      const idx = str.indexOf(token);
-
-      return idx < 0 ? "" : str.substr(idx);
-    };
 
     if (this.options.loader) {
       const afterResolveFn = (data, callback) => {
