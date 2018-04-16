@@ -41,8 +41,7 @@ class ImageminWebpackPlugin {
   }
 
   apply(compiler) {
-    // Need use map
-    const excludeChunksAssets = [];
+    const excludeChunksAssets = new Set();
     const plugin = { name: "ImageminPlugin" };
 
     if (typeof this.options.bail !== "boolean") {
@@ -99,9 +98,9 @@ class ImageminWebpackPlugin {
       Object.keys(assets).forEach(file => {
         if (
           ModuleFilenameHelpers.matchObject(this.options, file) &&
-          excludeChunksAssets.indexOf(file) === -1
+          !excludeChunksAssets.has(file)
         ) {
-          excludeChunksAssets.push(file);
+          excludeChunksAssets.add(file);
         }
       });
     };
@@ -126,7 +125,7 @@ class ImageminWebpackPlugin {
       const assetsForMinify = {};
 
       Object.keys(assets).forEach(file => {
-        if (excludeChunksAssets.indexOf(file) !== -1) {
+        if (excludeChunksAssets.has(file)) {
           return;
         }
 
