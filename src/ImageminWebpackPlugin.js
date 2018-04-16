@@ -122,7 +122,7 @@ class ImageminWebpackPlugin {
       const { assets } = compilation;
       const { maxConcurrency, name, manifest } = this.options;
       const throttle = createThrottle(maxConcurrency);
-      const assetsForMinify = {};
+      const assetsForMinify = new Set();
 
       Object.keys(assets).forEach(file => {
         if (excludeChunksAssets.has(file)) {
@@ -133,16 +133,16 @@ class ImageminWebpackPlugin {
           return;
         }
 
-        assetsForMinify[file] = assets[file];
+        assetsForMinify.add(file);
       });
 
-      if (Object.keys(assetsForMinify).length === 0) {
+      if (assetsForMinify.size === 0) {
         return callback();
       }
 
       return nodeify(
         Promise.all(
-          Object.keys(assetsForMinify).map(file =>
+          [...assetsForMinify].map(file =>
             throttle(() => {
               const asset = assets[file];
               const task = {
