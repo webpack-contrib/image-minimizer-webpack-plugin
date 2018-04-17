@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org).
 
-## HEAD
+## 3.0.0 - 2018-04-17
 
 * Added: `cache` options (i.e. persistent cache), by default is `false` (because it is good practice to disable `cache` by default).
 * Changed: `imagemin-loader` now dynamically added in loaders list as `pre` loader (i.e. no need setup `imagemin-loader` in `webpack.config.js`).
