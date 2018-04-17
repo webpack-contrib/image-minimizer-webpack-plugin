@@ -1,7 +1,10 @@
 import EmitPlugin from "./fixtures/EmitWepbackPlugin";
 import { ImageminWebpackPlugin } from "..";
 import basicWebpackConfig from "./fixtures/config";
+import cacache from "cacache";
 import defaultsDeep from "lodash.defaultsdeep";
+import del from "del";
+import findCacheDir from "find-cache-dir";
 import fs from "fs";
 import imagemin from "imagemin";
 import imageminGifsicle from "imagemin-gifsicle";
@@ -15,7 +18,9 @@ import test from "ava";
 import webpack from "webpack";
 
 const plugins = [
-  imageminGifsicle(),
+  imageminGifsicle({
+    foo: "bar"
+  }),
   imageminMozjpeg(),
   imageminPngquant(),
   imageminSvgo()
@@ -102,6 +107,115 @@ test("should execute successfully and optimize all images", t => {
 
     return Promise.all(promises);
   });
+});
+
+test("should execute successfully, optimize all images and cache their", t => {
+  const tmpDirectory = tempy.directory();
+  const webpackConfig = defaultsDeep(
+    {
+      output: {
+        path: tmpDirectory
+      }
+    },
+    basicWebpackConfig
+  );
+
+  webpackConfig.module.rules = webpackConfig.module.rules.concat([
+    {
+      loader: "file-loader",
+      options: {
+        emitFile: true,
+        name: "[path][name]-compressed.[ext]"
+      },
+      test: /\.(jpe?g|png|gif|svg)$/i
+    }
+  ]);
+  webpackConfig.plugins = [
+    new EmitPlugin(),
+    new ImageminWebpackPlugin({
+      cache: true,
+      imageminOptions: {
+        plugins
+      },
+      name: "[path][name]-compressed.[ext]"
+    })
+  ];
+
+  const cacheDir = findCacheDir({ name: "imagemin-webpack" });
+
+  // Rewrite tests on mock when migrate on jest
+  return Promise.resolve()
+    .then(() => del(cacheDir))
+    .then(() => pify(webpack)(webpackConfig))
+    .then(stats => {
+      const promises = [];
+      const { warnings, errors, assets } = stats.compilation;
+
+      t.true(warnings.length === 0, "no compilation warnings");
+      t.true(errors.length === 0, "no compilation error");
+      t.true(Object.keys(assets).length === 6, "6 assets");
+
+      const testedImages = [
+        "loader-test.gif",
+        "loader-test.jpg",
+        "loader-test.png",
+        "loader-test.svg",
+        "plugin-test.jpg"
+      ];
+
+      testedImages.forEach(testedImage => {
+        const testedImageName = `${path.basename(
+          testedImage,
+          path.extname(testedImage)
+        )}-compressed${path.extname(testedImage)}`;
+
+        t.true(
+          typeof assets[testedImageName] === "object",
+          "tested image exists in assets"
+        );
+
+        const pathToTestedImage = path.join(fixturesPath, testedImage);
+
+        promises.push(
+          pify(fs.readFile)(pathToTestedImage)
+            .then(data =>
+              imagemin.buffer(data, {
+                plugins
+              })
+            )
+            .then(compressedTestedImage => {
+              t.true(
+                compressedTestedImage.length === assets[testedImageName].size(),
+                `the image ${pathToTestedImage} is compressed`
+              );
+
+              return true;
+            })
+        );
+      });
+
+      return Promise.all(promises);
+    })
+    .then(() =>
+      cacache
+        .ls(cacheDir)
+        .then(cachedAssets => {
+          t.true(Object.keys(cachedAssets).length === 5, "5 cached assets");
+
+          return true;
+        })
+        .then(() => pify(webpack)(webpackConfig))
+        .then(stats => {
+          const { warnings, errors, assets } = stats.compilation;
+
+          t.true(warnings.length === 0, "no compilation warnings");
+          t.true(errors.length === 0, "no compilation error");
+          t.true(Object.keys(assets).length === 6, "6 assets");
+
+          return true;
+        })
+        .then(() => del(cacheDir))
+    );
 });
 
 test("should execute successfully and optimize only emitted images from other plugins (standalone plugin)", t => {

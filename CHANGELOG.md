@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org).
 
 ## HEAD
 
+* Added: `cache` options (i.e. persistent cache), by default is `false` (because it is good practice to disable `cache` by default).
 * Changed: `imagemin-loader` now dynamically added in loaders list as `pre` loader (i.e. no need setup `imagemin-loader` in `webpack.config.js`).
 * Changed: use `webpack` errors and warnings `api`.
 * Changed: `imagemin` plugins for `loader` should be placed in `imageminOptions` options (look example in `README.md`).

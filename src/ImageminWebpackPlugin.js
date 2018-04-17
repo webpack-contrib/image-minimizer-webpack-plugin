@@ -6,14 +6,17 @@ const createThrottle = require("async-throttle");
 const nodeify = require("nodeify");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
 const path = require("path");
+const findCacheDir = require("find-cache-dir");
+
 const minify = require("./minify/minify");
-const { interpolateName, getAfter } = require("./utils");
+const { cacheWrapper, interpolateName, getAfter } = require("./utils");
 
 class ImageminWebpackPlugin {
   constructor(options = {}) {
     // Strange in test with value `1`
-    const cpusLength = os.cpus().length;
+    const CPULength = os.cpus().length;
     const {
+      cache = false,
       test = /\.(jpe?g|png|gif|svg)$/i,
       include,
       exclude,
@@ -23,12 +26,13 @@ class ImageminWebpackPlugin {
       },
       loader = true,
       manifest = null,
-      maxConcurrency = cpusLength > 1 ? cpusLength - 1 : cpusLength,
+      maxConcurrency = CPULength > 1 ? CPULength - 1 : CPULength,
       name = "[hash].[ext]"
     } = options;
 
     this.options = {
       bail,
+      cache,
       exclude,
       imageminOptions,
       include,
@@ -38,6 +42,11 @@ class ImageminWebpackPlugin {
       name,
       test
     };
+
+    this.options.cacheDir =
+      this.options.cache === true
+        ? findCacheDir({ name: "imagemin-webpack" })
+        : cache;
   }
 
   apply(compiler) {
@@ -60,12 +69,15 @@ class ImageminWebpackPlugin {
           return callback(null, data);
         }
 
+        const { bail, imageminOptions, name, cacheDir } = this.options;
+
         data.loaders.push({
           loader: path.join(__dirname, "imagemin-loader.js"),
           options: {
-            bail: this.options.bail,
-            imageminOptions: this.options.imageminOptions,
-            name: this.options.name
+            bail,
+            cache: cacheDir,
+            imageminOptions,
+            name
           }
         });
 
@@ -80,6 +92,7 @@ class ImageminWebpackPlugin {
           );
         });
       } else {
+        /* istanbul ignore next */
         compiler.plugin("normal-module-factory", normalModuleFactory => {
           normalModuleFactory.plugin("after-resolve", afterResolveFn);
         });
@@ -105,6 +118,7 @@ class ImageminWebpackPlugin {
         );
       });
     } else {
+      /* istanbul ignore next */
       compiler.plugin("compilation", compilation => {
         compilation.plugin("after-optimize-assets", afterOptimizeAssetsFn);
       });
@@ -112,7 +126,7 @@ class ImageminWebpackPlugin {
 
     const emitFn = (compilation, callback) => {
       const { assets } = compilation;
-      const { maxConcurrency, name, manifest } = this.options;
+      const { maxConcurrency, name, manifest, bail, cacheDir } = this.options;
       const throttle = createThrottle(maxConcurrency);
       const assetsForMinify = new Set();
 
@@ -137,15 +151,24 @@ class ImageminWebpackPlugin {
           [...assetsForMinify].map(file =>
             throttle(() => {
               const asset = assets[file];
-              const task = {
-                bail: this.options.bail,
-                file,
-                imageminOptions: this.options.imageminOptions,
-                input: asset.source()
-              };
+              const task = Object.assign(
+                {},
+                {
+                  bail,
+                  file,
+                  input: asset.source(),
+                  outputPath: compiler.outputPath
+                },
+                this.options
+              );
 
               return Promise.resolve()
-                .then(() => minify(task))
+                .then(
+                  () =>
+                    cacheDir
+                      ? cacheWrapper(minify(task), task, cacheDir)
+                      : minify(task)
+                )
                 .then(result => {
                   const source = result.output
                     ? new RawSource(result.output)
@@ -189,6 +212,7 @@ class ImageminWebpackPlugin {
     if (compiler.hooks) {
       compiler.hooks.emit.tapAsync(plugin, emitFn);
     } else {
+      /* istanbul ignore next */
       compiler.plugin("emit", emitFn);
     }
   }

@@ -1,5 +1,8 @@
 import basicWebpackConfig from "./fixtures/config";
+import cacache from "cacache";
 import defaultsDeep from "lodash.defaultsdeep";
+import del from "del";
+import findCacheDir from "find-cache-dir";
 import fs from "fs";
 import imagemin from "imagemin";
 import imageminGifsicle from "imagemin-gifsicle";
@@ -36,7 +39,7 @@ const baseImageminRule = {
 };
 const fixturesPath = path.join(__dirname, "fixtures");
 
-test("should execute successfully", t => {
+test("should execute successfully and optimize all images", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
     {
@@ -55,11 +58,12 @@ test("should execute successfully", t => {
 
   return pify(webpack)(webpackConfig).then(stats => {
     const promises = [];
+    const { warnings, errors, assets } = stats.compilation;
 
-    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
-    t.true(stats.compilation.errors.length === 0, "no compilation error");
+    t.true(warnings.length === 0, "no compilation warnings");
+    t.true(errors.length === 0, "no compilation error");
+    t.true(Object.keys(assets).length === 5, "5 assets");
 
-    const { assets } = stats.compilation;
     const testedImages = [
       "loader-test.gif",
       "loader-test.jpg",
@@ -97,6 +101,92 @@ test("should execute successfully", t => {
   });
 });
 
+test("should execute successfully, optimize all images and cache their", t => {
+  const tmpDirectory = tempy.directory();
+  const webpackConfig = defaultsDeep(
+    {
+      output: {
+        path: tmpDirectory
+      }
+    },
+    basicWebpackConfig
+  );
+  const imageminRule = defaultsDeep({}, baseImageminRule);
+
+  imageminRule.use[1].options.imageminOptions = { plugins };
+  imageminRule.use[1].options.cache = true;
+  webpackConfig.module.rules = webpackConfig.module.rules.concat([
+    imageminRule
+  ]);
+
+  const cacheDir = findCacheDir({ name: "imagemin-webpack" });
+
+  return pify(webpack)(webpackConfig)
+    .then(stats => {
+      const promises = [];
+      const { warnings, errors, assets } = stats.compilation;
+
+      t.true(warnings.length === 0, "no compilation warnings");
+      t.true(errors.length === 0, "no compilation error");
+      t.true(Object.keys(assets).length === 5, "5 assets");
+
+      const testedImages = [
+        "loader-test.gif",
+        "loader-test.jpg",
+        "loader-test.png",
+        "loader-test.svg"
+      ];
+
+      testedImages.forEach(testedImage => {
+        t.true(
+          typeof assets[testedImage] === "object",
+          "tested image exists in assets"
+        );
+
+        const pathToTestedImage = path.join(fixturesPath, testedImage);
+
+        promises.push(
+          pify(fs.readFile)(pathToTestedImage)
+            .then(data =>
+              imagemin.buffer(data, {
+                plugins
+              })
+            )
+            .then(compressedTestedImage => {
+              t.true(
+                compressedTestedImage.length === assets[testedImage].size(),
+                `the image ${pathToTestedImage} is compressed`
+              );
+
+              return true;
+            })
+        );
+      });
+
+      return Promise.all(promises);
+    })
+    .then(() =>
+      cacache
+        .ls(cacheDir)
+        .then(cachedAssets => {
+          t.true(Object.keys(cachedAssets).length === 4, "4 cached assets");
+
+          return true;
+        })
+        .then(() => pify(webpack)(webpackConfig))
+        .then(stats => {
+          const { warnings, errors, assets } = stats.compilation;
+
+          t.true(warnings.length === 0, "no compilation warnings");
+          t.true(errors.length === 0, "no compilation error");
+          t.true(Object.keys(assets).length === 5, "5 assets");
+
+          return true;
+        })
+        .then(() => del(cacheDir))
+    );
+});
+
 test("should throw errors if imagemin plugins don't setup", t => {
   const tmpDirectory = tempy.directory();
   const webpackConfig = defaultsDeep(
@@ -113,8 +203,10 @@ test("should throw errors if imagemin plugins don't setup", t => {
   webpackConfig.module.rules = webpackConfig.module.rules.concat(imageminRule);
 
   return pify(webpack)(webpackConfig).then(stats => {
-    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
-    t.true(stats.compilation.errors.length === 4, "4 compilation errors");
+    const { warnings, errors } = stats.compilation;
+
+    t.true(warnings.length === 0, "no compilation warnings");
+    t.true(errors.length === 4, "4 compilation errors");
 
     stats.compilation.errors.forEach(error => {
       t.regex(
@@ -149,9 +241,11 @@ test("should throw errors on corrupted images using `loader.bail: true` option",
   webpackConfig.module.rules[1].use[1].options.bail = true;
 
   return pify(webpack)(webpackConfig).then(stats => {
-    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
-    t.true(stats.compilation.errors.length === 1, "no compilation error");
-    t.regex(stats.compilation.errors[0].message, /Corrupt\sJPEG\sdata/);
+    const { warnings, errors } = stats.compilation;
+
+    t.true(warnings.length === 0, "no compilation warnings");
+    t.true(errors.length === 1, "no compilation error");
+    t.regex(errors[0].message, /Corrupt\sJPEG\sdata/);
 
     return stats;
   });
@@ -178,9 +272,11 @@ test("should throw errors on corrupted images using `webpack.bail: true` option"
   ]);
 
   return pify(webpack)(webpackConfig).then(stats => {
-    t.true(stats.compilation.warnings.length === 0, "no compilation warnings");
-    t.true(stats.compilation.errors.length === 1, "no compilation error");
-    t.regex(stats.compilation.errors[0].message, /Corrupt\sJPEG\sdata/);
+    const { warnings, errors } = stats.compilation;
+
+    t.true(warnings.length === 0, "no compilation warnings");
+    t.true(errors.length === 1, "no compilation error");
+    t.regex(errors[0].message, /Corrupt\sJPEG\sdata/);
 
     return stats;
   });
@@ -207,9 +303,11 @@ test("should execute successfully and throw warnings on corrupted images using `
   webpackConfig.module.rules[1].use[1].options.bail = false;
 
   return pify(webpack)(webpackConfig).then(stats => {
-    t.true(stats.compilation.warnings.length === 1, "no compilation warnings");
-    t.regex(stats.compilation.warnings[0].message, /Corrupt\sJPEG\sdata/);
-    t.true(stats.compilation.errors.length === 0, "no compilation error");
+    const { warnings, errors } = stats.compilation;
+
+    t.true(warnings.length === 1, "no compilation warnings");
+    t.regex(warnings[0].message, /Corrupt\sJPEG\sdata/);
+    t.true(errors.length === 0, "no compilation error");
 
     return stats;
   });
@@ -236,9 +334,11 @@ test("should execute successfully and throw warnings on corrupted images using `
   ]);
 
   return pify(webpack)(webpackConfig).then(stats => {
-    t.true(stats.compilation.warnings.length === 1, "no compilation warnings");
-    t.regex(stats.compilation.warnings[0].message, /Corrupt\sJPEG\sdata/);
-    t.true(stats.compilation.errors.length === 0, "no compilation error");
+    const { warnings, errors } = stats.compilation;
+
+    t.true(warnings.length === 1, "no compilation warnings");
+    t.regex(warnings[0].message, /Corrupt\sJPEG\sdata/);
+    t.true(errors.length === 0, "no compilation error");
 
     return stats;
   });

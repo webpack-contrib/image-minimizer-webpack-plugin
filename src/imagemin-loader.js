@@ -2,6 +2,9 @@
 
 const loaderUtils = require("loader-utils");
 const nodeify = require("nodeify");
+const findCacheDir = require("find-cache-dir");
+
+const { cacheWrapper } = require("./utils");
 const minify = require("./minify/minify");
 
 module.exports = function(content) {
@@ -16,6 +19,11 @@ module.exports = function(content) {
     options.bail = bail;
   }
 
+  const cacheDir =
+    options.cache === true
+      ? findCacheDir({ name: "imagemin-webpack" })
+      : options.cache;
+
   const task = {
     bail: options.bail,
     file: this.resourcePath,
@@ -24,7 +32,10 @@ module.exports = function(content) {
   };
 
   return nodeify(
-    Promise.resolve().then(() => minify(task)),
+    Promise.resolve().then(
+      () =>
+        cacheDir ? cacheWrapper(minify(task), task, cacheDir) : minify(task)
+    ),
     (error, result) => {
       if (error) {
         return callback(error);
