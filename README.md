@@ -51,6 +51,18 @@ npm install imagemin-webpack --save-dev
 
 ### Optionals
 
+Images can be compressed in two modes:
+
+1.  [Lossless](https://en.wikipedia.org/wiki/Lossless_compression) (without loss of quality).
+2.  [Lossy](https://en.wikipedia.org/wiki/Lossy_compression) (with loss of quality).
+
+Note:
+
+* [imagemin-mozjpeg](https://github.com/imagemin/imagemin-mozjpeg) can be configured in lossless and lossy mode.
+* [imagemin-svgo](https://github.com/imagemin/imagemin-svgo) can be configured in lossless and lossy mode.
+
+Explore the options to get the best result for you.
+
 **Recommended basic imagemin plugins for lossless optimization**
 
 ```shell
