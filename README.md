@@ -17,7 +17,7 @@
   <h1>Imagemin Webpack</h1>
   <p>
     Plugin and Loader for <a href="http://webpack.js.org/">webpack</a> to optimize (compress) all images using <a href="https://github.com/imagemin/imagemin">imagemin</a>.
-    Do not worry about size of images, now they are always compressed.
+    Do not worry about size of images, now they are always optimized/compressed.
   </p>
 </div>
 
@@ -51,7 +51,7 @@ npm install imagemin-webpack --save-dev
 
 ### Optionals
 
-Images can be compressed in two modes:
+Images can be optimized in two modes:
 
 1.  [Lossless](https://en.wikipedia.org/wiki/Lossless_compression) (without loss of quality).
 2.  [Lossy](https://en.wikipedia.org/wiki/Lossy_compression) (with loss of quality).
@@ -88,8 +88,9 @@ const { ImageminWebpackPlugin } = require("imagemin-webpack");
 
 // Before importing imagemin plugin make sure you add it in `package.json` (`dependencies`) and install
 const imageminGifsicle = require("imagemin-gifsicle");
-
-const plugins = [imageminGifsicle()];
+const imageminJpegtran = require("imagemin-jpegtran");
+const imageminOptipng = require("imagemin-optipng");
+const imageminSvgo = require("imagemin-svgo");
 
 module.exports = {
   module: {
@@ -105,15 +106,32 @@ module.exports = {
     ]
   },
   plugins: [
-    // Make sure that the plugin is after any plugins that add images
+    // Make sure that the plugin is after any plugins that add images, example `CopyWebpackPlugin`
     new ImageminWebpackPlugin({
       imageminOptions: {
-        plugins
+        // Lossless optimization with custom option
+        // Feel free to experement with options for better result for you
+        plugins: [
+          imageminGifsicle({
+            interlaced: true
+          }),
+          imageminJpegtran({
+            progressive: true
+          }),
+          imageminOptipng({
+            optimizationLevel: 5
+          }),
+          imageminSvgo({
+            removeViewBox: true
+          })
+        ]
       }
     })
   ]
 };
 ```
+
+### Lossless Configuratoion
 
 ### Standalone Loader
 
