@@ -33,3 +33,6 @@ matrix:
 before_install:
   - npm install -g npm@latest
   - sudo apt-get install nasm
+  - nvm --version
+  - node --version
+  - npm --version
