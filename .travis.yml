@@ -31,7 +31,7 @@ matrix:
       env: CI=tests 6
 
 before_install:
-  - npm install -g npm@latest
+  - npm install -g npm@5
   - sudo apt-get install nasm
   - nvm --version
   - node --version
