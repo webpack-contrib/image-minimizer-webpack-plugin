@@ -305,8 +305,8 @@ const imageminGifsicle = require("imagemin-gifsicle");
 | **`imageminOptions`** |        `{Object}`         |             `{ plugins: [] }`             | Options for `imagemin`                                                                                                    |
 |     **`loader`**      |        `{Boolean}`        |                  `true`                   | Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other) |
 | **`maxConcurrency`**  |        `{Number}`         |          `os.cpus().length - 1`           | Maximum number of concurrency minification processes in one time                                                          |
-|      **`name`**       |        `{Number}`         |              `[hash].[ext]`               | The target asset name                                                                                                     |
-|    **`manifest`**     |        `{Number}`         |              `[hash].[ext]`               | Contain optimized list of images from other plugins                                                                       |
+|      **`name`**       |        `{String}`         |              `[hash].[ext]`               | The target asset name                                                                                                     |
+|    **`manifest`**     |        `{Object}`         |                `undefined`                | Contain optimized list of images from other plugins                                                                       |
 
 <!--lint enable no-html-->
 
@@ -465,7 +465,8 @@ const manifest = {};
   new ImageminWebpackPlugin({
     manifest
   }),
-  new OtherPlugin({
+  new SomeManifestPlugin({
+    // Contain compressed images
     manifest
   })
 ];

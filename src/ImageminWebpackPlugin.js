@@ -25,7 +25,7 @@ class ImageminWebpackPlugin {
         plugins: []
       },
       loader = true,
-      manifest = null,
+      manifest,
       maxConcurrency = CPULength > 1 ? CPULength - 1 : CPULength,
       name = "[hash].[ext]"
     } = options;
