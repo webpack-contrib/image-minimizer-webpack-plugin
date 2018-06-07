@@ -67,7 +67,7 @@
     "lint-staged": "^7.0.0",
     "lodash.defaultsdeep": "^4.6.0",
     "npm-run-all": "^4.0.0",
-    "npmpub": "^3.1.0",
+    "npmpub": "^4.0.0",
     "nyc": "^11.0.0",
     "pify": "^3.0.0",
     "prettier": "^1.5.2",
