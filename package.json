@@ -57,7 +57,7 @@
     "eslint-plugin-prettier": "^2.1.2",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-react": "^7.1.0",
-    "eslint-plugin-unicorn": "^4.0.2",
+    "eslint-plugin-unicorn": "^5.0.0",
     "file-loader": "^1.1.10",
     "husky": "^0.14.0",
     "imagemin-gifsicle": "5.2.0",
