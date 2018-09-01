@@ -186,7 +186,7 @@ class ImageminWebpackPlugin {
                     });
                   }
 
-                  const interpolatedName = interpolateName(file, name, {
+                  const interpolatedName = interpolateName(file, path.join(path.dirname(file), name), {
                     content: source.source()
                   });
 
