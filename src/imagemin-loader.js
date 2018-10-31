@@ -2,39 +2,31 @@
 
 const loaderUtils = require("loader-utils");
 const nodeify = require("nodeify");
-const findCacheDir = require("find-cache-dir");
 
-const { cacheWrapper } = require("./utils");
-const minify = require("./minify/minify");
+const minify = require("./minify");
 
 module.exports = function(content) {
   const options = loaderUtils.getOptions(this) || {};
   const callback = this.async();
   /* eslint-disable no-underscore-dangle */
-  const bail =
-    (this._compiler && this._compiler.options && this._compiler.options.bail) ||
-    false;
+  let { bail } = options;
 
-  if (typeof options.bail !== "boolean") {
-    options.bail = bail;
+  if (typeof bail === "undefined") {
+    bail =
+      (this._compiler &&
+        this._compiler.options &&
+        this._compiler.options.bail) ||
+      false;
   }
 
-  const cacheDir =
-    options.cache === true
-      ? findCacheDir({ name: "imagemin-webpack" })
-      : options.cache;
-
-  const task = {
-    bail: options.bail,
-    file: this.resourcePath,
-    imageminOptions: options.imageminOptions,
-    input: content
-  };
-
   return nodeify(
-    Promise.resolve().then(
-      () =>
-        cacheDir ? cacheWrapper(minify(task), task, cacheDir) : minify(task)
+    Promise.resolve().then(() =>
+      minify({
+        bail,
+        cache: options.cache,
+        imageminOptions: options.imageminOptions,
+        input: content
+      })
     ),
     (error, result) => {
       if (error) {
@@ -53,7 +45,14 @@ module.exports = function(content) {
         });
       }
 
-      return callback(null, result.output ? result.output : content);
+      const data = result.output ? result.output : content;
+
+      // A trick to avoid double compression by our plugin.
+      // Webpack doesn't have api to store meta information for assets,
+      // maybe in future it will be implemented.
+      data._compressed = true;
+
+      return callback(null, data);
     }
   );
 };

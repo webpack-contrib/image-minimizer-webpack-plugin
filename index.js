@@ -1,9 +1,8 @@
 "use strict";
 
 // eslint-disable-next-line node/no-unpublished-require
-const ImageminWebpackPlugin = require("./src/ImageminWebpackPlugin");
+const ImageminPlugin = require("./src/ImageminPlugin");
 
-module.exports = {
-  ImageminWebpackPlugin,
-  imageminLoader: require.resolve("./src/imagemin-loader")
-};
+ImageminPlugin.loader = require.resolve("./src/imagemin-loader.js");
+
+module.exports = ImageminPlugin;
