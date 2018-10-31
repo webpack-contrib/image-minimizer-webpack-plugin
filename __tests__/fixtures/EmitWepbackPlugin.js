@@ -9,7 +9,7 @@ export default class EmitWepbackPlugin {
     this.options = Object.assign(
       {},
       {
-        filename: "plugin-test.jpg"
+        fileNames: ["plugin-test.jpg"]
       },
       options
     );
@@ -19,15 +19,22 @@ export default class EmitWepbackPlugin {
     const plugin = { name: "EmitPlugin" };
 
     const emitFn = (compilation, callback) => {
-      const { filename } = this.options;
-      const filePath = path.join(__dirname, filename);
+      const { fileNames } = this.options;
 
       return nodeify(
-        pify(fs.readFile)(filePath).then(data => {
-          compilation.assets[filename] = new RawSource(data);
+        Promise.all(
+          fileNames.map(fileName => {
+            const filePath = path.join(__dirname, fileName);
 
-          return data;
-        }),
+            return Promise.resolve()
+              .then(() => pify(fs.readFile)(filePath))
+              .then(data => {
+                compilation.assets[fileName] = new RawSource(data);
+
+                return data;
+              });
+          })
+        ),
         callback
       );
     };

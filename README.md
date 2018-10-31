@@ -25,23 +25,23 @@
 
 ## Why
 
-* No extra dependencies (`imagemin-gifsicle`, `imagemin-pngquant`) in `dependencies` section into `package.json`.
+- No extra dependencies (`imagemin-gifsicle`, `imagemin-pngquant`) in `dependencies` section into `package.json`.
   You decide for yourself what plugins to use.
 
-* This loader and plugin will optimize ANY images regardless of how they were added to webpack.
+- This loader and plugin will optimize ANY images regardless of how they were added to webpack.
   `image-webpack-loader` don't optimize some images generating `favicons-webpack-plugin` or `copy-webpack-plugin`.
   `ImageminWebpackPlugin` don't optimize inlined images with `url-loader`.
 
-* Images optimized when inlined with `url-loader` or `svg-url-loader`. This can't be done with `imagemin-webpack-plugin`.
+- Images optimized when inlined with `url-loader` or `svg-url-loader`. This can't be done with `imagemin-webpack-plugin`.
 
-* Throttle asynchronous images optimization (using `maxConcurrency` plugin option).
+- Throttle asynchronous images optimization (using `maxConcurrency` plugin option).
   This allows you to not overload a server when building.
 
-* All tested.
+- All tested.
 
-* Persistent cache.
+- Persistent cache.
 
-* (Optional) Don't crash building process if your have corrupted image(s).
+- (Optional) Don't crash building process if your have corrupted image(s).
 
 ## Install
 
@@ -58,8 +58,8 @@ Images can be optimized in two modes:
 
 Note:
 
-* [imagemin-mozjpeg](https://github.com/imagemin/imagemin-mozjpeg) can be configured in lossless and lossy mode.
-* [imagemin-svgo](https://github.com/imagemin/imagemin-svgo) can be configured in lossless and lossy mode.
+- [imagemin-mozjpeg](https://github.com/imagemin/imagemin-mozjpeg) can be configured in lossless and lossy mode.
+- [imagemin-svgo](https://github.com/imagemin/imagemin-svgo) can be configured in lossless and lossy mode.
 
 Explore the options to get the best result for you.
 
@@ -75,16 +75,14 @@ npm install imagemin-gifsicle imagemin-jpegtran imagemin-optipng imagemin-svgo -
 npm install imagemin-gifsicle imagemin-mozjpeg imagemin-pngquant imagemin-svgo --save-dev
 ```
 
-## Usage
-
 ### Basic
 
-If you want to use `loader` or `plugin` standalone see sections below, but this is not recommended.
+Note: **If you want to use `loader` or `plugin` standalone see sections below, but this is not recommended**.
 
-**Make sure that plugin place after any plugins that add images or other assets which you want to optimized.**
+Note: **Make sure that plugin place after any plugins that add images or other assets which you want to optimized.**
 
 ```js
-const { ImageminWebpackPlugin } = require("imagemin-webpack");
+const ImageminPlugin = require("imagemin-webpack");
 
 // Before importing imagemin plugin make sure you add it in `package.json` (`dependencies`) and install
 const imageminGifsicle = require("imagemin-gifsicle");
@@ -107,7 +105,9 @@ module.exports = {
   },
   plugins: [
     // Make sure that the plugin is after any plugins that add images, example `CopyWebpackPlugin`
-    new ImageminWebpackPlugin({
+    new ImageminPlugin({
+      bail: false, // Ignore errors on corrupted images
+      cache: true,
       imageminOptions: {
         // Lossless optimization with custom option
         // Feel free to experement with options for better result for you
@@ -131,20 +131,16 @@ module.exports = {
 };
 ```
 
-### Lossless Configuratoion
-
 ### Standalone Loader
 
 [Documentation: Using loaders](https://webpack.js.org/concepts/loaders/)
 
-In your `webpack.config.js`, add the `imagemin-webpack`,
+In your `webpack.config.js`, add the `ImageminPlugin.loader`,
 chained with the [file-loader](https://github.com/webpack/file-loader)
 or [url-loader](https://github.com/webpack-contrib/url-loader):
 
 ```js
-const { imageminLoader } = require("imagemin-webpack");
-
-// Before importing imagemin plugin make sure you add it in `package.json` (`dependencies`) and install
+const ImageminPlugin = require("imagemin-webpack");
 const imageminGifsicle = require("imagemin-gifsicle");
 
 module.exports = {
@@ -157,10 +153,10 @@ module.exports = {
             loader: "file-loader" // Or `url-loader` or your other loader
           },
           {
-            loader: imageminLoader,
+            loader: ImageminPlugin.loader,
             options: {
-              cache: true,
               bail: false, // Ignore errors on corrupted images
+              cache: true,
               imageminOptions: {
                 plugins: [imageminGifsicle()]
               }
@@ -178,15 +174,10 @@ module.exports = {
 [Documentation: Using plugins](https://webpack.js.org/concepts/plugins/)
 
 ```js
-import { ImageminWebpackPlugin } from "imagemin-webpack";
+const ImageminWebpack = require("imagemin-webpack");
+const imageminGifsicle = require("imagemin-gifsicle");
 
-// Before importing imagemin plugin make sure you add it in `package.json` (`dependencies`) and install
-import imageminGifsicle from "imagemin-gifsicle";
-
-const imageminManifest = {};
-
-export default {
-  //
+module.exports = {
   module: {
     rules: [
       {
@@ -201,19 +192,13 @@ export default {
   },
   plugins: [
     // Make sure that the plugin is after any plugins that add images
-    new ImageminWebpackPlugin({
-      cache: true,
+    new ImageminWebpack({
       bail: false, // Ignore errors on corrupted images
-      loader: false,
+      cache: true,
       imageminOptions: {
         plugins: [imageminGifsicle()]
       },
-      manifest: imageminManifest, // This object will contain source and interpolated filenames
-      maxConcurrency: os.cpus().length - 1,
-      name: "[hash].[ext]",
-      test: /\.(jpe?g|png|gif|svg)$/i,
-      include: undefined,
-      exclude: undefined
+      loader: false
     })
   ]
 };
@@ -236,26 +221,68 @@ export default {
 **webpack.config.js**
 
 ```js
-[
-  new ImageminWebpackPlugin({
-    cache: true
-  })
-];
+const ImageminPlugin = require("imagemin-webpack");
+const imageminGifsicle = require("imagemin-gifsicle");
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          {
+            loader: "file-loader" // Or `url-loader` or your other loader
+          },
+          {
+            loader: ImageminPlugin.loader,
+            options: {
+              cache: true,
+              imageminOptions: {
+                plugins: [imageminGifsicle()]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+};
 ```
 
 Enable file caching.
-Default path to cache directory: `node_modules/.cache/uglifyjs-webpack-plugin`.
+Default path to cache directory: `node_modules/.cache/imagemin-webpack`.
 
 ##### `{String}`
 
 **webpack.config.js**
 
 ```js
-[
-  new ImageminWebpackPlugin({
-    cache: "path/to/cache"
-  })
-];
+const ImageminPlugin = require("imagemin-webpack");
+const imageminGifsicle = require("imagemin-gifsicle");
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          {
+            loader: "file-loader" // Or `url-loader` or your other loader
+          },
+          {
+            loader: ImageminPlugin.loader,
+            options: {
+              cache: "path/to/cache",
+              imageminOptions: {
+                plugins: [imageminGifsicle()]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+};
 ```
 
 #### `bail`
@@ -263,11 +290,32 @@ Default path to cache directory: `node_modules/.cache/uglifyjs-webpack-plugin`.
 **webpack.config.js**
 
 ```js
-[
-  new ImageminWebpackPlugin({
-    bail: true
-  })
-];
+const ImageminPlugin = require("imagemin-webpack");
+const imageminGifsicle = require("imagemin-gifsicle");
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          {
+            loader: "file-loader" // Or `url-loader` or your other loader
+          },
+          {
+            loader: ImageminPlugin.loader,
+            options: {
+              bail: true,
+              imageminOptions: {
+                plugins: [imageminGifsicle()]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+};
 ```
 
 #### `imageminOptions`
@@ -275,38 +323,55 @@ Default path to cache directory: `node_modules/.cache/uglifyjs-webpack-plugin`.
 **webpack.config.js**
 
 ```js
+const ImageminPlugin = require("imagemin-webpack");
 const imageminGifsicle = require("imagemin-gifsicle");
 
-[
-  new ImageminWebpackPlugin({
-    imageminOptions: {
-      plugins: [
-        imageminGifsicle({
-          interlaced: true,
-          optimizationLevel: 3
-        })
-      ]
-    }
-  })
-];
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          {
+            loader: "file-loader" // Or `url-loader` or your other loader
+          },
+          {
+            loader: ImageminPlugin.loader,
+            options: {
+              bail: true,
+              imageminOptions: {
+                plugins: [
+                  imageminGifsicle({
+                    interlaced: true,
+                    optimizationLevel: 3
+                  })
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+};
 ```
 
 ### Plugin Options
 
 <!--lint disable no-html-->
 
-|         Name          |           Type            |                  Default                  | Description                                                                                                               |
-| :-------------------: | :-----------------------: | :---------------------------------------: | :------------------------------------------------------------------------------------------------------------------------ |
-|      **`test`**       | `{RegExp\|Array<RegExp>}` | <code>/\.(jpe?g\|png\|gif\|svg)$/i</code> | Test to match files against                                                                                               | gif | svg)$/i</code> | Test to match files against | gif | svg)$/i</code> | Test to match files against |
-|     **`include`**     | `{RegExp\|Array<RegExp>}` |                `undefined`                | Files to `include`                                                                                                        |
-|     **`exclude`**     | `{RegExp\|Array<RegExp>}` |                `undefined`                | Files to `exclude`                                                                                                        |
-|      **`cache`**      |    `{Boolean\|String}`    |                  `false`                  | Enable file caching                                                                                                       |
-|      **`bail`**       |        `{Boolean}`        |          `compiler.options.bail`          | Emit warnings instead errors                                                                                              |
-| **`imageminOptions`** |        `{Object}`         |             `{ plugins: [] }`             | Options for `imagemin`                                                                                                    |
-|     **`loader`**      |        `{Boolean}`        |                  `true`                   | Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other) |
-| **`maxConcurrency`**  |        `{Number}`         |          `os.cpus().length - 1`           | Maximum number of concurrency minification processes in one time                                                          |
-|      **`name`**       |        `{String}`         |              `[hash].[ext]`               | The target asset name                                                                                                     |
-|    **`manifest`**     |        `{Object}`         |                `undefined`                | Contain optimized list of images from other plugins                                                                       |
+|         Name          |                   Type                    |                  Default                   | Description                                                                                                               |
+| :-------------------: | :---------------------------------------: | :----------------------------------------: | :------------------------------------------------------------------------------------------------------------------------ |
+|      **`test`**       | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|svg)\$/i</code> | Test to match files against                                                                                               | gif | svg)\$/i</code> | Test to match files against | gif | svg)\$/i</code> | Test to match files against |
+|     **`include`**     | `{String\/RegExp\|Array<String\|RegExp>}` |                `undefined`                 | Files to `include`                                                                                                        |
+|     **`exclude`**     | `{String\/RegExp\|Array<String\|RegExp>}` |                `undefined`                 | Files to `exclude`                                                                                                        |
+|      **`cache`**      |            `{Boolean\|String}`            |                  `false`                   | Enable file caching                                                                                                       |
+|      **`bail`**       |                `{Boolean}`                |          `compiler.options.bail`           | Emit warnings instead errors                                                                                              |
+| **`imageminOptions`** |                `{Object}`                 |             `{ plugins: [] }`              | Options for `imagemin`                                                                                                    |
+|     **`loader`**      |                `{Boolean}`                |                   `true`                   | Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other) |
+| **`maxConcurrency`**  |                `{Number}`                 |    `Math.max(1, os.cpus().length - 1)`     | Maximum number of concurrency minification processes in one time                                                          |
+|      **`name`**       |                `{String}`                 |               `[hash].[ext]`               | The target asset name                                                                                                     |
+|    **`manifest`**     |                `{Object}`                 |                `undefined`                 | Contain optimized list of images from other plugins                                                                       |
 
 <!--lint enable no-html-->
 
@@ -315,11 +380,15 @@ const imageminGifsicle = require("imagemin-gifsicle");
 **webpack.config.js**
 
 ```js
-[
-  new ImageminWebpackPlugin({
-    test: /\.(jpe?g|png|gif|svg)$/i
-  })
-];
+const ImageminPlugin = require("imagemin-webpack");
+
+module.exports = {
+  plugins: [
+    new ImageminPlugin({
+      test: /\.(jpe?g|png|gif|svg)$/i
+    })
+  ]
+};
 ```
 
 #### `include`
@@ -327,11 +396,15 @@ const imageminGifsicle = require("imagemin-gifsicle");
 **webpack.config.js**
 
 ```js
-[
-  new ImageminWebpackPlugin({
-    include: /\/includes/
-  })
-];
+const ImageminPlugin = require("imagemin-webpack");
+
+module.exports = {
+  plugins: [
+    new ImageminPlugin({
+      include: /\/includes/
+    })
+  ]
+};
 ```
 
 #### `exclude`
@@ -339,17 +412,22 @@ const imageminGifsicle = require("imagemin-gifsicle");
 **webpack.config.js**
 
 ```js
-[
-  new ImageminWebpackPlugin({
-    exclude: /\/excludes/
-  })
-];
+const ImageminPlugin = require("imagemin-webpack");
+
+module.exports = {
+  plugins: [
+    new ImageminPlugin({
+      exclude: /\/excludes/
+    })
+  ]
+};
 ```
 
 #### `cache`
 
 **Be careful** when your enable `cache` and change options for imagemin plugin (example for `imagemin-gifsicle`) you should remove cache manually.
 You can use `rm -rf ./node_modules/.cache/imagemin-webpack` command. This is due to the fact that `imagemin-plugin` is `Function` and we don't know her arguments to invalidate cache.
+
 Note: if somebody know how we can fix it PR welcome!
 
 ##### `{Boolean}`
@@ -357,26 +435,34 @@ Note: if somebody know how we can fix it PR welcome!
 **webpack.config.js**
 
 ```js
-[
-  new ImageminWebpackPlugin({
-    cache: true
-  })
-];
+const ImageminPlugin = require("imagemin-webpack");
+
+module.exports = {
+  plugins: [
+    new ImageminPlugin({
+      cache: true
+    })
+  ]
+};
 ```
 
 Enable file caching.
-Default path to cache directory: `node_modules/.cache/uglifyjs-webpack-plugin`.
+Default path to cache directory: `node_modules/.cache/imagemin-webpack`.
 
 ##### `{String}`
 
 **webpack.config.js**
 
 ```js
-[
-  new ImageminWebpackPlugin({
-    cache: "path/to/cache"
-  })
-];
+const ImageminPlugin = require("imagemin-webpack");
+
+module.exports = {
+  plugins: [
+    new ImageminPlugin({
+      cache: "path/to/cache"
+    })
+  ]
+};
 ```
 
 #### `bail`
@@ -384,11 +470,15 @@ Default path to cache directory: `node_modules/.cache/uglifyjs-webpack-plugin`.
 **webpack.config.js**
 
 ```js
-[
-  new ImageminWebpackPlugin({
-    bail: true
-  })
-];
+const ImageminPlugin = require("imagemin-webpack");
+
+module.exports = {
+  plugins: [
+    new ImageminPlugin({
+      bail: true
+    })
+  ]
+};
 ```
 
 #### `imageminOptions`
@@ -396,34 +486,23 @@ Default path to cache directory: `node_modules/.cache/uglifyjs-webpack-plugin`.
 **webpack.config.js**
 
 ```js
+const ImageminPlugin = require("imagemin-webpack");
 const imageminGifsicle = require("imagemin-gifsicle");
 
-[
-  new ImageminWebpackPlugin({
-    imageminOptions: {
-      plugins: [
-        imageminGifsicle({
-          interlaced: true,
-          optimizationLevel: 3
-        })
-      ]
-    }
-  })
-];
-```
-
-#### `loader`
-
-**webpack.config.js**
-
-```js
-const imageminGifsicle = require("imagemin-gifsicle");
-
-[
-  new ImageminWebpackPlugin({
-    loader: false
-  })
-];
+module.exports = {
+  plugins: [
+    new ImageminPlugin({
+      imageminOptions: {
+        plugins: [
+          imageminGifsicle({
+            interlaced: true,
+            optimizationLevel: 3
+          })
+        ]
+      }
+    })
+  ]
+};
 ```
 
 #### `maxConcurrency`
@@ -431,13 +510,15 @@ const imageminGifsicle = require("imagemin-gifsicle");
 **webpack.config.js**
 
 ```js
-const imageminGifsicle = require("imagemin-gifsicle");
+const ImageminPlugin = require("imagemin-webpack");
 
-[
-  new ImageminWebpackPlugin({
-    maxConcurrency: 3
-  })
-];
+module.exports = {
+  plugins: [
+    new ImageminPlugin({
+      maxConcurrency: 3
+    })
+  ]
+};
 ```
 
 #### `name`
@@ -445,38 +526,47 @@ const imageminGifsicle = require("imagemin-gifsicle");
 **webpack.config.js**
 
 ```js
-[
-  new ImageminWebpackPlugin({
-    name: "[hash]-compressed.[ext]"
-  })
-];
+const ImageminPlugin = require("imagemin-webpack");
+
+module.exports = {
+  plugins: [
+    new ImageminPlugin({
+      name: "[hash]-compressed.[ext]"
+    })
+  ]
+};
 ```
 
 #### `manifest`
 
-**Manifest will be contain list of optimized images only after `emit` event.**
+Note: contains only assets compressed by plugin.
+Note: Manifest will be contain list of optimized images only after `emit` event.
 
 **webpack.config.js**
 
 ```js
+const ImageminPlugin = require("imagemin-webpack");
+const ManifestPlugin = require("manifest-webpack-plugin");
 const manifest = {};
 
-[
-  new ImageminWebpackPlugin({
-    manifest
-  }),
-  new SomeManifestPlugin({
-    // Contain compressed images
-    manifest
-  })
-];
+module.exports = {
+  plugins: [
+    new ImageminPlugin({
+      manifest
+    }),
+    new ManifestPlugin({
+      // Contain compressed images
+      manifest
+    })
+  ]
+};
 ```
 
 ## Related
 
-* [imagemin](https://github.com/imagemin/imagemin) - API for this package.
-* [image-webpack-loader](https://github.com/tcoopman/image-webpack-loader) - inspiration, thanks.
-* [imagemin-webpack-plugin](https://github.com/Klathmon/imagemin-webpack-plugin) - inspiration, thanks.
+- [imagemin](https://github.com/imagemin/imagemin) - API for this package.
+- [image-webpack-loader](https://github.com/tcoopman/image-webpack-loader) - inspiration, thanks.
+- [imagemin-webpack-plugin](https://github.com/Klathmon/imagemin-webpack-plugin) - inspiration, thanks.
 
 ## Contribution
 
