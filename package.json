@@ -48,7 +48,7 @@
     "del": "^3.0.0",
     "eslint": "^5.8.0",
     "eslint-plugin-ava": "^5.1.1",
-    "eslint-plugin-html": "^4.0.5",
+    "eslint-plugin-html": "^5.0.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-itgalaxy": "^87.0.0",
     "eslint-plugin-jest": "^22.0.0",
