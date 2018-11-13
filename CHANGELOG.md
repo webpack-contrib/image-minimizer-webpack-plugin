@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org).
 
-## HEAD
+## 4.0.0 - 2018-11-13
 
 - Changed: rename class `ImageminWebpackPlugin` to `ImageminPlugin`.
 - Changed: change export `ImageminPlugin` and `imageminLoader` (Look on [Usage](https://github.com/itgalaxy/imagemin-webpack#usage)).
