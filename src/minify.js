@@ -23,13 +23,13 @@ function runImagemin(source, imageminOptions) {
 function minify(task = {}) {
   const { bail, cache, imageminOptions, input } = task;
   const result = {
-    errors: new Set(),
+    errors: [],
     output: null,
-    warnings: new Set()
+    warnings: []
   };
 
   if (!input) {
-    result.errors.add(new Error("Empty input"));
+    result.errors.push(new Error("Empty input"));
 
     return result;
   }
@@ -39,7 +39,7 @@ function minify(task = {}) {
     !imageminOptions.plugins ||
     imageminOptions.plugins.length === 0
   ) {
-    result.errors.add(new Error("No plugins found for `imagemin`"));
+    result.errors.push(new Error("No plugins found for `imagemin`"));
 
     return result;
   }
@@ -95,9 +95,9 @@ function minify(task = {}) {
     })
     .catch(error => {
       if (bail) {
-        result.errors.add(error);
+        result.errors.push(error);
       } else {
-        result.warnings.add(error);
+        result.warnings.push(error);
       }
 
       // Don't cache images with errors.

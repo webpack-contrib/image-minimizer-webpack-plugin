@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org).
 
+## 4.0.1 - 2018-11-14
+
+- Fixed: use `afterPlugins` event for include `loader` (`minimizer` plugins don't have `afterPlugins` hook, bug in `webpack`).
+- Fixed: don't add multiple `imagemin-loader` in multi compiler mode by default.
+- Fixed: don't interpolate asset module name when `loader` is disabled (also don't include their in `manifest` option).
+
 ## 4.0.0 - 2018-11-13
 
 - Changed: rename class `ImageminWebpackPlugin` to `ImageminPlugin`.

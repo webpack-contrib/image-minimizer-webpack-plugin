@@ -57,7 +57,7 @@ test("should return `Promise`", t => {
 test("should throw error on empty", t => {
   const result = minify();
 
-  t.true(result.errors.size === 1);
+  t.true(result.errors.length === 1);
 
   for (const error of result.errors) {
     t.regex(error.message, /Empty\sinput/);
@@ -70,7 +70,7 @@ test("should throw error on empty `imagemin` options", t => {
     input: Buffer.from("Foo")
   });
 
-  t.true(result.errors.size === 1);
+  t.true(result.errors.length === 1);
 
   for (const error of result.errors) {
     t.regex(error.message, /No\splugins\sfound\sfor\s`imagemin`/);
@@ -87,9 +87,9 @@ test("should containt warning on broken image (no `bail` option)", t =>
       },
       input: data
     }).then(result => {
-      t.true(result.errors.size === 0);
+      t.true(result.errors.length === 0);
       t.regex([...result.warnings][0].message, /Corrupt\sJPEG\sdata/);
-      t.true(result.warnings.size === 1);
+      t.true(result.warnings.length === 1);
       t.true(Buffer.compare(data, result.output) === 0);
 
       return result;
@@ -107,9 +107,9 @@ test("should containt warning on broken image (`bail` option with `false` value)
       },
       input: data
     }).then(result => {
-      t.true(result.errors.size === 0);
+      t.true(result.errors.length === 0);
       t.regex([...result.warnings][0].message, /Corrupt\sJPEG\sdata/);
-      t.true(result.warnings.size === 1);
+      t.true(result.warnings.length === 1);
       t.true(Buffer.compare(data, result.output) === 0);
 
       return result;
@@ -128,8 +128,8 @@ test("should containt warning on broken image (`bail` option with `true` value)"
       input: data
     }).then(result => {
       t.regex([...result.errors][0].message, /Corrupt\sJPEG\sdata/);
-      t.true(result.errors.size === 1);
-      t.true(result.warnings.size === 0);
+      t.true(result.errors.length === 1);
+      t.true(result.warnings.length === 0);
       t.true(Buffer.compare(data, result.output) === 0);
 
       return result;

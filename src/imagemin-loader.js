@@ -33,13 +33,13 @@ module.exports = function(content) {
         return callback(error);
       }
 
-      if (result.warnings && result.warnings.size > 0) {
+      if (result.warnings && result.warnings.length > 0) {
         result.warnings.forEach(warning => {
           this.emitWarning(warning);
         });
       }
 
-      if (result.errors && result.errors.size > 0) {
+      if (result.errors && result.errors.length > 0) {
         result.errors.forEach(warning => {
           this.emitError(warning);
         });

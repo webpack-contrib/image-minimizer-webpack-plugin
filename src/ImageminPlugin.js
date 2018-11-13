@@ -40,6 +40,7 @@ class ImageminPlugin {
       name,
       test
     };
+    this.loaderAdded = false;
   }
 
   apply(compiler) {
@@ -49,8 +50,23 @@ class ImageminPlugin {
       this.options.bail = compiler.options.bail;
     }
 
+    const moduleAssets = {};
+
+    compiler.hooks.compilation.tap(plugin, compilation => {
+      compilation.hooks.moduleAsset.tap(plugin, (module, file) => {
+        if (!module.userRequest) {
+          return;
+        }
+
+        moduleAssets[file] = path.join(
+          path.dirname(file),
+          path.basename(module.userRequest)
+        );
+      });
+    });
+
     if (this.options.loader) {
-      compiler.hooks.afterEnvironment.tap(plugin, () => {
+      compiler.hooks.afterPlugins.tap(plugin, () => {
         const {
           cache,
           test,
@@ -60,6 +76,11 @@ class ImageminPlugin {
           imageminOptions,
           name
         } = this.options;
+
+        // Avoid multiple adding loader in multi compiler mode
+        if (this.loaderAdded) {
+          return;
+        }
 
         compiler.options.module.rules.push({
           enforce: "pre",
@@ -74,6 +95,8 @@ class ImageminPlugin {
           },
           test
         });
+
+        this.loaderAdded = true;
       });
     }
 
@@ -129,16 +152,22 @@ class ImageminPlugin {
                     ? new RawSource(result.output)
                     : asset;
 
-                  if (result.warnings && result.warnings.size > 0) {
+                  if (result.warnings && result.warnings.length > 0) {
                     result.warnings.forEach(warning => {
                       compilation.warnings.push(warning);
                     });
                   }
 
-                  if (result.errors && result.errors.size > 0) {
+                  if (result.errors && result.errors.length > 0) {
                     result.errors.forEach(warning => {
                       compilation.errors.push(warning);
                     });
+                  }
+
+                  if (moduleAssets[file]) {
+                    compilation.assets[file] = source;
+
+                    return Promise.resolve(source);
                   }
 
                   const interpolatedName = interpolateName(file, name, {

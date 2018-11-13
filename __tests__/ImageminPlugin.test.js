@@ -1,4 +1,10 @@
-import { fixturesPath, isCompressed, plugins, runWebpack } from "./helpers";
+import {
+  fixturesPath,
+  isCompressed,
+  modulesHasImageminLoader,
+  plugins,
+  runWebpack
+} from "./helpers";
 import cacache from "cacache";
 import del from "del";
 import findCacheDir from "find-cache-dir";
@@ -6,15 +12,118 @@ import path from "path";
 import tempy from "tempy";
 import test from "ava";
 
-test("should optimizes all images (loader + plugin)", t =>
+test("should optimizes all images (loader + plugin) as plugin", t =>
   Promise.resolve()
     .then(() => runWebpack({ emitPlugin: true, imageminPlugin: true }))
     .then(stats => {
-      const { warnings, errors, assets } = stats.compilation;
+      const { warnings, errors, assets, modules } = stats.compilation;
 
       t.true(warnings.length === 0, "no compilation warnings");
       t.true(errors.length === 0, "no compilation error");
       t.true(Object.keys(assets).length === 6, "6 assets");
+
+      t.true(modulesHasImageminLoader(modules, "loader-test.gif"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.jpg"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.png"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.svg"));
+      t.true(!modulesHasImageminLoader(modules, "plugin-test.jpg"));
+
+      return isCompressed(
+        [
+          "loader-test.gif",
+          "loader-test.jpg",
+          "loader-test.png",
+          "loader-test.svg",
+          "plugin-test.jpg"
+        ],
+        assets
+      );
+    }));
+
+test("should optimizes all images (loader + plugin) as minimizer", t =>
+  Promise.resolve()
+    .then(() =>
+      runWebpack({ asMinimizer: true, emitPlugin: true, imageminPlugin: true })
+    )
+    .then(stats => {
+      const { warnings, errors, assets, modules } = stats.compilation;
+
+      t.true(warnings.length === 0, "no compilation warnings");
+      t.true(errors.length === 0, "no compilation error");
+      t.true(Object.keys(assets).length === 6, "6 assets");
+
+      t.true(modulesHasImageminLoader(modules, "loader-test.gif"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.jpg"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.png"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.svg"));
+      t.true(!modulesHasImageminLoader(modules, "plugin-test.jpg"));
+
+      return isCompressed(
+        [
+          "loader-test.gif",
+          "loader-test.jpg",
+          "loader-test.png",
+          "loader-test.svg",
+          "plugin-test.jpg"
+        ],
+        assets
+      );
+    }));
+
+test("should optimizes all images (loader + plugin) (multi compiler mode)", t =>
+  Promise.resolve()
+    .then(() => runWebpack({ emitPlugin: true, imageminPlugin: true }, true))
+    .then(multiStats => {
+      t.true(multiStats.stats.length === 2, "2 compilation");
+
+      return multiStats;
+    })
+    .then(multiStats => {
+      const {
+        warnings,
+        errors,
+        assets,
+        modules
+      } = multiStats.stats[0].compilation;
+
+      t.true(warnings.length === 0, "no compilation warnings");
+      t.true(errors.length === 0, "no compilation error");
+      t.true(Object.keys(assets).length === 6, "6 assets");
+
+      t.true(modulesHasImageminLoader(modules, "loader-test.gif"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.jpg"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.png"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.svg"));
+      t.true(!modulesHasImageminLoader(modules, "plugin-test.jpg"));
+
+      return isCompressed(
+        [
+          "loader-test.gif",
+          "loader-test.jpg",
+          "loader-test.png",
+          "loader-test.svg",
+          "plugin-test.jpg"
+        ],
+        assets
+      ).then(() => multiStats);
+    })
+    .then(multiStats => {
+      const {
+        warnings,
+        errors,
+        assets,
+        modules
+      } = multiStats.stats[1].compilation;
+
+      t.true(warnings.length === 0, "no compilation warnings");
+      t.true(errors.length === 0, "no compilation error");
+      t.true(Object.keys(assets).length === 6, "6 assets");
+
+      t.true(modulesHasImageminLoader(modules, "loader-test.gif"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.jpg"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.png"));
+      t.true(modulesHasImageminLoader(modules, "loader-test.svg"));
+      t.true(!modulesHasImageminLoader(modules, "plugin-test.jpg"));
 
       return isCompressed(
         [
@@ -589,7 +698,51 @@ test("should optimizes images and contains not empty manifest", t => {
       t.true(errors.length === 0, "no compilation error");
       t.true(Object.keys(assets).length === 3, "3 assets");
       t.deepEqual(manifest, {
-        "plugin-test.jpg": "82bc921bd1ff78cfda2eee090ee32afd.jpg"
+        "plugin-test.jpg": "dddd284f1bd12a27330d4d186a044d47.jpg"
+      });
+
+      return stats;
+    });
+});
+
+test("should optimizes images and interpolate assets names exclude module assets", t => {
+  const manifest = {};
+
+  return Promise.resolve()
+    .then(() =>
+      runWebpack({
+        emitPlugin: true,
+        entry: path.join(fixturesPath, "loader.js"),
+        imageminPluginOptions: {
+          imageminOptions: {
+            plugins
+          },
+          loader: false,
+          manifest
+        }
+      })
+    )
+    .then(stats => {
+      const { assets, warnings, errors } = stats.compilation;
+
+      t.true(warnings.length === 0, "no compilation warnings");
+      t.true(errors.length === 0, "no compilation error");
+      t.true(Object.keys(assets).length === 6, "6 assets");
+      t.true(
+        Object.keys(assets).every(
+          element =>
+            [
+              "loader-test.gif",
+              "loader-test.jpg",
+              "loader-test.png",
+              "loader-test.svg",
+              "bundle.js",
+              "dddd284f1bd12a27330d4d186a044d47.jpg"
+            ].indexOf(element) >= 0
+        )
+      );
+      t.deepEqual(manifest, {
+        "plugin-test.jpg": "dddd284f1bd12a27330d4d186a044d47.jpg"
       });
 
       return stats;

@@ -20,7 +20,7 @@ const plugins = [
 
 const fixturesPath = path.join(__dirname, "./fixtures");
 
-function runWebpack(options = {}) {
+function runWebpack(options = {}, multiCompiler = false) {
   const config = {
     bail: options.bail,
     context: fixturesPath,
@@ -67,22 +67,31 @@ function runWebpack(options = {}) {
   }
 
   if (options.imageminPlugin || options.imageminPluginOptions) {
-    config.plugins = config.plugins.concat(
-      new ImageminPlugin(
-        options.imageminPluginOptions
-          ? options.imageminPluginOptions
-          : {
-              cache: false,
-              imageminOptions: {
-                plugins
-              },
-              name: "[path][name].[ext]"
-            }
-      )
+    const imageminPlugin = new ImageminPlugin(
+      options.imageminPluginOptions
+        ? options.imageminPluginOptions
+        : {
+            cache: false,
+            imageminOptions: {
+              plugins
+            },
+            name: "[path][name].[ext]"
+          }
     );
+
+    if (options.asMinimizer) {
+      if (!config.optimization) {
+        config.optimization = {};
+      }
+
+      config.optimization.minimize = true;
+      config.optimization.minimizer = [imageminPlugin];
+    } else {
+      config.plugins = config.plugins.concat(imageminPlugin);
+    }
   }
 
-  return pify(webpack)(config);
+  return pify(webpack)(multiCompiler ? [config, config] : config);
 }
 
 function isCompressed(originalNames, assets) {
@@ -115,4 +124,22 @@ function isCompressed(originalNames, assets) {
   );
 }
 
-export { runWebpack, isCompressed, plugins, fixturesPath };
+function modulesHasImageminLoader(modules, id) {
+  return modules.some(module => {
+    if (!module.id.endsWith(id)) {
+      return false;
+    }
+
+    const { loaders } = module;
+
+    return loaders.find(loader => loader.loader === ImageminPlugin.loader);
+  });
+}
+
+export {
+  runWebpack,
+  isCompressed,
+  plugins,
+  fixturesPath,
+  modulesHasImageminLoader
+};
