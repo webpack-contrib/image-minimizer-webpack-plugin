@@ -1,3 +1,9 @@
+import path from "path";
+import cacache from "cacache";
+import del from "del";
+import findCacheDir from "find-cache-dir";
+import tempy from "tempy";
+import test from "ava";
 import {
   fixturesPath,
   isCompressed,
@@ -5,12 +11,6 @@ import {
   plugins,
   runWebpack
 } from "./helpers";
-import cacache from "cacache";
-import del from "del";
-import findCacheDir from "find-cache-dir";
-import path from "path";
-import tempy from "tempy";
-import test from "ava";
 
 test("should optimizes all images (loader + plugin) as plugin", t =>
   Promise.resolve()

@@ -1,5 +1,5 @@
-import interpolateName from "../../src/utils/interpolate-name";
 import test from "ava";
+import interpolateName from "../../src/utils/interpolate-name";
 
 test("interpolateName", t => {
   [

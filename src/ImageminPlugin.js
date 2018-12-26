@@ -1,11 +1,11 @@
 "use strict";
 
 const os = require("os");
+const path = require("path");
 const RawSource = require("webpack-sources/lib/RawSource");
 const createThrottle = require("async-throttle");
 const nodeify = require("nodeify");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
-const path = require("path");
 
 const minify = require("./minify");
 const { interpolateName } = require("./utils");

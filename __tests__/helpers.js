@@ -1,4 +1,3 @@
-import EmitPlugin from "./fixtures/EmitWepbackPlugin";
 import ImageminPlugin from "..";
 import fs from "fs";
 import imagemin from "imagemin";
@@ -10,6 +9,7 @@ import path from "path";
 import pify from "pify";
 import tempy from "tempy";
 import webpack from "webpack";
+import EmitPlugin from "./fixtures/EmitWepbackPlugin";
 
 const plugins = [
   imageminGifsicle(),
