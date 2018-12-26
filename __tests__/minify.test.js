@@ -5,6 +5,7 @@ import del from "del";
 import findCacheDir from "find-cache-dir";
 import imagemin from "imagemin";
 import imageminMozjpeg from "imagemin-mozjpeg";
+import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
 import test from "ava";
 import minify from "../src/minify";
@@ -43,6 +44,44 @@ test("should optimize", t =>
       )
   ));
 
+test("should return optimized image even when optimized image large then original", t => {
+  const svgoOptions = {
+    plugins: [
+      {
+        addAttributesToSVGElement: {
+          attributes: [
+            {
+              xmlns: "http://www.w3.org/2000/svg"
+            }
+          ]
+        }
+      }
+    ]
+  };
+
+  return pify(fs.readFile)(
+    path.resolve(__dirname, "./fixtures/large-after-optimization.svg")
+  ).then(data =>
+    minify({
+      imageminOptions: {
+        plugins: [imageminSvgo(svgoOptions)]
+      },
+      input: data
+    }).then(result =>
+      imagemin
+        .buffer(data, {
+          plugins: [imageminSvgo(svgoOptions)]
+        })
+        .then(compressedImage => {
+          t.true(result.output.length === compressedImage.length);
+
+          return compressedImage;
+        })
+        .then(() => result)
+    )
+  );
+});
+
 test("should return `Promise`", t => {
   const result = minify({
     imageminOptions: {
@@ -77,7 +116,7 @@ test("should throw error on empty `imagemin` options", t => {
   }
 });
 
-test("should containt warning on broken image (no `bail` option)", t =>
+test("should contains warning on broken image (no `bail` option)", t =>
   pify(fs.readFile)(
     path.resolve(__dirname, "./fixtures/test-corrupted.jpg")
   ).then(data =>
@@ -96,7 +135,7 @@ test("should containt warning on broken image (no `bail` option)", t =>
     })
   ));
 
-test("should containt warning on broken image (`bail` option with `false` value)", t =>
+test("should contains warning on broken image (`bail` option with `false` value)", t =>
   pify(fs.readFile)(
     path.resolve(__dirname, "./fixtures/test-corrupted.jpg")
   ).then(data =>
@@ -116,7 +155,7 @@ test("should containt warning on broken image (`bail` option with `false` value)
     })
   ));
 
-test("should containt warning on broken image (`bail` option with `true` value)", t =>
+test("should contains warning on broken image (`bail` option with `true` value)", t =>
   pify(fs.readFile)(
     path.resolve(__dirname, "./fixtures/test-corrupted.jpg")
   ).then(data =>
