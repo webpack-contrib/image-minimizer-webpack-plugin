@@ -4,7 +4,6 @@ const os = require("os");
 const path = require("path");
 const RawSource = require("webpack-sources/lib/RawSource");
 const createThrottle = require("async-throttle");
-const nodeify = require("nodeify");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
 
 const minify = require("./minify");
@@ -100,7 +99,7 @@ class ImageminPlugin {
       });
     }
 
-    compiler.hooks.emit.tapAsync(plugin, (compilation, callback) => {
+    compiler.hooks.emit.tapPromise(plugin, compilation => {
       const { assets } = compilation;
       const assetsForMinify = new Set();
 
@@ -118,7 +117,7 @@ class ImageminPlugin {
       });
 
       if (assetsForMinify.size === 0) {
-        return callback();
+        return Promise.resolve();
       }
 
       const {
@@ -132,64 +131,61 @@ class ImageminPlugin {
 
       const throttle = createThrottle(maxConcurrency);
 
-      return nodeify(
-        Promise.all(
-          [...assetsForMinify].map(file =>
-            throttle(() => {
-              const asset = assets[file];
+      return Promise.all(
+        [...assetsForMinify].map(file =>
+          throttle(() => {
+            const asset = assets[file];
 
-              return Promise.resolve()
-                .then(() =>
-                  minify({
-                    bail,
-                    cache,
-                    imageminOptions,
-                    input: asset.source()
-                  })
-                )
-                .then(result => {
-                  const source = result.output
-                    ? new RawSource(result.output)
-                    : asset;
+            return Promise.resolve()
+              .then(() =>
+                minify({
+                  bail,
+                  cache,
+                  imageminOptions,
+                  input: asset.source()
+                })
+              )
+              .then(result => {
+                const source = result.output
+                  ? new RawSource(result.output)
+                  : asset;
 
-                  if (result.warnings && result.warnings.length > 0) {
-                    result.warnings.forEach(warning => {
-                      compilation.warnings.push(warning);
-                    });
-                  }
-
-                  if (result.errors && result.errors.length > 0) {
-                    result.errors.forEach(warning => {
-                      compilation.errors.push(warning);
-                    });
-                  }
-
-                  if (moduleAssets[file]) {
-                    compilation.assets[file] = source;
-
-                    return Promise.resolve(source);
-                  }
-
-                  const interpolatedName = interpolateName(file, name, {
-                    content: source.source()
+                if (result.warnings && result.warnings.length > 0) {
+                  result.warnings.forEach(warning => {
+                    compilation.warnings.push(warning);
                   });
+                }
 
-                  compilation.assets[interpolatedName] = source;
+                if (result.errors && result.errors.length > 0) {
+                  result.errors.forEach(warning => {
+                    compilation.errors.push(warning);
+                  });
+                }
 
-                  if (interpolatedName !== file) {
-                    delete compilation.assets[file];
-                  }
-
-                  if (manifest && !manifest[file]) {
-                    manifest[file] = interpolatedName;
-                  }
+                if (moduleAssets[file]) {
+                  compilation.assets[file] = source;
 
                   return Promise.resolve(source);
+                }
+
+                const interpolatedName = interpolateName(file, name, {
+                  content: source.source()
                 });
-            })
-          )
-        ),
-        callback
+
+                compilation.assets[interpolatedName] = source;
+
+                if (interpolatedName !== file) {
+                  delete compilation.assets[file];
+                }
+
+                if (manifest && !manifest[file]) {
+                  manifest[file] = interpolatedName;
+                }
+
+                return Promise.resolve(source);
+              });
+          })
+        )
       );
     });
   }
