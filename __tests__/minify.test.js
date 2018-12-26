@@ -1,13 +1,13 @@
+import fs from "fs";
+import path from "path";
 import cacache from "cacache";
 import del from "del";
 import findCacheDir from "find-cache-dir";
-import fs from "fs";
 import imagemin from "imagemin";
 import imageminMozjpeg from "imagemin-mozjpeg";
-import minify from "../src/minify";
-import path from "path";
 import pify from "pify";
 import test from "ava";
+import minify from "../src/minify";
 
 function isPromise(obj) {
   return (

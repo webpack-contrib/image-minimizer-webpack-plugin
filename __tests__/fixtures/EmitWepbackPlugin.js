@@ -1,7 +1,7 @@
-import RawSource from "webpack-sources/lib/RawSource";
 import fs from "fs";
-import nodeify from "nodeify";
 import path from "path";
+import RawSource from "webpack-sources/lib/RawSource";
+import nodeify from "nodeify";
 import pify from "pify";
 
 export default class EmitWepbackPlugin {

@@ -1,8 +1,8 @@
 "use strict";
 
+const crypto = require("crypto");
 const imagemin = require("imagemin");
 const cacache = require("cacache");
-const crypto = require("crypto");
 const serialize = require("serialize-javascript");
 const findCacheDir = require("find-cache-dir");
 
