@@ -7,17 +7,7 @@ const serialize = require("serialize-javascript");
 const findCacheDir = require("find-cache-dir");
 
 function runImagemin(source, imageminOptions) {
-  const originalSize = source.length;
-
-  return Promise.resolve().then(() =>
-    imagemin.buffer(source, imageminOptions).then(optimizedSource => {
-      if (optimizedSource.length < originalSize) {
-        return optimizedSource;
-      }
-
-      return source;
-    })
-  );
+  return Promise.resolve().then(() => imagemin.buffer(source, imageminOptions));
 }
 
 function minify(task = {}) {
