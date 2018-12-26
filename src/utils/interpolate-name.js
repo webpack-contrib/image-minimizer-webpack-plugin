@@ -10,8 +10,8 @@ module.exports = (name, template, options) => {
   // A hack because loaderUtils.interpolateName doesn't
   // find the right path if no directory is defined
   // ie. [path] applied to 'file.txt' would return 'file'
-  if (resourcePath.indexOf(path.sep) < 0) {
-    resourcePath = path.sep + resourcePath;
+  if (resourcePath.indexOf(path.posix.sep) < 0) {
+    resourcePath = path.posix.sep + resourcePath;
     pathSepAdded = true;
   }
 

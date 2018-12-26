@@ -33,7 +33,12 @@ function runWebpack(options = {}, multiCompiler = false) {
         {
           test: options.test ? options.test : /\.(jpe?g|png|gif|svg)$/i,
           use: [
-            { loader: "file-loader", options: { name: "[path][name].[ext]" } }
+            {
+              loader: "file-loader",
+              options: {
+                name: options.name ? options.name : "[path][name].[ext]"
+              }
+            }
           ]
         }
       ]

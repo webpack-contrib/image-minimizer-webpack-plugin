@@ -84,7 +84,6 @@
     "webpack": "^4.0.0"
   },
   "scripts": {
-    "precommit": "lint-staged",
     "lint:prettify": "prettier --list-different '{**/*,*}.{js,mjs,jsx,json,md}' --ignore-path .gitignore",
     "lint:js": "eslint . --cache --report-unused-disable-directives --ignore-path .gitignore --ext 'js,.mjs,.jsx,.md'",
     "lint:md": "remark . LICENSE -f -q -i .gitignore",
