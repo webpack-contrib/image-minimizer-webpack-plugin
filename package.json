@@ -40,7 +40,6 @@
     "webpack-sources": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "^0.25.0",
     "babel-cli": "^6.26.0",
     "babel-eslint": "^10.0.1",
     "babel-preset-env": "^1.6.0",
@@ -62,6 +61,7 @@
     "file-loader": "^3.0.1",
     "url-loader": "^1.0.1",
     "husky": "^1.1.2",
+    "jest": "^23.6.0",
     "imagemin-gifsicle": "^6.0.1",
     "imagemin-mozjpeg": "^8.0.0",
     "imagemin-pngquant": "^6.0.0",
@@ -70,7 +70,6 @@
     "lodash.defaultsdeep": "^4.6.0",
     "npm-run-all": "^4.0.0",
     "npmpub": "^4.0.1",
-    "nyc": "^13.1.0",
     "pify": "^4.0.1",
     "prettier": "^1.5.2",
     "remark-cli": "^6.0.0",
@@ -92,13 +91,8 @@
     "fix": "npm-run-all -l prettify -p 'fix:**'",
     "pretest": "npm run lint",
     "test": "npm run test-only",
-    "test-only": "nyc ava --verbose --serial '**/__tests__/**/*.test.js'",
+    "test-only": "jest --runInBand --coverage",
     "release": "npmpub"
-  },
-  "ava": {
-    "require": "babel-register",
-    "concurrency": 5,
-    "babel": "inherit"
   },
   "babel": {
     "presets": [
@@ -129,9 +123,9 @@
       ]
     },
     "extends": [
-      "plugin:itgalaxy/ava",
-      "plugin:itgalaxy/esnext",
       "plugin:itgalaxy/node",
+      "plugin:itgalaxy/esnext",
+      "plugin:itgalaxy/jest",
       "plugin:itgalaxy/markdown"
     ],
     "overrides": [
@@ -172,6 +166,13 @@
   "remarkConfig": {
     "plugins": [
       "remark-preset-lint-itgalaxy"
+    ]
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/fixtures/",
+      "helpers.js"
     ]
   }
 }

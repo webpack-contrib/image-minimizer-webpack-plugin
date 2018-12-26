@@ -1,7 +1,6 @@
-import test from "ava";
 import interpolateName from "../../src/utils/interpolate-name";
 
-test("interpolateName", t => {
+describe("interpolateName", () => {
   [
     [
       "/app/js/javascript.js",
@@ -68,9 +67,8 @@ test("interpolateName", t => {
       content: testTemplate[2]
     });
 
-    t.true(
-      interpolatedName === testTemplate[3],
-      `should interpolate ${testTemplate[0]} ${testTemplate[1]}`
-    );
+    it(`should interpolate ${testTemplate[1]}`, () => {
+      expect(interpolatedName).toBe(testTemplate[3]);
+    });
   });
 });

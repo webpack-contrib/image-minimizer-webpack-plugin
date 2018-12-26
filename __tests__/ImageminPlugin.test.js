@@ -3,7 +3,6 @@ import cacache from "cacache";
 import del from "del";
 import findCacheDir from "find-cache-dir";
 import tempy from "tempy";
-import test from "ava";
 import {
   fixturesPath,
   isCompressed,
@@ -12,134 +11,145 @@ import {
   runWebpack
 } from "./helpers";
 
-test("should optimizes all images (loader + plugin) as plugin", t =>
-  Promise.resolve()
-    .then(() => runWebpack({ emitPlugin: true, imageminPlugin: true }))
-    .then(stats => {
-      const { warnings, errors, assets, modules } = stats.compilation;
+describe("imagemin plugin", () => {
+  it("should optimizes all images (loader + plugin) as plugin", () =>
+    Promise.resolve()
+      .then(() => runWebpack({ emitPlugin: true, imageminPlugin: true }))
+      .then(stats => {
+        const { warnings, errors, assets, modules } = stats.compilation;
 
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 6, "6 assets");
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(6);
 
-      t.true(modulesHasImageminLoader(modules, "loader-test.gif"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.jpg"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.png"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.svg"));
-      t.true(!modulesHasImageminLoader(modules, "plugin-test.jpg"));
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.jpg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.svg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "plugin-test.jpg")).toBe(
+          false
+        );
 
-      return isCompressed(
-        [
-          "loader-test.gif",
-          "loader-test.jpg",
-          "loader-test.png",
-          "loader-test.svg",
-          "plugin-test.jpg"
-        ],
-        assets
-      );
-    }));
+        return isCompressed(
+          [
+            "loader-test.gif",
+            "loader-test.jpg",
+            "loader-test.png",
+            "loader-test.svg",
+            "plugin-test.jpg"
+          ],
+          assets
+        );
+      }));
 
-test("should optimizes all images (loader + plugin) as minimizer", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({ asMinimizer: true, emitPlugin: true, imageminPlugin: true })
-    )
-    .then(stats => {
-      const { warnings, errors, assets, modules } = stats.compilation;
+  it("should optimizes all images (loader + plugin) as minimizer", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          asMinimizer: true,
+          emitPlugin: true,
+          imageminPlugin: true
+        })
+      )
+      .then(stats => {
+        const { warnings, errors, assets, modules } = stats.compilation;
 
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 6, "6 assets");
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(6);
 
-      t.true(modulesHasImageminLoader(modules, "loader-test.gif"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.jpg"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.png"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.svg"));
-      t.true(!modulesHasImageminLoader(modules, "plugin-test.jpg"));
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.jpg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.svg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "plugin-test.jpg")).toBe(
+          false
+        );
 
-      return isCompressed(
-        [
-          "loader-test.gif",
-          "loader-test.jpg",
-          "loader-test.png",
-          "loader-test.svg",
-          "plugin-test.jpg"
-        ],
-        assets
-      );
-    }));
+        return isCompressed(
+          [
+            "loader-test.gif",
+            "loader-test.jpg",
+            "loader-test.png",
+            "loader-test.svg",
+            "plugin-test.jpg"
+          ],
+          assets
+        );
+      }));
 
-test("should optimizes all images (loader + plugin) (multi compiler mode)", t =>
-  Promise.resolve()
-    .then(() => runWebpack({ emitPlugin: true, imageminPlugin: true }, true))
-    .then(multiStats => {
-      t.true(multiStats.stats.length === 2, "2 compilation");
+  it("should optimizes all images (loader + plugin) (multi compiler mode)", () =>
+    Promise.resolve()
+      .then(() => runWebpack({ emitPlugin: true, imageminPlugin: true }, true))
+      .then(multiStats => {
+        expect(multiStats.stats).toHaveLength(2);
 
-      return multiStats;
-    })
-    .then(multiStats => {
-      const {
-        warnings,
-        errors,
-        assets,
-        modules
-      } = multiStats.stats[0].compilation;
+        return multiStats;
+      })
+      .then(multiStats => {
+        const {
+          warnings,
+          errors,
+          assets,
+          modules
+        } = multiStats.stats[0].compilation;
 
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 6, "6 assets");
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(6);
 
-      t.true(modulesHasImageminLoader(modules, "loader-test.gif"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.jpg"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.png"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.svg"));
-      t.true(!modulesHasImageminLoader(modules, "plugin-test.jpg"));
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.jpg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.svg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "plugin-test.jpg")).toBe(
+          false
+        );
 
-      return isCompressed(
-        [
-          "loader-test.gif",
-          "loader-test.jpg",
-          "loader-test.png",
-          "loader-test.svg",
-          "plugin-test.jpg"
-        ],
-        assets
-      ).then(() => multiStats);
-    })
-    .then(multiStats => {
-      const {
-        warnings,
-        errors,
-        assets,
-        modules
-      } = multiStats.stats[1].compilation;
+        return isCompressed(
+          [
+            "loader-test.gif",
+            "loader-test.jpg",
+            "loader-test.png",
+            "loader-test.svg",
+            "plugin-test.jpg"
+          ],
+          assets
+        ).then(() => multiStats);
+      })
+      .then(multiStats => {
+        const {
+          warnings,
+          errors,
+          assets,
+          modules
+        } = multiStats.stats[1].compilation;
 
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 6, "6 assets");
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(6);
 
-      t.true(modulesHasImageminLoader(modules, "loader-test.gif"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.jpg"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.png"));
-      t.true(modulesHasImageminLoader(modules, "loader-test.svg"));
-      t.true(!modulesHasImageminLoader(modules, "plugin-test.jpg"));
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.jpg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.svg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "plugin-test.jpg")).toBe(
+          false
+        );
 
-      return isCompressed(
-        [
-          "loader-test.gif",
-          "loader-test.jpg",
-          "loader-test.png",
-          "loader-test.svg",
-          "plugin-test.jpg"
-        ],
-        assets
-      );
-    }));
+        return isCompressed(
+          [
+            "loader-test.gif",
+            "loader-test.jpg",
+            "loader-test.png",
+            "loader-test.svg",
+            "plugin-test.jpg"
+          ],
+          assets
+        );
+      }));
 
-test.serial(
-  "should optimizes all images and cache their (loader + plugin)",
-  t => {
+  it("should optimizes all images and cache their (loader + plugin)", () => {
     const cacheDir = findCacheDir({ name: "imagemin-webpack" });
     const output = tempy.directory();
 
@@ -160,9 +170,9 @@ test.serial(
       .then(stats => {
         const { warnings, errors, assets } = stats.compilation;
 
-        t.true(warnings.length === 0, "no compilation warnings");
-        t.true(errors.length === 0, "no compilation error");
-        t.true(Object.keys(assets).length === 6, "6 assets");
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(6);
 
         return isCompressed(
           [
@@ -181,7 +191,7 @@ test.serial(
           .then(cachedAssets => {
             // We handle 5 images, but `plugin-test.jpg` and `loader-test.jpg` are same
             // some we have only 4 compressed cached assets
-            t.true(Object.keys(cachedAssets).length === 4, "4 cached assets");
+            expect(Object.keys(cachedAssets)).toHaveLength(4);
 
             return true;
           })
@@ -199,20 +209,17 @@ test.serial(
           .then(stats => {
             const { warnings, errors, assets } = stats.compilation;
 
-            t.true(warnings.length === 0, "no compilation warnings");
-            t.true(errors.length === 0, "no compilation error");
-            t.true(Object.keys(assets).length === 6, "6 assets");
+            expect(warnings).toHaveLength(0);
+            expect(errors).toHaveLength(0);
+            expect(Object.keys(assets)).toHaveLength(6);
 
             return true;
           })
           .then(() => del(cacheDir))
       );
-  }
-);
+  });
 
-test.serial(
-  "should optimizes all images and cache their (custom cache location) (loader + plugin)",
-  t => {
+  it("should optimizes all images and cache their (custom cache location) (loader + plugin)", () => {
     const cacheDir = findCacheDir({ name: "imagemin-plugin-cache-location" });
     const output = tempy.directory();
 
@@ -233,9 +240,9 @@ test.serial(
       .then(stats => {
         const { warnings, errors, assets } = stats.compilation;
 
-        t.true(warnings.length === 0, "no compilation warnings");
-        t.true(errors.length === 0, "no compilation error");
-        t.true(Object.keys(assets).length === 6, "6 assets");
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(6);
 
         return isCompressed(
           [
@@ -254,7 +261,7 @@ test.serial(
           .then(cachedAssets => {
             // We handle 5 images, but `plugin-test.jpg` and `loader-test.jpg` are same
             // some we have only 4 compressed cached assets
-            t.true(Object.keys(cachedAssets).length === 4, "4 cached assets");
+            expect(Object.keys(cachedAssets)).toHaveLength(4);
 
             return true;
           })
@@ -272,20 +279,17 @@ test.serial(
           .then(stats => {
             const { warnings, errors, assets } = stats.compilation;
 
-            t.true(warnings.length === 0, "no compilation warnings");
-            t.true(errors.length === 0, "no compilation error");
-            t.true(Object.keys(assets).length === 6, "6 assets");
+            expect(warnings).toHaveLength(0);
+            expect(errors).toHaveLength(0);
+            expect(Object.keys(assets)).toHaveLength(6);
 
             return true;
           })
           .then(() => del(cacheDir))
       );
-  }
-);
+  });
 
-test.serial(
-  "should optimizes all images and doesn't cache their (loader + plugin)",
-  t => {
+  it("should optimizes all images and doesn't cache their (loader + plugin)", () => {
     const cacheDir = findCacheDir({ name: "imagemin-webpack" });
     const output = tempy.directory();
 
@@ -306,9 +310,9 @@ test.serial(
       .then(stats => {
         const { warnings, errors, assets } = stats.compilation;
 
-        t.true(warnings.length === 0, "no compilation warnings");
-        t.true(errors.length === 0, "no compilation error");
-        t.true(Object.keys(assets).length === 6, "6 assets");
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(6);
 
         return isCompressed(
           [
@@ -325,7 +329,7 @@ test.serial(
         cacache
           .ls(cacheDir)
           .then(cachedAssets => {
-            t.true(Object.keys(cachedAssets).length === 0, "0 cached assets");
+            expect(Object.keys(cachedAssets)).toHaveLength(0);
 
             return true;
           })
@@ -343,408 +347,400 @@ test.serial(
           .then(stats => {
             const { warnings, errors, assets } = stats.compilation;
 
-            t.true(warnings.length === 0, "no compilation warnings");
-            t.true(errors.length === 0, "no compilation error");
-            t.true(Object.keys(assets).length === 6, "6 assets");
+            expect(warnings).toHaveLength(0);
+            expect(errors).toHaveLength(0);
+            expect(Object.keys(assets)).toHaveLength(6);
 
             return true;
           })
           .then(() => del(cacheDir))
       );
-  }
-);
+  });
 
-test("should optimizes all images (plugin standalone)", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        emitPlugin: true,
-        imageminPluginOptions: {
-          imageminOptions: { plugins },
-          loader: false,
-          name: "[path][name].[ext]"
-        }
-      })
-    )
-    .then(stats => {
-      const { warnings, errors, assets } = stats.compilation;
-
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 6, "6 assets");
-
-      return isCompressed(
-        [
-          "loader-test.gif",
-          "loader-test.jpg",
-          "loader-test.png",
-          "loader-test.svg",
-          "plugin-test.jpg"
-        ],
-        assets
-      );
-    }));
-
-test("should optimizes successfully without any assets", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        entry: path.join(fixturesPath, "empty-entry.js"),
-        imageminPlugin: true
-      })
-    )
-    .then(stats => {
-      const { warnings, errors, assets } = stats.compilation;
-
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 1, "1 asset");
-
-      return stats;
-    }));
-
-test("should throws errors if imagemin plugins don't setup (by plugin)", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        emitPlugin: true,
-        entry: path.join(fixturesPath, "empty-entry.js"),
-        imageminPluginOptions: {
-          imageminOptions: {
-            plugins: []
+  it("should optimizes all images (plugin standalone)", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          emitPlugin: true,
+          imageminPluginOptions: {
+            imageminOptions: { plugins },
+            loader: false,
+            name: "[path][name].[ext]"
           }
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
+        })
+      )
+      .then(stats => {
+        const { warnings, errors, assets } = stats.compilation;
 
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 1, "1 compilation errors");
-      t.true(Object.keys(assets).length === 2, "2 assets");
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(6);
 
-      errors.forEach(error => {
-        t.regex(
-          error.message,
-          /No\splugins\sfound\sfor\s`imagemin`/,
-          "message error"
+        return isCompressed(
+          [
+            "loader-test.gif",
+            "loader-test.jpg",
+            "loader-test.png",
+            "loader-test.svg",
+            "plugin-test.jpg"
+          ],
+          assets
         );
-      });
+      }));
 
-      return stats;
-    }));
+  it("should optimizes successfully without any assets", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          entry: path.join(fixturesPath, "empty-entry.js"),
+          imageminPlugin: true
+        })
+      )
+      .then(stats => {
+        const { warnings, errors, assets } = stats.compilation;
 
-test("should throws errors if imagemin plugins don't setup (by loader)", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        entry: path.join(fixturesPath, "single-image-loader.js"),
-        imageminPluginOptions: {
-          imageminOptions: {
-            plugins: []
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(1);
+
+        return stats;
+      }));
+
+  it("should throws errors if imagemin plugins don't setup (by plugin)", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          emitPlugin: true,
+          entry: path.join(fixturesPath, "empty-entry.js"),
+          imageminPluginOptions: {
+            imageminOptions: {
+              plugins: []
+            }
           }
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
 
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 1, "1 compilation errors");
-      t.true(Object.keys(assets).length === 2, "2 assets");
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(1);
+        expect(Object.keys(assets)).toHaveLength(2);
 
-      stats.compilation.errors.forEach(error => {
-        t.regex(
-          error.message,
-          /No\splugins\sfound\sfor\s`imagemin`/,
-          "message error"
-        );
-      });
+        errors.forEach(error => {
+          expect(error.message).toMatch(/No\splugins\sfound\sfor\s`imagemin`/);
+        });
 
-      return stats;
-    }));
+        return stats;
+      }));
 
-test("should optimizes images and throws error on corrupted images using `plugin.bail` option with `true` value (by plugin)", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        emitPluginOptions: {
-          fileNames: ["test-corrupted.jpg", "plugin-test.png"]
-        },
-        entry: path.join(fixturesPath, "empty-entry.js"),
-        imageminPluginOptions: {
-          bail: true,
-          imageminOptions: {
-            plugins
-          },
-          name: "[path][name].[ext]"
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
-
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 1, "no compilation error");
-      t.regex(errors[0].message, /Corrupt\sJPEG\sdata/);
-      t.true(Object.keys(assets).length === 3, "3 assets");
-
-      return isCompressed(["plugin-test.png"], assets);
-    }));
-
-test("should optimizes images and throws errors on corrupted images using `plugin.bail` option with `true` value (by loader)", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        entry: path.join(fixturesPath, "loader-corrupted.js"),
-        imageminPluginOptions: {
-          bail: true,
-          imageminOptions: {
-            plugins
-          },
-          name: "[path][name].[ext]"
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
-
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 1, "no compilation error");
-      t.regex(errors[0].message, /Corrupt\sJPEG\sdata/);
-      t.true(Object.keys(assets).length === 3, "3 assets");
-
-      return isCompressed(["loader-test.png"], assets);
-    }));
-
-test("should optimizes images and throws warning on corrupted images using `plugin.bail` option with `false` value (by plugin)", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        emitPluginOptions: {
-          fileNames: ["test-corrupted.jpg", "plugin-test.png"]
-        },
-        entry: path.join(fixturesPath, "empty-entry.js"),
-        imageminPluginOptions: {
-          bail: false,
-          imageminOptions: {
-            plugins
-          },
-          name: "[path][name].[ext]"
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
-
-      t.true(warnings.length === 1, "1 compilation warnings");
-      t.regex(warnings[0].message, /Corrupt\sJPEG\sdata/);
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 3, "3 assets");
-
-      return isCompressed(["plugin-test.png"], assets);
-    }));
-
-test("should optimizes images and throws errors on corrupted images using `plugin.bail` option with `false` value (by loader)", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        entry: path.join(fixturesPath, "loader-corrupted.js"),
-        imageminPluginOptions: {
-          bail: false,
-          imageminOptions: {
-            plugins
-          },
-          name: "[path][name].[ext]"
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
-
-      t.true(warnings.length === 1, "1 compilation warnings");
-      t.regex(warnings[0].message, /Corrupt\sJPEG\sdata/);
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 3, "3 assets");
-
-      return isCompressed(["loader-test.png"], assets);
-    }));
-
-test("should optimizes images and throws errors on corrupted images using `webpack.bail` option with `true` value (by plugin)", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        bail: true,
-        emitPluginOptions: {
-          fileNames: ["test-corrupted.jpg", "plugin-test.png"]
-        },
-        entry: path.join(fixturesPath, "empty-entry.js"),
-        imageminPluginOptions: {
-          imageminOptions: {
-            plugins
-          },
-          name: "[path][name].[ext]"
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
-
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 1, "no compilation error");
-      t.regex(errors[0].message, /Corrupt\sJPEG\sdata/);
-      t.true(Object.keys(assets).length === 3, "3 assets");
-
-      return isCompressed(["plugin-test.png"], assets);
-    }));
-
-test("should optimizes images and throws warning on corrupted images using `webpack.bail` option with `true` value (by loader)", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        bail: true,
-        entry: path.join(fixturesPath, "loader-corrupted.js"),
-        imageminPluginOptions: {
-          imageminOptions: {
-            plugins
-          },
-          name: "[path][name].[ext]"
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
-
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 1, "no compilation error");
-      t.regex(errors[0].message, /Corrupt\sJPEG\sdata/);
-      t.true(Object.keys(assets).length === 3, "3 assets");
-
-      return isCompressed(["loader-test.png"], assets);
-    }));
-
-test("should optimizes images and throw warnings on corrupted images using `webpack.bail` option with `false` value (by plugin)", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        bail: false,
-        emitPluginOptions: {
-          fileNames: ["test-corrupted.jpg", "plugin-test.png"]
-        },
-        entry: path.join(fixturesPath, "empty-entry.js"),
-        imageminPluginOptions: {
-          imageminOptions: {
-            plugins
-          },
-          name: "[path][name].[ext]"
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
-
-      t.true(warnings.length === 1, "1 compilation warnings");
-      t.regex(warnings[0].message, /Corrupt\sJPEG\sdata/);
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 3, "3 assets");
-
-      return isCompressed(["plugin-test.png"], assets);
-    }));
-
-test("should optimizes images and throw warnings on corrupted images using `webpack.bail` option with `false` value (by loader)", t =>
-  Promise.resolve()
-    .then(() =>
-      runWebpack({
-        bail: false,
-        entry: path.join(fixturesPath, "loader-corrupted.js"),
-        imageminPluginOptions: {
-          imageminOptions: {
-            plugins
+  it("should throws errors if imagemin plugins don't setup (by loader)", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          entry: path.join(fixturesPath, "single-image-loader.js"),
+          imageminPluginOptions: {
+            imageminOptions: {
+              plugins: []
+            }
           }
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
 
-      t.true(warnings.length === 1, "1 compilation warnings");
-      t.regex(warnings[0].message, /Corrupt\sJPEG\sdata/);
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 3, "3 assets");
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(1);
+        expect(Object.keys(assets)).toHaveLength(2);
 
-      return isCompressed(["loader-test.png"], assets);
-    }));
+        stats.compilation.errors.forEach(error => {
+          expect(error.message).toMatch(/No\splugins\sfound\sfor\s`imagemin`/);
+        });
 
-test("should optimizes images and contains not empty manifest", t => {
-  const manifest = {};
+        return stats;
+      }));
 
-  return Promise.resolve()
-    .then(() =>
-      runWebpack({
-        emitPlugin: true,
-        entry: path.join(fixturesPath, "single-image-loader.js"),
-        imageminPluginOptions: {
-          imageminOptions: {
-            plugins
+  it("should optimizes images and throws error on corrupted images using `plugin.bail` option with `true` value (by plugin)", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          emitPluginOptions: {
+            fileNames: ["test-corrupted.jpg", "plugin-test.png"]
           },
-          manifest
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
+          entry: path.join(fixturesPath, "empty-entry.js"),
+          imageminPluginOptions: {
+            bail: true,
+            imageminOptions: {
+              plugins
+            },
+            name: "[path][name].[ext]"
+          }
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
 
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 3, "3 assets");
-      t.deepEqual(manifest, {
-        "plugin-test.jpg": "dddd284f1bd12a27330d4d186a044d47.jpg"
-      });
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(1);
+        expect(Object.keys(assets)).toHaveLength(3);
+        expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
 
-      return stats;
-    });
-});
+        return isCompressed(["plugin-test.png"], assets);
+      }));
 
-test("should optimizes images and interpolate assets names exclude module assets", t => {
-  const manifest = {};
+  it("should optimizes images and throws errors on corrupted images using `plugin.bail` option with `true` value (by loader)", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          entry: path.join(fixturesPath, "loader-corrupted.js"),
+          imageminPluginOptions: {
+            bail: true,
+            imageminOptions: {
+              plugins
+            },
+            name: "[path][name].[ext]"
+          }
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
 
-  return Promise.resolve()
-    .then(() =>
-      runWebpack({
-        emitPlugin: true,
-        entry: path.join(fixturesPath, "loader.js"),
-        imageminPluginOptions: {
-          imageminOptions: {
-            plugins
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(1);
+        expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+        expect(Object.keys(assets)).toHaveLength(3);
+
+        return isCompressed(["loader-test.png"], assets);
+      }));
+
+  it("should optimizes images and throws warning on corrupted images using `plugin.bail` option with `false` value (by plugin)", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          emitPluginOptions: {
+            fileNames: ["test-corrupted.jpg", "plugin-test.png"]
           },
-          loader: false,
-          manifest
-        }
-      })
-    )
-    .then(stats => {
-      const { assets, warnings, errors } = stats.compilation;
+          entry: path.join(fixturesPath, "empty-entry.js"),
+          imageminPluginOptions: {
+            bail: false,
+            imageminOptions: {
+              plugins
+            },
+            name: "[path][name].[ext]"
+          }
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
 
-      t.true(warnings.length === 0, "no compilation warnings");
-      t.true(errors.length === 0, "no compilation error");
-      t.true(Object.keys(assets).length === 6, "6 assets");
-      t.true(
-        Object.keys(assets).every(
-          element =>
-            [
-              "loader-test.gif",
-              "loader-test.jpg",
-              "loader-test.png",
-              "loader-test.svg",
-              "bundle.js",
-              "dddd284f1bd12a27330d4d186a044d47.jpg"
-            ].indexOf(element) >= 0
-        )
-      );
-      t.deepEqual(manifest, {
-        "plugin-test.jpg": "dddd284f1bd12a27330d4d186a044d47.jpg"
+        expect(warnings).toHaveLength(1);
+        expect(errors).toHaveLength(0);
+        expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+        expect(Object.keys(assets)).toHaveLength(3);
+
+        return isCompressed(["plugin-test.png"], assets);
+      }));
+
+  it("should optimizes images and throws errors on corrupted images using `plugin.bail` option with `false` value (by loader)", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          entry: path.join(fixturesPath, "loader-corrupted.js"),
+          imageminPluginOptions: {
+            bail: false,
+            imageminOptions: {
+              plugins
+            },
+            name: "[path][name].[ext]"
+          }
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
+
+        expect(warnings).toHaveLength(1);
+        expect(errors).toHaveLength(0);
+        expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+        expect(Object.keys(assets)).toHaveLength(3);
+
+        return isCompressed(["loader-test.png"], assets);
+      }));
+
+  it("should optimizes images and throws errors on corrupted images using `webpack.bail` option with `true` value (by plugin)", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          bail: true,
+          emitPluginOptions: {
+            fileNames: ["test-corrupted.jpg", "plugin-test.png"]
+          },
+          entry: path.join(fixturesPath, "empty-entry.js"),
+          imageminPluginOptions: {
+            imageminOptions: {
+              plugins
+            },
+            name: "[path][name].[ext]"
+          }
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
+
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(1);
+        expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+        expect(Object.keys(assets)).toHaveLength(3);
+
+        return isCompressed(["plugin-test.png"], assets);
+      }));
+
+  it("should optimizes images and throws warning on corrupted images using `webpack.bail` option with `true` value (by loader)", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          bail: true,
+          entry: path.join(fixturesPath, "loader-corrupted.js"),
+          imageminPluginOptions: {
+            imageminOptions: {
+              plugins
+            },
+            name: "[path][name].[ext]"
+          }
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
+
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(1);
+        expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+        expect(Object.keys(assets)).toHaveLength(3);
+
+        return isCompressed(["loader-test.png"], assets);
+      }));
+
+  it("should optimizes images and throw warnings on corrupted images using `webpack.bail` option with `false` value (by plugin)", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          bail: false,
+          emitPluginOptions: {
+            fileNames: ["test-corrupted.jpg", "plugin-test.png"]
+          },
+          entry: path.join(fixturesPath, "empty-entry.js"),
+          imageminPluginOptions: {
+            imageminOptions: {
+              plugins
+            },
+            name: "[path][name].[ext]"
+          }
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
+
+        expect(warnings).toHaveLength(1);
+        expect(errors).toHaveLength(0);
+        expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+        expect(Object.keys(assets)).toHaveLength(3);
+
+        return isCompressed(["plugin-test.png"], assets);
+      }));
+
+  it("should optimizes images and throw warnings on corrupted images using `webpack.bail` option with `false` value (by loader)", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          bail: false,
+          entry: path.join(fixturesPath, "loader-corrupted.js"),
+          imageminPluginOptions: {
+            imageminOptions: {
+              plugins
+            }
+          }
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
+
+        expect(warnings).toHaveLength(1);
+        expect(errors).toHaveLength(0);
+        expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+        expect(Object.keys(assets)).toHaveLength(3);
+
+        return isCompressed(["loader-test.png"], assets);
+      }));
+
+  it("should optimizes images and contains not empty manifest", () => {
+    const manifest = {};
+
+    return Promise.resolve()
+      .then(() =>
+        runWebpack({
+          emitPlugin: true,
+          entry: path.join(fixturesPath, "single-image-loader.js"),
+          imageminPluginOptions: {
+            imageminOptions: {
+              plugins
+            },
+            manifest
+          }
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
+
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(3);
+        expect(manifest).toEqual({
+          "plugin-test.jpg": "dddd284f1bd12a27330d4d186a044d47.jpg"
+        });
+
+        return stats;
       });
+  });
 
-      return stats;
-    });
+  it("should optimizes images and interpolate assets names exclude module assets", () => {
+    const manifest = {};
+
+    return Promise.resolve()
+      .then(() =>
+        runWebpack({
+          emitPlugin: true,
+          entry: path.join(fixturesPath, "loader.js"),
+          imageminPluginOptions: {
+            imageminOptions: {
+              plugins
+            },
+            loader: false,
+            manifest
+          }
+        })
+      )
+      .then(stats => {
+        const { assets, warnings, errors } = stats.compilation;
+
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(6);
+        expect(
+          Object.keys(assets).every(
+            element =>
+              [
+                "loader-test.gif",
+                "loader-test.jpg",
+                "loader-test.png",
+                "loader-test.svg",
+                "bundle.js",
+                "dddd284f1bd12a27330d4d186a044d47.jpg"
+              ].indexOf(element) >= 0
+          )
+        ).toBe(true);
+        expect(manifest).toEqual({
+          "plugin-test.jpg": "dddd284f1bd12a27330d4d186a044d47.jpg"
+        });
+
+        return stats;
+      });
+  });
 });

@@ -7,7 +7,6 @@ import imagemin from "imagemin";
 import imageminMozjpeg from "imagemin-mozjpeg";
 import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
-import test from "ava";
 import minify from "../src/minify";
 
 function isPromise(obj) {
@@ -18,13 +17,15 @@ function isPromise(obj) {
   );
 }
 
-test("minify should be is function", t => {
-  t.true(typeof minify === "function");
-});
+describe("minify", () => {
+  it("minify should be is function", () => {
+    expect(typeof minify === "function").toBe(true);
+  });
 
-test("should optimize", t =>
-  pify(fs.readFile)(path.resolve(__dirname, "./fixtures/loader-test.jpg")).then(
-    data =>
+  it("should optimize", () =>
+    pify(fs.readFile)(
+      path.resolve(__dirname, "./fixtures/loader-test.jpg")
+    ).then(data =>
       minify({
         imageminOptions: {
           plugins: [imageminMozjpeg()]
@@ -36,178 +37,176 @@ test("should optimize", t =>
             plugins: [imageminMozjpeg()]
           })
           .then(compressedImage => {
-            t.true(result.output.length === compressedImage.length);
+            expect(result.output).toHaveLength(compressedImage.length);
 
             return compressedImage;
           })
           .then(() => result)
       )
-  ));
+    ));
 
-test("should return optimized image even when optimized image large then original", t => {
-  const svgoOptions = {
-    plugins: [
-      {
-        addAttributesToSVGElement: {
-          attributes: [
-            {
-              xmlns: "http://www.w3.org/2000/svg"
-            }
-          ]
+  it("should return optimized image even when optimized image large then original", () => {
+    const svgoOptions = {
+      plugins: [
+        {
+          addAttributesToSVGElement: {
+            attributes: [
+              {
+                xmlns: "http://www.w3.org/2000/svg"
+              }
+            ]
+          }
         }
-      }
-    ]
-  };
+      ]
+    };
 
-  return pify(fs.readFile)(
-    path.resolve(__dirname, "./fixtures/large-after-optimization.svg")
-  ).then(data =>
-    minify({
-      imageminOptions: {
-        plugins: [imageminSvgo(svgoOptions)]
-      },
-      input: data
-    }).then(result =>
-      imagemin
-        .buffer(data, {
+    return pify(fs.readFile)(
+      path.resolve(__dirname, "./fixtures/large-after-optimization.svg")
+    ).then(data =>
+      minify({
+        imageminOptions: {
           plugins: [imageminSvgo(svgoOptions)]
-        })
-        .then(compressedImage => {
-          t.true(result.output.length === compressedImage.length);
+        },
+        input: data
+      }).then(result =>
+        imagemin
+          .buffer(data, {
+            plugins: [imageminSvgo(svgoOptions)]
+          })
+          .then(compressedImage => {
+            expect(result.output).toHaveLength(compressedImage.length);
 
-          return compressedImage;
-        })
-        .then(() => result)
-    )
-  );
-});
-
-test("should return `Promise`", t => {
-  const result = minify({
-    imageminOptions: {
-      plugins: [imageminMozjpeg()]
-    },
-    input: Buffer.from("Foo")
+            return compressedImage;
+          })
+          .then(() => result)
+      )
+    );
   });
 
-  t.true(isPromise(result));
-});
-
-test("should throw error on empty", t => {
-  const result = minify();
-
-  t.true(result.errors.length === 1);
-
-  for (const error of result.errors) {
-    t.regex(error.message, /Empty\sinput/);
-  }
-});
-
-test("should throw error on empty `imagemin` options", t => {
-  const result = minify({
-    imageminOptions: {},
-    input: Buffer.from("Foo")
-  });
-
-  t.true(result.errors.length === 1);
-
-  for (const error of result.errors) {
-    t.regex(error.message, /No\splugins\sfound\sfor\s`imagemin`/);
-  }
-});
-
-test("should contains warning on broken image (no `bail` option)", t =>
-  pify(fs.readFile)(
-    path.resolve(__dirname, "./fixtures/test-corrupted.jpg")
-  ).then(data =>
-    minify({
+  it("should return `Promise`", () => {
+    const result = minify({
       imageminOptions: {
         plugins: [imageminMozjpeg()]
       },
-      input: data
-    }).then(result => {
-      t.true(result.errors.length === 0);
-      t.regex([...result.warnings][0].message, /Corrupt\sJPEG\sdata/);
-      t.true(result.warnings.length === 1);
-      t.true(Buffer.compare(data, result.output) === 0);
+      input: Buffer.from("Foo")
+    });
 
-      return result;
-    })
-  ));
+    expect(isPromise(result)).toBe(true);
+  });
 
-test("should contains warning on broken image (`bail` option with `false` value)", t =>
-  pify(fs.readFile)(
-    path.resolve(__dirname, "./fixtures/test-corrupted.jpg")
-  ).then(data =>
-    minify({
-      bail: false,
+  it("should throw error on empty", () => {
+    const result = minify();
+
+    expect(result.errors).toHaveLength(1);
+
+    for (const error of result.errors) {
+      expect(error.message).toMatch(/Empty\sinput/);
+    }
+  });
+
+  it("should throw error on empty `imagemin` options", () => {
+    const result = minify({
+      imageminOptions: {},
+      input: Buffer.from("Foo")
+    });
+
+    expect(result.errors).toHaveLength(1);
+
+    for (const error of result.errors) {
+      expect(error.message).toMatch(/No\splugins\sfound\sfor\s`imagemin`/);
+    }
+  });
+
+  it("should contains warning on broken image (no `bail` option)", () =>
+    pify(fs.readFile)(
+      path.resolve(__dirname, "./fixtures/test-corrupted.jpg")
+    ).then(data =>
+      minify({
+        imageminOptions: {
+          plugins: [imageminMozjpeg()]
+        },
+        input: data
+      }).then(result => {
+        expect(result.warnings).toHaveLength(1);
+        expect(result.errors).toHaveLength(0);
+        expect([...result.warnings][0].message).toMatch(/Corrupt\sJPEG\sdata/);
+        expect(result.output.equals(data)).toBe(true);
+
+        return result;
+      })
+    ));
+
+  it("should contains warning on broken image (`bail` option with `false` value)", () =>
+    pify(fs.readFile)(
+      path.resolve(__dirname, "./fixtures/test-corrupted.jpg")
+    ).then(data =>
+      minify({
+        bail: false,
+        imageminOptions: {
+          plugins: [imageminMozjpeg()]
+        },
+        input: data
+      }).then(result => {
+        expect(result.warnings).toHaveLength(1);
+        expect(result.errors).toHaveLength(0);
+        expect([...result.warnings][0].message).toMatch(/Corrupt\sJPEG\sdata/);
+        expect(result.output.equals(data)).toBe(true);
+
+        return result;
+      })
+    ));
+
+  it("should contains warning on broken image (`bail` option with `true` value)", () =>
+    pify(fs.readFile)(
+      path.resolve(__dirname, "./fixtures/test-corrupted.jpg")
+    ).then(data =>
+      minify({
+        bail: true,
+        imageminOptions: {
+          plugins: [imageminMozjpeg()]
+        },
+        input: data
+      }).then(result => {
+        expect(result.warnings).toHaveLength(0);
+        expect(result.errors).toHaveLength(1);
+        expect([...result.errors][0].message).toMatch(/Corrupt\sJPEG\sdata/);
+        expect(result.output.equals(data)).toBe(true);
+
+        return result;
+      })
+    ));
+
+  it("should return original content on invalid content (`String`)", () => {
+    const input = "Foo";
+
+    return minify({
       imageminOptions: {
         plugins: [imageminMozjpeg()]
       },
-      input: data
+      input
     }).then(result => {
-      t.true(result.errors.length === 0);
-      t.regex([...result.warnings][0].message, /Corrupt\sJPEG\sdata/);
-      t.true(result.warnings.length === 1);
-      t.true(Buffer.compare(data, result.output) === 0);
+      expect(result.output.toString()).toBe(input);
 
       return result;
-    })
-  ));
+    });
+  });
 
-test("should contains warning on broken image (`bail` option with `true` value)", t =>
-  pify(fs.readFile)(
-    path.resolve(__dirname, "./fixtures/test-corrupted.jpg")
-  ).then(data =>
-    minify({
-      bail: true,
+  it("should return original content on invalid content (`Buffer`)", () => {
+    const input = Buffer.from("Foo");
+
+    return minify({
       imageminOptions: {
         plugins: [imageminMozjpeg()]
       },
-      input: data
+      input
     }).then(result => {
-      t.regex([...result.errors][0].message, /Corrupt\sJPEG\sdata/);
-      t.true(result.errors.length === 1);
-      t.true(result.warnings.length === 0);
-      t.true(Buffer.compare(data, result.output) === 0);
+      expect(result.output.equals(input)).toBe(true);
 
       return result;
-    })
-  ));
-
-test("should return original content on invalid content (`String`)", t => {
-  const input = "Foo";
-
-  return minify({
-    imageminOptions: {
-      plugins: [imageminMozjpeg()]
-    },
-    input
-  }).then(result => {
-    t.true(result.output.toString() === input);
-
-    return result;
+    });
   });
-});
 
-test("should return original content on invalid content (`Buffer`)", t => {
-  const input = Buffer.from("Foo");
-
-  return minify({
-    imageminOptions: {
-      plugins: [imageminMozjpeg()]
-    },
-    input
-  }).then(result => {
-    t.true(result.output === input);
-
-    return result;
-  });
-});
-
-test.serial(
-  "should optimize and cache (`cache` option with `true` value)",
-  t => {
+  it("should optimize and cache (`cache` option with `true` value)", () => {
     const cacheDir = findCacheDir({ name: "imagemin-webpack" });
 
     return Promise.resolve()
@@ -228,7 +227,7 @@ test.serial(
               plugins: [imageminMozjpeg()]
             })
             .then(compressedImage => {
-              t.true(result.output.length === compressedImage.length);
+              expect(result.output.equals(compressedImage)).toBe(true);
 
               return compressedImage;
             })
@@ -237,18 +236,15 @@ test.serial(
       )
       .then(result =>
         cacache.ls(cacheDir).then(cachedAssets => {
-          t.true(Object.keys(cachedAssets).length === 1, "1 cached assets");
+          expect(Object.keys(cachedAssets)).toHaveLength(1);
 
           return result;
         })
       )
       .then(() => del(cacheDir));
-  }
-);
+  });
 
-test.serial(
-  "should optimize and cache (`cache` option with `{String}` value)",
-  t => {
+  it("should optimize and cache (`cache` option with `{String}` value)", () => {
     const cacheDir = findCacheDir({ name: "minify-cache" });
 
     return Promise.resolve()
@@ -269,7 +265,7 @@ test.serial(
               plugins: [imageminMozjpeg()]
             })
             .then(compressedImage => {
-              t.true(result.output.length === compressedImage.length);
+              expect(result.output.equals(compressedImage)).toBe(true);
 
               return compressedImage;
             })
@@ -278,18 +274,15 @@ test.serial(
       )
       .then(result =>
         cacache.ls(cacheDir).then(cachedAssets => {
-          t.true(Object.keys(cachedAssets).length === 1, "1 cached assets");
+          expect(Object.keys(cachedAssets)).toHaveLength(1);
 
           return result;
         })
       )
       .then(() => del(cacheDir));
-  }
-);
+  });
 
-test.serial(
-  "should optimize and doesn't cache (`cache` option with `false` value)",
-  t => {
+  it("should optimize and doesn't cache (`cache` option with `false` value)", () => {
     const cacheDir = findCacheDir({ name: "imagemin-webpack" });
 
     return Promise.resolve()
@@ -310,7 +303,7 @@ test.serial(
               plugins: [imageminMozjpeg()]
             })
             .then(compressedImage => {
-              t.true(result.output.length === compressedImage.length);
+              expect(result.output.equals(compressedImage)).toBe(true);
 
               return compressedImage;
             })
@@ -319,11 +312,11 @@ test.serial(
       )
       .then(result =>
         cacache.ls(cacheDir).then(cachedAssets => {
-          t.true(Object.keys(cachedAssets).length === 0, "0 cached assets");
+          expect(Object.keys(cachedAssets)).toHaveLength(0);
 
           return result;
         })
       )
       .then(() => del(cacheDir));
-  }
-);
+  });
+});
