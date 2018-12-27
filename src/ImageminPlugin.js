@@ -14,6 +14,7 @@ class ImageminPlugin {
     const cpus = os.cpus() || { length: 1 };
     const {
       cache = false,
+      filter = () => true,
       test = /\.(jpe?g|png|gif|svg)$/i,
       include,
       exclude,
@@ -30,6 +31,7 @@ class ImageminPlugin {
     this.options = {
       bail,
       cache,
+      filter,
       exclude,
       imageminOptions,
       include,
@@ -68,6 +70,7 @@ class ImageminPlugin {
       compiler.hooks.afterPlugins.tap(plugin, () => {
         const {
           cache,
+          filter,
           test,
           include,
           exclude,
@@ -89,6 +92,7 @@ class ImageminPlugin {
           options: {
             bail,
             cache,
+            filter,
             imageminOptions,
             name
           },
@@ -102,6 +106,7 @@ class ImageminPlugin {
     compiler.hooks.emit.tapPromise(plugin, compilation => {
       const { assets } = compilation;
       const assetsForMinify = new Set();
+      const { context } = compiler.options;
 
       Object.keys(assets).forEach(file => {
         if (!ModuleFilenameHelpers.matchObject(this.options, file)) {
@@ -123,6 +128,7 @@ class ImageminPlugin {
       const {
         bail,
         cache,
+        filter,
         imageminOptions,
         maxConcurrency,
         manifest,
@@ -141,8 +147,10 @@ class ImageminPlugin {
                 minify({
                   bail,
                   cache,
+                  filter,
                   imageminOptions,
-                  input: asset.source()
+                  input: asset.source(),
+                  sourcePath: path.join(context, file)
                 })
               )
               .then(result => {

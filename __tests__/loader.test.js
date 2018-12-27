@@ -308,4 +308,38 @@ describe("loader", () => {
 
         return isCompressed(["loader-test.png"], assets);
       }));
+
+  it("should optimizes all images exclude filtered", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          imageminLoaderOptions: {
+            filter: (source, sourcePath) => {
+              expect(source).toBeInstanceOf(Buffer);
+              expect(typeof sourcePath).toBe("string");
+
+              if (source.byteLength === 631) {
+                return false;
+              }
+
+              return true;
+            },
+            imageminOptions: { plugins }
+          }
+        })
+      )
+      .then(stats => {
+        const { warnings, errors, assets } = stats.compilation;
+
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(5);
+
+        // Need add check `!isCompressed on `loader-test.jpg` and `plugin-test.jpg`
+
+        return isCompressed(
+          ["loader-test.gif", "loader-test.png", "loader-test.svg"],
+          assets
+        );
+      }));
 });

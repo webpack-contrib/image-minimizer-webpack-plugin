@@ -208,15 +208,66 @@ module.exports = {
 
 ### Loader Options
 
-|         Name          |        Type         |         Default         | Description                  |
-| :-------------------: | :-----------------: | :---------------------: | :--------------------------- |
-|      **`cache`**      | `{Boolean\|String}` |         `false`         | Enable file caching          |
-|      **`bail`**       |     `{Boolean}`     | `compiler.options.bail` | Emit warnings instead errors |
-| **`imageminOptions`** |     `{Object}`      |    `{ plugins: [] }`    | Options for `imagemin`       |
+|         Name          |        Type         |         Default         | Description                                 |
+| :-------------------: | :-----------------: | :---------------------: | :------------------------------------------ |
+|     **`filter`**      |    `{Function}`     |       `undefined`       | Allows filtering of images for optimization |
+|      **`cache`**      | `{Boolean\|String}` |         `false`         | Enable file caching                         |
+|      **`bail`**       |     `{Boolean}`     | `compiler.options.bail` | Emit warnings instead errors                |
+| **`imageminOptions`** |     `{Object}`      |    `{ plugins: [] }`    | Options for `imagemin`                      |
+
+#### `filter`
+
+Allows filtering of images for optimization.
+
+Return `true` to optimize the image, `false` otherwise.
+
+**webpack.config.js**
+
+```js
+const ImageminPlugin = require("imagemin-webpack");
+const imageminGifsicle = require("imagemin-gifsicle");
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          {
+            loader: "file-loader" // Or `url-loader` or your other loader
+          },
+          {
+            loader: ImageminPlugin.loader,
+            options: {
+              cache: true,
+              filter: (source, sourcePath) => {
+                // The `source` argument is a `Buffer` of source file
+                // The `sourcePath` argument is an absolute path to source
+                if (source.byteLength < 8192) {
+                  return false;
+                }
+
+                return true;
+              },
+              imageminOptions: {
+                plugins: [imageminGifsicle()]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+};
+```
 
 #### `cache`
 
+Enable file caching. Default path to cache directory: `node_modules/.cache/imagemin-webpack`.
+
 ##### `{Boolean}`
+
+Enable/disable file caching.
 
 **webpack.config.js**
 
@@ -249,10 +300,9 @@ module.exports = {
 };
 ```
 
-Enable file caching.
-Default path to cache directory: `node_modules/.cache/imagemin-webpack`.
-
 ##### `{String}`
+
+Enable file caching and set path to cache directory.
 
 **webpack.config.js**
 
@@ -287,6 +337,8 @@ module.exports = {
 
 #### `bail`
 
+Emit warnings instead errors.
+
 **webpack.config.js**
 
 ```js
@@ -319,6 +371,10 @@ module.exports = {
 ```
 
 #### `imageminOptions`
+
+Options for `imagemin`.
+
+More information and examples [here](https://github.com/imagemin/imagemin).
 
 **webpack.config.js**
 
@@ -362,20 +418,23 @@ module.exports = {
 
 |         Name          |                   Type                    |                  Default                   | Description                                                                                                               |
 | :-------------------: | :---------------------------------------: | :----------------------------------------: | :------------------------------------------------------------------------------------------------------------------------ |
-|      **`test`**       | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|svg)\$/i</code> | Test to match files against                                                                                               | gif | svg)\$/i</code> | Test to match files against | gif | svg)\$/i</code> | Test to match files against |
+|      **`test`**       | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|svg)\$/i</code> | Test to match files against                                                                                               |
 |     **`include`**     | `{String\/RegExp\|Array<String\|RegExp>}` |                `undefined`                 | Files to `include`                                                                                                        |
 |     **`exclude`**     | `{String\/RegExp\|Array<String\|RegExp>}` |                `undefined`                 | Files to `exclude`                                                                                                        |
+|     **`filter`**      |               `{Function}`                |                `() => true`                | Allows filtering of images for optimization                                                                               |
 |      **`cache`**      |            `{Boolean\|String}`            |                  `false`                   | Enable file caching                                                                                                       |
 |      **`bail`**       |                `{Boolean}`                |          `compiler.options.bail`           | Emit warnings instead errors                                                                                              |
 | **`imageminOptions`** |                `{Object}`                 |             `{ plugins: [] }`              | Options for `imagemin`                                                                                                    |
 |     **`loader`**      |                `{Boolean}`                |                   `true`                   | Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other) |
-| **`maxConcurrency`**  |                `{Number}`                 |    `Math.max(1, os.cpus().length - 1)`     | Maximum number of concurrency minification processes in one time                                                          |
+| **`maxConcurrency`**  |                `{Number}`                 |    `Math.max(1, os.cpus().length - 1)`     | Maximum number of concurrency optimization processes in one time                                                          |
 |      **`name`**       |                `{String}`                 |               `[hash].[ext]`               | The target asset name                                                                                                     |
 |    **`manifest`**     |                `{Object}`                 |                `undefined`                 | Contain optimized list of images from other plugins                                                                       |
 
 <!--lint enable no-html-->
 
 #### `test`
+
+Test to match files against.
 
 **webpack.config.js**
 
@@ -393,6 +452,8 @@ module.exports = {
 
 #### `include`
 
+Files to include.
+
 **webpack.config.js**
 
 ```js
@@ -409,6 +470,8 @@ module.exports = {
 
 #### `exclude`
 
+Files to exclude.
+
 **webpack.config.js**
 
 ```js
@@ -423,14 +486,47 @@ module.exports = {
 };
 ```
 
+#### `filter`
+
+Allows filtering of images for optimization.
+
+Return `true` to optimize the image, `false` otherwise.
+
+**webpack.config.js**
+
+```js
+const ImageminPlugin = require("imagemin-webpack");
+
+module.exports = {
+  plugins: [
+    new ImageminPlugin({
+      filter: (source, sourcePath) => {
+        // The `source` argument is a `Buffer` of source file
+        // The `sourcePath` argument is an absolute path to source
+        if (source.byteLength < 8192) {
+          return false;
+        }
+
+        return true;
+      }
+    })
+  ]
+};
+```
+
 #### `cache`
 
+Enable file caching. Default path to cache directory: `node_modules/.cache/imagemin-webpack`.
+
 **Be careful** when your enable `cache` and change options for imagemin plugin (example for `imagemin-gifsicle`) you should remove cache manually.
+
 You can use `rm -rf ./node_modules/.cache/imagemin-webpack` command. This is due to the fact that `imagemin-plugin` is `Function` and we don't know her arguments to invalidate cache.
 
 Note: if somebody know how we can fix it PR welcome!
 
 ##### `{Boolean}`
+
+Enable/disable file caching.
 
 **webpack.config.js**
 
@@ -446,10 +542,9 @@ module.exports = {
 };
 ```
 
-Enable file caching.
-Default path to cache directory: `node_modules/.cache/imagemin-webpack`.
-
 ##### `{String}`
+
+Enable file caching and set path to cache directory.
 
 **webpack.config.js**
 
@@ -467,6 +562,8 @@ module.exports = {
 
 #### `bail`
 
+Emit warnings instead errors.
+
 **webpack.config.js**
 
 ```js
@@ -482,6 +579,10 @@ module.exports = {
 ```
 
 #### `imageminOptions`
+
+Options for `imagemin`.
+
+More information and examples [here](https://github.com/imagemin/imagemin).
 
 **webpack.config.js**
 
@@ -507,6 +608,8 @@ module.exports = {
 
 #### `maxConcurrency`
 
+Maximum number of concurrency optimization processes in one time.
+
 **webpack.config.js**
 
 ```js
@@ -523,6 +626,8 @@ module.exports = {
 
 #### `name`
 
+The target asset name.
+
 **webpack.config.js**
 
 ```js
@@ -538,6 +643,8 @@ module.exports = {
 ```
 
 #### `manifest`
+
+Contain optimized list of images from other plugins.
 
 Note: contains only assets compressed by plugin.
 Note: Manifest will be contain list of optimized images only after `emit` event.
