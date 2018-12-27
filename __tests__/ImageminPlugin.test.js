@@ -12,7 +12,7 @@ import {
 } from "./helpers";
 
 describe("imagemin plugin", () => {
-  it("should optimizes all images (loader + plugin) as plugin", () =>
+  it("should optimizes all images (loader + plugin)", () =>
     Promise.resolve()
       .then(() => runWebpack({ emitPlugin: true, imageminPlugin: true }))
       .then(stats => {
@@ -807,5 +807,51 @@ describe("imagemin plugin", () => {
         );
 
         return stats;
+      }));
+
+  it("should optimizes all images (loader + plugin) exclude filtered", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          emitPlugin: true,
+          imageminPluginOptions: {
+            filter: (source, sourcePath) => {
+              expect(source).toBeInstanceOf(Buffer);
+              expect(typeof sourcePath).toBe("string");
+
+              if (source.byteLength === 631) {
+                return false;
+              }
+
+              return true;
+            },
+            imageminOptions: {
+              plugins
+            },
+            name: "[path][name].[ext]"
+          }
+        })
+      )
+      .then(stats => {
+        const { warnings, errors, assets, modules } = stats.compilation;
+
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toHaveLength(6);
+
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.jpg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.svg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "plugin-test.jpg")).toBe(
+          false
+        );
+
+        // Need add check `!isCompressed on `loader-test.jpg` and `plugin-test.jpg`
+
+        return isCompressed(
+          ["loader-test.gif", "loader-test.png", "loader-test.svg"],
+          assets
+        );
       }));
 });

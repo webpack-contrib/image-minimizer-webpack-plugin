@@ -319,4 +319,34 @@ describe("minify", () => {
       )
       .then(() => del(cacheDir));
   });
+
+  it("should not optimize filtered", () =>
+    pify(fs.readFile)(
+      path.resolve(__dirname, "./fixtures/loader-test.jpg")
+    ).then(input =>
+      minify({
+        filter: (source, sourcePath) => {
+          expect(source).toBeInstanceOf(Buffer);
+          expect(typeof sourcePath).toBe("string");
+
+          if (source.byteLength === 631) {
+            return false;
+          }
+
+          return true;
+        },
+        imageminOptions: {
+          plugins: [imageminMozjpeg()]
+        },
+        input,
+        sourcePath: "foo.png"
+      }).then(result => {
+        expect(result.warnings).toHaveLength(0);
+        expect(result.errors).toHaveLength(0);
+        expect(result.output.equals(input)).toBe(true);
+        expect(result.sourcePath).toBe("foo.png");
+
+        return result;
+      })
+    ));
 });

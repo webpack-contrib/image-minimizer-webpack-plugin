@@ -11,11 +11,12 @@ function runImagemin(source, imageminOptions) {
 }
 
 function minify(task = {}) {
-  const { bail, cache, imageminOptions, input } = task;
+  const { bail, cache, filter, imageminOptions, input, sourcePath } = task;
   const result = {
     errors: [],
     output: null,
-    warnings: []
+    warnings: [],
+    sourcePath
   };
 
   if (!input) {
@@ -36,6 +37,12 @@ function minify(task = {}) {
 
   // Ensure that the contents i have are in the form of a buffer
   const source = Buffer.isBuffer(input) ? input : Buffer.from(input);
+
+  if (filter && !filter(source, sourcePath)) {
+    result.output = source;
+
+    return Promise.resolve(result);
+  }
 
   // Need invalidate on all options in plugins and version plugins
 

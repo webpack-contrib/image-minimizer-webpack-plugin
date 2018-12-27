@@ -19,13 +19,17 @@ module.exports = function(content) {
       false;
   }
 
+  const { resourcePath } = this;
+
   return nodeify(
     Promise.resolve().then(() =>
       minify({
         bail,
         cache: options.cache,
+        filter: options.filter,
         imageminOptions: options.imageminOptions,
-        input: content
+        input: content,
+        sourcePath: resourcePath
       })
     ),
     (error, result) => {
