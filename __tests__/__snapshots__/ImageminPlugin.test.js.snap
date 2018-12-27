@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`imagemin plugin should optimizes all images (loader + plugin) and interpolate \`[name].[ext]\` name 1`] = `
+Array [
+  "loader-test.gif",
+  "loader-test.jpg",
+  "loader-test.png",
+  "loader-test.svg",
+  "bundle.js",
+  "plugin-test.png",
+]
+`;
+
+exports[`imagemin plugin should optimizes all images (loader + plugin) and interpolate \`[path][name].[ext]\` name 1`] = `
+Array [
+  "nested/deep/loader-test.gif",
+  "nested/deep/loader-test.jpg",
+  "nested/deep/loader-test.png",
+  "nested/deep/loader-test.svg",
+  "bundle.js",
+  "nested/deep/plugin-test.png",
+]
+`;

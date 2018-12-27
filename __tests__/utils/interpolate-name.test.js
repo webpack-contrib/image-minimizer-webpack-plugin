@@ -3,6 +3,18 @@ import interpolateName from "../../src/utils/interpolate-name";
 describe("interpolateName", () => {
   [
     [
+      "\\app\\js\\javascript.js",
+      "js/[hash].script.[ext]",
+      "test content",
+      "js/9473fdd0d880a43c21b7778d34872157.script.js"
+    ],
+    [
+      "app\\js\\javascript.js",
+      "js/[hash].script.[ext]",
+      "test content",
+      "js/9473fdd0d880a43c21b7778d34872157.script.js"
+    ],
+    [
       "/app/js/javascript.js",
       "js/[hash].script.[ext]",
       "test content",
@@ -49,6 +61,12 @@ describe("interpolateName", () => {
       "js/[name].[ext]",
       "test content",
       "js/filenameWithoutExt.bin"
+    ],
+    [
+      "test.js",
+      "[path][name].[hash].[ext]",
+      "test content",
+      "test.9473fdd0d880a43c21b7778d34872157.js"
     ],
     [
       "test.js",

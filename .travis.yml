@@ -23,6 +23,11 @@ matrix:
     - node_js: "6"
       script: npm run test-only
       env: CI=tests 6
+      os: linux
+    - node_js: "6"
+      script: npm run test-only
+      env: CI=tests 6
+      os: windows
     - node_js: "8"
       script: npm run test-only
       env: CI=tests 8
@@ -34,8 +39,7 @@ matrix:
       env: CI=tests 11
 
 before_install:
-  - npm install -g npm@latest
-  - sudo apt-get install nasm
-  - nvm --version
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g npm@latest; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install nasm; fi
   - node --version
   - npm --version

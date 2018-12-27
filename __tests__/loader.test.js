@@ -41,10 +41,18 @@ describe("loader", () => {
         expect(warnings).toHaveLength(0);
         expect(errors).toHaveLength(0);
         expect(Object.keys(assets)).toHaveLength(7);
-        expect(assets["loader-test.txt"].source().toString()).toBe("TEXT\n");
-        expect(assets["loader-test.css"].source().toString()).toBe(
-          "a {\n  color: red;\n}\n"
-        );
+        expect(
+          assets["loader-test.txt"]
+            .source()
+            .toString()
+            .replace(/\r\n|\r/g, "\n")
+        ).toBe("TEXT\n");
+        expect(
+          assets["loader-test.css"]
+            .source()
+            .toString()
+            .replace(/\r\n|\r/g, "\n")
+        ).toBe("a {\n  color: red;\n}\n");
 
         return isCompressed(
           [

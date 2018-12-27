@@ -743,4 +743,69 @@ describe("imagemin plugin", () => {
         return stats;
       });
   });
+
+  it("should optimizes all images (loader + plugin) and interpolate `[name].[ext]` name", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          emitPluginOptions: {
+            fileNames: ["plugin-test.png"]
+          },
+          imageminPluginOptions: {
+            imageminOptions: { plugins },
+            name: "[name].[ext]"
+          },
+          name: "[name].[ext]"
+        })
+      )
+      .then(stats => {
+        const { warnings, errors, assets, modules } = stats.compilation;
+
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toMatchSnapshot();
+
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.jpg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.svg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "plugin-test.jpg")).toBe(
+          false
+        );
+
+        return stats;
+      }));
+
+  it("should optimizes all images (loader + plugin) and interpolate `[path][name].[ext]` name", () =>
+    Promise.resolve()
+      .then(() =>
+        runWebpack({
+          entry: path.join(fixturesPath, "./nested/deep/loader.js"),
+          emitPluginOptions: {
+            fileNames: ["nested/deep/plugin-test.png"]
+          },
+          imageminPluginOptions: {
+            imageminOptions: { plugins },
+            name: "[path][name].[ext]"
+          },
+          name: "[path][name].[ext]"
+        })
+      )
+      .then(stats => {
+        const { warnings, errors, assets, modules } = stats.compilation;
+
+        expect(warnings).toHaveLength(0);
+        expect(errors).toHaveLength(0);
+        expect(Object.keys(assets)).toMatchSnapshot();
+
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.jpg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.gif")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "loader-test.svg")).toBe(true);
+        expect(modulesHasImageminLoader(modules, "plugin-test.jpg")).toBe(
+          false
+        );
+
+        return stats;
+      }));
 });
