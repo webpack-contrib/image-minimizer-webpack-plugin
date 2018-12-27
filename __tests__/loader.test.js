@@ -2,344 +2,301 @@ import path from "path";
 import cacache from "cacache";
 import del from "del";
 import findCacheDir from "find-cache-dir";
-import { fixturesPath, isCompressed, plugins, runWebpack } from "./helpers";
+import { fixturesPath, isOptimized, plugins, webpack } from "./helpers";
 
 describe("loader", () => {
-  it("should optimizes all images", () =>
-    Promise.resolve()
-      .then(() => runWebpack({ imageminLoader: true }))
-      .then(stats => {
-        const { warnings, errors, assets } = stats.compilation;
+  it("should optimizes all images", async () => {
+    const stats = await webpack({ imageminLoader: true });
+    const { warnings, errors, assets } = stats.compilation;
 
-        expect(warnings).toHaveLength(0);
-        expect(errors).toHaveLength(0);
-        expect(Object.keys(assets)).toHaveLength(5);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
 
-        return isCompressed(
-          [
-            "loader-test.gif",
-            "loader-test.jpg",
-            "loader-test.png",
-            "loader-test.svg"
-          ],
-          assets
-        );
-      }));
+    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
+  });
 
-  it("should optimizes all images and don't break non images", () =>
-    Promise.resolve()
-      .then(() =>
-        runWebpack({
-          entry: path.join(fixturesPath, "loader-other-imports.js"),
-          imageminLoader: true,
-          test: /\.(jpe?g|png|gif|svg|css|txt)$/i
-        })
-      )
-      .then(stats => {
-        const { warnings, errors, assets } = stats.compilation;
+  it("should optimizes all images and don't break non images", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "loader-other-imports.js"),
+      imageminLoader: true,
+      test: /\.(jpe?g|png|gif|svg|css|txt)$/i
+    });
+    const { warnings, errors, assets } = stats.compilation;
 
-        expect(warnings).toHaveLength(0);
-        expect(errors).toHaveLength(0);
-        expect(Object.keys(assets)).toHaveLength(7);
-        expect(
-          assets["loader-test.txt"]
-            .source()
-            .toString()
-            .replace(/\r\n|\r/g, "\n")
-        ).toBe("TEXT\n");
-        expect(
-          assets["loader-test.css"]
-            .source()
-            .toString()
-            .replace(/\r\n|\r/g, "\n")
-        ).toBe("a {\n  color: red;\n}\n");
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+    expect(Object.keys(assets)).toHaveLength(7);
+    expect(
+      assets["loader-test.txt"]
+        .source()
+        .toString()
+        .replace(/\r\n|\r/g, "\n")
+    ).toBe("TEXT\n");
+    expect(
+      assets["loader-test.css"]
+        .source()
+        .toString()
+        .replace(/\r\n|\r/g, "\n")
+    ).toBe("a {\n  color: red;\n}\n");
 
-        return isCompressed(
-          [
-            "loader-test.gif",
-            "loader-test.jpg",
-            "loader-test.png",
-            "loader-test.svg"
-          ],
-          assets
-        );
-      }));
+    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
+  });
 
-  it("should optimizes all images and cache their", () => {
+  it("should optimizes all images and cache their", async () => {
+    const spyGet = jest.spyOn(cacache, "get");
+    const spyPut = jest.spyOn(cacache, "put");
+
     const cacheDir = findCacheDir({ name: "imagemin-webpack" });
 
-    return Promise.resolve()
-      .then(() => del(cacheDir))
-      .then(() =>
-        runWebpack({
-          imageminLoaderOptions: { cache: true, imageminOptions: { plugins } }
-        })
-      )
-      .then(stats => {
-        const { warnings, errors, assets } = stats.compilation;
+    await del(cacheDir);
 
-        expect(warnings).toHaveLength(0);
-        expect(errors).toHaveLength(0);
-        expect(Object.keys(assets)).toHaveLength(5);
+    const options = {
+      imageminLoaderOptions: { cache: true, imageminOptions: { plugins } }
+    };
+    const stats = await webpack(options);
+    const { warnings, errors, assets } = stats.compilation;
 
-        return isCompressed(
-          [
-            "loader-test.gif",
-            "loader-test.jpg",
-            "loader-test.png",
-            "loader-test.svg"
-          ],
-          assets
-        );
-      })
-      .then(() =>
-        cacache
-          .ls(cacheDir)
-          .then(cachedAssets => {
-            expect(Object.keys(cachedAssets)).toHaveLength(4);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
 
-            return true;
-          })
-          .then(() => runWebpack({ cache: true }))
-          .then(stats => {
-            const { warnings, errors, assets } = stats.compilation;
+    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
 
-            expect(warnings).toHaveLength(0);
-            expect(errors).toHaveLength(0);
-            expect(Object.keys(assets)).toHaveLength(5);
+    // Try to found cached files, but we don't have their in cache
+    expect(spyGet).toHaveBeenCalledTimes(4);
+    // Put files in cache
+    expect(spyPut).toHaveBeenCalledTimes(4);
 
-            return true;
-          })
-          .then(() => del(cacheDir))
-      );
+    spyGet.mockClear();
+    spyPut.mockClear();
+
+    const secondStats = await webpack(options);
+    const {
+      warnings: secondWarnings,
+      errors: secondErrors,
+      assets: secondAssets
+    } = secondStats.compilation;
+
+    expect(secondWarnings).toHaveLength(0);
+    expect(secondErrors).toHaveLength(0);
+
+    await expect(isOptimized("loader-test.gif", secondAssets)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", secondAssets)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", secondAssets)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", secondAssets)).resolves.toBe(
+      true
+    );
+
+    // Now we have cached files so we get their and don't put
+    expect(spyGet).toHaveBeenCalledTimes(4);
+    expect(spyPut).toHaveBeenCalledTimes(0);
+
+    await del(cacheDir);
+
+    spyGet.mockRestore();
+    spyPut.mockRestore();
   });
 
-  it("should optimizes all images and cache their (custom cache location)", () => {
-    const cacheDir = findCacheDir({ name: "imagemin-loader-cache-location" });
+  it("should optimizes all images and cache their (custom cache location)", async () => {
+    const spyGet = jest.spyOn(cacache, "get");
+    const spyPut = jest.spyOn(cacache, "put");
 
-    return Promise.resolve()
-      .then(() => del(cacheDir))
-      .then(() =>
-        runWebpack({
-          imageminLoaderOptions: {
-            cache: cacheDir,
-            imageminOptions: { plugins }
+    const cacheDir = findCacheDir({
+      name: "imagemin-webpack-loader-custom-cache-location"
+    });
+
+    await del(cacheDir);
+
+    const options = {
+      imageminLoaderOptions: { cache: cacheDir, imageminOptions: { plugins } }
+    };
+    const stats = await webpack(options);
+    const { warnings, errors, assets } = stats.compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
+
+    // Try to found cached files, but we don't have their in cache
+    expect(spyGet).toHaveBeenCalledTimes(4);
+    // Put files in cache
+    expect(spyPut).toHaveBeenCalledTimes(4);
+
+    spyGet.mockClear();
+    spyPut.mockClear();
+
+    const secondStats = await webpack(options);
+    const {
+      warnings: secondWarnings,
+      errors: secondErrors,
+      assets: secondAssets
+    } = secondStats.compilation;
+
+    expect(secondWarnings).toHaveLength(0);
+    expect(secondErrors).toHaveLength(0);
+
+    await expect(isOptimized("loader-test.gif", secondAssets)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", secondAssets)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", secondAssets)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", secondAssets)).resolves.toBe(
+      true
+    );
+
+    // Now we have cached files so we get their and don't put
+    expect(spyGet).toHaveBeenCalledTimes(4);
+    expect(spyPut).toHaveBeenCalledTimes(0);
+
+    await del(cacheDir);
+
+    spyGet.mockRestore();
+    spyPut.mockRestore();
+  });
+
+  it("should optimizes all images and doesn't cache their", async () => {
+    const spyGet = jest.spyOn(cacache, "get");
+    const spyPut = jest.spyOn(cacache, "put");
+
+    const stats = await webpack({
+      imageminLoaderOptions: { cache: false, imageminOptions: { plugins } }
+    });
+    const { warnings, errors, assets } = stats.compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
+
+    expect(spyGet).toHaveBeenCalledTimes(0);
+    expect(spyPut).toHaveBeenCalledTimes(0);
+
+    spyGet.mockRestore();
+    spyPut.mockRestore();
+  });
+
+  it("should throws error if imagemin plugins don't setup", async () => {
+    const stats = await webpack({ imageminLoaderOptions: {} });
+    const { warnings, errors } = stats.compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(4);
+
+    stats.compilation.errors.forEach(error => {
+      expect(error.message).toMatch(/No\splugins\sfound\sfor\s`imagemin`/);
+    });
+  });
+
+  it("should throws error on corrupted images using `bail` option with `true` value", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
+      imageminLoaderOptions: { bail: true, imageminOptions: { plugins } }
+    });
+    const { assets, warnings, errors } = stats.compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(Object.keys(assets)).toHaveLength(3);
+
+    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+  });
+
+  it("should throws warning on corrupted images using `bail` option with `false` value", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
+      imageminLoaderOptions: { bail: false, imageminOptions: { plugins } }
+    });
+    const { assets, warnings, errors } = stats.compilation;
+
+    expect(warnings).toHaveLength(1);
+    expect(errors).toHaveLength(0);
+    expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+
+    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+  });
+
+  it("should throws error on corrupted images using `webpack.bail` option with `true` value", async () => {
+    const stats = await webpack({
+      bail: true,
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
+      imageminLoaderOptions: { imageminOptions: { plugins } }
+    });
+    const { assets, warnings, errors } = stats.compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+
+    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+  });
+
+  it("should throws warning on corrupted images using `webpack.bail` option with `false` value", async () => {
+    const stats = await webpack({
+      bail: false,
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
+      imageminLoaderOptions: { imageminOptions: { plugins } }
+    });
+    const { assets, warnings, errors } = stats.compilation;
+
+    expect(warnings).toHaveLength(1);
+    expect(errors).toHaveLength(0);
+    expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+
+    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+  });
+
+  it("should optimizes all images exclude filtered", async () => {
+    const stats = await webpack({
+      imageminLoaderOptions: {
+        filter: (source, sourcePath) => {
+          expect(source).toBeInstanceOf(Buffer);
+          expect(typeof sourcePath).toBe("string");
+
+          if (source.byteLength === 631) {
+            return false;
           }
-        })
-      )
-      .then(stats => {
-        const { warnings, errors, assets } = stats.compilation;
 
-        expect(warnings).toHaveLength(0);
-        expect(errors).toHaveLength(0);
-        expect(Object.keys(assets)).toHaveLength(5);
+          return true;
+        },
+        imageminOptions: { plugins }
+      }
+    });
 
-        return isCompressed(
-          [
-            "loader-test.gif",
-            "loader-test.jpg",
-            "loader-test.png",
-            "loader-test.svg"
-          ],
-          assets
-        );
-      })
-      .then(() =>
-        cacache
-          .ls(cacheDir)
-          .then(cachedAssets => {
-            expect(Object.keys(cachedAssets)).toHaveLength(4);
+    const { warnings, errors, assets } = stats.compilation;
 
-            return true;
-          })
-          .then(() => runWebpack({ cache: cacheDir }))
-          .then(stats => {
-            const { warnings, errors, assets } = stats.compilation;
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+    expect(Object.keys(assets)).toHaveLength(5);
 
-            expect(warnings).toHaveLength(0);
-            expect(errors).toHaveLength(0);
-            expect(Object.keys(assets)).toHaveLength(5);
-
-            return true;
-          })
-          .then(() => del(cacheDir))
-      );
+    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(false);
   });
-
-  it("should optimizes all images and doesn't cache their", () => {
-    const cacheDir = findCacheDir({ name: "imagemin-webpack" });
-
-    return Promise.resolve()
-      .then(() => del(cacheDir))
-      .then(() =>
-        runWebpack({
-          imageminLoaderOptions: { cache: false, imageminOptions: { plugins } }
-        })
-      )
-      .then(stats => {
-        const { warnings, errors, assets } = stats.compilation;
-
-        expect(warnings).toHaveLength(0);
-        expect(errors).toHaveLength(0);
-        expect(Object.keys(assets)).toHaveLength(5);
-
-        return isCompressed(
-          [
-            "loader-test.gif",
-            "loader-test.jpg",
-            "loader-test.png",
-            "loader-test.svg"
-          ],
-          assets
-        );
-      })
-      .then(() =>
-        cacache
-          .ls(cacheDir)
-          .then(cachedAssets => {
-            expect(Object.keys(cachedAssets)).toHaveLength(0);
-
-            return true;
-          })
-          .then(() => runWebpack({ cache: false }))
-          .then(stats => {
-            const { warnings, errors, assets } = stats.compilation;
-
-            expect(warnings).toHaveLength(0);
-            expect(errors).toHaveLength(0);
-            expect(Object.keys(assets)).toHaveLength(5);
-
-            return true;
-          })
-          .then(() => del(cacheDir))
-      );
-  });
-
-  it("should throws error if imagemin plugins don't setup", () =>
-    Promise.resolve()
-      .then(() => runWebpack({ imageminLoaderOptions: {} }))
-      .then(stats => {
-        const { warnings, errors } = stats.compilation;
-
-        expect(warnings).toHaveLength(0);
-        expect(errors).toHaveLength(4);
-
-        stats.compilation.errors.forEach(error => {
-          expect(error.message).toMatch(/No\splugins\sfound\sfor\s`imagemin`/);
-        });
-
-        return stats;
-      }));
-
-  it("should throws error on corrupted images using `bail` option with `true` value", () =>
-    Promise.resolve()
-      .then(() =>
-        runWebpack({
-          entry: path.join(fixturesPath, "loader-corrupted.js"),
-          imageminLoaderOptions: { bail: true, imageminOptions: { plugins } }
-        })
-      )
-      .then(stats => {
-        const { assets, warnings, errors } = stats.compilation;
-
-        expect(warnings).toHaveLength(0);
-        expect(errors).toHaveLength(1);
-        expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
-        expect(Object.keys(assets)).toHaveLength(3);
-
-        return isCompressed(["loader-test.png"], assets);
-      }));
-
-  it("should throws warning on corrupted images using `bail` option with `false` value", () =>
-    Promise.resolve()
-      .then(() =>
-        runWebpack({
-          entry: path.join(fixturesPath, "loader-corrupted.js"),
-          imageminLoaderOptions: { bail: false, imageminOptions: { plugins } }
-        })
-      )
-      .then(stats => {
-        const { assets, warnings, errors } = stats.compilation;
-
-        expect(warnings).toHaveLength(1);
-        expect(errors).toHaveLength(0);
-        expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
-        expect(Object.keys(assets)).toHaveLength(3);
-
-        return isCompressed(["loader-test.png"], assets);
-      }));
-
-  it("should throws error on corrupted images using `webpack.bail` option with `true` value", () =>
-    Promise.resolve()
-      .then(() =>
-        runWebpack({
-          bail: true,
-          entry: path.join(fixturesPath, "loader-corrupted.js"),
-          imageminLoaderOptions: { imageminOptions: { plugins } }
-        })
-      )
-      .then(stats => {
-        const { assets, warnings, errors } = stats.compilation;
-
-        expect(warnings).toHaveLength(0);
-        expect(errors).toHaveLength(1);
-        expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
-        expect(Object.keys(assets)).toHaveLength(3);
-
-        return isCompressed(["loader-test.png"], assets);
-      }));
-
-  it("should throws warning on corrupted images using `webpack.bail` option with `false` value", () =>
-    Promise.resolve()
-      .then(() =>
-        runWebpack({
-          bail: false,
-          entry: path.join(fixturesPath, "loader-corrupted.js"),
-          imageminLoaderOptions: { imageminOptions: { plugins } }
-        })
-      )
-      .then(stats => {
-        const { assets, warnings, errors } = stats.compilation;
-
-        expect(warnings).toHaveLength(1);
-        expect(errors).toHaveLength(0);
-        expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
-        expect(Object.keys(assets)).toHaveLength(3);
-
-        return isCompressed(["loader-test.png"], assets);
-      }));
-
-  it("should optimizes all images exclude filtered", () =>
-    Promise.resolve()
-      .then(() =>
-        runWebpack({
-          imageminLoaderOptions: {
-            filter: (source, sourcePath) => {
-              expect(source).toBeInstanceOf(Buffer);
-              expect(typeof sourcePath).toBe("string");
-
-              if (source.byteLength === 631) {
-                return false;
-              }
-
-              return true;
-            },
-            imageminOptions: { plugins }
-          }
-        })
-      )
-      .then(stats => {
-        const { warnings, errors, assets } = stats.compilation;
-
-        expect(warnings).toHaveLength(0);
-        expect(errors).toHaveLength(0);
-        expect(Object.keys(assets)).toHaveLength(5);
-
-        // Need add check `!isCompressed on `loader-test.jpg` and `plugin-test.jpg`
-
-        return isCompressed(
-          ["loader-test.gif", "loader-test.png", "loader-test.svg"],
-          assets
-        );
-      }));
 });

@@ -99,37 +99,27 @@ function runWebpack(options = {}, multiCompiler = false) {
   return pify(webpack)(multiCompiler ? [config, config] : config);
 }
 
-function isCompressed(originalNames, assets) {
-  return Promise.all(
-    originalNames.map(originalName => {
-      const asset = assets[originalName];
-      const source = asset.source();
+function isOptimized(originalPath, assets) {
+  const source = assets[originalPath];
 
-      if (!Buffer.isBuffer(source)) {
-        throw new Error(`Asset "${originalName}" is not a buffer`);
-      }
+  if (!source) {
+    throw new Error(`Can't find assets`);
+  }
 
-      const pathToOriginal = path.join(fixturesPath, originalName);
+  const originalBuffer = source.source();
+  const pathToOriginal = path.join(fixturesPath, originalPath);
 
-      return Promise.resolve()
-        .then(() => pify(fs.readFile)(pathToOriginal))
-        .then(data =>
-          imagemin.buffer(data, {
-            plugins
-          })
-        )
-        .then(compressedData => {
-          if (compressedData.length !== asset.size()) {
-            throw new Error(`Image "${originalName}" is not compressed.`);
-          }
-
-          return compressedData;
-        });
-    })
-  );
+  return Promise.resolve()
+    .then(() => pify(fs.readFile)(pathToOriginal))
+    .then(data =>
+      imagemin.buffer(data, {
+        plugins
+      })
+    )
+    .then(optimizedBuffer => optimizedBuffer.equals(originalBuffer));
 }
 
-function modulesHasImageminLoader(modules, id) {
+function hasLoader(id, modules) {
   return modules.some(module => {
     if (!module.id.endsWith(id)) {
       return false;
@@ -141,10 +131,4 @@ function modulesHasImageminLoader(modules, id) {
   });
 }
 
-export {
-  runWebpack,
-  isCompressed,
-  plugins,
-  fixturesPath,
-  modulesHasImageminLoader
-};
+export { runWebpack as webpack, isOptimized, plugins, fixturesPath, hasLoader };
