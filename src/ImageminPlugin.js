@@ -3,7 +3,7 @@
 const os = require("os");
 const path = require("path");
 const RawSource = require("webpack-sources/lib/RawSource");
-const createThrottle = require("async-throttle");
+const pLimit = require("p-limit");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
 
 const minify = require("./minify");
@@ -127,11 +127,11 @@ class ImageminPlugin {
         name
       } = this.options;
 
-      const throttle = createThrottle(maxConcurrency);
+      const limit = pLimit(maxConcurrency);
 
       return Promise.all(
         [...assetsForMinify].map(file =>
-          throttle(() => {
+          limit(() => {
             const asset = assets[file];
 
             return Promise.resolve()
@@ -184,7 +184,7 @@ class ImageminPlugin {
 
                 return Promise.resolve(source);
               });
-          })
+          }, file)
         )
       );
     });
