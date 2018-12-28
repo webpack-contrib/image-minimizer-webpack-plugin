@@ -8,15 +8,16 @@ const minify = require("./minify");
 module.exports = function(content) {
   const options = loaderUtils.getOptions(this) || {};
   const callback = this.async();
-  /* eslint-disable no-underscore-dangle */
   let { bail } = options;
 
   if (typeof bail === "undefined") {
+    /* eslint-disable no-underscore-dangle */
     bail =
       (this._compiler &&
         this._compiler.options &&
         this._compiler.options.bail) ||
       false;
+    /* eslint-enable no-underscore-dangle */
   }
 
   const { resourcePath } = this;
@@ -54,6 +55,7 @@ module.exports = function(content) {
       // A trick to avoid double compression by our plugin.
       // Webpack doesn't have api to store meta information for assets,
       // maybe in future it will be implemented.
+      // eslint-disable-next-line no-underscore-dangle
       data._compressed = true;
 
       return callback(null, data);

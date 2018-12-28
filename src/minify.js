@@ -39,6 +39,7 @@ function minify(task = {}) {
   const source = Buffer.isBuffer(input) ? input : Buffer.from(input);
 
   if (filter && !filter(source, sourcePath)) {
+    result.filtered = true;
     result.output = source;
 
     return Promise.resolve(result);

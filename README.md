@@ -676,6 +676,60 @@ module.exports = {
 };
 ```
 
+## Examples
+
+### Optimize images based on size
+
+You can use difference options (like `progressive`/`interlaced` and etc) based on image size (example - don't do progressive transformation for small images).
+
+What is `progressive` image? [`Answer here`](https://jmperezperez.com/medium-image-progressive-loading-placeholder/).
+
+**webpack.config.js**
+
+```js
+const ImageminPlugin = require("imagemin-webpack");
+const imageminJpegtran = require("imagemin-jpegtran");
+
+module.exports = {
+  minimizer: [
+    new ImageminPlugin({
+      // Only apply this one to files equal to or over 8192 bytes
+      filter: source => {
+        if (source.byteLength >= 8192) {
+          return true;
+        }
+
+        return false;
+      },
+      imageminOptions: {
+        plugins: [
+          imageminJpegtran({
+            progressive: true
+          })
+        ]
+      }
+    }),
+    new ImageminPlugin({
+      // Only apply this one to files under 8192
+      filter: source => {
+        if (source.byteLength < 8192) {
+          return true;
+        }
+
+        return false;
+      },
+      imageminOptions: {
+        plugins: [
+          imageminJpegtran({
+            progressive: false
+          })
+        ]
+      }
+    })
+  ]
+};
+```
+
 ## Related
 
 - [imagemin](https://github.com/imagemin/imagemin) - API for this package.
