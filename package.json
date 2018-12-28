@@ -30,11 +30,11 @@
     "node": ">= 6.9.0"
   },
   "dependencies": {
-    "async-throttle": "^1.1.0",
     "cacache": "^11.0.1",
     "find-cache-dir": "^2.0.0",
     "serialize-javascript": "^1.6.0",
     "loader-utils": "^1.0.0",
+    "p-limit": "^2.1.0",
     "imagemin": "^6.0.0",
     "nodeify": "^1.0.0",
     "webpack-sources": "^1.0.0"
