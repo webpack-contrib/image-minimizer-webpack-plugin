@@ -93,7 +93,7 @@
     "fix": "npm-run-all -l prettify -p 'fix:**'",
     "pretest": "npm run lint",
     "test": "npm run test-only",
-    "test-only": "jest --coverage",
+    "test-only": "jest --coverage --runInBand",
     "release": "npmpub"
   },
   "babel": {

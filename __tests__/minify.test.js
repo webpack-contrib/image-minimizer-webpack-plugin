@@ -353,5 +353,6 @@ describe("minify", () => {
     expect(result.errors).toHaveLength(0);
     expect(result.output.equals(input)).toBe(true);
     expect(result.sourcePath).toBe("foo.png");
+    expect(result.filtered).toBe(true);
   });
 });

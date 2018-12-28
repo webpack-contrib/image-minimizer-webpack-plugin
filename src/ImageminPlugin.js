@@ -41,7 +41,6 @@ class ImageminPlugin {
       name,
       test
     };
-    this.loaderAdded = false;
   }
 
   apply(compiler) {
@@ -79,11 +78,6 @@ class ImageminPlugin {
           name
         } = this.options;
 
-        // Avoid multiple adding loader in multi compiler mode
-        if (this.loaderAdded) {
-          return;
-        }
-
         compiler.options.module.rules.push({
           enforce: "pre",
           exclude,
@@ -98,8 +92,6 @@ class ImageminPlugin {
           },
           test
         });
-
-        this.loaderAdded = true;
       });
     }
 
@@ -170,7 +162,7 @@ class ImageminPlugin {
                   });
                 }
 
-                if (moduleAssets[file]) {
+                if (moduleAssets[file] || result.filtered) {
                   compilation.assets[file] = source;
 
                   return Promise.resolve(source);
