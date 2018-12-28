@@ -96,9 +96,9 @@ class ImageminPlugin {
     }
 
     compiler.hooks.emit.tapPromise(plugin, compilation => {
-      const { assets } = compilation;
-      const assetsForMinify = new Set();
       const { context } = compiler.options;
+      const { assets } = compilation;
+      const assetsForMinify = [];
 
       Object.keys(assets).forEach(file => {
         if (!ModuleFilenameHelpers.matchObject(this.options, file)) {
@@ -110,10 +110,10 @@ class ImageminPlugin {
           return;
         }
 
-        assetsForMinify.add(file);
+        assetsForMinify.push(file);
       });
 
-      if (assetsForMinify.size === 0) {
+      if (assetsForMinify.length === 0) {
         return Promise.resolve();
       }
 
