@@ -24,19 +24,23 @@ module.exports = function(content) {
 
   return nodeify(
     Promise.resolve().then(() =>
-      minify({
-        bail,
-        cache: options.cache,
-        filter: options.filter,
-        imageminOptions: options.imageminOptions,
-        input: content,
-        sourcePath: resourcePath
-      })
+      minify([
+        {
+          bail,
+          cache: options.cache,
+          filter: options.filter,
+          imageminOptions: options.imageminOptions,
+          input: content,
+          sourcePath: resourcePath
+        }
+      ])
     ),
-    (error, result) => {
+    (error, results) => {
       if (error) {
         return callback(error);
       }
+
+      const [result] = results;
 
       if (result.warnings && result.warnings.length > 0) {
         result.warnings.forEach(warning => {
