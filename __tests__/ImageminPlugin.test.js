@@ -626,7 +626,7 @@ describe("imagemin plugin", () => {
     await expect(isOptimized("plugin-test.png", assets)).resolves.toBe(true);
   });
 
-  it("should optimizes all images (loader + plugin) and interpolate `[path][name].[ext]` name", async () => {
+  it.only("should optimizes all images (loader + plugin) and interpolate `[path][name].[ext]` name", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./nested/deep/loader.js"),
       emitPluginOptions: {
@@ -647,6 +647,8 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.jpg", modules)).toBe(true);
     expect(hasLoader("loader-test.gif", modules)).toBe(true);
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
+
+    console.log(Object.keys(assets));
 
     await expect(
       isOptimized("nested/deep/loader-test.gif", assets)
