@@ -950,4 +950,23 @@ describe("imagemin plugin", () => {
       )
     ).resolves.toBe(true);
   });
+
+  it("should optimizes all images (loader + plugin) from `mini-css-extract-plugin`", async () => {
+    const stats = await webpack({
+      emitPlugin: true,
+      imageminPlugin: true,
+      entry: path.join(fixturesPath, "entry-with-css.js"),
+      MCEP: true
+    });
+    const { warnings, errors, assets } = stats.compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    // Bug in mini-css-extract-plugin
+    // expect(hasLoader("url.png", modules)).toBe(true);
+
+    await expect(isOptimized("url.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("plugin-test.jpg", assets)).resolves.toBe(true);
+  });
 });

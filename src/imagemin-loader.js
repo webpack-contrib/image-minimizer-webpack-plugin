@@ -24,16 +24,20 @@ module.exports = function(content) {
 
   return nodeify(
     Promise.resolve().then(() =>
-      minify([
+      minify(
+        [
+          {
+            input: content,
+            sourcePath: resourcePath
+          }
+        ],
         {
           bail,
           cache: options.cache,
-          filter: options.filter,
           imageminOptions: options.imageminOptions,
-          input: content,
-          sourcePath: resourcePath
+          filter: options.filter
         }
-      ])
+      )
     ),
     (error, results) => {
       if (error) {

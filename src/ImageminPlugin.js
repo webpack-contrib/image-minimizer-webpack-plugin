@@ -47,18 +47,12 @@ class ImageminPlugin {
       this.options.bail = compiler.options.bail;
     }
 
-    const moduleAssets = {};
+    const moduleAssets = new Set();
 
+    // Collect assets from modules
     compiler.hooks.compilation.tap(plugin, compilation => {
       compilation.hooks.moduleAsset.tap(plugin, (module, file) => {
-        if (!module.userRequest) {
-          return;
-        }
-
-        moduleAssets[file] = path.join(
-          path.dirname(file),
-          path.basename(module.userRequest)
-        );
+        moduleAssets.add(file);
       });
     });
 
@@ -111,6 +105,7 @@ class ImageminPlugin {
           return;
         }
 
+        // Exclude already optimized assets from `imagemin-loader`
         // eslint-disable-next-line no-underscore-dangle
         if (assets[file].source()._compressed) {
           return;
@@ -119,10 +114,6 @@ class ImageminPlugin {
         const asset = assets[file];
 
         assetsForMinify.push({
-          bail,
-          cache,
-          filter,
-          imageminOptions,
           input: asset.source(),
           sourcePath: path.join(context, file)
         });
@@ -133,7 +124,15 @@ class ImageminPlugin {
       }
 
       return Promise.resolve()
-        .then(() => minify(assetsForMinify, { maxConcurrency }))
+        .then(() =>
+          minify(assetsForMinify, {
+            bail,
+            filter,
+            cache,
+            imageminOptions,
+            maxConcurrency
+          })
+        )
         .then(results => {
           results.forEach(result => {
             const source = result.output
@@ -152,31 +151,34 @@ class ImageminPlugin {
               });
             }
 
-            const originaResourcePath = path.relative(
+            const originalResourcePath = path.relative(
               context,
               result.sourcePath
             );
 
-            if (moduleAssets[originaResourcePath] || result.filtered) {
-              compilation.assets[originaResourcePath] = source;
+            // Exclude:
+            // 1. Module assets (`file-loader` already interpolated asset name)
+            // 2. Filtered assets
+            if (moduleAssets.has(originalResourcePath) || result.filtered) {
+              compilation.assets[originalResourcePath] = source;
 
               return;
             }
 
             const interpolatedName = loaderUtils.interpolateName(
-              { resourcePath: path.join(context, originaResourcePath) },
+              { resourcePath: path.join(context, originalResourcePath) },
               name,
               { content: source.source(), context }
             );
 
             compilation.assets[interpolatedName] = source;
 
-            if (interpolatedName !== originaResourcePath) {
-              delete compilation.assets[originaResourcePath];
+            if (interpolatedName !== originalResourcePath) {
+              delete compilation.assets[originalResourcePath];
             }
 
-            if (manifest && !manifest[originaResourcePath]) {
-              manifest[originaResourcePath] = interpolatedName;
+            if (manifest && !manifest[originalResourcePath]) {
+              manifest[originalResourcePath] = interpolatedName;
             }
           });
 
