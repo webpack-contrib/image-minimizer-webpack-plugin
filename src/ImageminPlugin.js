@@ -3,9 +3,9 @@
 const path = require("path");
 const RawSource = require("webpack-sources/lib/RawSource");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
+const loaderUtils = require("loader-utils");
 
 const minify = require("./minify");
-const { interpolateName } = require("./utils");
 
 class ImageminPlugin {
   constructor(options = {}) {
@@ -163,12 +163,10 @@ class ImageminPlugin {
               return;
             }
 
-            const interpolatedName = interpolateName(
-              originaResourcePath,
+            const interpolatedName = loaderUtils.interpolateName(
+              { resourcePath: path.join(context, originaResourcePath) },
               name,
-              {
-                content: source.source()
-              }
+              { content: source.source(), context }
             );
 
             compilation.assets[interpolatedName] = source;

@@ -626,7 +626,7 @@ describe("imagemin plugin", () => {
     await expect(isOptimized("plugin-test.png", assets)).resolves.toBe(true);
   });
 
-  it.only("should optimizes all images (loader + plugin) and interpolate `[path][name].[ext]` name", async () => {
+  it("should optimizes all images (loader + plugin) and interpolate `[path][name].[ext]` name", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./nested/deep/loader.js"),
       emitPluginOptions: {
@@ -648,8 +648,6 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.gif", modules)).toBe(true);
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
-    console.log(Object.keys(assets));
-
     await expect(
       isOptimized("nested/deep/loader-test.gif", assets)
     ).resolves.toBe(true);
@@ -664,6 +662,60 @@ describe("imagemin plugin", () => {
     ).resolves.toBe(true);
     await expect(
       isOptimized("nested/deep/plugin-test.png", assets)
+    ).resolves.toBe(true);
+  });
+
+  it("should optimizes all images (loader + plugin) and interpolate `dir/[path][name].sub.[ext]` name", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./nested/deep/loader.js"),
+      emitPluginOptions: {
+        fileNames: ["nested/deep/plugin-test.png"]
+      },
+      imageminPluginOptions: {
+        imageminOptions: { plugins },
+        name: "dir/[path][name].sub.[ext]"
+      },
+      name: "dir/[path][name].sub.[ext]"
+    });
+    const { warnings, errors, assets, modules } = stats.compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    expect(hasLoader("loader-test.gif", modules)).toBe(true);
+    expect(hasLoader("loader-test.jpg", modules)).toBe(true);
+    expect(hasLoader("loader-test.gif", modules)).toBe(true);
+    expect(hasLoader("loader-test.svg", modules)).toBe(true);
+
+    await expect(
+      isOptimized(
+        ["dir/nested/deep/loader-test.sub.gif", "nested/deep/loader-test.gif"],
+        assets
+      )
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized(
+        ["dir/nested/deep/loader-test.sub.jpg", "nested/deep/loader-test.jpg"],
+        assets
+      )
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized(
+        ["dir/nested/deep/loader-test.sub.png", "nested/deep/loader-test.png"],
+        assets
+      )
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized(
+        ["dir/nested/deep/loader-test.sub.svg", "nested/deep/loader-test.svg"],
+        assets
+      )
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized(
+        ["dir/nested/deep/plugin-test.sub.png", "nested/deep/plugin-test.png"],
+        assets
+      )
     ).resolves.toBe(true);
   });
 
