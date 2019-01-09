@@ -1,17 +1,14 @@
 "use strict";
 
-const os = require("os");
 const path = require("path");
 const RawSource = require("webpack-sources/lib/RawSource");
-const pLimit = require("p-limit");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
+const loaderUtils = require("loader-utils");
 
 const minify = require("./minify");
-const { interpolateName } = require("./utils");
 
 class ImageminPlugin {
   constructor(options = {}) {
-    const cpus = os.cpus() || { length: 1 };
     const {
       cache = false,
       filter = () => true,
@@ -24,7 +21,7 @@ class ImageminPlugin {
       },
       loader = true,
       manifest,
-      maxConcurrency = Math.max(1, cpus.length - 1),
+      maxConcurrency,
       name = "[hash].[ext]"
     } = options;
 
@@ -99,6 +96,15 @@ class ImageminPlugin {
       const { context } = compiler.options;
       const { assets } = compilation;
       const assetsForMinify = [];
+      const {
+        bail,
+        cache,
+        filter,
+        imageminOptions,
+        maxConcurrency,
+        manifest,
+        name
+      } = this.options;
 
       Object.keys(assets).forEach(file => {
         if (!ModuleFilenameHelpers.matchObject(this.options, file)) {
@@ -110,83 +116,72 @@ class ImageminPlugin {
           return;
         }
 
-        assetsForMinify.push(file);
+        const asset = assets[file];
+
+        assetsForMinify.push({
+          bail,
+          cache,
+          filter,
+          imageminOptions,
+          input: asset.source(),
+          sourcePath: path.join(context, file)
+        });
       });
 
       if (assetsForMinify.length === 0) {
         return Promise.resolve();
       }
 
-      const {
-        bail,
-        cache,
-        filter,
-        imageminOptions,
-        maxConcurrency,
-        manifest,
-        name
-      } = this.options;
+      return Promise.resolve()
+        .then(() => minify(assetsForMinify, { maxConcurrency }))
+        .then(results => {
+          results.forEach(result => {
+            const source = result.output
+              ? new RawSource(result.output)
+              : new RawSource(result.originalInput);
 
-      const limit = pLimit(maxConcurrency);
-
-      return Promise.all(
-        [...assetsForMinify].map(file =>
-          limit(() => {
-            const asset = assets[file];
-
-            return Promise.resolve()
-              .then(() =>
-                minify({
-                  bail,
-                  cache,
-                  filter,
-                  imageminOptions,
-                  input: asset.source(),
-                  sourcePath: path.join(context, file)
-                })
-              )
-              .then(result => {
-                const source = result.output
-                  ? new RawSource(result.output)
-                  : asset;
-
-                if (result.warnings && result.warnings.length > 0) {
-                  result.warnings.forEach(warning => {
-                    compilation.warnings.push(warning);
-                  });
-                }
-
-                if (result.errors && result.errors.length > 0) {
-                  result.errors.forEach(warning => {
-                    compilation.errors.push(warning);
-                  });
-                }
-
-                if (moduleAssets[file] || result.filtered) {
-                  compilation.assets[file] = source;
-
-                  return Promise.resolve(source);
-                }
-
-                const interpolatedName = interpolateName(file, name, {
-                  content: source.source()
-                });
-
-                compilation.assets[interpolatedName] = source;
-
-                if (interpolatedName !== file) {
-                  delete compilation.assets[file];
-                }
-
-                if (manifest && !manifest[file]) {
-                  manifest[file] = interpolatedName;
-                }
-
-                return Promise.resolve(source);
+            if (result.warnings && result.warnings.length > 0) {
+              result.warnings.forEach(warning => {
+                compilation.warnings.push(warning);
               });
-          }, file)
-        )
-      );
+            }
+
+            if (result.errors && result.errors.length > 0) {
+              result.errors.forEach(warning => {
+                compilation.errors.push(warning);
+              });
+            }
+
+            const originaResourcePath = path.relative(
+              context,
+              result.sourcePath
+            );
+
+            if (moduleAssets[originaResourcePath] || result.filtered) {
+              compilation.assets[originaResourcePath] = source;
+
+              return;
+            }
+
+            const interpolatedName = loaderUtils.interpolateName(
+              { resourcePath: path.join(context, originaResourcePath) },
+              name,
+              { content: source.source(), context }
+            );
+
+            compilation.assets[interpolatedName] = source;
+
+            if (interpolatedName !== originaResourcePath) {
+              delete compilation.assets[originaResourcePath];
+            }
+
+            if (manifest && !manifest[originaResourcePath]) {
+              manifest[originaResourcePath] = interpolatedName;
+            }
+          });
+
+          return results;
+        });
     });
   }
 }
