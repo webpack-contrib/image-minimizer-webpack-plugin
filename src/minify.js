@@ -23,14 +23,7 @@ function minify(tasks = [], options = {}) {
   return Promise.all(
     tasks.map(task =>
       limit(() => {
-        const {
-          bail,
-          cache,
-          filter,
-          imageminOptions,
-          input,
-          sourcePath
-        } = task;
+        const { input, sourcePath } = task;
         const result = {
           errors: [],
           output: null,
@@ -46,9 +39,9 @@ function minify(tasks = [], options = {}) {
         }
 
         if (
-          !imageminOptions ||
-          !imageminOptions.plugins ||
-          imageminOptions.plugins.length === 0
+          !options.imageminOptions ||
+          !options.imageminOptions.plugins ||
+          options.imageminOptions.plugins.length === 0
         ) {
           result.errors.push(new Error("No plugins found for `imagemin`"));
 
@@ -58,7 +51,7 @@ function minify(tasks = [], options = {}) {
         // Ensure that the contents i have are in the form of a buffer
         const source = Buffer.isBuffer(input) ? input : Buffer.from(input);
 
-        if (filter && !filter(source, sourcePath)) {
+        if (options.filter && !options.filter(source, sourcePath)) {
           result.filtered = true;
           result.output = source;
 
@@ -70,9 +63,11 @@ function minify(tasks = [], options = {}) {
         let cacheDir = null;
         let cacheKey = null;
 
-        if (cache) {
+        if (options.cache) {
           cacheDir =
-            cache === true ? findCacheDir({ name: "imagemin-webpack" }) : cache;
+            options.cache === true
+              ? findCacheDir({ name: "imagemin-webpack" })
+              : options.cache;
           cacheKey = serialize({
             hash: crypto
               .createHash("md4")
@@ -80,7 +75,7 @@ function minify(tasks = [], options = {}) {
               .digest("hex"),
             // eslint-disable-next-line global-require
             imagemin: require("imagemin/package.json").version,
-            "imagemin-options": imageminOptions,
+            "imagemin-options": options.imageminOptions,
             // eslint-disable-next-line global-require
             "imagemin-webpack": require("../package.json").version
           });
@@ -89,22 +84,23 @@ function minify(tasks = [], options = {}) {
         return Promise.resolve()
           .then(() => {
             // If `cache` enabled, we try to get compressed source from cache, if cache doesn't found, we run `imagemin`.
-            if (cache) {
+            if (options.cache) {
               return cacache
                 .get(cacheDir, cacheKey)
                 .then(
                   ({ data }) => data,
                   () =>
-                    runImagemin(source, imageminOptions).then(optimizedSource =>
-                      cacache
-                        .put(cacheDir, cacheKey, optimizedSource)
-                        .then(() => optimizedSource)
+                    runImagemin(source, options.imageminOptions).then(
+                      optimizedSource =>
+                        cacache
+                          .put(cacheDir, cacheKey, optimizedSource)
+                          .then(() => optimizedSource)
                     )
                 );
             }
 
             // If `cache` disable, we just run `imagemin`.
-            return runImagemin(source, imageminOptions);
+            return runImagemin(source, options.imageminOptions);
           })
           .then(optimizedSource => {
             result.output = optimizedSource;
@@ -112,7 +108,7 @@ function minify(tasks = [], options = {}) {
             return result;
           })
           .catch(error => {
-            if (bail) {
+            if (options.bail) {
               result.errors.push(error);
             } else {
               result.warnings.push(error);

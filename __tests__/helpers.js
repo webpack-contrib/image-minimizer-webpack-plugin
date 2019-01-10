@@ -10,6 +10,7 @@ import pify from "pify";
 import tempy from "tempy";
 import webpack from "webpack";
 import EmitPlugin from "./fixtures/EmitWepbackPlugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
 const plugins = [
   imageminGifsicle(),
@@ -48,7 +49,19 @@ function runWebpack(maybeOptions) {
               }
             ]
           }
-        ]
+        ].concat(
+          options.MCEP
+            ? {
+                test: /\.css$/,
+                use: [
+                  {
+                    loader: MiniCssExtractPlugin.loader
+                  },
+                  "css-loader"
+                ]
+              }
+            : []
+        )
       },
       output: {
         filename: "bundle.js",
@@ -109,6 +122,17 @@ function runWebpack(maybeOptions) {
           config.plugins = config.plugins.concat(imageminPlugin);
         }
       });
+    }
+
+    if (options.MCEP) {
+      config.plugins = config.plugins.concat(
+        new MiniCssExtractPlugin({
+          // Options similar to the same options in webpackOptions.output
+          // both options are optional
+          filename: "[name].css",
+          chunkFilename: "[id].css"
+        })
+      );
     }
 
     configs.push(config);
