@@ -24,20 +24,12 @@ module.exports = function(content) {
 
   return nodeify(
     Promise.resolve().then(() =>
-      minify(
-        [
-          {
-            input: content,
-            sourcePath: resourcePath
-          }
-        ],
-        {
-          bail,
-          cache: options.cache,
-          imageminOptions: options.imageminOptions,
-          filter: options.filter
-        }
-      )
+      minify([{ input: content, path: resourcePath }], {
+        bail,
+        cache: options.cache,
+        imageminOptions: options.imageminOptions,
+        filter: options.filter
+      })
     ),
     (error, results) => {
       if (error) {
@@ -58,7 +50,7 @@ module.exports = function(content) {
         });
       }
 
-      const data = result.output ? result.output : content;
+      const data = result.output ? result.output : result.input;
 
       // A trick to avoid double compression by our plugin.
       // Webpack doesn't have api to store meta information for assets,
