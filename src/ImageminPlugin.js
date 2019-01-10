@@ -12,7 +12,7 @@ class ImageminPlugin {
     const {
       cache = false,
       filter = () => true,
-      test = /\.(jpe?g|png|gif|svg)$/i,
+      test = /\.(jpe?g|png|gif|tif|webp|svg)$/i,
       include,
       exclude,
       bail = null,
