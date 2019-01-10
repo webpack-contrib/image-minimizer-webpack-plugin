@@ -23,13 +23,12 @@ function minify(tasks = [], options = {}) {
   return Promise.all(
     tasks.map(task =>
       limit(() => {
-        const { input, sourcePath } = task;
+        const { input, path } = task;
         const result = {
-          errors: [],
-          output: null,
+          input,
+          path,
           warnings: [],
-          originalInput: input,
-          sourcePath
+          errors: []
         };
 
         if (!input) {
@@ -38,20 +37,21 @@ function minify(tasks = [], options = {}) {
           return result;
         }
 
+        // Ensure that the contents i have are in the form of a buffer
+        const source = Buffer.isBuffer(input) ? input : Buffer.from(input);
+
         if (
           !options.imageminOptions ||
           !options.imageminOptions.plugins ||
           options.imageminOptions.plugins.length === 0
         ) {
+          result.output = source;
           result.errors.push(new Error("No plugins found for `imagemin`"));
 
           return result;
         }
 
-        // Ensure that the contents i have are in the form of a buffer
-        const source = Buffer.isBuffer(input) ? input : Buffer.from(input);
-
-        if (options.filter && !options.filter(source, sourcePath)) {
+        if (options.filter && !options.filter(source, path)) {
           result.filtered = true;
           result.output = source;
 
