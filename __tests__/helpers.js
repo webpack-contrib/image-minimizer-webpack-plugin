@@ -141,7 +141,8 @@ function runWebpack(maybeOptions) {
   return pify(webpack)(configs.length === 1 ? configs[0] : configs);
 }
 
-function isOptimized(originalPath, assets) {
+function isOptimized(originalPath, compilation) {
+  const { assets } = compilation;
   let name = originalPath;
   let realName = originalPath;
 
@@ -152,11 +153,12 @@ function isOptimized(originalPath, assets) {
   const source = assets[name];
 
   if (!source) {
-    throw new Error(`Can't find assets`);
+    throw new Error(`Can't find asset`);
   }
 
-  const originalBuffer = source.source();
+  const { path: outputPath } = compilation.options.output;
   const pathToOriginal = path.join(fixturesPath, realName);
+  const pathToEmitted = path.join(outputPath, name);
 
   return Promise.resolve()
     .then(() => pify(fs.readFile)(pathToOriginal))
@@ -165,7 +167,11 @@ function isOptimized(originalPath, assets) {
         plugins
       })
     )
-    .then(optimizedBuffer => optimizedBuffer.equals(originalBuffer));
+    .then(optimizedBuffer =>
+      Promise.resolve()
+        .then(() => pify(fs.readFile)(pathToEmitted))
+        .then(emmitedBuffer => optimizedBuffer.equals(emmitedBuffer))
+    );
 }
 
 function hasLoader(id, modules) {
