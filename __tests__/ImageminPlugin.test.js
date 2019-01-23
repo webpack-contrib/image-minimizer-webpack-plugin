@@ -10,10 +10,13 @@ import {
   webpack
 } from "./helpers";
 
+const IS_WEBPACK_VERSION_NEXT = process.env.WEBPACK_VERSION === "next";
+
 describe("imagemin plugin", () => {
   it("should optimizes all images (loader + plugin)", async () => {
     const stats = await webpack({ emitPlugin: true, imageminPlugin: true });
-    const { warnings, errors, assets, modules } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors, modules } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -23,11 +26,21 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.gif", modules)).toBe(true);
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
-    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
-    await expect(isOptimized("plugin-test.jpg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      true
+    );
   });
 
   it("should optimizes all images (loader + plugin) as minimizer", async () => {
@@ -36,7 +49,8 @@ describe("imagemin plugin", () => {
       emitPlugin: true,
       imageminPlugin: true
     });
-    const { warnings, errors, assets, modules } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors, modules } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -46,11 +60,21 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.gif", modules)).toBe(true);
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
-    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
-    await expect(isOptimized("plugin-test.jpg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      true
+    );
   });
 
   it("should optimizes all images (loader + plugin) (multi compiler mode)", async () => {
@@ -73,12 +97,8 @@ describe("imagemin plugin", () => {
 
     expect(multiStats.stats).toHaveLength(2);
 
-    const {
-      warnings,
-      errors,
-      assets,
-      modules
-    } = multiStats.stats[0].compilation;
+    const [{ compilation: firstCompilation }] = multiStats.stats;
+    const { warnings, errors, modules } = multiStats.stats[0].compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -87,19 +107,19 @@ describe("imagemin plugin", () => {
     expect(hasLoader("multiple-loader-test-2.svg", modules)).toBe(true);
 
     await expect(
-      isOptimized("multiple-loader-test-1.svg", assets)
+      isOptimized("multiple-loader-test-1.svg", firstCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-loader-test-2.svg", assets)
+      isOptimized("multiple-loader-test-2.svg", firstCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-plugin-test-1.svg", assets)
+      isOptimized("multiple-plugin-test-1.svg", firstCompilation)
     ).resolves.toBe(true);
 
+    const [, { compilation: secondCompilation }] = multiStats.stats;
     const {
       warnings: secondWarnings,
       errors: secondErrors,
-      assets: secondAssets,
       modules: secondModules
     } = multiStats.stats[1].compilation;
 
@@ -110,13 +130,13 @@ describe("imagemin plugin", () => {
     expect(hasLoader("multiple-loader-test-4.svg", secondModules)).toBe(true);
 
     await expect(
-      isOptimized("multiple-loader-test-3.svg", secondAssets)
+      isOptimized("multiple-loader-test-3.svg", secondCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-loader-test-4.svg", secondAssets)
+      isOptimized("multiple-loader-test-4.svg", secondCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-plugin-test-2.svg", secondAssets)
+      isOptimized("multiple-plugin-test-2.svg", secondCompilation)
     ).resolves.toBe(true);
   });
 
@@ -137,16 +157,27 @@ describe("imagemin plugin", () => {
       }
     };
     const stats = await webpack(options);
-    const { warnings, errors, assets } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
-    await expect(isOptimized("plugin-test.jpg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      true
+    );
 
     // Try to found cached files, but we don't have their in cache
     expect(spyGet).toHaveBeenCalledTimes(5);
@@ -157,27 +188,27 @@ describe("imagemin plugin", () => {
     spyPut.mockClear();
 
     const secondStats = await webpack(options);
+    const { compilation: secondCompilation } = secondStats;
     const {
       warnings: secondWarnings,
-      errors: secondErrors,
-      assets: secondAssets
+      errors: secondErrors
     } = secondStats.compilation;
 
     expect(secondWarnings).toHaveLength(0);
     expect(secondErrors).toHaveLength(0);
 
-    await expect(isOptimized("loader-test.gif", secondAssets)).resolves.toBe(
-      true
-    );
-    await expect(isOptimized("loader-test.jpg", secondAssets)).resolves.toBe(
-      true
-    );
-    await expect(isOptimized("loader-test.png", secondAssets)).resolves.toBe(
-      true
-    );
-    await expect(isOptimized("loader-test.svg", secondAssets)).resolves.toBe(
-      true
-    );
+    await expect(
+      isOptimized("loader-test.gif", secondCompilation)
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized("loader-test.jpg", secondCompilation)
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized("loader-test.png", secondCompilation)
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized("loader-test.svg", secondCompilation)
+    ).resolves.toBe(true);
 
     // Now we have cached files so we get their and don't put
     expect(spyGet).toHaveBeenCalledTimes(5);
@@ -208,16 +239,27 @@ describe("imagemin plugin", () => {
       }
     };
     const stats = await webpack(options);
-    const { warnings, errors, assets } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
-    await expect(isOptimized("plugin-test.jpg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      true
+    );
 
     // Try to found cached files, but we don't have their in cache
     expect(spyGet).toHaveBeenCalledTimes(5);
@@ -228,30 +270,30 @@ describe("imagemin plugin", () => {
     spyPut.mockClear();
 
     const secondStats = await webpack(options);
+    const { compilation: secondCompilation } = secondStats;
     const {
       warnings: secondWarnings,
-      errors: secondErrors,
-      assets: secondAssets
+      errors: secondErrors
     } = secondStats.compilation;
 
     expect(secondWarnings).toHaveLength(0);
     expect(secondErrors).toHaveLength(0);
 
-    await expect(isOptimized("loader-test.gif", secondAssets)).resolves.toBe(
-      true
-    );
-    await expect(isOptimized("loader-test.jpg", secondAssets)).resolves.toBe(
-      true
-    );
-    await expect(isOptimized("loader-test.png", secondAssets)).resolves.toBe(
-      true
-    );
-    await expect(isOptimized("loader-test.svg", secondAssets)).resolves.toBe(
-      true
-    );
-    await expect(isOptimized("plugin-test.jpg", secondAssets)).resolves.toBe(
-      true
-    );
+    await expect(
+      isOptimized("loader-test.gif", secondCompilation)
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized("loader-test.jpg", secondCompilation)
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized("loader-test.png", secondCompilation)
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized("loader-test.svg", secondCompilation)
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized("plugin-test.jpg", secondCompilation)
+    ).resolves.toBe(true);
 
     // Now we have cached files so we get their and don't put
     expect(spyGet).toHaveBeenCalledTimes(5);
@@ -276,16 +318,27 @@ describe("imagemin plugin", () => {
       }
     });
 
-    const { warnings, errors, assets } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
-    await expect(isOptimized("plugin-test.jpg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      true
+    );
 
     expect(spyGet).toHaveBeenCalledTimes(0);
     expect(spyPut).toHaveBeenCalledTimes(0);
@@ -303,16 +356,27 @@ describe("imagemin plugin", () => {
         name: "[path][name].[ext]"
       }
     });
-    const { warnings, errors, assets } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
-    await expect(isOptimized("plugin-test.jpg", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      true
+    );
   });
 
   it("should optimizes successfully without any assets", async () => {
@@ -338,13 +402,16 @@ describe("imagemin plugin", () => {
         }
       }
     });
-    const { assets, warnings, errors } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].toString()).toMatch(/No\splugins\sfound\sfor\s`imagemin`/);
 
-    await expect(isOptimized("plugin-test.jpg", assets)).resolves.toBe(false);
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      false
+    );
   });
 
   it("should throws errors if imagemin plugins don't setup (by loader)", async () => {
@@ -356,14 +423,17 @@ describe("imagemin plugin", () => {
         }
       }
     });
-    const { assets, warnings, errors } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
 
     expect(errors[0].toString()).toMatch(/No\splugins\sfound\sfor\s`imagemin`/);
 
-    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(false);
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      false
+    );
   });
 
   it("should optimizes images and throws error on corrupted images using `plugin.bail` option with `true` value (by plugin)", async () => {
@@ -380,13 +450,16 @@ describe("imagemin plugin", () => {
         name: "[path][name].[ext]"
       }
     });
-    const { assets, warnings, errors } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
 
-    await expect(isOptimized("plugin-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
+      true
+    );
   });
 
   it(
@@ -403,13 +476,16 @@ describe("imagemin plugin", () => {
           name: "[path][name].[ext]"
         }
       });
-      const { assets, warnings, errors } = stats.compilation;
+      const { compilation } = stats;
+      const { warnings, errors } = compilation;
 
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
 
-      await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+      await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+        true
+      );
     }
   );
 
@@ -427,13 +503,16 @@ describe("imagemin plugin", () => {
         name: "[path][name].[ext]"
       }
     });
-    const { assets, warnings, errors } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
     expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
 
-    await expect(isOptimized("plugin-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
+      true
+    );
   });
 
   it("should optimizes images and throws errors on corrupted images using `plugin.bail` option with `false` value (by loader)", async () => {
@@ -447,13 +526,16 @@ describe("imagemin plugin", () => {
         name: "[path][name].[ext]"
       }
     });
-    const { assets, warnings, errors } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
     expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
 
-    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
   });
 
   it("should optimizes images and throws errors on corrupted images using `webpack.bail` option with `true` value (by plugin)", async () => {
@@ -470,13 +552,16 @@ describe("imagemin plugin", () => {
         name: "[path][name].[ext]"
       }
     });
-    const { assets, warnings, errors } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
 
-    await expect(isOptimized("plugin-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
+      true
+    );
   });
 
   it("should optimizes images and throws warning on corrupted images using `webpack.bail` option with `true` value (by loader)", async () => {
@@ -490,13 +575,16 @@ describe("imagemin plugin", () => {
         name: "[path][name].[ext]"
       }
     });
-    const { assets, warnings, errors } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
 
-    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
   });
 
   it("should optimizes images and throw warnings on corrupted images using `webpack.bail` option with `false` value (by plugin)", async () => {
@@ -513,13 +601,16 @@ describe("imagemin plugin", () => {
         name: "[path][name].[ext]"
       }
     });
-    const { assets, warnings, errors } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
     expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
 
-    await expect(isOptimized("plugin-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
+      true
+    );
   });
 
   it("should optimizes images and throw warnings on corrupted images using `webpack.bail` option with `false` value (by loader)", async () => {
@@ -532,13 +623,16 @@ describe("imagemin plugin", () => {
         }
       }
     });
-    const { assets, warnings, errors } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = stats.compilation;
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
     expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
 
-    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
   });
 
   it("should optimizes images and contains not empty manifest", async () => {
@@ -553,7 +647,8 @@ describe("imagemin plugin", () => {
         manifest
       }
     });
-    const { warnings, errors } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -576,7 +671,8 @@ describe("imagemin plugin", () => {
         manifest
       }
     });
-    const { assets, warnings, errors } = stats.compilation;
+    const { compilation } = stats;
+    const { assets, warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -609,7 +705,8 @@ describe("imagemin plugin", () => {
       },
       name: "[name].[ext]"
     });
-    const { warnings, errors, assets, modules } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors, modules } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -619,11 +716,21 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.gif", modules)).toBe(true);
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
-    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
-    await expect(isOptimized("plugin-test.png", assets)).resolves.toBe(true);
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
+      true
+    );
   });
 
   it("should optimizes all images (loader + plugin) and interpolate `[path][name].[ext]` name", async () => {
@@ -638,7 +745,8 @@ describe("imagemin plugin", () => {
       },
       name: "[path][name].[ext]"
     });
-    const { warnings, errors, assets, modules } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors, modules } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -649,19 +757,19 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
     await expect(
-      isOptimized("nested/deep/loader-test.gif", assets)
+      isOptimized("nested/deep/loader-test.gif", compilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("nested/deep/loader-test.jpg", assets)
+      isOptimized("nested/deep/loader-test.jpg", compilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("nested/deep/loader-test.png", assets)
+      isOptimized("nested/deep/loader-test.png", compilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("nested/deep/loader-test.svg", assets)
+      isOptimized("nested/deep/loader-test.svg", compilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("nested/deep/plugin-test.png", assets)
+      isOptimized("nested/deep/plugin-test.png", compilation)
     ).resolves.toBe(true);
   });
 
@@ -677,7 +785,8 @@ describe("imagemin plugin", () => {
       },
       name: "dir/[path][name].sub.[ext]"
     });
-    const { warnings, errors, assets, modules } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors, modules } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -690,31 +799,31 @@ describe("imagemin plugin", () => {
     await expect(
       isOptimized(
         ["dir/nested/deep/loader-test.sub.gif", "nested/deep/loader-test.gif"],
-        assets
+        compilation
       )
     ).resolves.toBe(true);
     await expect(
       isOptimized(
         ["dir/nested/deep/loader-test.sub.jpg", "nested/deep/loader-test.jpg"],
-        assets
+        compilation
       )
     ).resolves.toBe(true);
     await expect(
       isOptimized(
         ["dir/nested/deep/loader-test.sub.png", "nested/deep/loader-test.png"],
-        assets
+        compilation
       )
     ).resolves.toBe(true);
     await expect(
       isOptimized(
         ["dir/nested/deep/loader-test.sub.svg", "nested/deep/loader-test.svg"],
-        assets
+        compilation
       )
     ).resolves.toBe(true);
     await expect(
       isOptimized(
         ["dir/nested/deep/plugin-test.sub.png", "nested/deep/plugin-test.png"],
-        assets
+        compilation
       )
     ).resolves.toBe(true);
   });
@@ -742,7 +851,8 @@ describe("imagemin plugin", () => {
         name: "[path][name].[ext]"
       }
     });
-    const { warnings, errors, assets, modules } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors, modules } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -752,11 +862,21 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.gif", modules)).toBe(true);
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
-    await expect(isOptimized("loader-test.gif", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.jpg", assets)).resolves.toBe(false);
-    await expect(isOptimized("loader-test.png", assets)).resolves.toBe(true);
-    await expect(isOptimized("loader-test.svg", assets)).resolves.toBe(true);
-    await expect(isOptimized("plugin-test.jpg", assets)).resolves.toBe(false);
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      false
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      false
+    );
   });
 
   it("should optimizes all images with filter (multiple plugins)", async () => {
@@ -801,7 +921,8 @@ describe("imagemin plugin", () => {
         }
       ]
     });
-    const { warnings, errors, assets, modules } = stats.compilation;
+    const { compilation } = stats;
+    const { warnings, errors, modules } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -813,21 +934,21 @@ describe("imagemin plugin", () => {
     expect(hasLoader("multiple-loader-test-2.svg", modules)).toBe(true);
 
     await expect(
-      isOptimized("multiple-loader-test-1.svg", assets)
+      isOptimized("multiple-loader-test-1.svg", compilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-loader-test-2.svg", assets)
+      isOptimized("multiple-loader-test-2.svg", compilation)
     ).resolves.toBe(true);
     await expect(
       isOptimized(
         ["multiple-plugin-test-1.1.svg", "multiple-plugin-test-1.svg"],
-        assets
+        compilation
       )
     ).resolves.toBe(true);
     await expect(
       isOptimized(
         ["multiple-plugin-test-2.2.svg", "multiple-plugin-test-2.svg"],
-        assets
+        compilation
       )
     ).resolves.toBe(true);
   });
@@ -886,12 +1007,8 @@ describe("imagemin plugin", () => {
         }
       }
     ]);
-    const {
-      warnings,
-      errors,
-      assets,
-      modules
-    } = multiStats.stats[0].compilation;
+    const [{ compilation: firstCompilation }] = multiStats.stats;
+    const { warnings, errors, modules } = firstCompilation;
 
     expect(multiStats.stats).toHaveLength(2);
 
@@ -904,27 +1021,27 @@ describe("imagemin plugin", () => {
     expect(hasLoader("multiple-loader-test-2.svg", modules)).toBe(true);
 
     await expect(
-      isOptimized("multiple-loader-test-1.svg", assets)
+      isOptimized("multiple-loader-test-1.svg", firstCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-loader-test-2.svg", assets)
+      isOptimized("multiple-loader-test-2.svg", firstCompilation)
     ).resolves.toBe(false);
     await expect(
       isOptimized(
         ["multiple-plugin-test-1.1.svg", "multiple-plugin-test-1.svg"],
-        assets
+        firstCompilation
       )
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-plugin-test-2.svg", assets)
+      isOptimized("multiple-plugin-test-2.svg", firstCompilation)
     ).resolves.toBe(false);
 
+    const [, { compilation: secondCompilation }] = multiStats.stats;
     const {
       warnings: secondWarnings,
       errors: secondErrors,
-      assets: secondAssets,
       modules: secondModules
-    } = multiStats.stats[1].compilation;
+    } = secondCompilation;
 
     expect(secondWarnings).toHaveLength(0);
     expect(secondErrors).toHaveLength(0);
@@ -935,38 +1052,43 @@ describe("imagemin plugin", () => {
     expect(hasLoader("multiple-loader-test-4.svg", secondModules)).toBe(true);
 
     await expect(
-      isOptimized("multiple-loader-test-3.svg", secondAssets)
+      isOptimized("multiple-loader-test-3.svg", secondCompilation)
     ).resolves.toBe(false);
     await expect(
-      isOptimized("multiple-loader-test-4.svg", secondAssets)
+      isOptimized("multiple-loader-test-4.svg", secondCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-plugin-test-3.svg", secondAssets)
+      isOptimized("multiple-plugin-test-3.svg", secondCompilation)
     ).resolves.toBe(false);
     await expect(
       isOptimized(
         ["multiple-plugin-test-4.2.svg", "multiple-plugin-test-4.svg"],
-        secondAssets
+        secondCompilation
       )
     ).resolves.toBe(true);
   });
 
-  it("should optimizes all images (loader + plugin) from `mini-css-extract-plugin`", async () => {
-    const stats = await webpack({
-      emitPlugin: true,
-      imageminPlugin: true,
-      entry: path.join(fixturesPath, "entry-with-css.js"),
-      MCEP: true
+  if (!IS_WEBPACK_VERSION_NEXT) {
+    it("should optimizes all images (loader + plugin) from `mini-css-extract-plugin`", async () => {
+      const stats = await webpack({
+        emitPlugin: true,
+        imageminPlugin: true,
+        entry: path.join(fixturesPath, "entry-with-css.js"),
+        MCEP: true
+      });
+      const { compilation } = stats;
+      const { warnings, errors } = stats.compilation;
+
+      expect(warnings).toHaveLength(0);
+      expect(errors).toHaveLength(0);
+
+      // Bug in mini-css-extract-plugin
+      // expect(hasLoader("url.png", modules)).toBe(true);
+
+      await expect(isOptimized("url.png", compilation)).resolves.toBe(true);
+      await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+        true
+      );
     });
-    const { warnings, errors, assets } = stats.compilation;
-
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-
-    // Bug in mini-css-extract-plugin
-    // expect(hasLoader("url.png", modules)).toBe(true);
-
-    await expect(isOptimized("url.png", assets)).resolves.toBe(true);
-    await expect(isOptimized("plugin-test.jpg", assets)).resolves.toBe(true);
-  });
+  }
 });
