@@ -86,9 +86,8 @@ class ImageminPlugin {
       });
     }
 
-    compiler.hooks.emit.tapPromise(plugin, compilation => {
+    const optimizeAssetsFn = (compilation, assets) => {
       const { context } = compiler.options;
-      const { assets } = compilation;
       const assetsForMinify = [];
       const {
         bail,
@@ -181,7 +180,11 @@ class ImageminPlugin {
 
           return results;
         });
-    });
+    };
+
+    compiler.hooks.emit.tapPromise(plugin, compilation =>
+      optimizeAssetsFn(compilation, compilation.assets)
+    );
   }
 }
 
