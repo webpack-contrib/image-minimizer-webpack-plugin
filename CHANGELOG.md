@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org).
 
+## 4.1.0 - 2019-01-23
+
+- Feature: `filter` option.
+- Feature: add `webp` and `tif` to `test` option by default.
+- Fixed: don't break interpolated `[path]` on windows.
+- Fixed: relax `node` version in `engines` field.
+- Fixed: stop returning original file when the optimized file is larger.
+- Fixed: optimize all images in multi compiler mode.
+
 ## 4.0.1 - 2018-11-14
 
 - Fixed: use `afterPlugins` event for include `loader` (`minimizer` plugins don't have `afterPlugins` hook, bug in `webpack`).
