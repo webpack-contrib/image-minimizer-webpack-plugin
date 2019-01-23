@@ -52,12 +52,6 @@ module.exports = function(content) {
 
       const data = result.output ? result.output : result.input;
 
-      // A trick to avoid double compression by our plugin.
-      // Webpack doesn't have api to store meta information for assets,
-      // maybe in future it will be implemented.
-      // eslint-disable-next-line no-underscore-dangle
-      data._compressed = true;
-
       return callback(null, data);
     }
   );

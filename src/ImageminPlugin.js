@@ -92,6 +92,7 @@ class ImageminPlugin {
       const {
         bail,
         cache,
+        loader,
         filter,
         imageminOptions,
         maxConcurrency,
@@ -105,8 +106,7 @@ class ImageminPlugin {
         }
 
         // Exclude already optimized assets from `imagemin-loader`
-        // eslint-disable-next-line no-underscore-dangle
-        if (assets[file].source()._compressed) {
+        if (loader && moduleAssets.has(file)) {
           return;
         }
 
