@@ -108,7 +108,7 @@ module.exports = {
       cache: true,
       imageminOptions: {
         // Lossless optimization with custom option
-        // Feel free to experement with options for better result for you
+        // Feel free to expirement with options for better result for you
         plugins: [
           imageminGifsicle({
             interlaced: true
