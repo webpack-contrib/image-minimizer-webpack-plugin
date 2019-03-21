@@ -121,7 +121,7 @@ module.exports = {
           }),
           imageminSvgo({
             plugins: [{
-              removeViewBox: false,
+              removeViewBox: false
             }]
           })
         ]
