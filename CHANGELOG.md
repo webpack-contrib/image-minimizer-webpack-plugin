@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org).
 
+## 5.0.0 - 2019-07-04
+
+- Changed: minimum required Node.js version is `8.9.0`.
+- Fixed: fallback for cache directory when it can't be resolved.
+
 ## 4.1.0 - 2019-01-23
 
 - Feature: `filter` option.

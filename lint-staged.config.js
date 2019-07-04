@@ -11,5 +11,6 @@ module.exports = {
     "eslint --report-unused-disable-directives",
     "remark -f -q",
     "git add"
-  ]
+  ],
+  "*.{yml,yaml}": ["prettier --list-different", "git add"]
 };

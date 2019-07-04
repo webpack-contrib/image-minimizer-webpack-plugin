@@ -1,11 +1,12 @@
 sudo: false
 
 git:
-  depth: 1
+  depth: 10
 
 branches:
   only:
     - master
+    - next
 
 language: node_js
 
@@ -17,33 +18,35 @@ cache:
 
 matrix:
   include:
-    - node_js: "11"
+    - node_js: "12"
       script: npm run pretest
       env: CI=pretest
-    - node_js: "6"
-      script: npm run test-only
-      env: CI=tests 6
-      os: linux
-    - node_js: "6"
-      script: npm run test-only
-      env: CI=tests 6
-      os: windows
     - node_js: "8"
-      script: npm run test-only
+      script: npm run test:coverage
       env: CI=tests 8
-    - node_js: "10"
-      script: npm run test-only
-      env: CI=tests 10
-    - node_js: "11"
-      script: npm run test-only
-      env: CI=tests 11
+      os: linux
     - node_js: "8"
-      script: npm run test-only
+      script: npm run test:coverage
+      env: CI=tests 8
+      os: windows
+    - node_js: "10"
+      script: npm run test:coverage
+      env: CI=tests 10
+    - node_js: "12"
+      script: npm run test:coverage
+      env: CI=tests 12
+    - node_js: "8"
+      script: npm run test:coverage
       env: CI=tests WEBPACK_VERSION=next 8
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install nasm; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm install -g npm@latest; fi
   - if [[ "$WEBPACK_VERSION" == "next" ]]; then npm install webpack@next; fi
+
+install:
+  - npm ci
+
+before_script:
   - node --version
   - npm --version

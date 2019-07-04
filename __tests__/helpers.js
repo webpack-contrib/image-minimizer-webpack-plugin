@@ -1,16 +1,16 @@
-import ImageminPlugin from "..";
 import fs from "fs";
+import path from "path";
 import imagemin from "imagemin";
 import imageminGifsicle from "imagemin-gifsicle";
 import imageminMozjpeg from "imagemin-mozjpeg";
 import imageminPngquant from "imagemin-pngquant";
 import imageminSvgo from "imagemin-svgo";
-import path from "path";
 import pify from "pify";
 import tempy from "tempy";
 import webpack from "webpack";
-import EmitPlugin from "./fixtures/EmitWepbackPlugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import EmitPlugin from "./fixtures/EmitWepbackPlugin";
+import ImageminPlugin from "..";
 
 const plugins = [
   imageminGifsicle(),
