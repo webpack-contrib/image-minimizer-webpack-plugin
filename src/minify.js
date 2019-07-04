@@ -66,7 +66,7 @@ function minify(tasks = [], options = {}) {
         if (options.cache) {
           cacheDir =
             options.cache === true
-              ? findCacheDir({ name: "imagemin-webpack" })
+              ? findCacheDir({ name: "imagemin-webpack" }) || os.tmpdir()
               : options.cache;
           cacheKey = serialize({
             hash: crypto

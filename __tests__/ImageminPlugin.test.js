@@ -1,6 +1,6 @@
+import os from "os";
 import path from "path";
 import cacache from "cacache";
-import del from "del";
 import findCacheDir from "find-cache-dir";
 import {
   fixturesPath,
@@ -144,9 +144,9 @@ describe("imagemin plugin", () => {
     const spyGet = jest.spyOn(cacache, "get");
     const spyPut = jest.spyOn(cacache, "put");
 
-    const cacheDir = findCacheDir({ name: "imagemin-webpack" });
+    const cacheDir = findCacheDir({ name: "imagemin-webpack" }) || os.tmpdir();
 
-    await del(cacheDir);
+    await cacache.rm.all(cacheDir);
 
     const options = {
       emitPlugin: true,
@@ -214,7 +214,7 @@ describe("imagemin plugin", () => {
     expect(spyGet).toHaveBeenCalledTimes(5);
     expect(spyPut).toHaveBeenCalledTimes(0);
 
-    await del(cacheDir);
+    await cacache.rm.all(cacheDir);
 
     spyGet.mockRestore();
     spyPut.mockRestore();
@@ -224,11 +224,12 @@ describe("imagemin plugin", () => {
     const spyGet = jest.spyOn(cacache, "get");
     const spyPut = jest.spyOn(cacache, "put");
 
-    const cacheDir = findCacheDir({
-      name: "imagemin-webpack-plugin-cache-location"
-    });
+    const cacheDir =
+      findCacheDir({
+        name: "imagemin-webpack-plugin-cache-location-for-plugin"
+      }) || os.tmpdir();
 
-    await del(cacheDir);
+    await cacache.rm.all(cacheDir);
 
     const options = {
       emitPlugin: true,
@@ -299,7 +300,7 @@ describe("imagemin plugin", () => {
     expect(spyGet).toHaveBeenCalledTimes(5);
     expect(spyPut).toHaveBeenCalledTimes(0);
 
-    await del(cacheDir);
+    await cacache.rm.all(cacheDir);
 
     spyGet.mockRestore();
     spyPut.mockRestore();
@@ -462,32 +463,28 @@ describe("imagemin plugin", () => {
     );
   });
 
-  it(
-    "should optimi" +
-      "zes images and throws errors on corrupted images using `plugin.bail` option with `true` value (by loader)",
-    async () => {
-      const stats = await webpack({
-        entry: path.join(fixturesPath, "loader-corrupted.js"),
-        imageminPluginOptions: {
-          bail: true,
-          imageminOptions: {
-            plugins
-          },
-          name: "[path][name].[ext]"
-        }
-      });
-      const { compilation } = stats;
-      const { warnings, errors } = compilation;
+  it("should optimizes images and throws errors on corrupted images using `plugin.bail` option with `true` value (by loader)", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
+      imageminPluginOptions: {
+        bail: true,
+        imageminOptions: {
+          plugins
+        },
+        name: "[path][name].[ext]"
+      }
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
-      expect(warnings).toHaveLength(0);
-      expect(errors).toHaveLength(1);
-      expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
 
-      await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-        true
-      );
-    }
-  );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+  });
 
   it("should optimizes images and throws warning on corrupted images using `plugin.bail` option with `false` value (by plugin)", async () => {
     const stats = await webpack({
@@ -677,16 +674,15 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
     expect(
-      Object.keys(assets).every(
-        element =>
-          [
-            "loader-test.gif",
-            "loader-test.jpg",
-            "loader-test.png",
-            "loader-test.svg",
-            "bundle.js",
-            "463cb29d806bd713487cfbcc6fccc982.jpg"
-          ].indexOf(element) >= 0
+      Object.keys(assets).every(element =>
+        [
+          "loader-test.gif",
+          "loader-test.jpg",
+          "loader-test.png",
+          "loader-test.svg",
+          "bundle.js",
+          "463cb29d806bd713487cfbcc6fccc982.jpg"
+        ].includes(element)
       )
     ).toBe(true);
     expect(manifest).toEqual({

@@ -1,7 +1,6 @@
 "use strict";
 
 const loaderUtils = require("loader-utils");
-const nodeify = require("nodeify");
 
 const minify = require("./minify");
 
@@ -22,20 +21,16 @@ module.exports = function(content) {
 
   const { resourcePath } = this;
 
-  return nodeify(
-    Promise.resolve().then(() =>
+  Promise.resolve()
+    .then(() =>
       minify([{ input: content, path: resourcePath }], {
         bail,
         cache: options.cache,
         imageminOptions: options.imageminOptions,
         filter: options.filter
       })
-    ),
-    (error, results) => {
-      if (error) {
-        return callback(error);
-      }
-
+    )
+    .then(results => {
       const [result] = results;
 
       if (result.warnings && result.warnings.length > 0) {
@@ -52,9 +47,11 @@ module.exports = function(content) {
 
       const data = result.output ? result.output : result.input;
 
+      // eslint-disable-next-line promise/no-callback-in-promise
       return callback(null, data);
-    }
-  );
+    })
+    // eslint-disable-next-line promise/no-callback-in-promise
+    .catch(error => callback(error));
 };
 
 module.exports.raw = true;

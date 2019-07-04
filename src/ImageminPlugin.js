@@ -69,10 +69,9 @@ class ImageminPlugin {
           name
         } = this.options;
 
-        compiler.options.module.rules.push({
+        const loader = {
+          test,
           enforce: "pre",
-          exclude,
-          include,
           loader: path.join(__dirname, "imagemin-loader.js"),
           options: {
             bail,
@@ -80,9 +79,18 @@ class ImageminPlugin {
             filter,
             imageminOptions,
             name
-          },
-          test
-        });
+          }
+        };
+
+        if (include) {
+          loader.include = include;
+        }
+
+        if (exclude) {
+          loader.exclude = exclude;
+        }
+
+        compiler.options.module.rules.push(loader);
       });
     }
 

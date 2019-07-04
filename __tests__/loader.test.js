@@ -1,7 +1,7 @@
+import os from "os";
 import fs from "fs";
 import path from "path";
 import cacache from "cacache";
-import del from "del";
 import findCacheDir from "find-cache-dir";
 import pify from "pify";
 import { fixturesPath, isOptimized, plugins, webpack } from "./helpers";
@@ -76,9 +76,9 @@ describe("loader", () => {
     const spyGet = jest.spyOn(cacache, "get");
     const spyPut = jest.spyOn(cacache, "put");
 
-    const cacheDir = findCacheDir({ name: "imagemin-webpack" });
+    const cacheDir = findCacheDir({ name: "imagemin-webpack" }) || os.tmpdir();
 
-    await del(cacheDir);
+    await cacache.rm.all(cacheDir);
 
     const options = {
       imageminLoaderOptions: { cache: true, imageminOptions: { plugins } }
@@ -138,7 +138,7 @@ describe("loader", () => {
     expect(spyGet).toHaveBeenCalledTimes(4);
     expect(spyPut).toHaveBeenCalledTimes(0);
 
-    await del(cacheDir);
+    await cacache.rm.all(cacheDir);
 
     spyGet.mockRestore();
     spyPut.mockRestore();
@@ -148,11 +148,12 @@ describe("loader", () => {
     const spyGet = jest.spyOn(cacache, "get");
     const spyPut = jest.spyOn(cacache, "put");
 
-    const cacheDir = findCacheDir({
-      name: "imagemin-webpack-loader-custom-cache-location"
-    });
+    const cacheDir =
+      findCacheDir({
+        name: "imagemin-webpack-loader-custom-cache-location-for-loader"
+      }) || os.tmpdir();
 
-    await del(cacheDir);
+    await cacache.rm.all(cacheDir);
 
     const options = {
       imageminLoaderOptions: { cache: cacheDir, imageminOptions: { plugins } }
@@ -212,7 +213,7 @@ describe("loader", () => {
     expect(spyGet).toHaveBeenCalledTimes(4);
     expect(spyPut).toHaveBeenCalledTimes(0);
 
-    await del(cacheDir);
+    await cacache.rm.all(cacheDir);
 
     spyGet.mockRestore();
     spyPut.mockRestore();
