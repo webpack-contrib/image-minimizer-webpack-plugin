@@ -81,12 +81,6 @@ npm install imagemin-gifsicle imagemin-mozjpeg imagemin-pngquant imagemin-svgo -
 ```js
 const ImageminPlugin = require("imagemin-webpack");
 
-// Before importing imagemin plugin make sure you add it in `package.json` (`dependencies`) and install
-const imageminGifsicle = require("imagemin-gifsicle");
-const imageminJpegtran = require("imagemin-jpegtran");
-const imageminOptipng = require("imagemin-optipng");
-const imageminSvgo = require("imagemin-svgo");
-
 module.exports = {
   module: {
     rules: [
@@ -106,25 +100,24 @@ module.exports = {
       bail: false, // Ignore errors on corrupted images
       cache: true,
       imageminOptions: {
+        // Before using imagemin plugins make sure you have added them in `package.json` (`devDependencies`) and installed them
+
         // Lossless optimization with custom option
-        // Feel free to expirement with options for better result for you
+        // Feel free to experiment with options for better result for you
         plugins: [
-          imageminGifsicle({
-            interlaced: true
-          }),
-          imageminJpegtran({
-            progressive: true
-          }),
-          imageminOptipng({
-            optimizationLevel: 5
-          }),
-          imageminSvgo({
-            plugins: [
-              {
-                removeViewBox: false
-              }
-            ]
-          })
+          ["gifsicle", { interlaced: true }],
+          ["jpegtran", { progressive: true }],
+          ["optipng", { optimizationLevel: 5 }],
+          [
+            "svgo",
+            {
+              plugins: [
+                {
+                  removeViewBox: false
+                }
+              ]
+            }
+          ]
         ]
       }
     })
@@ -165,7 +158,7 @@ module.exports = {
               bail: false, // Ignore errors on corrupted images
               cache: true,
               imageminOptions: {
-                plugins: [imageminGifsicle()]
+                plugins: ["gifsicle"]
               }
             }
           }
@@ -200,12 +193,12 @@ module.exports = {
     ]
   },
   plugins: [
-    // Make sure that the plugin is after any plugins that add images
+    // Make sure that the plugin placed after any plugins that added images
     new ImageminWebpack({
       bail: false, // Ignore errors on corrupted images
       cache: true,
       imageminOptions: {
-        plugins: [imageminGifsicle()]
+        plugins: ["gifsicle"]
       },
       // Disable `loader`
       loader: false
@@ -320,13 +313,9 @@ module.exports = {
 
 #### `cache`
 
-Enable file caching. Default path to cache directory: `node_modules/.cache/imagemin-webpack`.
+Enable/disable file caching. Default path to cache directory: `node_modules/.cache/imagemin-webpack`.
 
-**Be careful** when your enable `cache` and change options for imagemin plugin (example for `imagemin-gifsicle`) you should remove cache manually.
-
-You can use `rm -rf ./node_modules/.cache/imagemin-webpack` command. This is due to the fact that `imagemin-plugin` is `Function` and we don't know her arguments to invalidate cache.
-
-Note: if somebody know how we can fix it PR welcome!
+**Be careful:** you should remove cache manually when you enable `cache` using `Function` configuration for imagemin plugins and change option(s) for plugin(s) (for example for `imagemin-gifsicle`).
 
 ##### `{Boolean}`
 
@@ -399,10 +388,26 @@ module.exports = {
     new ImageminPlugin({
       imageminOptions: {
         plugins: [
-          imageminGifsicle({
-            interlaced: true,
-            optimizationLevel: 3
-          })
+          // Name
+          "gifsicle",
+          // Name with options
+          ["mozjpeg", { quality: 80 }],
+          // Full package name
+          [
+            "imagemin-svgo",
+            {
+              plugins: [
+                {
+                  removeViewBox: false
+                }
+              ]
+            }
+          ],
+          [
+            // Custom package name
+            "nonstandard-imagemin-package-name",
+            { myOptions: true }
+          ]
         ]
       }
     })
@@ -451,7 +456,7 @@ module.exports = {
 Contain optimized list of images from other plugins.
 
 Note: contains only assets compressed by plugin.
-Note: Manifest will be contain list of optimized images only after `emit` event.
+Note: manifest will be contain list of optimized images only after `emit` event.
 
 **webpack.config.js**
 
@@ -517,7 +522,7 @@ module.exports = {
                 return true;
               },
               imageminOptions: {
-                plugins: [imageminGifsicle()]
+                plugins: ["gifsicle"]
               }
             }
           }
@@ -556,7 +561,7 @@ module.exports = {
             options: {
               cache: true,
               imageminOptions: {
-                plugins: [imageminGifsicle()]
+                plugins: ["gifsicle"]
               }
             }
           }
@@ -591,7 +596,7 @@ module.exports = {
             options: {
               cache: "path/to/cache",
               imageminOptions: {
-                plugins: [imageminGifsicle()]
+                plugins: ["gifsicle"]
               }
             }
           }
@@ -626,7 +631,7 @@ module.exports = {
             options: {
               bail: true,
               imageminOptions: {
-                plugins: [imageminGifsicle()]
+                plugins: ["gifsicle"]
               }
             }
           }
@@ -664,10 +669,7 @@ module.exports = {
               bail: true,
               imageminOptions: {
                 plugins: [
-                  imageminGifsicle({
-                    interlaced: true,
-                    optimizationLevel: 3
-                  })
+                  ["gifsicle", { interlaced: true, optimizationLevel: 3 }]
                 ]
               }
             }
@@ -705,11 +707,7 @@ module.exports = {
         return false;
       },
       imageminOptions: {
-        plugins: [
-          imageminJpegtran({
-            progressive: true
-          })
-        ]
+        plugins: [["jpegtran", { progressive: true }]]
       }
     }),
     new ImageminPlugin({
@@ -722,11 +720,7 @@ module.exports = {
         return false;
       },
       imageminOptions: {
-        plugins: [
-          imageminJpegtran({
-            progressive: false
-          })
-        ]
+        plugins: [["jpegtran", { progressive: false }]]
       }
     })
   ]
@@ -743,6 +737,10 @@ module.exports = {
 
 Feel free to push your code if you agree with publishing under the MIT license.
 
-## [Changelog](CHANGELOG.md)
+## Changelog
 
-## [License](LICENSE)
+[CHANGELOG](./CHANGELOG.md)
+
+## License
+
+[MIT](./LICENSE)

@@ -392,7 +392,7 @@ describe("imagemin plugin", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it("should throws errors if imagemin plugins don't setup (by plugin)", async () => {
+  it("should throws warnings if imagemin plugins don't setup (by plugin)", async () => {
     const stats = await webpack({
       emitPlugin: true,
       entry: path.join(fixturesPath, "empty-entry.js"),
@@ -406,16 +406,16 @@ describe("imagemin plugin", () => {
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(1);
-    expect(errors[0].toString()).toMatch(/No\splugins\sfound\sfor\s`imagemin`/);
+    expect(warnings).toHaveLength(1);
+    expect(errors).toHaveLength(0);
+    expect(warnings[0].toString()).toMatch(/No plugins found for `imagemin`/);
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
       false
     );
   });
 
-  it("should throws errors if imagemin plugins don't setup (by loader)", async () => {
+  it("should throws warnings if imagemin plugins don't setup (by loader)", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "single-image-loader.js"),
       imageminPluginOptions: {
@@ -427,10 +427,10 @@ describe("imagemin plugin", () => {
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(1);
+    expect(warnings).toHaveLength(1);
+    expect(errors).toHaveLength(0);
 
-    expect(errors[0].toString()).toMatch(/No\splugins\sfound\sfor\s`imagemin`/);
+    expect(warnings[0].toString()).toMatch(/No plugins found for `imagemin`/);
 
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
       false
@@ -456,7 +456,7 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(errors[0].message).toMatch(/Corrupt JPEG data/);
 
     await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
@@ -479,7 +479,7 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(errors[0].message).toMatch(/Corrupt JPEG data/);
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
@@ -505,7 +505,7 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
-    expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(warnings[0].message).toMatch(/Corrupt JPEG data/);
 
     await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
@@ -528,7 +528,7 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
-    expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(warnings[0].message).toMatch(/Corrupt JPEG data/);
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
@@ -554,7 +554,7 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(errors[0].message).toMatch(/Corrupt JPEG data/);
 
     await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
@@ -577,7 +577,7 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(errors[0].message).toMatch(/Corrupt JPEG data/);
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
@@ -603,7 +603,7 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
-    expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(warnings[0].message).toMatch(/Corrupt JPEG data/);
 
     await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
@@ -625,7 +625,7 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
-    expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(warnings[0].message).toMatch(/Corrupt JPEG data/);
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
