@@ -252,8 +252,8 @@ describe("loader", () => {
     spyPut.mockRestore();
   });
 
-  it("should throws error if imagemin plugins don't setup", async () => {
-    const stats = await webpack({ imageminLoaderOptions: {} });
+  it("should throws errors if imagemin plugins don't setup (`bail` is `true`)", async () => {
+    const stats = await webpack({ imageminLoaderOptions: { bail: true } });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
@@ -261,7 +261,20 @@ describe("loader", () => {
     expect(errors).toHaveLength(4);
 
     stats.compilation.errors.forEach(error => {
-      expect(error.message).toMatch(/No\splugins\sfound\sfor\s`imagemin`/);
+      expect(error.message).toMatch(/No plugins found for `imagemin`/);
+    });
+  });
+
+  it("should throws warnings if imagemin plugins don't setup (`bail` is `false`)", async () => {
+    const stats = await webpack({ imageminLoaderOptions: { bail: false } });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(4);
+    expect(errors).toHaveLength(0);
+
+    stats.compilation.warnings.forEach(warning => {
+      expect(warning.message).toMatch(/No plugins found for `imagemin`/);
     });
   });
 
@@ -275,7 +288,7 @@ describe("loader", () => {
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(errors[0].message).toMatch(/Corrupt JPEG data/);
     expect(Object.keys(assets)).toHaveLength(3);
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
@@ -293,7 +306,7 @@ describe("loader", () => {
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
-    expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(warnings[0].message).toMatch(/Corrupt JPEG data/);
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
@@ -302,16 +315,15 @@ describe("loader", () => {
 
   it("should throws error on corrupted images using `webpack.bail` option with `true` value", async () => {
     const stats = await webpack({
-      bail: true,
       entry: path.join(fixturesPath, "loader-corrupted.js"),
-      imageminLoaderOptions: { imageminOptions: { plugins } }
+      imageminLoaderOptions: { bail: true, imageminOptions: { plugins } }
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(errors[0].message).toMatch(/Corrupt JPEG data/);
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
@@ -320,16 +332,15 @@ describe("loader", () => {
 
   it("should throws warning on corrupted images using `webpack.bail` option with `false` value", async () => {
     const stats = await webpack({
-      bail: false,
       entry: path.join(fixturesPath, "loader-corrupted.js"),
-      imageminLoaderOptions: { imageminOptions: { plugins } }
+      imageminLoaderOptions: { bail: false, imageminOptions: { plugins } }
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
-    expect(warnings[0].message).toMatch(/Corrupt\sJPEG\sdata/);
+    expect(warnings[0].message).toMatch(/Corrupt JPEG data/);
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true

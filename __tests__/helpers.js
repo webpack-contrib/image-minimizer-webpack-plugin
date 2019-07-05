@@ -12,12 +12,7 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import EmitPlugin from "./fixtures/EmitWepbackPlugin";
 import ImageminPlugin from "..";
 
-const plugins = [
-  imageminGifsicle(),
-  imageminMozjpeg(),
-  imageminPngquant(),
-  imageminSvgo()
-];
+const plugins = ["gifsicle", "mozjpeg", "pngquant", "svgo"];
 
 const fixturesPath = path.join(__dirname, "./fixtures");
 
@@ -164,7 +159,12 @@ function isOptimized(originalPath, compilation) {
     .then(() => pify(fs.readFile)(pathToOriginal))
     .then(data =>
       imagemin.buffer(data, {
-        plugins
+        plugins: [
+          imageminGifsicle(),
+          imageminMozjpeg(),
+          imageminPngquant(),
+          imageminSvgo()
+        ]
       })
     )
     .then(optimizedBuffer =>
