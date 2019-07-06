@@ -122,7 +122,7 @@ class ImageminPlugin {
 
         assetsForMinify.push({
           input: asset.source(),
-          path: path.join(context, file)
+          filePath: path.join(context, file)
         });
       });
 
@@ -158,7 +158,10 @@ class ImageminPlugin {
               });
             }
 
-            const originalResourcePath = path.relative(context, result.path);
+            const originalResourcePath = path.relative(
+              context,
+              result.filePath
+            );
 
             // Exclude:
             // 1. Module assets (`file-loader` already interpolated asset name)
