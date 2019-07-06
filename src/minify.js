@@ -1,5 +1,6 @@
 "use strict";
 
+const path = require("path");
 const os = require("os");
 const crypto = require("crypto");
 const imagemin = require("imagemin");
@@ -13,13 +14,23 @@ function runImagemin(source, imageminOptions) {
   return Promise.resolve().then(() => imagemin.buffer(source, imageminOptions));
 }
 
-function prepareImageminOptions(options, result) {
+function getConfigForFile(result, options) {
   if (
     !options.imageminOptions ||
     !options.imageminOptions.plugins ||
     (options.imageminOptions.plugins &&
       options.imageminOptions.plugins.length === 0)
   ) {
+    const error = new Error(
+      "No plugins found for `imagemin`. Please read documentation."
+    );
+
+    if (options.bail) {
+      result.errors.push(error);
+    } else {
+      result.warnings.push(error);
+    }
+
     return options;
   }
 
@@ -128,6 +139,7 @@ function minify(tasks = [], options = {}) {
         // eslint-disable-next-line global-require
         imageminVersion = require("imagemin/package.json").version;
       } catch (ignoreError) {
+        /* istanbul ignore next */
         imageminVersion = "unknown";
         // Nothing
       }
@@ -136,6 +148,7 @@ function minify(tasks = [], options = {}) {
         // eslint-disable-next-line global-require
         packageVersion = require("../package.json").version;
       } catch (ignoreError) {
+        /* istanbul ignore next */
         packageVersion = "unknown";
         // Nothing
       }
@@ -144,104 +157,88 @@ function minify(tasks = [], options = {}) {
     return Promise.all(
       tasks.map(task =>
         limit(() => {
-          const { input, path } = task;
+          const { input, filePath } = task;
           const result = {
             input,
-            path,
+            // Return original source if something wrong
+            output: input,
             warnings: [],
             errors: []
           };
 
-          if (!input) {
+          if (filePath) {
+            result.filePath = path.isAbsolute(filePath)
+              ? filePath
+              : path.resolve(filePath);
+          }
+
+          if (!result.input) {
             result.errors.push(new Error("Empty input"));
 
             return result;
           }
 
           // Ensure that the contents i have are in the form of a buffer
-          const source = Buffer.isBuffer(input) ? input : Buffer.from(input);
-
-          const imageminOptions = prepareImageminOptions(options, result);
-
-          if (
-            !imageminOptions ||
-            !imageminOptions.plugins ||
-            imageminOptions.plugins.length === 0
-          ) {
-            result.output = source;
-
-            const error = new Error(
-              "No plugins found for `imagemin`. Please read documentation."
-            );
-
-            if (options.bail) {
-              result.errors.push(error);
-            } else {
-              result.warnings.push(error);
-            }
-
-            return result;
-          }
-
-          if (options.filter && !options.filter(source, path)) {
-            result.filtered = true;
-            result.output = source;
-
-            return result;
-          }
-
-          let cacheKey = null;
-
-          if (options.cache) {
-            cacheKey = serialize({
-              hash: crypto
-                .createHash("md4")
-                .update(input)
-                .digest("hex"),
-              imagemin: imageminVersion,
-              "imagemin-options": imageminOptions,
-              "imagemin-webpack": packageVersion
-            });
-          }
+          result.input = Buffer.isBuffer(input) ? input : Buffer.from(input);
 
           return Promise.resolve()
-            .then(() => {
-              // If `cache` enabled, we try to get compressed source from cache, if cache doesn't found, we run `imagemin`.
+            .then(() => getConfigForFile(result, options))
+            .then(imageminOptions => {
+              if (options.filter && !options.filter(result.input, filePath)) {
+                result.filtered = true;
+
+                return result;
+              }
+
+              let cacheKey = null;
+
               if (options.cache) {
-                return cacache
-                  .get(cacheDir, cacheKey)
-                  .then(
-                    ({ data }) => data,
-                    () =>
-                      runImagemin(source, imageminOptions).then(
-                        optimizedSource =>
-                          cacache
-                            .put(cacheDir, cacheKey, optimizedSource)
-                            .then(() => optimizedSource)
-                      )
-                  );
+                cacheKey = serialize({
+                  hash: crypto
+                    .createHash("md4")
+                    .update(result.input)
+                    .digest("hex"),
+                  imagemin: imageminVersion,
+                  "imagemin-options": imageminOptions,
+                  "imagemin-webpack": packageVersion
+                });
               }
 
-              // If `cache` disable, we just run `imagemin`.
-              return runImagemin(source, imageminOptions);
-            })
-            .then(optimizedSource => {
-              result.output = optimizedSource;
+              return Promise.resolve()
+                .then(() => {
+                  // If `cache` enabled, we try to get compressed source from cache, if cache doesn't found, we run `imagemin`.
+                  if (options.cache) {
+                    return cacache
+                      .get(cacheDir, cacheKey)
+                      .then(
+                        ({ data }) => data,
+                        () =>
+                          runImagemin(result.input, imageminOptions).then(
+                            optimizedSource =>
+                              cacache
+                                .put(cacheDir, cacheKey, optimizedSource)
+                                .then(() => optimizedSource)
+                          )
+                      );
+                  }
 
-              return result;
-            })
-            .catch(error => {
-              if (options.bail) {
-                result.errors.push(error);
-              } else {
-                result.warnings.push(error);
-              }
+                  // If `cache` disable, we just run `imagemin`.
+                  return runImagemin(result.input, imageminOptions);
+                })
+                .then(optimizedSource => {
+                  result.output = optimizedSource;
 
-              // Don't cache images with errors.
-              // Return original source if something wrong.
-              result.output = source;
+                  return result;
+                })
+                .catch(error => {
+                  if (options.bail) {
+                    result.errors.push(error);
+                  } else {
+                    result.warnings.push(error);
+                  }
 
-              return result;
+                  return result;
+                });
             });
         })
       )

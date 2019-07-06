@@ -23,7 +23,7 @@ module.exports = function(content) {
 
   Promise.resolve()
     .then(() =>
-      minify([{ input: content, path: resourcePath }], {
+      minify([{ input: content, filePath: resourcePath }], {
         bail,
         cache: options.cache,
         imageminOptions: options.imageminOptions,
