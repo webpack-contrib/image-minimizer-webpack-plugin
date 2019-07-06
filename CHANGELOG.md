@@ -10,7 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org).
 - Changed: emit warning by default on no plugins for `imagemin`.
 - Feature: simple configuration using `String` or `Array`, for example `{ imageminOptions: { plugins: ['mozjpeg']}}` or `{ imageminOptions: { plugins: [['mozjpeg', { quality: 60 ]]}}`.
 - Fixed: fallback for cache directory when it can't be resolved.
-- Fixed: cache invalidation when options was changes or plugin version was updated.
+- Fixed: cache invalidation when plugin options was changes or plugin version was updated.
 - Perf: improve performance.
 
 ## 4.1.0 - 2019-01-23
