@@ -99,13 +99,27 @@ function getConfigForFile(result, options) {
         ]);
 
         return requiredPlugin;
-      }
+      } else if (typeof plugin === "function") {
+        result.warnings.push(
+          new Error(
+            "Do not use a function as plugin (i.e. '{ plugins: [imageminMozjpeg()] }'), it is not allowed invalidate a cache. It will be removed in next major release. You can rewrite this to '{ plugins: ['mozjpeg'] }' or '{ plugins: [['mozjpeg', options]] }', please see the documentation for more information."
+          )
+        );
+      } else {
+        const error = new Error(
+          `Invalid plugin configuration "${JSON.stringify(
+            plugin
+          )}, plugin configuraion should be 'string' or '[string, object]'"`
+        );
 
-      result.warnings.push(
-        new Error(
-          "Do not use a function as plugin (i.e. `{ plugins: [imageminMozjpeg()] }`), it is not allowed invalidate a cache. It will be removed in next major release. You can rewrite this to `{ plugins: [['mozjpeg', options]] }`, please see the documentation for more information."
-        )
-      );
+        if (options.bail) {
+          result.errors.push(error);
+        } else {
+          result.warnings.push(error);
+        }
+
+        return false;
+      }
 
       return plugin;
     })
