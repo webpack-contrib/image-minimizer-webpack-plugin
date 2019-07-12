@@ -212,7 +212,7 @@ describe("minify", () => {
     expect(result[0].output.equals(input)).toBe(true);
   });
 
-  it("should contains warning on broken image (no `bail` option)", async () => {
+  it("should throw warning on broken image (no `bail` option)", async () => {
     const filePath = path.resolve(__dirname, "./fixtures/test-corrupted.jpg");
     const input = await pify(fs.readFile)(filePath);
     const result = await minify([{ input, filePath }], {
@@ -226,7 +226,7 @@ describe("minify", () => {
     expect(result[0].output.equals(input)).toBe(true);
   });
 
-  it("should contains warning on broken image (`bail` option with `false` value)", async () => {
+  it("should throw warning on broken image (`bail` option with `false` value)", async () => {
     const filePath = path.resolve(__dirname, "./fixtures/test-corrupted.jpg");
     const input = await pify(fs.readFile)(filePath);
     const result = await minify([{ input, filePath }], {
@@ -241,7 +241,7 @@ describe("minify", () => {
     expect(result[0].output.equals(input)).toBe(true);
   });
 
-  it("should contains warning on broken image (`bail` option with `true` value)", async () => {
+  it("should throw error on broken image (`bail` option with `true` value)", async () => {
     const filePath = path.resolve(__dirname, "./fixtures/test-corrupted.jpg");
     const input = await pify(fs.readFile)(filePath);
     const result = await minify([{ input, filePath }], {
@@ -918,7 +918,7 @@ describe("minify", () => {
     expect(result[0].output.equals(optimizedSource)).toBe(true);
   });
 
-  it("should throw error on empty `imagemin` options (configuration using `string`) (`bail` is not specify)", async () => {
+  it("should throw warning on empty `imagemin` options (configuration using `string`) (`bail` is not specify)", async () => {
     const filePath = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filePath);
     const result = await minify([{ input, filePath }], {
@@ -963,7 +963,7 @@ describe("minify", () => {
     expect(result).toHaveLength(1);
   });
 
-  it("should throw error on empty `imagemin` options (configuration using `string`) (`bail` is `false`)", async () => {
+  it("should throw warning on empty `imagemin` options (configuration using `string`) (`bail` is `false`)", async () => {
     const filePath = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filePath);
     const result = await minify([{ input, filePath }], {
@@ -1056,5 +1056,51 @@ describe("minify", () => {
     });
 
     expect(result[0].output.equals(optimizedSource)).toBe(true);
+  });
+
+  it("should throw error on invalid plugin configuration (`bail` is `true`)", async () => {
+    const filePath = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filePath);
+    const result = await minify([{ input, filePath }], {
+      bail: true,
+      imageminOptions: {
+        plugins: [{ foo: "bar" }]
+      }
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].warnings).toHaveLength(0);
+    expect(result[0].errors).toHaveLength(1);
+    expect(result[0].errors[0].toString()).toMatch(
+      /Invalid plugin configuration/
+    );
+    expect(result[0].filePath).toBe(filePath);
+    expect(result[0].input.equals(input)).toBe(true);
+    expect(result[0].output.equals(input)).toBe(true);
+
+    expect(result).toHaveLength(1);
+  });
+
+  it("should throw warning on invalid plugin configuration (`bail` is `false`)", async () => {
+    const filePath = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filePath);
+    const result = await minify([{ input, filePath }], {
+      bail: false,
+      imageminOptions: {
+        plugins: [{ foo: "bar" }]
+      }
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].warnings).toHaveLength(1);
+    expect(result[0].warnings[0].toString()).toMatch(
+      /Invalid plugin configuration/
+    );
+    expect(result[0].errors).toHaveLength(0);
+    expect(result[0].filePath).toBe(filePath);
+    expect(result[0].input.equals(input)).toBe(true);
+    expect(result[0].output.equals(input)).toBe(true);
+
+    expect(result).toHaveLength(1);
   });
 });
