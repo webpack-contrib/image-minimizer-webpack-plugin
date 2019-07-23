@@ -3,130 +3,12 @@
 const path = require("path");
 const os = require("os");
 const crypto = require("crypto");
-const imagemin = require("imagemin");
 const cacache = require("cacache");
 const serialize = require("serialize-javascript");
 const findCacheDir = require("find-cache-dir");
 const pLimit = require("p-limit");
-const deepmerge = require("deepmerge");
-
-function runImagemin(source, imageminOptions) {
-  return Promise.resolve().then(() => imagemin.buffer(source, imageminOptions));
-}
-
-function getConfigForFile(result, options) {
-  if (
-    !options.imageminOptions ||
-    !options.imageminOptions.plugins ||
-    (options.imageminOptions.plugins &&
-      options.imageminOptions.plugins.length === 0)
-  ) {
-    const error = new Error(
-      "No plugins found for `imagemin`. Please read documentation."
-    );
-
-    if (options.bail) {
-      result.errors.push(error);
-    } else {
-      result.warnings.push(error);
-    }
-
-    return options;
-  }
-
-  const imageminOptions = deepmerge({}, options.imageminOptions);
-
-  if (!imageminOptions.pluginsMeta) {
-    imageminOptions.pluginsMeta = [];
-  }
-
-  imageminOptions.plugins = imageminOptions.plugins
-    .map(plugin => {
-      const isPluginArray = Array.isArray(plugin);
-
-      if (typeof plugin === "string" || isPluginArray) {
-        const pluginName = isPluginArray ? plugin[0] : plugin;
-        // eslint-disable-next-line no-undefined
-        const pluginOptions = isPluginArray ? plugin[1] : undefined;
-
-        let requiredPlugin = null;
-        let requiredPluginName = `imagemin-${pluginName}`;
-
-        try {
-          // eslint-disable-next-line global-require, import/no-dynamic-require
-          requiredPlugin = require(requiredPluginName)(pluginOptions);
-        } catch (ignoreError) {
-          requiredPluginName = pluginName;
-
-          try {
-            // eslint-disable-next-line global-require, import/no-dynamic-require
-            requiredPlugin = require(requiredPluginName)(pluginOptions);
-          } catch (ignoreError1) {
-            const pluginNameForError = pluginName.startsWith("imagemin")
-              ? pluginName
-              : `imagemin-${pluginName}`;
-
-            const error = new Error(
-              `Unknown plugin: ${pluginNameForError}\n\nDid you forget to install the plugin?\nYou can install it with:\n\n$ npm install ${pluginNameForError} --save-dev\n$ yarn add ${pluginNameForError} --dev`
-            );
-
-            if (options.bail) {
-              result.errors.push(error);
-            } else {
-              result.warnings.push(error);
-            }
-
-            return false;
-          }
-          // Nothing
-        }
-
-        let version = "unknown";
-
-        try {
-          // eslint-disable-next-line global-require, import/no-dynamic-require
-          ({ version } = require(`${requiredPluginName}/package.json`));
-        } catch (ignoreVersion) {
-          // Nothing
-        }
-
-        imageminOptions.pluginsMeta.push([
-          {
-            name: requiredPluginName,
-            options: pluginOptions || {},
-            version
-          }
-        ]);
-
-        return requiredPlugin;
-      } else if (typeof plugin === "function") {
-        result.warnings.push(
-          new Error(
-            "Do not use a function as plugin (i.e. '{ plugins: [imageminMozjpeg()] }'), it is not allowed invalidate a cache. It will be removed in next major release. You can rewrite this to '{ plugins: ['mozjpeg'] }' or '{ plugins: [['mozjpeg', options]] }', please see the documentation for more information."
-          )
-        );
-      } else {
-        const error = new Error(
-          `Invalid plugin configuration "${JSON.stringify(
-            plugin
-          )}, plugin configuraion should be 'string' or '[string, object]'"`
-        );
-
-        if (options.bail) {
-          result.errors.push(error);
-        } else {
-          result.warnings.push(error);
-        }
-
-        return false;
-      }
-
-      return plugin;
-    })
-    .filter(Boolean);
-
-  return imageminOptions;
-}
+const getConfigForFile = require("./utils/getConfigForFile");
+const runImagemin = require("./utils/runImagemin");
 
 function minify(tasks = [], options = {}) {
   return Promise.resolve().then(() => {
@@ -204,7 +86,7 @@ function minify(tasks = [], options = {}) {
               }
 
               return Promise.resolve()
-                .then(() => getConfigForFile(result, options))
+                .then(() => getConfigForFile(result.filePath, options, result))
                 .then(imageminOptions => {
                   let cacheKey = null;
 
