@@ -1103,4 +1103,38 @@ describe("minify", () => {
 
     expect(result).toHaveLength(1);
   });
+
+  it("should supports methods in option for plugin", async () => {
+    const svgoOptions = {
+      plugins: [
+        {
+          cleanupIDs: {
+            prefix: {
+              toString() {
+                this.counter = this.counter || 0;
+
+                return `custom-id-${this.counter++}`;
+              }
+            }
+          }
+        }
+      ]
+    };
+
+    const filePath = path.resolve(__dirname, "./fixtures/svg-with-id.svg");
+    const input = await pify(fs.readFile)(filePath);
+    const result = await minify([{ input, filePath }], {
+      imageminOptions: { plugins: [["svgo", svgoOptions]] }
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].warnings).toHaveLength(0);
+    expect(result[0].errors).toHaveLength(0);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminSvgo(svgoOptions)]
+    });
+
+    expect(result[0].output.equals(optimizedSource)).toBe(true);
+  });
 });
