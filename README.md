@@ -727,6 +727,50 @@ module.exports = {
 };
 ```
 
+## Additional API
+
+### `normalizeConfig(config)`
+
+The function normalizes configuration (converts plugins names and options to `Function`s) for using in `imagemin` package directly.
+
+```js
+const imagemin = require("imagemin");
+const { normalizeConfig } = require("imagemin-webpack");
+const imageminConfig = normalizeConfig({
+  plugins: [
+    "jpegtran",
+    [
+      "pngquant",
+      {
+        quality: [0.6, 0.8]
+      }
+    ]
+  ]
+});
+
+/* 
+  console.log(imageminConfig);
+  =>
+  {
+    plugins: [Function, Function],
+    pluginsMeta: [ 
+      { name: "imagemin-jpegtran", version: "x.x.x", options: {} }, 
+      { name: "imagemin-pngquant", version: "x.x.x", options: { quality: [0.6, 0.8] } 
+    ]
+  }
+*/
+
+(async () => {
+  const files = await imagemin(["images/*.{jpg,png}"], {
+    destination: "build/images",
+    plugins: imageminConfig.plugins
+  });
+
+  console.log(files);
+  // => [{data: <Buffer 89 50 4e …>, path: 'build/images/foo.jpg'}, …]
+})();
+```
+
 ## Related
 
 - [imagemin](https://github.com/imagemin/imagemin) - API for this package.
