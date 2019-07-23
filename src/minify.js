@@ -196,63 +196,66 @@ function minify(tasks = [], options = {}) {
           result.input = Buffer.isBuffer(input) ? input : Buffer.from(input);
 
           return Promise.resolve()
-            .then(() => getConfigForFile(result, options))
-            .then(imageminOptions => {
+            .then(() => {
               if (options.filter && !options.filter(result.input, filePath)) {
                 result.filtered = true;
 
                 return result;
               }
 
-              let cacheKey = null;
+              return Promise.resolve()
+                .then(() => getConfigForFile(result, options))
+                .then(imageminOptions => {
+                  let cacheKey = null;
 
-              if (options.cache) {
-                cacheKey = serialize({
-                  hash: crypto
-                    .createHash("md4")
-                    .update(result.input)
-                    .digest("hex"),
-                  imagemin: imageminVersion,
-                  "imagemin-options": imageminOptions,
-                  "imagemin-webpack": packageVersion
+                  if (options.cache) {
+                    cacheKey = serialize({
+                      hash: crypto
+                        .createHash("md4")
+                        .update(result.input)
+                        .digest("hex"),
+                      imagemin: imageminVersion,
+                      "imagemin-options": imageminOptions,
+                      "imagemin-webpack": packageVersion
+                    });
+                  }
+
+                  return Promise.resolve()
+                    .then(() => {
+                      // If `cache` enabled, we try to get compressed source from cache, if cache doesn't found, we run `imagemin`.
+                      if (options.cache) {
+                        return cacache
+                          .get(cacheDir, cacheKey)
+                          .then(
+                            ({ data }) => data,
+                            () =>
+                              runImagemin(result.input, imageminOptions).then(
+                                optimizedSource =>
+                                  cacache
+                                    .put(cacheDir, cacheKey, optimizedSource)
+                                    .then(() => optimizedSource)
+                              )
+                          );
+                      }
+
+                      // If `cache` disable, we just run `imagemin`.
+                      return runImagemin(result.input, imageminOptions);
+                    })
+                    .then(optimizedSource => {
+                      result.output = optimizedSource;
+
+                      return result;
+                    });
                 });
+            })
+            .catch(error => {
+              if (options.bail) {
+                result.errors.push(error);
+              } else {
+                result.warnings.push(error);
               }
 
-              return Promise.resolve()
-                .then(() => {
-                  // If `cache` enabled, we try to get compressed source from cache, if cache doesn't found, we run `imagemin`.
-                  if (options.cache) {
-                    return cacache
-                      .get(cacheDir, cacheKey)
-                      .then(
-                        ({ data }) => data,
-                        () =>
-                          runImagemin(result.input, imageminOptions).then(
-                            optimizedSource =>
-                              cacache
-                                .put(cacheDir, cacheKey, optimizedSource)
-                                .then(() => optimizedSource)
-                          )
-                      );
-                  }
-
-                  // If `cache` disable, we just run `imagemin`.
-                  return runImagemin(result.input, imageminOptions);
-                })
-                .then(optimizedSource => {
-                  result.output = optimizedSource;
-
-                  return result;
-                })
-                .catch(error => {
-                  if (options.bail) {
-                    result.errors.push(error);
-                  } else {
-                    result.warnings.push(error);
-                  }
-
-                  return result;
-                });
+              return result;
             });
         })
       )
