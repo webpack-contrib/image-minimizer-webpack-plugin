@@ -7,6 +7,6 @@ const ImageminPlugin = require("./src/ImageminPlugin");
 ImageminPlugin.loader = require.resolve("./src/imagemin-loader");
 
 // eslint-disable-next-line node/no-unpublished-require
-ImageminPlugin.normalizeConfig = require("./src/utils/normalizeConfig");
+ImageminPlugin.normalizeConfig = require("./src/utils/normalize-config");
 
 module.exports = ImageminPlugin;

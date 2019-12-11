@@ -1,4 +1,4 @@
-import ImageminPlugin from "..";
+import ImageminPlugin from "../index.js";
 
 describe("api", () => {
   describe("basic", () => {

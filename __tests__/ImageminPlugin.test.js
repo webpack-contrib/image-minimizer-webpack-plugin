@@ -8,7 +8,7 @@ import {
   hasLoader,
   plugins,
   webpack
-} from "./helpers";
+} from "./helpers.js";
 
 const IS_WEBPACK_VERSION_NEXT = process.env.WEBPACK_VERSION === "next";
 
