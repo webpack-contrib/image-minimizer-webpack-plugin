@@ -1,6 +1,6 @@
 "use strict";
 
-const normalizeConfig = require("./normalizeConfig");
+const normalizeConfig = require("./normalize-config");
 
 function getConfigForFile(filePath, options, result) {
   // Implement autosearch config on root directory of project in future

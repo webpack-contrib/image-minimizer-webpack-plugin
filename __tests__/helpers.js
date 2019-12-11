@@ -9,8 +9,8 @@ import pify from "pify";
 import tempy from "tempy";
 import webpack from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import EmitPlugin from "./fixtures/EmitWepbackPlugin";
-import ImageminPlugin from "..";
+import EmitPlugin from "./fixtures/EmitWepbackPlugin.js";
+import ImageminPlugin from "../index.js";
 
 const plugins = ["gifsicle", "mozjpeg", "pngquant", "svgo"];
 
@@ -148,7 +148,7 @@ function isOptimized(originalPath, compilation) {
   const source = assets[name];
 
   if (!source) {
-    throw new Error(`Can't find asset`);
+    throw new Error("Can't find asset");
   }
 
   const { path: outputPath } = compilation.options.output;

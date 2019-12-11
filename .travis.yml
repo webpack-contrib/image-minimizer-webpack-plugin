@@ -35,9 +35,12 @@ matrix:
     - node_js: "12"
       script: npm run test:coverage
       env: CI=tests 12
-    - node_js: "8"
+    - node_js: "13"
       script: npm run test:coverage
-      env: CI=tests WEBPACK_VERSION=next 8
+      env: CI=tests 13
+    - node_js: "10"
+      script: npm run test:coverage
+      env: CI=tests WEBPACK_VERSION=next 10
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install nasm; fi

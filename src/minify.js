@@ -7,8 +7,8 @@ const cacache = require("cacache");
 const serialize = require("serialize-javascript");
 const findCacheDir = require("find-cache-dir");
 const pLimit = require("p-limit");
-const getConfigForFile = require("./utils/getConfigForFile");
-const runImagemin = require("./utils/runImagemin");
+const getConfigForFile = require("./utils/get-config-for-file");
+const runImagemin = require("./utils/run-imagemin");
 
 function minify(tasks = [], options = {}) {
   return Promise.resolve().then(() => {
@@ -106,18 +106,18 @@ function minify(tasks = [], options = {}) {
                     .then(() => {
                       // If `cache` enabled, we try to get compressed source from cache, if cache doesn't found, we run `imagemin`.
                       if (options.cache) {
-                        return cacache
-                          .get(cacheDir, cacheKey)
-                          .then(
-                            ({ data }) => data,
-                            () =>
-                              runImagemin(result.input, imageminOptions).then(
-                                optimizedSource =>
-                                  cacache
-                                    .put(cacheDir, cacheKey, optimizedSource)
-                                    .then(() => optimizedSource)
-                              )
-                          );
+                        return cacache.get(cacheDir, cacheKey).then(
+                          ({ data }) => data,
+                          () =>
+                            runImagemin(
+                              result.input,
+                              imageminOptions
+                            ).then(optimizedSource =>
+                              cacache
+                                .put(cacheDir, cacheKey, optimizedSource)
+                                .then(() => optimizedSource)
+                            )
+                        );
                       }
 
                       // If `cache` disable, we just run `imagemin`.

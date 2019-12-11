@@ -4,18 +4,14 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [5.1.0](https://github.com/itgalaxy/imagemin-webpack/compare/v5.0.0...v5.1.0) (2019-07-23)
 
-
 ### Bug Fixes
 
-* better handling configuration errors ([#114](https://github.com/itgalaxy/imagemin-webpack/issues/114)) ([6b192c2](https://github.com/itgalaxy/imagemin-webpack/commit/6b192c2))
-* increase perf for filtered assets ([#118](https://github.com/itgalaxy/imagemin-webpack/issues/118)) ([32eae8c](https://github.com/itgalaxy/imagemin-webpack/commit/32eae8c))
-
+- better handling configuration errors ([#114](https://github.com/itgalaxy/imagemin-webpack/issues/114)) ([6b192c2](https://github.com/itgalaxy/imagemin-webpack/commit/6b192c2))
+- increase perf for filtered assets ([#118](https://github.com/itgalaxy/imagemin-webpack/issues/118)) ([32eae8c](https://github.com/itgalaxy/imagemin-webpack/commit/32eae8c))
 
 ### Features
 
-* `normalizeConfig` api helper ([#119](https://github.com/itgalaxy/imagemin-webpack/issues/119)) ([6977f8f](https://github.com/itgalaxy/imagemin-webpack/commit/6977f8f))
-
-
+- `normalizeConfig` api helper ([#119](https://github.com/itgalaxy/imagemin-webpack/issues/119)) ([6977f8f](https://github.com/itgalaxy/imagemin-webpack/commit/6977f8f))
 
 ## 5.0.0 - 2019-07-04
 

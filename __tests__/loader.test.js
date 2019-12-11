@@ -4,7 +4,7 @@ import path from "path";
 import cacache from "cacache";
 import findCacheDir from "find-cache-dir";
 import pify from "pify";
-import { fixturesPath, isOptimized, plugins, webpack } from "./helpers";
+import { fixturesPath, isOptimized, plugins, webpack } from "./helpers.js";
 
 describe("loader", () => {
   it("should optimizes all images", async () => {

@@ -6,7 +6,7 @@ import imagemin from "imagemin";
 import imageminMozjpeg from "imagemin-mozjpeg";
 import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
-import minify from "../src/minify";
+import minify from "../src/minify.js";
 
 function isPromise(obj) {
   return (
@@ -1104,18 +1104,12 @@ describe("minify", () => {
     expect(result).toHaveLength(1);
   });
 
-  it("should supports methods in option for plugin", async () => {
+  it("should support svgo options", async () => {
     const svgoOptions = {
       plugins: [
         {
           cleanupIDs: {
-            prefix: {
-              toString() {
-                this.counter = this.counter || 0;
-
-                return `custom-id-${this.counter++}`;
-              }
-            }
+            prefix: "qwerty"
           }
         }
       ]

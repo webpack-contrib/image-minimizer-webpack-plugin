@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import RawSource from "webpack-sources/lib/RawSource";
+import RawSource from "webpack-sources/lib/RawSource.js";
 import pify from "pify";
 
 export default class EmitWepbackPlugin {
@@ -17,6 +17,7 @@ export default class EmitWepbackPlugin {
   apply(compiler) {
     const plugin = { name: "EmitPlugin" };
 
+    // eslint-disable-next-line unicorn/consistent-function-scoping
     const emitFn = (compilation, callback) => {
       const { fileNames } = this.options;
 
