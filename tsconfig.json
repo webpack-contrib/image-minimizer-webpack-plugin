@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "outDir": "types",
+    "newLine": "LF",
+    "allowJs": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "emitDeclarationOnly": true
+  },
+  "include": ["./src/**/*"]
+}
