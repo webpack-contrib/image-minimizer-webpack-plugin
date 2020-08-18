@@ -509,7 +509,9 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
-    expect(warnings[0].message).toMatch(/Corrupt JPEG data/);
+    expect(warnings[0].message).toMatch(
+      /(Corrupt JPEG data|Command failed with EPIPE)/
+    );
 
     await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
@@ -532,7 +534,9 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
-    expect(warnings[0].message).toMatch(/Corrupt JPEG data/);
+    expect(warnings[0].message).toMatch(
+      /(Corrupt JPEG data|Command failed with EPIPE)/
+    );
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
@@ -558,7 +562,9 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toMatch(/Corrupt JPEG data/);
+    expect(errors[0].message).toMatch(
+      /(Corrupt JPEG data|Command failed with EPIPE)/
+    );
 
     await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
@@ -581,7 +587,9 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toMatch(/Corrupt JPEG data/);
+    expect(errors[0].message).toMatch(
+      /(Corrupt JPEG data|Command failed with EPIPE)/
+    );
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
@@ -607,7 +615,9 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
-    expect(warnings[0].message).toMatch(/Corrupt JPEG data/);
+    expect(warnings[0].message).toMatch(
+      /(Corrupt JPEG data|Command failed with EPIPE)/
+    );
 
     await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
@@ -629,7 +639,9 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
-    expect(warnings[0].message).toMatch(/Corrupt JPEG data/);
+    expect(warnings[0].message).toMatch(
+      /(Corrupt JPEG data|Command failed with EPIPE)/
+    );
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
