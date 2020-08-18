@@ -131,10 +131,12 @@ function minify(tasks = [], options = {}) {
                 });
             })
             .catch((error) => {
+              const errored = error instanceof Error ? error : new Error(error);
+
               if (options.bail) {
-                result.errors.push(error);
+                result.errors.push(errored);
               } else {
-                result.warnings.push(error);
+                result.warnings.push(errored);
               }
 
               return result;
