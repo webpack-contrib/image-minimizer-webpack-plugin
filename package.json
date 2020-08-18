@@ -84,6 +84,7 @@
     "webpack": "^4.0.0 || ^5.0.0"
   },
   "scripts": {
+    "security": "npm audit",
     "lint:prettier": "prettier . --list-different --ignore-path .gitignore",
     "lint:js": "eslint . --cache --report-unused-disable-directives --ignore-path .gitignore --ext '.js,.cjs,.mjs,.jsx,.md'",
     "lint:md": "remark . LICENSE -f -q -i .gitignore",
