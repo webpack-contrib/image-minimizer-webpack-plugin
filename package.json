@@ -1,100 +1,100 @@
 {
-  "name": "imagemin-webpack",
-  "version": "5.1.0",
-  "description": "Webpack loader and plugin to optimize (compress) images using imagemin",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/itgalaxy/imagemin-webpack.git"
-  },
-  "homepage": "https://github.com/itgalaxy/imagemin-webpack",
-  "keywords": [
-    "webpack",
-    "loader",
-    "plugin",
-    "imagemin",
-    "images",
-    "minify",
-    "compress",
-    "optimize"
-  ],
-  "author": "Itgalaxy <development@itgalaxy.company>",
-  "bugs": {
-    "url": "https://github.com/itgalaxy/imagemin-webpack/issues"
-  },
-  "license": "MIT",
-  "main": "index.js",
-  "files": [
-    "src"
-  ],
-  "engines": {
-    "node": ">= 8.9.0"
-  },
-  "dependencies": {
-    "cacache": "^13.0.1",
-    "deepmerge": "^4.2.2",
-    "find-cache-dir": "^3.1.0",
-    "imagemin": "^7.0.1",
-    "loader-utils": "^1.2.3",
-    "p-limit": "^2.2.1",
-    "serialize-javascript": "^2.1.2",
-    "webpack-sources": "^1.4.3"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.7.5",
-    "@babel/core": "^7.7.5",
-    "@babel/preset-env": "^7.7.6",
-    "babel-eslint": "^10.0.3",
-    "babel-jest": "^24.9.0",
-    "css-loader": "^3.3.0",
-    "del": "^5.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-ava": "^9.0.0",
-    "eslint-plugin-html": "^6.0.0",
-    "eslint-plugin-import": "^2.19.1",
-    "eslint-plugin-itgalaxy": "^117.0.0",
-    "eslint-plugin-jest": "^23.1.1",
-    "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-lodash": "^6.0.0",
-    "eslint-plugin-markdown": "^1.0.1",
-    "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-react": "^7.17.0",
-    "eslint-plugin-unicorn": "^14.0.1",
-    "file-loader": "^5.0.2",
-    "husky": "^3.1.0",
-    "imagemin-gifsicle": "^6.0.1",
-    "imagemin-mozjpeg": "^8.0.0",
-    "imagemin-pngquant": "^8.0.0",
-    "imagemin-svgo": "^7.0.0",
-    "jest": "^24.9.0",
-    "lint-staged": "^9.5.0",
-    "lodash.defaultsdeep": "^4.6.1",
-    "mini-css-extract-plugin": "^0.8.0",
-    "npm-run-all": "^4.1.5",
-    "pify": "^4.0.1",
-    "prettier": "^1.19.1",
-    "remark-cli": "^7.0.1",
-    "remark-preset-lint-itgalaxy": "^15.0.0",
-    "standard-version": "^7.0.1",
-    "tempy": "^0.3.0",
-    "url-loader": "^3.0.0",
-    "webpack": "^4.41.2"
-  },
-  "peerDependencies": {
-    "webpack": "^4.0.0"
-  },
-  "scripts": {
-    "lint:prettier": "prettier '{**/*,*}.{js,cjs,mjs,jsx,json,md,yml,yaml}' --list-different --ignore-path .gitignore",
-    "lint:js": "eslint . --cache --report-unused-disable-directives --ignore-path .gitignore --ext '.js,.cjs,.mjs,.jsx,.md'",
-    "lint:md": "remark . LICENSE -f -q -i .gitignore",
-    "lint": "npm-run-all -l -p 'lint:**'",
-    "prettier": "npm run lint:prettier -- --write",
-    "fix:js": "npm run lint:script -- --fix",
-    "fix": "npm-run-all -p 'fix:**' -l prettier",
-    "pretest": "npm run lint",
-    "test:only": "jest --runInBand",
-    "test:coverage": "jest --coverage --runInBand",
-    "test": "npm run test:coverage",
-    "release": "standard-version"
-  }
+	"name": "imagemin-webpack",
+	"version": "5.1.0",
+	"description": "Webpack loader and plugin to optimize (compress) images using imagemin",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/itgalaxy/imagemin-webpack.git"
+	},
+	"homepage": "https://github.com/itgalaxy/imagemin-webpack",
+	"keywords": [
+		"webpack",
+		"loader",
+		"plugin",
+		"imagemin",
+		"images",
+		"minify",
+		"compress",
+		"optimize"
+	],
+	"author": "Itgalaxy <development@itgalaxy.company>",
+	"bugs": {
+		"url": "https://github.com/itgalaxy/imagemin-webpack/issues"
+	},
+	"license": "MIT",
+	"main": "index.js",
+	"files": [
+		"src"
+	],
+	"engines": {
+		"node": ">= 8.9.0"
+	},
+	"dependencies": {
+		"cacache": "^13.0.1",
+		"deepmerge": "^4.2.2",
+		"find-cache-dir": "^3.1.0",
+		"imagemin": "^7.0.1",
+		"loader-utils": "^1.2.3",
+		"p-limit": "^2.2.1",
+		"serialize-javascript": "^4.0.0",
+		"webpack-sources": "^1.4.3"
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.7.5",
+		"@babel/core": "^7.7.5",
+		"@babel/preset-env": "^7.7.6",
+		"babel-eslint": "^10.0.3",
+		"babel-jest": "^24.9.0",
+		"css-loader": "^3.3.0",
+		"del": "^5.1.0",
+		"eslint": "^6.7.2",
+		"eslint-plugin-ava": "^9.0.0",
+		"eslint-plugin-html": "^6.0.0",
+		"eslint-plugin-import": "^2.19.1",
+		"eslint-plugin-itgalaxy": "^117.0.0",
+		"eslint-plugin-jest": "^23.1.1",
+		"eslint-plugin-jsx-a11y": "^6.2.3",
+		"eslint-plugin-lodash": "^6.0.0",
+		"eslint-plugin-markdown": "^1.0.1",
+		"eslint-plugin-node": "^10.0.0",
+		"eslint-plugin-promise": "^4.2.1",
+		"eslint-plugin-react": "^7.17.0",
+		"eslint-plugin-unicorn": "^14.0.1",
+		"file-loader": "^5.0.2",
+		"husky": "^4.2.5",
+		"imagemin-gifsicle": "^6.0.1",
+		"imagemin-mozjpeg": "^8.0.0",
+		"imagemin-pngquant": "^8.0.0",
+		"imagemin-svgo": "^7.0.0",
+		"jest": "^24.9.0",
+		"lint-staged": "^9.5.0",
+		"lodash.defaultsdeep": "^4.6.1",
+		"mini-css-extract-plugin": "^0.8.0",
+		"npm-run-all": "^4.1.5",
+		"pify": "^4.0.1",
+		"prettier": "^1.19.1",
+		"remark-cli": "^7.0.1",
+		"remark-preset-lint-itgalaxy": "^15.0.0",
+		"standard-version": "^7.0.1",
+		"tempy": "^0.3.0",
+		"url-loader": "^3.0.0",
+		"webpack": "^4.41.2"
+	},
+	"peerDependencies": {
+		"webpack": "^4.44.1"
+	},
+	"scripts": {
+		"lint:prettier": "prettier '{**/*,*}.{js,cjs,mjs,jsx,json,md,yml,yaml}' --list-different --ignore-path .gitignore",
+		"lint:js": "eslint . --cache --report-unused-disable-directives --ignore-path .gitignore --ext '.js,.cjs,.mjs,.jsx,.md'",
+		"lint:md": "remark . LICENSE -f -q -i .gitignore",
+		"lint": "npm-run-all -l -p 'lint:**'",
+		"prettier": "npm run lint:prettier -- --write",
+		"fix:js": "npm run lint:script -- --fix",
+		"fix": "npm-run-all -p 'fix:**' -l prettier",
+		"pretest": "npm run lint",
+		"test:only": "jest --runInBand",
+		"test:coverage": "jest --coverage --runInBand",
+		"test": "npm run test:coverage",
+		"release": "standard-version"
+	}
 }
