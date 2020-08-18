@@ -1,10 +1,12 @@
 # imagemin-webpack
 
-[![NPM version](https://img.shields.io/npm/v/imagemin-webpack.svg)](https://www.npmjs.org/package/imagemin-webpack)
-[![Travis Build Status](https://img.shields.io/travis/itgalaxy/imagemin-webpack/master.svg?label=build)](https://travis-ci.org/itgalaxy/imagemin-webpack)
-[![dependencies Status](https://david-dm.org/itgalaxy/imagemin-webpack/status.svg)](https://david-dm.org/itgalaxy/imagemin-webpack)
-[![devDependencies Status](https://david-dm.org/itgalaxy/imagemin-webpack/dev-status.svg)](https://david-dm.org/itgalaxy/imagemin-webpack?type=dev)
-[![peerDependencies Status](https://david-dm.org/itgalaxy/imagemin-webpack/peer-status.svg)](https://david-dm.org/itgalaxy/imagemin-webpack?type=peer)
+[![npm][npm]][npm-url]
+[![node][node]][node-url]
+[![deps][deps]][deps-url]
+[![tests][tests]][tests-url]
+[![coverage][cover]][cover-url]
+[![chat][chat]][chat-url]
+[![size][size]][size-url]
 
 <!--lint disable no-html-->
 
@@ -788,3 +790,18 @@ Feel free to push your code if you agree with publishing under the MIT license.
 ## License
 
 [MIT](./LICENSE)
+
+[npm]: https://img.shields.io/npm/v/imagemin-webpack.svg
+[npm-url]: https://npmjs.com/package/imagemin-webpack
+[node]: https://img.shields.io/node/v/imagemin-webpack.svg
+[node-url]: https://nodejs.org
+[deps]: https://david-dm.org/itgalaxy/imagemin-webpack.svg
+[deps-url]: https://david-dm.org/itgalaxy/imagemin-webpack
+[tests]: https://github.com/itgalaxy/imagemin-webpack/workflows/imagemin-webpack/badge.svg
+[tests-url]: https://github.com/itgalaxy/imagemin-webpack/actions
+[cover]: https://codecov.io/gh/itgalaxy/imagemin-webpack/branch/master/graph/badge.svg
+[cover-url]: https://codecov.io/gh/itgalaxy/imagemin-webpack
+[chat]: https://badges.gitter.im/webpack/webpack.svg
+[chat-url]: https://gitter.im/webpack/webpack
+[size]: https://packagephobia.now.sh/badge?p=imagemin-webpack
+[size-url]: https://packagephobia.now.sh/result?p=imagemin-webpack
