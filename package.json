@@ -36,7 +36,7 @@
     "imagemin": "^7.0.1",
     "loader-utils": "^1.2.3",
     "p-limit": "^2.2.1",
-    "serialize-javascript": "^2.1.2",
+    "serialize-javascript": "^3.1.0",
     "webpack-sources": "^1.4.3"
   },
   "devDependencies": {
