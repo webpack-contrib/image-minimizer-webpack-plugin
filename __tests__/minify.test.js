@@ -222,7 +222,9 @@ describe("minify", () => {
     expect(result).toHaveLength(1);
     expect(result[0].warnings).toHaveLength(1);
     expect(result[0].errors).toHaveLength(0);
-    expect([...result[0].warnings][0].message).toMatch(/Corrupt JPEG data/);
+    expect([...result[0].warnings][0].message).toMatch(
+      /(Corrupt JPEG data|Command failed with EPIPE)/
+    );
     expect(result[0].output.equals(input)).toBe(true);
   });
 
@@ -237,7 +239,9 @@ describe("minify", () => {
     expect(result).toHaveLength(1);
     expect(result[0].warnings).toHaveLength(1);
     expect(result[0].errors).toHaveLength(0);
-    expect([...result[0].warnings][0].message).toMatch(/Corrupt JPEG data/);
+    expect([...result[0].warnings][0].message).toMatch(
+      /(Corrupt JPEG data|Command failed with EPIPE)/
+    );
     expect(result[0].output.equals(input)).toBe(true);
   });
 
