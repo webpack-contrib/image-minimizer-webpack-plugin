@@ -17,12 +17,12 @@ class ImageminPlugin {
       exclude,
       bail = null,
       imageminOptions = {
-        plugins: []
+        plugins: [],
       },
       loader = true,
       manifest,
       maxConcurrency,
-      name = "[hash].[ext]"
+      name = "[hash].[ext]",
     } = options;
 
     this.options = {
@@ -36,7 +36,7 @@ class ImageminPlugin {
       manifest,
       maxConcurrency,
       name,
-      test
+      test,
     };
   }
 
@@ -50,7 +50,7 @@ class ImageminPlugin {
     const moduleAssets = new Set();
 
     // Collect assets from modules
-    compiler.hooks.compilation.tap(plugin, compilation => {
+    compiler.hooks.compilation.tap(plugin, (compilation) => {
       compilation.hooks.moduleAsset.tap(plugin, (module, file) => {
         moduleAssets.add(file);
       });
@@ -66,7 +66,7 @@ class ImageminPlugin {
           exclude,
           bail,
           imageminOptions,
-          name
+          name,
         } = this.options;
 
         const loader = {
@@ -78,8 +78,8 @@ class ImageminPlugin {
             cache,
             filter,
             imageminOptions,
-            name
-          }
+            name,
+          },
         };
 
         if (include) {
@@ -105,10 +105,10 @@ class ImageminPlugin {
         imageminOptions,
         maxConcurrency,
         manifest,
-        name
+        name,
       } = this.options;
 
-      Object.keys(assets).forEach(file => {
+      Object.keys(assets).forEach((file) => {
         if (!ModuleFilenameHelpers.matchObject(this.options, file)) {
           return;
         }
@@ -122,7 +122,7 @@ class ImageminPlugin {
 
         assetsForMinify.push({
           input: asset.source(),
-          filePath: path.join(context, file)
+          filePath: path.join(context, file),
         });
       });
 
@@ -137,23 +137,23 @@ class ImageminPlugin {
             filter,
             cache,
             imageminOptions,
-            maxConcurrency
+            maxConcurrency,
           })
         )
-        .then(results => {
-          results.forEach(result => {
+        .then((results) => {
+          results.forEach((result) => {
             const source = result.output
               ? new RawSource(result.output)
               : new RawSource(result.input);
 
             if (result.warnings && result.warnings.length > 0) {
-              result.warnings.forEach(warning => {
+              result.warnings.forEach((warning) => {
                 compilation.warnings.push(warning);
               });
             }
 
             if (result.errors && result.errors.length > 0) {
-              result.errors.forEach(warning => {
+              result.errors.forEach((warning) => {
                 compilation.errors.push(warning);
               });
             }
@@ -193,7 +193,7 @@ class ImageminPlugin {
         });
     };
 
-    compiler.hooks.emit.tapPromise(plugin, compilation =>
+    compiler.hooks.emit.tapPromise(plugin, (compilation) =>
       optimizeAssetsFn(compilation, compilation.assets)
     );
   }

@@ -1,5 +1,5 @@
 "use strict";
 
 module.exports = {
-  plugins: ["remark-preset-lint-itgalaxy"]
+  plugins: ["remark-preset-lint-itgalaxy"],
 };

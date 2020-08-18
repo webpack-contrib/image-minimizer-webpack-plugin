@@ -24,7 +24,7 @@ function normalizeConfig(imageminOptions, metaData = {}) {
   }
 
   imageminConfig.plugins = imageminConfig.plugins
-    .map(plugin => {
+    .map((plugin) => {
       const isPluginArray = Array.isArray(plugin);
 
       if (typeof plugin === "string" || isPluginArray) {
@@ -36,13 +36,13 @@ function normalizeConfig(imageminOptions, metaData = {}) {
         let requiredPluginName = `imagemin-${pluginName}`;
 
         try {
-          // eslint-disable-next-line global-require, import/no-dynamic-require
+          // eslint-disable-next-line import/no-dynamic-require, node/global-require
           requiredPlugin = require(requiredPluginName)(pluginOptions);
         } catch (ignoreError) {
           requiredPluginName = pluginName;
 
           try {
-            // eslint-disable-next-line global-require, import/no-dynamic-require
+            // eslint-disable-next-line import/no-dynamic-require, node/global-require
             requiredPlugin = require(requiredPluginName)(pluginOptions);
           } catch (ignoreError1) {
             const pluginNameForError = pluginName.startsWith("imagemin")
@@ -64,7 +64,7 @@ function normalizeConfig(imageminOptions, metaData = {}) {
         let version = "unknown";
 
         try {
-          // eslint-disable-next-line global-require, import/no-dynamic-require
+          // eslint-disable-next-line import/no-dynamic-require, node/global-require
           ({ version } = require(`${requiredPluginName}/package.json`));
         } catch (ignoreVersion) {
           // Nothing
@@ -74,8 +74,8 @@ function normalizeConfig(imageminOptions, metaData = {}) {
           {
             name: requiredPluginName,
             options: pluginOptions || {},
-            version
-          }
+            version,
+          },
         ]);
 
         return requiredPlugin;

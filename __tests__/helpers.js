@@ -23,7 +23,7 @@ function runWebpack(maybeOptions) {
 
   const configs = [];
 
-  maybeMultiCompiler.forEach(options => {
+  maybeMultiCompiler.forEach((options) => {
     const config = {
       bail: options.bail,
       context: fixturesPath,
@@ -39,33 +39,33 @@ function runWebpack(maybeOptions) {
               {
                 loader: "file-loader",
                 options: {
-                  name: options.name ? options.name : "[path][name].[ext]"
-                }
-              }
-            ]
-          }
+                  name: options.name ? options.name : "[path][name].[ext]",
+                },
+              },
+            ],
+          },
         ].concat(
           options.MCEP
             ? {
                 test: /\.css$/,
                 use: [
                   {
-                    loader: MiniCssExtractPlugin.loader
+                    loader: MiniCssExtractPlugin.loader,
                   },
-                  "css-loader"
-                ]
+                  "css-loader",
+                ],
               }
             : []
-        )
+        ),
       },
       output: {
         filename: "bundle.js",
         path:
           options.output && options.output.path
             ? options.output.path
-            : tempy.directory()
+            : tempy.directory(),
       },
-      plugins: []
+      plugins: [],
     };
 
     if (options.imageminLoader || options.imageminLoaderOptions) {
@@ -75,8 +75,8 @@ function runWebpack(maybeOptions) {
           ? options.imageminLoaderOptions
           : {
               cache: false,
-              imageminOptions: { plugins }
-            }
+              imageminOptions: { plugins },
+            },
       });
     }
 
@@ -93,15 +93,15 @@ function runWebpack(maybeOptions) {
           ? options.imageminPlugin || options.imageminPluginOptions
           : [options.imageminPlugin || options.imageminPluginOptions];
 
-      imageminPluginsOptions.forEach(imageminPluginOptions => {
+      imageminPluginsOptions.forEach((imageminPluginOptions) => {
         const imageminPlugin = new ImageminPlugin(
           typeof imageminPluginOptions === "boolean"
             ? {
                 cache: false,
                 imageminOptions: {
-                  plugins
+                  plugins,
                 },
-                name: "[path][name].[ext]"
+                name: "[path][name].[ext]",
               }
             : imageminPluginOptions
         );
@@ -125,7 +125,7 @@ function runWebpack(maybeOptions) {
           // Options similar to the same options in webpackOptions.output
           // both options are optional
           filename: "[name].css",
-          chunkFilename: "[id].css"
+          chunkFilename: "[id].css",
         })
       );
     }
@@ -157,32 +157,32 @@ function isOptimized(originalPath, compilation) {
 
   return Promise.resolve()
     .then(() => pify(fs.readFile)(pathToOriginal))
-    .then(data =>
+    .then((data) =>
       imagemin.buffer(data, {
         plugins: [
           imageminGifsicle(),
           imageminMozjpeg(),
           imageminPngquant(),
-          imageminSvgo()
-        ]
+          imageminSvgo(),
+        ],
       })
     )
-    .then(optimizedBuffer =>
+    .then((optimizedBuffer) =>
       Promise.resolve()
         .then(() => pify(fs.readFile)(pathToEmitted))
-        .then(emmitedBuffer => optimizedBuffer.equals(emmitedBuffer))
+        .then((emmitedBuffer) => optimizedBuffer.equals(emmitedBuffer))
     );
 }
 
 function hasLoader(id, modules) {
-  return modules.some(module => {
+  return modules.some((module) => {
     if (!module.id.endsWith(id)) {
       return false;
     }
 
     const { loaders } = module;
 
-    return loaders.find(loader => loader.loader === ImageminPlugin.loader);
+    return loaders.find((loader) => loader.loader === ImageminPlugin.loader);
   });
 }
 

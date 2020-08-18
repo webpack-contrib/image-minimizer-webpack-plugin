@@ -8,7 +8,7 @@ export default class EmitWepbackPlugin {
     this.options = Object.assign(
       {},
       {
-        fileNames: ["plugin-test.jpg"]
+        fileNames: ["plugin-test.jpg"],
       },
       options
     );
@@ -17,26 +17,22 @@ export default class EmitWepbackPlugin {
   apply(compiler) {
     const plugin = { name: "EmitPlugin" };
 
-    // eslint-disable-next-line unicorn/consistent-function-scoping
     const emitFn = (compilation, callback) => {
       const { fileNames } = this.options;
 
       return Promise.all(
-        fileNames.map(fileName => {
+        fileNames.map((fileName) => {
           const filePath = path.join(__dirname, fileName);
 
           return Promise.resolve()
             .then(() => pify(fs.readFile)(filePath))
-            .then(data => {
+            .then((data) => {
               compilation.assets[fileName] = new RawSource(data);
 
               return data;
             });
         })
-      ).then(
-        // eslint-disable-next-line promise/no-callback-in-promise
-        () => callback()
-      );
+      ).then(() => callback());
     };
 
     if (compiler.hooks) {

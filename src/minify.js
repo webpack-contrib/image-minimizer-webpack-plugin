@@ -32,7 +32,7 @@ function minify(tasks = [], options = {}) {
           : options.cache;
 
       try {
-        // eslint-disable-next-line global-require
+        // eslint-disable-next-line node/global-require
         imageminVersion = require("imagemin/package.json").version;
       } catch (ignoreError) {
         /* istanbul ignore next */
@@ -41,7 +41,7 @@ function minify(tasks = [], options = {}) {
       }
 
       try {
-        // eslint-disable-next-line global-require
+        // eslint-disable-next-line node/global-require
         packageVersion = require("../package.json").version;
       } catch (ignoreError) {
         /* istanbul ignore next */
@@ -51,7 +51,7 @@ function minify(tasks = [], options = {}) {
     }
 
     return Promise.all(
-      tasks.map(task =>
+      tasks.map((task) =>
         limit(() => {
           const { input, filePath } = task;
           const result = {
@@ -59,7 +59,7 @@ function minify(tasks = [], options = {}) {
             // Return original source if something wrong
             output: input,
             warnings: [],
-            errors: []
+            errors: [],
           };
 
           if (filePath) {
@@ -87,7 +87,7 @@ function minify(tasks = [], options = {}) {
 
               return Promise.resolve()
                 .then(() => getConfigForFile(result.filePath, options, result))
-                .then(imageminOptions => {
+                .then((imageminOptions) => {
                   let cacheKey = null;
 
                   if (options.cache) {
@@ -98,7 +98,7 @@ function minify(tasks = [], options = {}) {
                         .digest("hex"),
                       imagemin: imageminVersion,
                       "imagemin-options": imageminOptions,
-                      "imagemin-webpack": packageVersion
+                      "imagemin-webpack": packageVersion,
                     });
                   }
 
@@ -112,7 +112,7 @@ function minify(tasks = [], options = {}) {
                             runImagemin(
                               result.input,
                               imageminOptions
-                            ).then(optimizedSource =>
+                            ).then((optimizedSource) =>
                               cacache
                                 .put(cacheDir, cacheKey, optimizedSource)
                                 .then(() => optimizedSource)
@@ -123,14 +123,14 @@ function minify(tasks = [], options = {}) {
                       // If `cache` disable, we just run `imagemin`.
                       return runImagemin(result.input, imageminOptions);
                     })
-                    .then(optimizedSource => {
+                    .then((optimizedSource) => {
                       result.output = optimizedSource;
 
                       return result;
                     });
                 });
             })
-            .catch(error => {
+            .catch((error) => {
               if (options.bail) {
                 result.errors.push(error);
               } else {
