@@ -35,9 +35,9 @@ matrix:
     - node_js: "12"
       script: npm run test:coverage
       env: CI=tests 12
-    - node_js: "13"
+    - node_js: "14"
       script: npm run test:coverage
-      env: CI=tests 13
+      env: CI=tests 14
     - node_js: "10"
       script: npm run test:coverage
       env: CI=tests WEBPACK_VERSION=next 10

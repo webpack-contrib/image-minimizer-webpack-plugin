@@ -4,7 +4,7 @@ const loaderUtils = require("loader-utils");
 
 const minify = require("./minify");
 
-module.exports = function(content) {
+module.exports = function (content) {
   const options = loaderUtils.getOptions(this) || {};
   const callback = this.async();
   let { bail } = options;
@@ -27,31 +27,29 @@ module.exports = function(content) {
         bail,
         cache: options.cache,
         imageminOptions: options.imageminOptions,
-        filter: options.filter
+        filter: options.filter,
       })
     )
-    .then(results => {
+    .then((results) => {
       const [result] = results;
 
       if (result.warnings && result.warnings.length > 0) {
-        result.warnings.forEach(warning => {
+        result.warnings.forEach((warning) => {
           this.emitWarning(warning);
         });
       }
 
       if (result.errors && result.errors.length > 0) {
-        result.errors.forEach(warning => {
+        result.errors.forEach((warning) => {
           this.emitError(warning);
         });
       }
 
       const data = result.output ? result.output : result.input;
 
-      // eslint-disable-next-line promise/no-callback-in-promise
       return callback(null, data);
     })
-    // eslint-disable-next-line promise/no-callback-in-promise
-    .catch(error => callback(error));
+    .catch((error) => callback(error));
 };
 
 module.exports.raw = true;

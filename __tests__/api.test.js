@@ -35,7 +35,7 @@ describe("api", () => {
       ).toMatchSnapshot();
       expect(
         ImageminPlugin.normalizeConfig({
-          plugins: [["mozjpeg", { quality: 0 }]]
+          plugins: [["mozjpeg", { quality: 0 }]],
         })
       ).toMatchSnapshot();
     });

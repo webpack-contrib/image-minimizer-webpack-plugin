@@ -34,7 +34,7 @@ Object {
       Object {
         "name": "imagemin-mozjpeg",
         "options": Object {},
-        "version": "8.0.0",
+        "version": "9.0.0",
       },
     ],
   ],
@@ -51,7 +51,7 @@ Object {
       Object {
         "name": "imagemin-mozjpeg",
         "options": Object {},
-        "version": "8.0.0",
+        "version": "9.0.0",
       },
     ],
   ],
@@ -68,7 +68,7 @@ Object {
       Object {
         "name": "imagemin-mozjpeg",
         "options": Object {},
-        "version": "8.0.0",
+        "version": "9.0.0",
       },
     ],
   ],
@@ -87,7 +87,7 @@ Object {
         "options": Object {
           "quality": 0,
         },
-        "version": "8.0.0",
+        "version": "9.0.0",
       },
     ],
   ],

@@ -88,11 +88,11 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader" // Or `url-loader` or your other loader
-          }
-        ]
-      }
-    ]
+            loader: "file-loader", // Or `url-loader` or your other loader
+          },
+        ],
+      },
+    ],
   },
   plugins: [
     // Make sure that the plugin is after any plugins that add images, example `CopyWebpackPlugin`
@@ -113,15 +113,15 @@ module.exports = {
             {
               plugins: [
                 {
-                  removeViewBox: false
-                }
-              ]
-            }
-          ]
-        ]
-      }
-    })
-  ]
+                  removeViewBox: false,
+                },
+              ],
+            },
+          ],
+        ],
+      },
+    }),
+  ],
 };
 ```
 
@@ -150,7 +150,7 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader" // Or `url-loader` or your other loader
+            loader: "file-loader", // Or `url-loader` or your other loader
           },
           {
             loader: ImageminPlugin.loader,
@@ -158,14 +158,14 @@ module.exports = {
               bail: false, // Ignore errors on corrupted images
               cache: true,
               imageminOptions: {
-                plugins: ["gifsicle"]
-              }
-            }
-          }
-        ]
-      }
-    ]
-  }
+                plugins: ["gifsicle"],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
 };
 ```
 
@@ -186,11 +186,11 @@ module.exports = {
         loader: "file-loader",
         options: {
           emitFile: true, // Don't forget emit images
-          name: "[path][name].[ext]"
+          name: "[path][name].[ext]",
         },
-        test: /\.(jpe?g|png|gif|svg)$/i
-      }
-    ]
+        test: /\.(jpe?g|png|gif|svg)$/i,
+      },
+    ],
   },
   plugins: [
     // Make sure that the plugin placed after any plugins that added images
@@ -198,12 +198,12 @@ module.exports = {
       bail: false, // Ignore errors on corrupted images
       cache: true,
       imageminOptions: {
-        plugins: ["gifsicle"]
+        plugins: ["gifsicle"],
       },
       // Disable `loader`
-      loader: false
-    })
-  ]
+      loader: false,
+    }),
+  ],
 };
 ```
 
@@ -241,9 +241,9 @@ const ImageminPlugin = require("imagemin-webpack");
 module.exports = {
   plugins: [
     new ImageminPlugin({
-      test: /\.(jpe?g|png|gif|svg)$/i
-    })
-  ]
+      test: /\.(jpe?g|png|gif|svg)$/i,
+    }),
+  ],
 };
 ```
 
@@ -259,9 +259,9 @@ const ImageminPlugin = require("imagemin-webpack");
 module.exports = {
   plugins: [
     new ImageminPlugin({
-      include: /\/includes/
-    })
-  ]
+      include: /\/includes/,
+    }),
+  ],
 };
 ```
 
@@ -277,9 +277,9 @@ const ImageminPlugin = require("imagemin-webpack");
 module.exports = {
   plugins: [
     new ImageminPlugin({
-      exclude: /\/excludes/
-    })
-  ]
+      exclude: /\/excludes/,
+    }),
+  ],
 };
 ```
 
@@ -305,9 +305,9 @@ module.exports = {
         }
 
         return true;
-      }
-    })
-  ]
+      },
+    }),
+  ],
 };
 ```
 
@@ -329,9 +329,9 @@ const ImageminPlugin = require("imagemin-webpack");
 module.exports = {
   plugins: [
     new ImageminPlugin({
-      cache: true
-    })
-  ]
+      cache: true,
+    }),
+  ],
 };
 ```
 
@@ -347,9 +347,9 @@ const ImageminPlugin = require("imagemin-webpack");
 module.exports = {
   plugins: [
     new ImageminPlugin({
-      cache: "path/to/cache"
-    })
-  ]
+      cache: "path/to/cache",
+    }),
+  ],
 };
 ```
 
@@ -365,9 +365,9 @@ const ImageminPlugin = require("imagemin-webpack");
 module.exports = {
   plugins: [
     new ImageminPlugin({
-      bail: true
-    })
-  ]
+      bail: true,
+    }),
+  ],
 };
 ```
 
@@ -398,20 +398,20 @@ module.exports = {
             {
               plugins: [
                 {
-                  removeViewBox: false
-                }
-              ]
-            }
+                  removeViewBox: false,
+                },
+              ],
+            },
           ],
           [
             // Custom package name
             "nonstandard-imagemin-package-name",
-            { myOptions: true }
-          ]
-        ]
-      }
-    })
-  ]
+            { myOptions: true },
+          ],
+        ],
+      },
+    }),
+  ],
 };
 ```
 
@@ -427,9 +427,9 @@ const ImageminPlugin = require("imagemin-webpack");
 module.exports = {
   plugins: [
     new ImageminPlugin({
-      maxConcurrency: 3
-    })
-  ]
+      maxConcurrency: 3,
+    }),
+  ],
 };
 ```
 
@@ -445,9 +445,9 @@ const ImageminPlugin = require("imagemin-webpack");
 module.exports = {
   plugins: [
     new ImageminPlugin({
-      name: "[hash]-compressed.[ext]"
-    })
-  ]
+      name: "[hash]-compressed.[ext]",
+    }),
+  ],
 };
 ```
 
@@ -468,13 +468,13 @@ const manifest = {};
 module.exports = {
   plugins: [
     new ImageminPlugin({
-      manifest
+      manifest,
     }),
     new ManifestPlugin({
       // Contain compressed images
-      manifest
-    })
-  ]
+      manifest,
+    }),
+  ],
 };
 ```
 
@@ -506,7 +506,7 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader" // Or `url-loader` or your other loader
+            loader: "file-loader", // Or `url-loader` or your other loader
           },
           {
             loader: ImageminPlugin.loader,
@@ -522,14 +522,14 @@ module.exports = {
                 return true;
               },
               imageminOptions: {
-                plugins: ["gifsicle"]
-              }
-            }
-          }
-        ]
-      }
-    ]
-  }
+                plugins: ["gifsicle"],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
 };
 ```
 
@@ -554,21 +554,21 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader" // Or `url-loader` or your other loader
+            loader: "file-loader", // Or `url-loader` or your other loader
           },
           {
             loader: ImageminPlugin.loader,
             options: {
               cache: true,
               imageminOptions: {
-                plugins: ["gifsicle"]
-              }
-            }
-          }
-        ]
-      }
-    ]
-  }
+                plugins: ["gifsicle"],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
 };
 ```
 
@@ -589,21 +589,21 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader" // Or `url-loader` or your other loader
+            loader: "file-loader", // Or `url-loader` or your other loader
           },
           {
             loader: ImageminPlugin.loader,
             options: {
               cache: "path/to/cache",
               imageminOptions: {
-                plugins: ["gifsicle"]
-              }
-            }
-          }
-        ]
-      }
-    ]
-  }
+                plugins: ["gifsicle"],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
 };
 ```
 
@@ -624,21 +624,21 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader" // Or `url-loader` or your other loader
+            loader: "file-loader", // Or `url-loader` or your other loader
           },
           {
             loader: ImageminPlugin.loader,
             options: {
               bail: true,
               imageminOptions: {
-                plugins: ["gifsicle"]
-              }
-            }
-          }
-        ]
-      }
-    ]
-  }
+                plugins: ["gifsicle"],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
 };
 ```
 
@@ -661,7 +661,7 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader" // Or `url-loader` or your other loader
+            loader: "file-loader", // Or `url-loader` or your other loader
           },
           {
             loader: ImageminPlugin.loader,
@@ -669,15 +669,15 @@ module.exports = {
               bail: true,
               imageminOptions: {
                 plugins: [
-                  ["gifsicle", { interlaced: true, optimizationLevel: 3 }]
-                ]
-              }
-            }
-          }
-        ]
-      }
-    ]
-  }
+                  ["gifsicle", { interlaced: true, optimizationLevel: 3 }],
+                ],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
 };
 ```
 
@@ -699,7 +699,7 @@ module.exports = {
   minimizer: [
     new ImageminPlugin({
       // Only apply this one to files equal to or over 8192 bytes
-      filter: source => {
+      filter: (source) => {
         if (source.byteLength >= 8192) {
           return true;
         }
@@ -707,12 +707,12 @@ module.exports = {
         return false;
       },
       imageminOptions: {
-        plugins: [["jpegtran", { progressive: true }]]
-      }
+        plugins: [["jpegtran", { progressive: true }]],
+      },
     }),
     new ImageminPlugin({
       // Only apply this one to files under 8192
-      filter: source => {
+      filter: (source) => {
         if (source.byteLength < 8192) {
           return true;
         }
@@ -720,10 +720,10 @@ module.exports = {
         return false;
       },
       imageminOptions: {
-        plugins: [["jpegtran", { progressive: false }]]
-      }
-    })
-  ]
+        plugins: [["jpegtran", { progressive: false }]],
+      },
+    }),
+  ],
 };
 ```
 
@@ -742,20 +742,20 @@ const imageminConfig = normalizeConfig({
     [
       "pngquant",
       {
-        quality: [0.6, 0.8]
-      }
-    ]
-  ]
+        quality: [0.6, 0.8],
+      },
+    ],
+  ],
 });
 
-/* 
+/*
   console.log(imageminConfig);
   =>
   {
     plugins: [Function, Function],
-    pluginsMeta: [ 
-      { name: "imagemin-jpegtran", version: "x.x.x", options: {} }, 
-      { name: "imagemin-pngquant", version: "x.x.x", options: { quality: [0.6, 0.8] } 
+    pluginsMeta: [
+      { name: "imagemin-jpegtran", version: "x.x.x", options: {} },
+      { name: "imagemin-pngquant", version: "x.x.x", options: { quality: [0.6, 0.8] }
     ]
   }
 */
@@ -763,7 +763,7 @@ const imageminConfig = normalizeConfig({
 (async () => {
   const files = await imagemin(["images/*.{jpg,png}"], {
     destination: "build/images",
-    plugins: imageminConfig.plugins
+    plugins: imageminConfig.plugins,
   });
 
   console.log(files);

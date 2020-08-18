@@ -33,7 +33,7 @@ describe("loader", () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "loader-other-imports.js"),
       imageminLoader: true,
-      test: /\.(jpe?g|png|gif|svg|css|txt)$/i
+      test: /\.(jpe?g|png|gif|svg|css|txt)$/i,
     });
     const { compilation } = stats;
     const { warnings, errors, assets } = compilation;
@@ -81,7 +81,7 @@ describe("loader", () => {
     await cacache.rm.all(cacheDir);
 
     const options = {
-      imageminLoaderOptions: { cache: true, imageminOptions: { plugins } }
+      imageminLoaderOptions: { cache: true, imageminOptions: { plugins } },
     };
     const stats = await webpack(options);
     const { compilation } = stats;
@@ -115,7 +115,7 @@ describe("loader", () => {
     const { compilation: secondCompilation } = secondStats;
     const {
       warnings: secondWarnings,
-      errors: secondErrors
+      errors: secondErrors,
     } = secondCompilation;
 
     expect(secondWarnings).toHaveLength(0);
@@ -150,13 +150,13 @@ describe("loader", () => {
 
     const cacheDir =
       findCacheDir({
-        name: "imagemin-webpack-loader-custom-cache-location-for-loader"
+        name: "imagemin-webpack-loader-custom-cache-location-for-loader",
       }) || os.tmpdir();
 
     await cacache.rm.all(cacheDir);
 
     const options = {
-      imageminLoaderOptions: { cache: cacheDir, imageminOptions: { plugins } }
+      imageminLoaderOptions: { cache: cacheDir, imageminOptions: { plugins } },
     };
     const stats = await webpack(options);
     const { compilation } = stats;
@@ -190,7 +190,7 @@ describe("loader", () => {
     const { compilation: secondCompilation } = secondStats;
     const {
       warnings: secondWarnings,
-      errors: secondErrors
+      errors: secondErrors,
     } = secondCompilation;
 
     expect(secondWarnings).toHaveLength(0);
@@ -224,7 +224,7 @@ describe("loader", () => {
     const spyPut = jest.spyOn(cacache, "put");
 
     const stats = await webpack({
-      imageminLoaderOptions: { cache: false, imageminOptions: { plugins } }
+      imageminLoaderOptions: { cache: false, imageminOptions: { plugins } },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -260,7 +260,7 @@ describe("loader", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(4);
 
-    stats.compilation.errors.forEach(error => {
+    stats.compilation.errors.forEach((error) => {
       expect(error.message).toMatch(/No plugins found for `imagemin`/);
     });
   });
@@ -273,7 +273,7 @@ describe("loader", () => {
     expect(warnings).toHaveLength(4);
     expect(errors).toHaveLength(0);
 
-    stats.compilation.warnings.forEach(warning => {
+    stats.compilation.warnings.forEach((warning) => {
       expect(warning.message).toMatch(/No plugins found for `imagemin`/);
     });
   });
@@ -281,7 +281,7 @@ describe("loader", () => {
   it("should throws error on corrupted images using `bail` option with `true` value", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "loader-corrupted.js"),
-      imageminLoaderOptions: { bail: true, imageminOptions: { plugins } }
+      imageminLoaderOptions: { bail: true, imageminOptions: { plugins } },
     });
     const { compilation } = stats;
     const { assets, warnings, errors } = compilation;
@@ -299,7 +299,7 @@ describe("loader", () => {
   it("should throws warning on corrupted images using `bail` option with `false` value", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "loader-corrupted.js"),
-      imageminLoaderOptions: { bail: false, imageminOptions: { plugins } }
+      imageminLoaderOptions: { bail: false, imageminOptions: { plugins } },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -316,7 +316,7 @@ describe("loader", () => {
   it("should throws error on corrupted images using `webpack.bail` option with `true` value", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "loader-corrupted.js"),
-      imageminLoaderOptions: { bail: true, imageminOptions: { plugins } }
+      imageminLoaderOptions: { bail: true, imageminOptions: { plugins } },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -333,7 +333,7 @@ describe("loader", () => {
   it("should throws warning on corrupted images using `webpack.bail` option with `false` value", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "loader-corrupted.js"),
-      imageminLoaderOptions: { bail: false, imageminOptions: { plugins } }
+      imageminLoaderOptions: { bail: false, imageminOptions: { plugins } },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -360,8 +360,8 @@ describe("loader", () => {
 
           return true;
         },
-        imageminOptions: { plugins }
-      }
+        imageminOptions: { plugins },
+      },
     });
 
     const { compilation } = stats;

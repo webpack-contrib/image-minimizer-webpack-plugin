@@ -7,7 +7,7 @@ import {
   isOptimized,
   hasLoader,
   plugins,
-  webpack
+  webpack,
 } from "./helpers.js";
 
 const IS_WEBPACK_VERSION_NEXT = process.env.WEBPACK_VERSION === "next";
@@ -47,7 +47,7 @@ describe("imagemin plugin", () => {
     const stats = await webpack({
       asMinimizer: true,
       emitPlugin: true,
-      imageminPlugin: true
+      imageminPlugin: true,
     });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
@@ -82,17 +82,17 @@ describe("imagemin plugin", () => {
       {
         entry: path.join(fixturesPath, "multiple-entry.js"),
         emitPluginOptions: {
-          fileNames: ["multiple-plugin-test-1.svg"]
+          fileNames: ["multiple-plugin-test-1.svg"],
         },
-        imageminPlugin: true
+        imageminPlugin: true,
       },
       {
         entry: path.join(fixturesPath, "multiple-entry-2.js"),
         emitPluginOptions: {
-          fileNames: ["multiple-plugin-test-2.svg"]
+          fileNames: ["multiple-plugin-test-2.svg"],
         },
-        imageminPlugin: true
-      }
+        imageminPlugin: true,
+      },
     ]);
 
     expect(multiStats.stats).toHaveLength(2);
@@ -120,7 +120,7 @@ describe("imagemin plugin", () => {
     const {
       warnings: secondWarnings,
       errors: secondErrors,
-      modules: secondModules
+      modules: secondModules,
     } = multiStats.stats[1].compilation;
 
     expect(secondWarnings).toHaveLength(0);
@@ -153,8 +153,8 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         cache: true,
         imageminOptions: { plugins },
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     };
     const stats = await webpack(options);
     const { compilation } = stats;
@@ -191,7 +191,7 @@ describe("imagemin plugin", () => {
     const { compilation: secondCompilation } = secondStats;
     const {
       warnings: secondWarnings,
-      errors: secondErrors
+      errors: secondErrors,
     } = secondStats.compilation;
 
     expect(secondWarnings).toHaveLength(0);
@@ -226,7 +226,7 @@ describe("imagemin plugin", () => {
 
     const cacheDir =
       findCacheDir({
-        name: "imagemin-webpack-plugin-cache-location-for-plugin"
+        name: "imagemin-webpack-plugin-cache-location-for-plugin",
       }) || os.tmpdir();
 
     await cacache.rm.all(cacheDir);
@@ -236,8 +236,8 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         cache: cacheDir,
         imageminOptions: { plugins },
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     };
     const stats = await webpack(options);
     const { compilation } = stats;
@@ -274,7 +274,7 @@ describe("imagemin plugin", () => {
     const { compilation: secondCompilation } = secondStats;
     const {
       warnings: secondWarnings,
-      errors: secondErrors
+      errors: secondErrors,
     } = secondStats.compilation;
 
     expect(secondWarnings).toHaveLength(0);
@@ -315,8 +315,8 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         cache: false,
         imageminOptions: { plugins },
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     });
 
     const { compilation } = stats;
@@ -354,8 +354,8 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         imageminOptions: { plugins },
         loader: false,
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -383,7 +383,7 @@ describe("imagemin plugin", () => {
   it("should optimizes successfully without any assets", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "empty-entry.js"),
-      imageminPlugin: true
+      imageminPlugin: true,
     });
 
     const { warnings, errors } = stats.compilation;
@@ -399,9 +399,9 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         name: "[name].[ext]",
         imageminOptions: {
-          plugins: []
-        }
-      }
+          plugins: [],
+        },
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -420,9 +420,9 @@ describe("imagemin plugin", () => {
       entry: path.join(fixturesPath, "single-image-loader.js"),
       imageminPluginOptions: {
         imageminOptions: {
-          plugins: []
-        }
-      }
+          plugins: [],
+        },
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -440,16 +440,16 @@ describe("imagemin plugin", () => {
   it("should optimizes images and throws error on corrupted images using `plugin.bail` option with `true` value (by plugin)", async () => {
     const stats = await webpack({
       emitPluginOptions: {
-        fileNames: ["test-corrupted.jpg", "plugin-test.png"]
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
         bail: true,
         imageminOptions: {
-          plugins
+          plugins,
         },
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -469,10 +469,10 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         bail: true,
         imageminOptions: {
-          plugins
+          plugins,
         },
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -489,16 +489,16 @@ describe("imagemin plugin", () => {
   it("should optimizes images and throws warning on corrupted images using `plugin.bail` option with `false` value (by plugin)", async () => {
     const stats = await webpack({
       emitPluginOptions: {
-        fileNames: ["test-corrupted.jpg", "plugin-test.png"]
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
         bail: false,
         imageminOptions: {
-          plugins
+          plugins,
         },
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -518,10 +518,10 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         bail: false,
         imageminOptions: {
-          plugins
+          plugins,
         },
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -539,15 +539,15 @@ describe("imagemin plugin", () => {
     const stats = await webpack({
       bail: true,
       emitPluginOptions: {
-        fileNames: ["test-corrupted.jpg", "plugin-test.png"]
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
         imageminOptions: {
-          plugins
+          plugins,
         },
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -567,10 +567,10 @@ describe("imagemin plugin", () => {
       entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
         imageminOptions: {
-          plugins
+          plugins,
         },
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -588,15 +588,15 @@ describe("imagemin plugin", () => {
     const stats = await webpack({
       bail: false,
       emitPluginOptions: {
-        fileNames: ["test-corrupted.jpg", "plugin-test.png"]
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
         imageminOptions: {
-          plugins
+          plugins,
         },
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -616,9 +616,9 @@ describe("imagemin plugin", () => {
       entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
         imageminOptions: {
-          plugins
-        }
-      }
+          plugins,
+        },
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = stats.compilation;
@@ -639,10 +639,10 @@ describe("imagemin plugin", () => {
       entry: path.join(fixturesPath, "single-image-loader.js"),
       imageminPluginOptions: {
         imageminOptions: {
-          plugins
+          plugins,
         },
-        manifest
-      }
+        manifest,
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -651,7 +651,7 @@ describe("imagemin plugin", () => {
     expect(errors).toHaveLength(0);
 
     expect(manifest).toEqual({
-      "plugin-test.jpg": "463cb29d806bd713487cfbcc6fccc982.jpg"
+      "plugin-test.jpg": "f48748954547acf94595fa0b22e03be5.jpg",
     });
   });
 
@@ -662,11 +662,11 @@ describe("imagemin plugin", () => {
       entry: path.join(fixturesPath, "loader.js"),
       imageminPluginOptions: {
         imageminOptions: {
-          plugins
+          plugins,
         },
         loader: false,
-        manifest
-      }
+        manifest,
+      },
     });
     const { compilation } = stats;
     const { assets, warnings, errors } = compilation;
@@ -674,32 +674,32 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
     expect(
-      Object.keys(assets).every(element =>
+      Object.keys(assets).every((element) =>
         [
           "loader-test.gif",
           "loader-test.jpg",
           "loader-test.png",
           "loader-test.svg",
           "bundle.js",
-          "463cb29d806bd713487cfbcc6fccc982.jpg"
+          "f48748954547acf94595fa0b22e03be5.jpg",
         ].includes(element)
       )
     ).toBe(true);
     expect(manifest).toEqual({
-      "plugin-test.jpg": "463cb29d806bd713487cfbcc6fccc982.jpg"
+      "plugin-test.jpg": "f48748954547acf94595fa0b22e03be5.jpg",
     });
   });
 
   it("should optimizes all images (loader + plugin) and interpolate `[name].[ext]` name", async () => {
     const stats = await webpack({
       emitPluginOptions: {
-        fileNames: ["plugin-test.png"]
+        fileNames: ["plugin-test.png"],
       },
       imageminPluginOptions: {
         imageminOptions: { plugins },
-        name: "[name].[ext]"
+        name: "[name].[ext]",
       },
-      name: "[name].[ext]"
+      name: "[name].[ext]",
     });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
@@ -733,13 +733,13 @@ describe("imagemin plugin", () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./nested/deep/loader.js"),
       emitPluginOptions: {
-        fileNames: ["nested/deep/plugin-test.png"]
+        fileNames: ["nested/deep/plugin-test.png"],
       },
       imageminPluginOptions: {
         imageminOptions: { plugins },
-        name: "[path][name].[ext]"
+        name: "[path][name].[ext]",
       },
-      name: "[path][name].[ext]"
+      name: "[path][name].[ext]",
     });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
@@ -773,13 +773,13 @@ describe("imagemin plugin", () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./nested/deep/loader.js"),
       emitPluginOptions: {
-        fileNames: ["nested/deep/plugin-test.png"]
+        fileNames: ["nested/deep/plugin-test.png"],
       },
       imageminPluginOptions: {
         imageminOptions: { plugins },
-        name: "dir/[path][name].sub.[ext]"
+        name: "dir/[path][name].sub.[ext]",
       },
-      name: "dir/[path][name].sub.[ext]"
+      name: "dir/[path][name].sub.[ext]",
     });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
@@ -842,10 +842,10 @@ describe("imagemin plugin", () => {
           return true;
         },
         imageminOptions: {
-          plugins
+          plugins,
         },
-        name: "[path][name].[ext]"
-      }
+        name: "[path][name].[ext]",
+      },
     });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
@@ -882,11 +882,11 @@ describe("imagemin plugin", () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "multiple-entry.js"),
       emitPluginOptions: {
-        fileNames: ["multiple-plugin-test-1.svg", "multiple-plugin-test-2.svg"]
+        fileNames: ["multiple-plugin-test-1.svg", "multiple-plugin-test-2.svg"],
       },
       imageminPluginOptions: [
         {
-          filter: source => {
+          filter: (source) => {
             if (source.byteLength > 500) {
               firstFilterCounter++;
 
@@ -896,12 +896,12 @@ describe("imagemin plugin", () => {
             return false;
           },
           imageminOptions: {
-            plugins
+            plugins,
           },
-          name: "[name].1.[ext]"
+          name: "[name].1.[ext]",
         },
         {
-          filter: source => {
+          filter: (source) => {
             if (source.byteLength < 500) {
               secondFilterCounter++;
 
@@ -911,11 +911,11 @@ describe("imagemin plugin", () => {
             return false;
           },
           imageminOptions: {
-            plugins
+            plugins,
           },
-          name: "[name].2.[ext]"
-        }
-      ]
+          name: "[name].2.[ext]",
+        },
+      ],
     });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
@@ -959,11 +959,11 @@ describe("imagemin plugin", () => {
         emitPluginOptions: {
           fileNames: [
             "multiple-plugin-test-1.svg",
-            "multiple-plugin-test-2.svg"
-          ]
+            "multiple-plugin-test-2.svg",
+          ],
         },
         imageminPluginOptions: {
-          filter: source => {
+          filter: (source) => {
             if (source.byteLength > 500) {
               firstFilterCounter++;
 
@@ -973,21 +973,21 @@ describe("imagemin plugin", () => {
             return false;
           },
           imageminOptions: {
-            plugins
+            plugins,
           },
-          name: "[name].1.[ext]"
-        }
+          name: "[name].1.[ext]",
+        },
       },
       {
         entry: path.join(fixturesPath, "multiple-entry-2.js"),
         emitPluginOptions: {
           fileNames: [
             "multiple-plugin-test-3.svg",
-            "multiple-plugin-test-4.svg"
-          ]
+            "multiple-plugin-test-4.svg",
+          ],
         },
         imageminPluginOptions: {
-          filter: source => {
+          filter: (source) => {
             if (source.byteLength < 500) {
               secondFilterCounter++;
 
@@ -997,11 +997,11 @@ describe("imagemin plugin", () => {
             return false;
           },
           imageminOptions: {
-            plugins
+            plugins,
           },
-          name: "[name].2.[ext]"
-        }
-      }
+          name: "[name].2.[ext]",
+        },
+      },
     ]);
     const [{ compilation: firstCompilation }] = multiStats.stats;
     const { warnings, errors, modules } = firstCompilation;
@@ -1036,7 +1036,7 @@ describe("imagemin plugin", () => {
     const {
       warnings: secondWarnings,
       errors: secondErrors,
-      modules: secondModules
+      modules: secondModules,
     } = secondCompilation;
 
     expect(secondWarnings).toHaveLength(0);
@@ -1070,7 +1070,7 @@ describe("imagemin plugin", () => {
         emitPlugin: true,
         imageminPlugin: true,
         entry: path.join(fixturesPath, "entry-with-css.js"),
-        MCEP: true
+        MCEP: true,
       });
       const { compilation } = stats;
       const { warnings, errors } = stats.compilation;
