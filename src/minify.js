@@ -28,14 +28,14 @@ function minify(tasks = [], options = {}) {
         ? findCacheDir({ name: "imagemin-webpack" }) || os.tmpdir()
         : options.cache;
 
-      try {
-        // eslint-disable-next-line node/global-require
-        imageminVersion = require("imagemin/package.json").version;
-      } catch (ignoreError) {
-        /* istanbul ignore next */
-        imageminVersion = "unknown";
-        // Nothing
-      }
+    try {
+      // eslint-disable-next-line node/global-require
+      imageminVersion = require("imagemin/package.json").version;
+    } catch (ignoreError) {
+      /* istanbul ignore next */
+      imageminVersion = "unknown";
+      // Nothing
+    }
 
     try {
       // eslint-disable-next-line node/global-require
