@@ -41,23 +41,32 @@ class ImageminPlugin {
   }
 
   apply(compiler) {
-    const plugin = { name: "ImageminPlugin" };
+    const pluginName = this.constructor.name;
 
     if (typeof this.options.bail !== "boolean") {
       this.options.bail = compiler.options.bail;
     }
 
+    const matchObject = ModuleFilenameHelpers.matchObject.bind(
+      // eslint-disable-next-line no-undefined
+      undefined,
+      this.options
+    );
+
     const moduleAssets = new Set();
 
     // Collect assets from modules
-    compiler.hooks.compilation.tap(plugin, (compilation) => {
-      compilation.hooks.moduleAsset.tap(plugin, (module, file) => {
-        moduleAssets.add(file);
-      });
+    compiler.hooks.compilation.tap({ name: pluginName }, (compilation) => {
+      compilation.hooks.moduleAsset.tap(
+        { name: pluginName },
+        (module, file) => {
+          moduleAssets.add(file);
+        }
+      );
     });
 
     if (this.options.loader) {
-      compiler.hooks.afterPlugins.tap(plugin, () => {
+      compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
         const {
           cache,
           filter,
@@ -94,7 +103,7 @@ class ImageminPlugin {
       });
     }
 
-    const optimizeAssetsFn = (compilation, assets) => {
+    const optimizeAssetsFn = async (compilation, assets) => {
       const { context } = compiler.options;
       const assetsForMinify = [];
       const {
@@ -109,7 +118,7 @@ class ImageminPlugin {
       } = this.options;
 
       Object.keys(assets).forEach((file) => {
-        if (!ModuleFilenameHelpers.matchObject(this.options, file)) {
+        if (!matchObject(file)) {
           return;
         }
 
@@ -130,70 +139,67 @@ class ImageminPlugin {
         return Promise.resolve();
       }
 
-      return Promise.resolve()
-        .then(() =>
-          minify(assetsForMinify, {
-            bail,
-            filter,
-            cache,
-            imageminOptions,
-            maxConcurrency,
-          })
-        )
-        .then((results) => {
-          results.forEach((result) => {
-            const source = result.output
-              ? new RawSource(result.output)
-              : new RawSource(result.input);
+      let results;
 
-            if (result.warnings && result.warnings.length > 0) {
-              result.warnings.forEach((warning) => {
-                compilation.warnings.push(warning);
-              });
-            }
-
-            if (result.errors && result.errors.length > 0) {
-              result.errors.forEach((warning) => {
-                compilation.errors.push(warning);
-              });
-            }
-
-            const originalResourcePath = path.relative(
-              context,
-              result.filePath
-            );
-
-            // Exclude:
-            // 1. Module assets (`file-loader` already interpolated asset name)
-            // 2. Filtered assets
-            if (moduleAssets.has(originalResourcePath) || result.filtered) {
-              compilation.assets[originalResourcePath] = source;
-
-              return;
-            }
-
-            const interpolatedName = loaderUtils.interpolateName(
-              { resourcePath: path.join(context, originalResourcePath) },
-              name,
-              { content: source.source(), context }
-            );
-
-            compilation.assets[interpolatedName] = source;
-
-            if (interpolatedName !== originalResourcePath) {
-              delete compilation.assets[originalResourcePath];
-            }
-
-            if (manifest && !manifest[originalResourcePath]) {
-              manifest[originalResourcePath] = interpolatedName;
-            }
-          });
-
-          return results;
+      try {
+        results = await minify(assetsForMinify, {
+          bail,
+          filter,
+          cache,
+          imageminOptions,
+          maxConcurrency,
         });
+      } catch (error) {
+        return Promise.reject(error);
+      }
+
+      results.forEach((result) => {
+        const source = new RawSource(result.output);
+
+        if (result.warnings && result.warnings.length > 0) {
+          result.warnings.forEach((warning) => {
+            compilation.warnings.push(warning);
+          });
+        }
+
+        if (result.errors && result.errors.length > 0) {
+          result.errors.forEach((warning) => {
+            compilation.errors.push(warning);
+          });
+        }
+
+        const originalResourcePath = path.relative(context, result.filePath);
+
+        // Exclude:
+        // 1. Module assets (`file-loader` already interpolated asset name)
+        // 2. Filtered assets
+        if (moduleAssets.has(originalResourcePath) || result.filtered) {
+          compilation.assets[originalResourcePath] = source;
+
+          return;
+        }
+
+        const interpolatedName = loaderUtils.interpolateName(
+          { resourcePath: path.join(context, originalResourcePath) },
+          name,
+          { content: source.source(), context }
+        );
+
+        compilation.assets[interpolatedName] = source;
+
+        if (interpolatedName !== originalResourcePath) {
+          delete compilation.assets[originalResourcePath];
+        }
+
+        if (manifest && !manifest[originalResourcePath]) {
+          manifest[originalResourcePath] = interpolatedName;
+        }
+      });
+
+      return Promise.resolve();
     };
 
-    compiler.hooks.emit.tapPromise(plugin, (compilation) =>
+    compiler.hooks.emit.tapPromise({ name: pluginName }, (compilation) =>
       optimizeAssetsFn(compilation, compilation.assets)
     );
   }
