@@ -4,52 +4,53 @@ const loaderUtils = require("loader-utils");
 
 const minify = require("./minify");
 
-module.exports = function (content) {
-  const options = loaderUtils.getOptions(this) || {};
+module.exports = async function loader(content) {
+  const options = loaderUtils.getOptions(this);
   const callback = this.async();
-  let { bail } = options;
 
-  if (typeof bail === "undefined") {
-    /* eslint-disable no-underscore-dangle */
-    bail =
-      (this._compiler &&
-        this._compiler.options &&
-        this._compiler.options.bail) ||
-      false;
-    /* eslint-enable no-underscore-dangle */
-  }
+  const bail =
+    typeof options.bail === "undefined"
+      ? // eslint-disable-next-line no-underscore-dangle
+        (this._compiler &&
+          // eslint-disable-next-line no-underscore-dangle
+          this._compiler.options &&
+          // eslint-disable-next-line no-underscore-dangle
+          this._compiler.options.bail) ||
+        false
+      : options.bail;
 
   const { resourcePath } = this;
 
-  Promise.resolve()
-    .then(() =>
-      minify([{ input: content, filePath: resourcePath }], {
-        bail,
-        cache: options.cache,
-        imageminOptions: options.imageminOptions,
-        filter: options.filter,
-      })
-    )
-    .then((results) => {
-      const [result] = results;
+  let result;
 
-      if (result.warnings && result.warnings.length > 0) {
-        result.warnings.forEach((warning) => {
-          this.emitWarning(warning);
-        });
-      }
+  try {
+    [result] = await minify([{ input: content, filePath: resourcePath }], {
+      bail,
+      cache: options.cache,
+      imageminOptions: options.imageminOptions,
+      filter: options.filter,
+    });
+  } catch (error) {
+    callback(error);
 
-      if (result.errors && result.errors.length > 0) {
-        result.errors.forEach((warning) => {
-          this.emitError(warning);
-        });
-      }
+    return;
+  }
 
-      const data = result.output ? result.output : result.input;
+  if (result.warnings && result.warnings.length > 0) {
+    result.warnings.forEach((warning) => {
+      this.emitWarning(warning);
+    });
+  }
 
-      return callback(null, data);
-    })
-    .catch((error) => callback(error));
+  if (result.errors && result.errors.length > 0) {
+    result.errors.forEach((warning) => {
+      this.emitError(warning);
+    });
+  }
+
+  const data = result.output ? result.output : result.input;
+
+  callback(null, data);
 };
 
 module.exports.raw = true;
