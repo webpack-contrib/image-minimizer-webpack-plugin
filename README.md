@@ -42,7 +42,7 @@
 
 - Persistent cache.
 
-- (Optional) Don't crash building process if your have corrupted image(s).
+- (Optional) Don't crash building process if you have corrupted image(s).
 
 ## Install
 
