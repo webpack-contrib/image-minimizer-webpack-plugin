@@ -1,6 +1,7 @@
 "use strict";
 
 const path = require("path");
+const webpack = require("webpack");
 const RawSource = require("webpack-sources/lib/RawSource");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
 const loaderUtils = require("loader-utils");
@@ -38,6 +39,10 @@ class ImageminPlugin {
       name,
       test,
     };
+  }
+
+  static isWebpack4() {
+    return webpack.version[0] === "4";
   }
 
   apply(compiler) {
@@ -103,7 +108,7 @@ class ImageminPlugin {
       });
     }
 
-    const optimizeAssetsFn = async (compilation, assets) => {
+    const optimizeFn = async (compilation, assets) => {
       const { context } = compiler.options;
       const assetsForMinify = [];
       const {
@@ -199,9 +204,24 @@ class ImageminPlugin {
       return Promise.resolve();
     };
 
-    compiler.hooks.emit.tapPromise({ name: pluginName }, (compilation) =>
-      optimizeAssetsFn(compilation, compilation.assets)
-    );
+    if (ImageminPlugin.isWebpack4()) {
+      compiler.hooks.emit.tapPromise({ name: pluginName }, (compilation) =>
+        optimizeFn(compilation, compilation.assets)
+      );
+    } else {
+      // eslint-disable-next-line node/global-require
+      const Compilation = require("webpack/lib/Compilation");
+
+      compiler.hooks.compilation.tap(pluginName, (compilation) => {
+        compilation.hooks.processAssets.tapPromise(
+          {
+            name: pluginName,
+            stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
+          },
+          (assets) => optimizeFn(compilation, assets)
+        );
+      });
+    }
   }
 }
 

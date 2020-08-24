@@ -17,28 +17,19 @@ export default class EmitWepbackPlugin {
   apply(compiler) {
     const plugin = { name: "EmitPlugin" };
 
-    const emitFn = (compilation, callback) => {
-      const { fileNames } = this.options;
+    compiler.hooks.thisCompilation.tap(plugin, (compilation) => {
+      compilation.hooks.additionalAssets.tapPromise(plugin, () => {
+        const { fileNames } = this.options;
 
-      return Promise.all(
-        fileNames.map((fileName) => {
-          const filePath = path.join(__dirname, fileName);
+        return Promise.all(
+          fileNames.map(async (fileName) => {
+            const filePath = path.join(__dirname, fileName);
+            const data = await pify(fs.readFile)(filePath);
 
-          return Promise.resolve()
-            .then(() => pify(fs.readFile)(filePath))
-            .then((data) => {
-              compilation.assets[fileName] = new RawSource(data);
-
-              return data;
-            });
-        })
-      ).then(() => callback());
-    };
-
-    if (compiler.hooks) {
-      compiler.hooks.emit.tapAsync(plugin, emitFn);
-    } else {
-      compiler.plugin("emit", emitFn);
-    }
+            compilation.emitAsset(fileName, new RawSource(data));
+          })
+        );
+      });
+    });
   }
 }
