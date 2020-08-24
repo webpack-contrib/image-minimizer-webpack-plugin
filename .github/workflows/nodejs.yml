@@ -1,4 +1,4 @@
-name: imagemin-webpack
+name: image-minimizer-webpack-plugin
 
 on:
   push:

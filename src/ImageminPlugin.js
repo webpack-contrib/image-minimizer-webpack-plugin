@@ -7,7 +7,7 @@ const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
 
 const minify = require("./minify");
 
-class ImageminPlugin {
+class ImageMinimizerPlugin {
   constructor(options = {}) {
     const {
       cache = false,
@@ -183,7 +183,7 @@ class ImageminPlugin {
       return Promise.resolve();
     };
 
-    if (ImageminPlugin.isWebpack4()) {
+    if (ImageMinimizerPlugin.isWebpack4()) {
       compiler.hooks.emit.tapPromise({ name: pluginName }, (compilation) =>
         optimizeFn(compilation, compilation.assets)
       );
@@ -204,4 +204,4 @@ class ImageminPlugin {
   }
 }
 
-module.exports = ImageminPlugin;
+module.exports = ImageMinimizerPlugin;

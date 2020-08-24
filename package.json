@@ -1,12 +1,12 @@
 {
-  "name": "imagemin-webpack",
+  "name": "image-minimizer-webpack-plugin",
   "version": "5.1.0",
   "description": "Webpack loader and plugin to optimize (compress) images using imagemin",
   "repository": {
     "type": "git",
-    "url": "https://github.com/itgalaxy/imagemin-webpack.git"
+    "url": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin.git"
   },
-  "homepage": "https://github.com/itgalaxy/imagemin-webpack",
+  "homepage": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin",
   "keywords": [
     "webpack",
     "loader",
@@ -17,9 +17,9 @@
     "compress",
     "optimize"
   ],
-  "author": "Itgalaxy <development@itgalaxy.company>",
+  "author": "Alexander Krasnoyarov (https://github.com/evilebottnawi)",
   "bugs": {
-    "url": "https://github.com/itgalaxy/imagemin-webpack/issues"
+    "url": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues"
   },
   "license": "MIT",
   "main": "index.js",

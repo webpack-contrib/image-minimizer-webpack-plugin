@@ -637,7 +637,7 @@ describe("minify", () => {
     spyGet.mockClear();
     spyPut.mockClear();
 
-    jest.doMock("imagemin-webpack/package.json", () => ({
+    jest.doMock("image-minimizer-webpack-plugin/package.json", () => ({
       name: "imagemin-webpack",
       version: "999999.99999.99999",
     }));
