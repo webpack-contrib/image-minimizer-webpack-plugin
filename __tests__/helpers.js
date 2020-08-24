@@ -101,7 +101,6 @@ function runWebpack(maybeOptions) {
                 imageminOptions: {
                   plugins,
                 },
-                name: "[path][name].[ext]",
               }
             : imageminPluginOptions
         );

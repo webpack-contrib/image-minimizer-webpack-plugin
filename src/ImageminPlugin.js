@@ -4,7 +4,6 @@ const path = require("path");
 const webpack = require("webpack");
 const RawSource = require("webpack-sources/lib/RawSource");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
-const loaderUtils = require("loader-utils");
 
 const minify = require("./minify");
 
@@ -21,9 +20,7 @@ class ImageminPlugin {
         plugins: [],
       },
       loader = true,
-      manifest,
       maxConcurrency,
-      name = "[hash].[ext]",
     } = options;
 
     this.options = {
@@ -34,9 +31,7 @@ class ImageminPlugin {
       imageminOptions,
       include,
       loader,
-      manifest,
       maxConcurrency,
-      name,
       test,
     };
   }
@@ -118,8 +113,6 @@ class ImageminPlugin {
         filter,
         imageminOptions,
         maxConcurrency,
-        manifest,
-        name,
       } = this.options;
 
       Object.keys(assets).forEach((file) => {
@@ -184,21 +177,7 @@ class ImageminPlugin {
           return;
         }
 
-        const interpolatedName = loaderUtils.interpolateName(
-          { resourcePath: path.join(context, originalResourcePath) },
-          name,
-          { content: source.source(), context }
-        );
-
-        compilation.assets[interpolatedName] = source;
-
-        if (interpolatedName !== originalResourcePath) {
-          delete compilation.assets[originalResourcePath];
-        }
-
-        if (manifest && !manifest[originalResourcePath]) {
-          manifest[originalResourcePath] = interpolatedName;
-        }
+        compilation.assets[originalResourcePath.replace(/\\/g, "/")] = source;
       });
 
       return Promise.resolve();
@@ -224,9 +203,5 @@ class ImageminPlugin {
     }
   }
 }
-
-//------------------------------------------------------------------------------
-// Public API
-//------------------------------------------------------------------------------
 
 module.exports = ImageminPlugin;
