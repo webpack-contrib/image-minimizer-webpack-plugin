@@ -1,40 +1,40 @@
-import ImageminPlugin from "../index.js";
+import ImageMinimizerPlugin from "../index.js";
 
 describe("api", () => {
   describe("basic", () => {
     it("should exported", () => {
-      expect(ImageminPlugin).toBeInstanceOf(Object);
-      expect(typeof ImageminPlugin.loader).toBe("string");
-      expect(typeof ImageminPlugin.normalizeConfig).toBe("function");
+      expect(ImageMinimizerPlugin).toBeInstanceOf(Object);
+      expect(typeof ImageMinimizerPlugin.loader).toBe("string");
+      expect(typeof ImageMinimizerPlugin.normalizeConfig).toBe("function");
     });
   });
 
   describe("normalizeConfig", () => {
     it("should works", () => {
       expect(() =>
-        ImageminPlugin.normalizeConfig({})
+        ImageMinimizerPlugin.normalizeConfig({})
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
-        ImageminPlugin.normalizeConfig({ plugins: [] })
+        ImageMinimizerPlugin.normalizeConfig({ plugins: [] })
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
-        ImageminPlugin.normalizeConfig({ plugins: ["unknown"] })
+        ImageMinimizerPlugin.normalizeConfig({ plugins: ["unknown"] })
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
-        ImageminPlugin.normalizeConfig({ plugins: ["imagemin-unknown"] })
+        ImageMinimizerPlugin.normalizeConfig({ plugins: ["imagemin-unknown"] })
       ).toThrowErrorMatchingSnapshot();
 
       expect(
-        ImageminPlugin.normalizeConfig({ plugins: ["mozjpeg"] })
+        ImageMinimizerPlugin.normalizeConfig({ plugins: ["mozjpeg"] })
       ).toMatchSnapshot();
       expect(
-        ImageminPlugin.normalizeConfig({ plugins: ["imagemin-mozjpeg"] })
+        ImageMinimizerPlugin.normalizeConfig({ plugins: ["imagemin-mozjpeg"] })
       ).toMatchSnapshot();
       expect(
-        ImageminPlugin.normalizeConfig({ plugins: [["mozjpeg"]] })
+        ImageMinimizerPlugin.normalizeConfig({ plugins: [["mozjpeg"]] })
       ).toMatchSnapshot();
       expect(
-        ImageminPlugin.normalizeConfig({
+        ImageMinimizerPlugin.normalizeConfig({
           plugins: [["mozjpeg", { quality: 0 }]],
         })
       ).toMatchSnapshot();

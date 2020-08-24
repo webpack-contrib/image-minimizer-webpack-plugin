@@ -7,7 +7,7 @@ const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
 
 const minify = require("./minify");
 
-class ImageminPlugin {
+class ImageMinimizerPlugin {
   constructor(options = {}) {
     const {
       cache = false,
@@ -38,6 +38,64 @@ class ImageminPlugin {
 
   static isWebpack4() {
     return webpack.version[0] === "4";
+  }
+
+  async runTasks(compiler, compilation, assetsForMinify, moduleAssets) {
+    const {
+      bail,
+      cache,
+      filter,
+      imageminOptions,
+      maxConcurrency,
+    } = this.options;
+
+    let results;
+
+    try {
+      results = await minify(assetsForMinify, {
+        bail,
+        filter,
+        cache,
+        imageminOptions,
+        maxConcurrency,
+      });
+    } catch (error) {
+      return Promise.reject(error);
+    }
+
+    results.forEach((result) => {
+      const source = new RawSource(result.output);
+
+      if (result.warnings && result.warnings.length > 0) {
+        result.warnings.forEach((warning) => {
+          compilation.warnings.push(warning);
+        });
+      }
+
+      if (result.errors && result.errors.length > 0) {
+        result.errors.forEach((warning) => {
+          compilation.errors.push(warning);
+        });
+      }
+
+      const originalResourcePath = path.relative(
+        compiler.options.context,
+        result.filePath
+      );
+
+      // Exclude:
+      // 1. Module assets (`file-loader` already interpolated asset name)
+      // 2. Filtered assets
+      if (moduleAssets.has(originalResourcePath) || result.filtered) {
+        compilation.assets[originalResourcePath] = source;
+
+        return;
+      }
+
+      compilation.assets[originalResourcePath.replace(/\\/g, "/")] = source;
+    });
+
+    return Promise.resolve();
   }
 
   apply(compiler) {
@@ -106,14 +164,6 @@ class ImageminPlugin {
     const optimizeFn = async (compilation, assets) => {
       const { context } = compiler.options;
       const assetsForMinify = [];
-      const {
-        bail,
-        cache,
-        loader,
-        filter,
-        imageminOptions,
-        maxConcurrency,
-      } = this.options;
 
       Object.keys(assets).forEach((file) => {
         if (!matchObject(file)) {
@@ -121,7 +171,7 @@ class ImageminPlugin {
         }
 
         // Exclude already optimized assets from `imagemin-loader`
-        if (loader && moduleAssets.has(file)) {
+        if (this.options.loader && moduleAssets.has(file)) {
           return;
         }
 
@@ -137,53 +187,12 @@ class ImageminPlugin {
         return Promise.resolve();
       }
 
-      let results;
-
-      try {
-        results = await minify(assetsForMinify, {
-          bail,
-          filter,
-          cache,
-          imageminOptions,
-          maxConcurrency,
-        });
-      } catch (error) {
-        return Promise.reject(error);
-      }
-
-      results.forEach((result) => {
-        const source = new RawSource(result.output);
-
-        if (result.warnings && result.warnings.length > 0) {
-          result.warnings.forEach((warning) => {
-            compilation.warnings.push(warning);
-          });
-        }
-
-        if (result.errors && result.errors.length > 0) {
-          result.errors.forEach((warning) => {
-            compilation.errors.push(warning);
-          });
-        }
-
-        const originalResourcePath = path.relative(context, result.filePath);
-
-        // Exclude:
-        // 1. Module assets (`file-loader` already interpolated asset name)
-        // 2. Filtered assets
-        if (moduleAssets.has(originalResourcePath) || result.filtered) {
-          compilation.assets[originalResourcePath] = source;
-
-          return;
-        }
-
-        compilation.assets[originalResourcePath.replace(/\\/g, "/")] = source;
-      });
+      await this.runTasks(compiler, compilation, assetsForMinify, moduleAssets);
 
       return Promise.resolve();
     };
 
-    if (ImageminPlugin.isWebpack4()) {
+    if (ImageMinimizerPlugin.isWebpack4()) {
       compiler.hooks.emit.tapPromise({ name: pluginName }, (compilation) =>
         optimizeFn(compilation, compilation.assets)
       );
@@ -204,4 +213,4 @@ class ImageminPlugin {
   }
 }
 
-module.exports = ImageminPlugin;
+module.exports = ImageMinimizerPlugin;

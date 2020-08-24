@@ -10,7 +10,7 @@ import tempy from "tempy";
 import webpack from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import EmitPlugin from "./fixtures/EmitWepbackPlugin.js";
-import ImageminPlugin from "../index.js";
+import ImageMinimizerPlugin from "../index.js";
 
 const plugins = ["gifsicle", "mozjpeg", "pngquant", "svgo"];
 
@@ -70,7 +70,7 @@ function runWebpack(maybeOptions) {
 
     if (options.imageminLoader || options.imageminLoaderOptions) {
       config.module.rules[0].use = config.module.rules[0].use.concat({
-        loader: ImageminPlugin.loader,
+        loader: ImageMinimizerPlugin.loader,
         options: options.imageminLoaderOptions
           ? options.imageminLoaderOptions
           : {
@@ -94,7 +94,7 @@ function runWebpack(maybeOptions) {
           : [options.imageminPlugin || options.imageminPluginOptions];
 
       imageminPluginsOptions.forEach((imageminPluginOptions) => {
-        const imageminPlugin = new ImageminPlugin(
+        const ImageMinimizerPluginCreated = new ImageMinimizerPlugin(
           typeof imageminPluginOptions === "boolean"
             ? {
                 cache: false,
@@ -111,9 +111,9 @@ function runWebpack(maybeOptions) {
           }
 
           config.optimization.minimize = true;
-          config.optimization.minimizer = [imageminPlugin];
+          config.optimization.minimizer = [ImageMinimizerPluginCreated];
         } else {
-          config.plugins = config.plugins.concat(imageminPlugin);
+          config.plugins = config.plugins.concat(ImageMinimizerPluginCreated);
         }
       });
     }
@@ -181,7 +181,9 @@ function hasLoader(id, modules) {
 
     const { loaders } = module;
 
-    return loaders.find((loader) => loader.loader === ImageminPlugin.loader);
+    return loaders.find(
+      (loader) => loader.loader === ImageMinimizerPlugin.loader
+    );
   });
 }
 
