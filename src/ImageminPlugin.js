@@ -21,7 +21,6 @@ class ImageminPlugin {
         plugins: [],
       },
       loader = true,
-      manifest,
       maxConcurrency,
       name = "[hash].[ext]",
     } = options;
@@ -34,7 +33,6 @@ class ImageminPlugin {
       imageminOptions,
       include,
       loader,
-      manifest,
       maxConcurrency,
       name,
       test,
@@ -118,7 +116,6 @@ class ImageminPlugin {
         filter,
         imageminOptions,
         maxConcurrency,
-        manifest,
         name,
       } = this.options;
 
@@ -194,10 +191,6 @@ class ImageminPlugin {
 
         if (interpolatedName !== originalResourcePath) {
           delete compilation.assets[originalResourcePath];
-        }
-
-        if (manifest && !manifest[originalResourcePath]) {
-          manifest[originalResourcePath] = interpolatedName;
         }
       });
 

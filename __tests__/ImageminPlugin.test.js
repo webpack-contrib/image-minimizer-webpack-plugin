@@ -648,64 +648,6 @@ describe("imagemin plugin", () => {
     );
   });
 
-  it("should optimizes images and contains not empty manifest", async () => {
-    const manifest = {};
-    const stats = await webpack({
-      emitPlugin: true,
-      entry: path.join(fixturesPath, "single-image-loader.js"),
-      imageminPluginOptions: {
-        imageminOptions: {
-          plugins,
-        },
-        manifest,
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
-
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-
-    expect(manifest).toEqual({
-      "plugin-test.jpg": "f48748954547acf94595fa0b22e03be5.jpg",
-    });
-  });
-
-  it("should optimizes images and interpolate assets names exclude module assets", async () => {
-    const manifest = {};
-    const stats = await webpack({
-      emitPlugin: true,
-      entry: path.join(fixturesPath, "loader.js"),
-      imageminPluginOptions: {
-        imageminOptions: {
-          plugins,
-        },
-        loader: false,
-        manifest,
-      },
-    });
-    const { compilation } = stats;
-    const { assets, warnings, errors } = compilation;
-
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-    expect(
-      Object.keys(assets).every((element) =>
-        [
-          "loader-test.gif",
-          "loader-test.jpg",
-          "loader-test.png",
-          "loader-test.svg",
-          "bundle.js",
-          "f48748954547acf94595fa0b22e03be5.jpg",
-        ].includes(element)
-      )
-    ).toBe(true);
-    expect(manifest).toEqual({
-      "plugin-test.jpg": "f48748954547acf94595fa0b22e03be5.jpg",
-    });
-  });
-
   it("should optimizes all images (loader + plugin) and interpolate `[name].[ext]` name", async () => {
     const stats = await webpack({
       emitPluginOptions: {

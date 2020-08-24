@@ -453,33 +453,6 @@ module.exports = {
 };
 ```
 
-#### `manifest`
-
-Contain optimized list of images from other plugins.
-
-Note: contains only assets compressed by plugin.
-Note: manifest will be contain list of optimized images only after `emit` event.
-
-**webpack.config.js**
-
-```js
-const ImageminPlugin = require("imagemin-webpack");
-const ManifestPlugin = require("manifest-webpack-plugin");
-const manifest = {};
-
-module.exports = {
-  plugins: [
-    new ImageminPlugin({
-      manifest,
-    }),
-    new ManifestPlugin({
-      // Contain compressed images
-      manifest,
-    }),
-  ],
-};
-```
-
 ### Loader Options
 
 |         Name          |        Type         |         Default         | Description                                 |
