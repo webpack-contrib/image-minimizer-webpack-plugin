@@ -4,7 +4,6 @@ const path = require("path");
 const webpack = require("webpack");
 const RawSource = require("webpack-sources/lib/RawSource");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
-const loaderUtils = require("loader-utils");
 
 const minify = require("./minify");
 
@@ -22,7 +21,6 @@ class ImageminPlugin {
       },
       loader = true,
       maxConcurrency,
-      name = "[hash].[ext]",
     } = options;
 
     this.options = {
@@ -34,7 +32,6 @@ class ImageminPlugin {
       include,
       loader,
       maxConcurrency,
-      name,
       test,
     };
   }
@@ -116,7 +113,6 @@ class ImageminPlugin {
         filter,
         imageminOptions,
         maxConcurrency,
-        name,
       } = this.options;
 
       Object.keys(assets).forEach((file) => {
@@ -181,17 +177,7 @@ class ImageminPlugin {
           return;
         }
 
-        const interpolatedName = loaderUtils.interpolateName(
-          { resourcePath: path.join(context, originalResourcePath) },
-          name,
-          { content: source.source(), context }
-        );
-
-        compilation.assets[interpolatedName] = source;
-
-        if (interpolatedName !== originalResourcePath) {
-          delete compilation.assets[originalResourcePath];
-        }
+        compilation.assets[originalResourcePath] = source;
       });
 
       return Promise.resolve();

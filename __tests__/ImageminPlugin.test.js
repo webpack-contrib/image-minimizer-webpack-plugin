@@ -727,61 +727,6 @@ describe("imagemin plugin", () => {
     ).resolves.toBe(true);
   });
 
-  it("should optimizes all images (loader + plugin) and interpolate `dir/[path][name].sub.[ext]` name", async () => {
-    const stats = await webpack({
-      entry: path.join(fixturesPath, "./nested/deep/loader.js"),
-      emitPluginOptions: {
-        fileNames: ["nested/deep/plugin-test.png"],
-      },
-      imageminPluginOptions: {
-        imageminOptions: { plugins },
-        name: "dir/[path][name].sub.[ext]",
-      },
-      name: "dir/[path][name].sub.[ext]",
-    });
-    const { compilation } = stats;
-    const { warnings, errors, modules } = compilation;
-
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-
-    expect(hasLoader("loader-test.gif", modules)).toBe(true);
-    expect(hasLoader("loader-test.jpg", modules)).toBe(true);
-    expect(hasLoader("loader-test.gif", modules)).toBe(true);
-    expect(hasLoader("loader-test.svg", modules)).toBe(true);
-
-    await expect(
-      isOptimized(
-        ["dir/nested/deep/loader-test.sub.gif", "nested/deep/loader-test.gif"],
-        compilation
-      )
-    ).resolves.toBe(true);
-    await expect(
-      isOptimized(
-        ["dir/nested/deep/loader-test.sub.jpg", "nested/deep/loader-test.jpg"],
-        compilation
-      )
-    ).resolves.toBe(true);
-    await expect(
-      isOptimized(
-        ["dir/nested/deep/loader-test.sub.png", "nested/deep/loader-test.png"],
-        compilation
-      )
-    ).resolves.toBe(true);
-    await expect(
-      isOptimized(
-        ["dir/nested/deep/loader-test.sub.svg", "nested/deep/loader-test.svg"],
-        compilation
-      )
-    ).resolves.toBe(true);
-    await expect(
-      isOptimized(
-        ["dir/nested/deep/plugin-test.sub.png", "nested/deep/plugin-test.png"],
-        compilation
-      )
-    ).resolves.toBe(true);
-  });
-
   it("should optimizes all images (loader + plugin) exclude filtered", async () => {
     const stats = await webpack({
       emitPlugin: true,
@@ -856,7 +801,6 @@ describe("imagemin plugin", () => {
           imageminOptions: {
             plugins,
           },
-          name: "[name].1.[ext]",
         },
         {
           filter: (source) => {
@@ -871,7 +815,6 @@ describe("imagemin plugin", () => {
           imageminOptions: {
             plugins,
           },
-          name: "[name].2.[ext]",
         },
       ],
     });
@@ -894,16 +837,10 @@ describe("imagemin plugin", () => {
       isOptimized("multiple-loader-test-2.svg", compilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized(
-        ["multiple-plugin-test-1.1.svg", "multiple-plugin-test-1.svg"],
-        compilation
-      )
+      isOptimized("multiple-plugin-test-1.svg", compilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized(
-        ["multiple-plugin-test-2.2.svg", "multiple-plugin-test-2.svg"],
-        compilation
-      )
+      isOptimized("multiple-plugin-test-2.svg", compilation)
     ).resolves.toBe(true);
   });
 
@@ -933,7 +870,6 @@ describe("imagemin plugin", () => {
           imageminOptions: {
             plugins,
           },
-          name: "[name].1.[ext]",
         },
       },
       {
@@ -981,10 +917,7 @@ describe("imagemin plugin", () => {
       isOptimized("multiple-loader-test-2.svg", firstCompilation)
     ).resolves.toBe(false);
     await expect(
-      isOptimized(
-        ["multiple-plugin-test-1.1.svg", "multiple-plugin-test-1.svg"],
-        firstCompilation
-      )
+      isOptimized("multiple-plugin-test-1.svg", firstCompilation)
     ).resolves.toBe(true);
     await expect(
       isOptimized("multiple-plugin-test-2.svg", firstCompilation)
@@ -1015,10 +948,7 @@ describe("imagemin plugin", () => {
       isOptimized("multiple-plugin-test-3.svg", secondCompilation)
     ).resolves.toBe(false);
     await expect(
-      isOptimized(
-        ["multiple-plugin-test-4.2.svg", "multiple-plugin-test-4.svg"],
-        secondCompilation
-      )
+      isOptimized("multiple-plugin-test-4.svg", secondCompilation)
     ).resolves.toBe(true);
   });
 
