@@ -153,7 +153,6 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         cache: true,
         imageminOptions: { plugins },
-        name: "[path][name].[ext]",
       },
     };
     const stats = await webpack(options);
@@ -236,7 +235,6 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         cache: cacheDir,
         imageminOptions: { plugins },
-        name: "[path][name].[ext]",
       },
     };
     const stats = await webpack(options);
@@ -315,7 +313,6 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         cache: false,
         imageminOptions: { plugins },
-        name: "[path][name].[ext]",
       },
     });
 
@@ -354,7 +351,6 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         imageminOptions: { plugins },
         loader: false,
-        name: "[path][name].[ext]",
       },
     });
     const { compilation } = stats;
@@ -397,7 +393,6 @@ describe("imagemin plugin", () => {
       emitPlugin: true,
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
-        name: "[name].[ext]",
         imageminOptions: {
           plugins: [],
         },
@@ -448,7 +443,6 @@ describe("imagemin plugin", () => {
         imageminOptions: {
           plugins,
         },
-        name: "[path][name].[ext]",
       },
     });
     const { compilation } = stats;
@@ -473,7 +467,6 @@ describe("imagemin plugin", () => {
         imageminOptions: {
           plugins,
         },
-        name: "[path][name].[ext]",
       },
     });
     const { compilation } = stats;
@@ -501,7 +494,6 @@ describe("imagemin plugin", () => {
         imageminOptions: {
           plugins,
         },
-        name: "[path][name].[ext]",
       },
     });
     const { compilation } = stats;
@@ -526,7 +518,6 @@ describe("imagemin plugin", () => {
         imageminOptions: {
           plugins,
         },
-        name: "[path][name].[ext]",
       },
     });
     const { compilation } = stats;
@@ -554,7 +545,6 @@ describe("imagemin plugin", () => {
         imageminOptions: {
           plugins,
         },
-        name: "[path][name].[ext]",
       },
     });
     const { compilation } = stats;
@@ -579,7 +569,6 @@ describe("imagemin plugin", () => {
         imageminOptions: {
           plugins,
         },
-        name: "[path][name].[ext]",
       },
     });
     const { compilation } = stats;
@@ -607,7 +596,6 @@ describe("imagemin plugin", () => {
         imageminOptions: {
           plugins,
         },
-        name: "[path][name].[ext]",
       },
     });
     const { compilation } = stats;
@@ -655,9 +643,7 @@ describe("imagemin plugin", () => {
       },
       imageminPluginOptions: {
         imageminOptions: { plugins },
-        name: "[name].[ext]",
       },
-      name: "[name].[ext]",
     });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
@@ -695,9 +681,7 @@ describe("imagemin plugin", () => {
       },
       imageminPluginOptions: {
         imageminOptions: { plugins },
-        name: "[path][name].[ext]",
       },
-      name: "[path][name].[ext]",
     });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
@@ -747,7 +731,6 @@ describe("imagemin plugin", () => {
         imageminOptions: {
           plugins,
         },
-        name: "[path][name].[ext]",
       },
     });
     const { compilation } = stats;
@@ -893,7 +876,6 @@ describe("imagemin plugin", () => {
           imageminOptions: {
             plugins,
           },
-          name: "[name].2.[ext]",
         },
       },
     ]);
