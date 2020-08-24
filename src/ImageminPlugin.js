@@ -177,7 +177,7 @@ class ImageminPlugin {
           return;
         }
 
-        compilation.assets[originalResourcePath] = source;
+        compilation.assets[originalResourcePath.replace(/\\/g, "/")] = source;
       });
 
       return Promise.resolve();
@@ -203,9 +203,5 @@ class ImageminPlugin {
     }
   }
 }
-
-//------------------------------------------------------------------------------
-// Public API
-//------------------------------------------------------------------------------
 
 module.exports = ImageminPlugin;
