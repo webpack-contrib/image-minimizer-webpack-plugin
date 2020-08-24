@@ -175,7 +175,7 @@ function isOptimized(originalPath, compilation) {
 }
 
 function hasLoader(id, modules) {
-  return modules.some((module) => {
+  return [...modules].some((module) => {
     if (!module.id.endsWith(id)) {
       return false;
     }
