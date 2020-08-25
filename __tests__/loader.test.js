@@ -358,9 +358,9 @@ describe("loader", () => {
   it("should optimizes all images exclude filtered", async () => {
     const stats = await webpack({
       imageminLoaderOptions: {
-        filter: (source, sourcePath) => {
+        filter: (source, filename) => {
           expect(source).toBeInstanceOf(Buffer);
-          expect(typeof sourcePath).toBe("string");
+          expect(typeof filename).toBe("string");
 
           if (source.byteLength === 631) {
             return false;

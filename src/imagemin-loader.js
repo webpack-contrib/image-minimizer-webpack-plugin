@@ -1,5 +1,7 @@
 "use strict";
 
+const path = require("path");
+
 const loaderUtils = require("loader-utils");
 
 const minify = require("./minify");
@@ -24,12 +26,20 @@ module.exports = async function loader(content) {
   let result;
 
   try {
-    [result] = await minify([{ input: content, filePath: resourcePath }], {
-      bail,
-      cache: options.cache,
-      imageminOptions: options.imageminOptions,
-      filter: options.filter,
-    });
+    [result] = await minify(
+      [
+        {
+          input: content,
+          filename: path.relative(this.rootContext, resourcePath),
+        },
+      ],
+      {
+        bail,
+        cache: options.cache,
+        imageminOptions: options.imageminOptions,
+        filter: options.filter,
+      }
+    );
   } catch (error) {
     callback(error);
 

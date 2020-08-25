@@ -1,6 +1,5 @@
 "use strict";
 
-const path = require("path");
 const os = require("os");
 const crypto = require("crypto");
 const cacache = require("cacache");
@@ -50,14 +49,14 @@ function minify(tasks = [], options = {}) {
   return Promise.all(
     tasks.map((task) =>
       limit(async () => {
-        const { input, filePath } = task;
-        const result = { input, output: input, warnings: [], errors: [] };
-
-        if (filePath) {
-          result.filePath = path.isAbsolute(filePath)
-            ? filePath
-            : path.resolve(filePath);
-        }
+        const { input, filename } = task;
+        const result = {
+          input,
+          filename,
+          output: input,
+          warnings: [],
+          errors: [],
+        };
 
         if (!result.input) {
           result.errors.push(new Error("Empty input"));
@@ -68,17 +67,13 @@ function minify(tasks = [], options = {}) {
         // Ensure that the contents i have are in the form of a buffer
         result.input = Buffer.isBuffer(input) ? input : Buffer.from(input);
 
-        if (options.filter && !options.filter(result.input, filePath)) {
+        if (options.filter && !options.filter(result.input, filename)) {
           result.filtered = true;
 
           return result;
         }
 
-        const imageminOptions = getConfigForFile(
-          result.filePath,
-          options,
-          result
-        );
+        const imageminOptions = getConfigForFile(options, result);
 
         let cacheKey;
         let output;
