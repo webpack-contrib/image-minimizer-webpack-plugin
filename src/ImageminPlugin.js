@@ -44,6 +44,27 @@ class ImageMinimizerPlugin {
     return webpack.version[0] === "4";
   }
 
+  // eslint-disable-next-line consistent-return
+  static getAsset(compilation, name) {
+    // New API
+    if (compilation.getAsset) {
+      return compilation.getAsset(name);
+    }
+
+    if (compilation.assets[name]) {
+      return { name, source: compilation.assets[name], info: {} };
+    }
+  }
+
+  static updateAsset(compilation, name, newSource, assetInfo) {
+    // New API
+    if (compilation.updateAsset) {
+      compilation.updateAsset(name, newSource, assetInfo);
+    }
+
+    compilation.assets[name] = newSource;
+  }
+
   async runTasks(compiler, compilation, assetNames) {
     const {
       bail,
@@ -55,9 +76,22 @@ class ImageMinimizerPlugin {
 
     let results;
 
+    const tasks = assetNames.filter((assetName) => {
+      const { info: assetInfo } = ImageMinimizerPlugin.getAsset(
+        compilation,
+        assetName
+      );
+
+      if (assetInfo.minimized) {
+        return false;
+      }
+
+      return true;
+    });
+
     try {
       results = await minify(
-        assetNames.map((assetName) => ({
+        tasks.map((assetName) => ({
           input: compilation.getAsset(assetName).source.source(),
           filename: assetName,
         })),
@@ -92,7 +126,14 @@ class ImageMinimizerPlugin {
         });
       }
 
-      compilation.assets[filename] = new RawSource(output);
+      ImageMinimizerPlugin.updateAsset(
+        compilation,
+        filename,
+        new RawSource(output),
+        {
+          minimized: true,
+        }
+      );
     });
 
     return Promise.resolve();
