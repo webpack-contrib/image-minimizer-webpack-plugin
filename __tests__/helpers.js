@@ -44,19 +44,31 @@ function runWebpack(maybeOptions) {
               },
             ],
           },
-        ].concat(
-          options.MCEP
-            ? {
-                test: /\.css$/,
-                use: [
-                  {
-                    loader: MiniCssExtractPlugin.loader,
-                  },
-                  "css-loader",
-                ],
-              }
-            : []
-        ),
+        ]
+          .concat(
+            options.MCEP
+              ? {
+                  test: /\.css$/,
+                  use: [
+                    {
+                      loader: MiniCssExtractPlugin.loader,
+                    },
+                    "css-loader",
+                  ],
+                }
+              : []
+          )
+          .concat(
+            options.childPlugin
+              ? {
+                  test: /child-compilation\.js$/,
+                  loader: path.resolve(
+                    __dirname,
+                    "./fixtures/emit-asset-in-child-compilation-loader.js"
+                  ),
+                }
+              : []
+          ),
       },
       output: {
         filename: "bundle.js",

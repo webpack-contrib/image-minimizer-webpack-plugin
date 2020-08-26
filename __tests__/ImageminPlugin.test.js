@@ -934,6 +934,44 @@ describe("imagemin plugin", () => {
     ).resolves.toBe(true);
   });
 
+  it("should work with child compilation", async () => {
+    const stats = await webpack({
+      entry: path.resolve(__dirname, "fixtures/loader-with-child.js"),
+      emitPlugin: true,
+      imageminPlugin: true,
+      childPlugin: true,
+    });
+    const { compilation } = stats;
+    const { warnings, errors, modules } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    expect(hasLoader("loader-test.gif", modules)).toBe(true);
+    expect(hasLoader("loader-test.jpg", modules)).toBe(true);
+    expect(hasLoader("loader-test.gif", modules)).toBe(true);
+    expect(hasLoader("loader-test.svg", modules)).toBe(true);
+
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(
+      isOptimized("child-compilation-image.png", compilation)
+    ).resolves.toBe(true);
+  });
+
   if (!IS_WEBPACK_VERSION_NEXT) {
     it("should optimizes all images (loader + plugin) from `mini-css-extract-plugin`", async () => {
       const stats = await webpack({
