@@ -2,10 +2,14 @@
 
 const path = require("path");
 const webpack = require("webpack");
-const RawSource = require("webpack-sources/lib/RawSource");
 const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
 
 const minify = require("./minify");
+
+// webpack 5 exposes the sources property to ensure the right version of webpack-sources is used
+const { RawSource } =
+  // eslint-disable-next-line import/order, node/global-require
+  webpack.sources || require("webpack-sources");
 
 class ImageMinimizerPlugin {
   constructor(options = {}) {
