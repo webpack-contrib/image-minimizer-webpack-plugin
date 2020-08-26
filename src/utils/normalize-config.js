@@ -1,6 +1,6 @@
 "use strict";
 
-const deepmerge = require("deepmerge");
+const { klona } = require("klona/full");
 
 function log(error, metaData, type = null) {
   if (metaData.result) {
@@ -32,7 +32,7 @@ function normalizeConfig(imageminOptions, metaData = {}) {
     return imageminOptions;
   }
 
-  const imageminConfig = deepmerge({}, imageminOptions);
+  const imageminConfig = klona(imageminOptions);
 
   if (!imageminConfig.pluginsMeta) {
     imageminConfig.pluginsMeta = [];
