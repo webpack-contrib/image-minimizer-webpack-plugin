@@ -1,17 +1,15 @@
-"use strict";
+import path from 'path';
 
-const path = require("path");
+import loaderUtils from 'loader-utils';
 
-const loaderUtils = require("loader-utils");
-
-const minify = require("./minify");
+import minify from './minify';
 
 module.exports = async function loader(content) {
   const options = loaderUtils.getOptions(this);
   const callback = this.async();
 
   const bail =
-    typeof options.bail === "undefined"
+    typeof options.bail === 'undefined'
       ? // eslint-disable-next-line no-underscore-dangle
         (this._compiler &&
           // eslint-disable-next-line no-underscore-dangle

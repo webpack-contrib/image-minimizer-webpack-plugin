@@ -1,13 +1,15 @@
-import os from "os";
-import fs from "fs";
-import path from "path";
-import cacache from "cacache";
-import findCacheDir from "find-cache-dir";
-import pify from "pify";
-import { fixturesPath, isOptimized, plugins, webpack } from "./helpers.js";
+import os from 'os';
+import fs from 'fs';
+import path from 'path';
 
-describe("loader", () => {
-  it("should optimizes all images", async () => {
+import cacache from 'cacache';
+import findCacheDir from 'find-cache-dir';
+import pify from 'pify';
+
+import { fixturesPath, isOptimized, plugins, webpack } from './helpers';
+
+describe('loader', () => {
+  it('should optimizes all images', async () => {
     const stats = await webpack({ imageminLoader: true });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -15,23 +17,23 @@ describe("loader", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
       true
     );
   });
 
   it("should optimizes all images and don't break non images", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, "loader-other-imports.js"),
+      entry: path.join(fixturesPath, 'loader-other-imports.js'),
       imageminLoader: true,
       test: /\.(jpe?g|png|gif|svg|css|txt)$/i,
     });
@@ -45,38 +47,38 @@ describe("loader", () => {
     const { path: outputPath } = compilation.options.output;
 
     const txtBuffer = await pify(fs.readFile)(
-      path.join(outputPath, "loader-test.txt")
+      path.join(outputPath, 'loader-test.txt')
     );
 
-    expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
+    expect(txtBuffer.toString().replace(/\r\n|\r/g, '\n')).toBe('TEXT\n');
 
     const cssBuffer = await pify(fs.readFile)(
-      path.join(outputPath, "loader-test.css")
+      path.join(outputPath, 'loader-test.css')
     );
 
-    expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
-      "a {\n  color: red;\n}\n"
+    expect(cssBuffer.toString().replace(/\r\n|\r/g, '\n')).toBe(
+      'a {\n  color: red;\n}\n'
     );
 
-    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
       true
     );
   });
 
-  it("should optimizes all images and cache their", async () => {
-    const spyGet = jest.spyOn(cacache, "get");
-    const spyPut = jest.spyOn(cacache, "put");
+  it('should optimizes all images and cache their', async () => {
+    const spyGet = jest.spyOn(cacache, 'get');
+    const spyPut = jest.spyOn(cacache, 'put');
 
-    const cacheDir = findCacheDir({ name: "imagemin-webpack" }) || os.tmpdir();
+    const cacheDir = findCacheDir({ name: 'imagemin-webpack' }) || os.tmpdir();
 
     await cacache.rm.all(cacheDir);
 
@@ -90,16 +92,16 @@ describe("loader", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
       true
     );
 
@@ -122,16 +124,16 @@ describe("loader", () => {
     expect(secondErrors).toHaveLength(0);
 
     await expect(
-      isOptimized("loader-test.gif", secondCompilation)
+      isOptimized('loader-test.gif', secondCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("loader-test.jpg", secondCompilation)
+      isOptimized('loader-test.jpg', secondCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("loader-test.png", secondCompilation)
+      isOptimized('loader-test.png', secondCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("loader-test.svg", secondCompilation)
+      isOptimized('loader-test.svg', secondCompilation)
     ).resolves.toBe(true);
 
     // Now we have cached files so we get their and don't put
@@ -144,13 +146,13 @@ describe("loader", () => {
     spyPut.mockRestore();
   });
 
-  it("should optimizes all images and cache their (custom cache location)", async () => {
-    const spyGet = jest.spyOn(cacache, "get");
-    const spyPut = jest.spyOn(cacache, "put");
+  it('should optimizes all images and cache their (custom cache location)', async () => {
+    const spyGet = jest.spyOn(cacache, 'get');
+    const spyPut = jest.spyOn(cacache, 'put');
 
     const cacheDir =
       findCacheDir({
-        name: "imagemin-webpack-loader-custom-cache-location-for-loader",
+        name: 'imagemin-webpack-loader-custom-cache-location-for-loader',
       }) || os.tmpdir();
 
     await cacache.rm.all(cacheDir);
@@ -165,16 +167,16 @@ describe("loader", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
       true
     );
 
@@ -197,16 +199,16 @@ describe("loader", () => {
     expect(secondErrors).toHaveLength(0);
 
     await expect(
-      isOptimized("loader-test.gif", secondCompilation)
+      isOptimized('loader-test.gif', secondCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("loader-test.jpg", secondCompilation)
+      isOptimized('loader-test.jpg', secondCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("loader-test.png", secondCompilation)
+      isOptimized('loader-test.png', secondCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized("loader-test.svg", secondCompilation)
+      isOptimized('loader-test.svg', secondCompilation)
     ).resolves.toBe(true);
 
     // Now we have cached files so we get their and don't put
@@ -220,8 +222,8 @@ describe("loader", () => {
   });
 
   it("should optimizes all images and doesn't cache their", async () => {
-    const spyGet = jest.spyOn(cacache, "get");
-    const spyPut = jest.spyOn(cacache, "put");
+    const spyGet = jest.spyOn(cacache, 'get');
+    const spyPut = jest.spyOn(cacache, 'put');
 
     const stats = await webpack({
       imageminLoaderOptions: { cache: false, imageminOptions: { plugins } },
@@ -232,16 +234,16 @@ describe("loader", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
       true
     );
 
@@ -278,9 +280,9 @@ describe("loader", () => {
     });
   });
 
-  it("should throws error on corrupted images using `bail` option with `true` value", async () => {
+  it('should throws error on corrupted images using `bail` option with `true` value', async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, "loader-corrupted.js"),
+      entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminLoaderOptions: { bail: true, imageminOptions: { plugins } },
     });
     const { compilation } = stats;
@@ -293,14 +295,14 @@ describe("loader", () => {
     );
     expect(Object.keys(assets)).toHaveLength(3);
 
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
       true
     );
   });
 
-  it("should throws warning on corrupted images using `bail` option with `false` value", async () => {
+  it('should throws warning on corrupted images using `bail` option with `false` value', async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, "loader-corrupted.js"),
+      entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminLoaderOptions: { bail: false, imageminOptions: { plugins } },
     });
     const { compilation } = stats;
@@ -312,14 +314,14 @@ describe("loader", () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
       true
     );
   });
 
-  it("should throws error on corrupted images using `webpack.bail` option with `true` value", async () => {
+  it('should throws error on corrupted images using `webpack.bail` option with `true` value', async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, "loader-corrupted.js"),
+      entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminLoaderOptions: { bail: true, imageminOptions: { plugins } },
     });
     const { compilation } = stats;
@@ -331,14 +333,14 @@ describe("loader", () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
       true
     );
   });
 
-  it("should throws warning on corrupted images using `webpack.bail` option with `false` value", async () => {
+  it('should throws warning on corrupted images using `webpack.bail` option with `false` value', async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, "loader-corrupted.js"),
+      entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminLoaderOptions: { bail: false, imageminOptions: { plugins } },
     });
     const { compilation } = stats;
@@ -350,17 +352,17 @@ describe("loader", () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
       true
     );
   });
 
-  it("should optimizes all images exclude filtered", async () => {
+  it('should optimizes all images exclude filtered', async () => {
     const stats = await webpack({
       imageminLoaderOptions: {
         filter: (source, filename) => {
           expect(source).toBeInstanceOf(Buffer);
-          expect(typeof filename).toBe("string");
+          expect(typeof filename).toBe('string');
 
           if (source.byteLength === 631) {
             return false;
@@ -379,16 +381,16 @@ describe("loader", () => {
     expect(errors).toHaveLength(0);
     expect(Object.keys(assets)).toHaveLength(5);
 
-    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
       false
     );
   });

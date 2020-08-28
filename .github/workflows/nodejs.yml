@@ -43,11 +43,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Security audit
-        run: npm run security
+      # - name: Security audit
+      #  run: npm run security
 
       - name: Check commit message
-        uses: wagoid/commitlint-github-action@v2
+        uses: wagoid/commitlint-github-action@v1
 
   test:
     name: Test - ${{ matrix.os }} - Node v${{ matrix.node-version }}, Webpack ${{ matrix.webpack-version }}

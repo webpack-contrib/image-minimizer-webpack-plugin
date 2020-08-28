@@ -1,15 +1,14 @@
-"use strict";
+import path from 'path';
 
-const path = require("path");
-const webpack = require("webpack");
-const ModuleFilenameHelpers = require("webpack/lib/ModuleFilenameHelpers");
+import webpack from 'webpack';
+import ModuleFilenameHelpers from 'webpack/lib/ModuleFilenameHelpers';
 
-const minify = require("./minify");
+import minify from './minify';
 
 // webpack 5 exposes the sources property to ensure the right version of webpack-sources is used
 const { RawSource } =
-  // eslint-disable-next-line import/order, node/global-require
-  webpack.sources || require("webpack-sources");
+  // eslint-disable-next-line import/order, global-require
+  webpack.sources || require('webpack-sources');
 
 class ImageMinimizerPlugin {
   constructor(options = {}) {
@@ -41,7 +40,7 @@ class ImageMinimizerPlugin {
   }
 
   static isWebpack4() {
-    return webpack.version[0] === "4";
+    return webpack.version[0] === '4';
   }
 
   // eslint-disable-next-line consistent-return
@@ -62,6 +61,7 @@ class ImageMinimizerPlugin {
       compilation.updateAsset(name, newSource, assetInfo);
     }
 
+    // eslint-disable-next-line no-param-reassign
     compilation.assets[name] = newSource;
   }
 
@@ -142,7 +142,7 @@ class ImageMinimizerPlugin {
   apply(compiler) {
     const pluginName = this.constructor.name;
 
-    if (typeof this.options.bail !== "boolean") {
+    if (typeof this.options.bail !== 'boolean') {
       this.options.bail = compiler.options.bail;
     }
 
@@ -181,8 +181,8 @@ class ImageMinimizerPlugin {
           test,
           include,
           exclude,
-          enforce: "pre",
-          loader: path.join(__dirname, "imagemin-loader.js"),
+          enforce: 'pre',
+          loader: path.join(__dirname, 'loader.js'),
           options: {
             bail,
             cache,
@@ -224,8 +224,8 @@ class ImageMinimizerPlugin {
         optimizeFn(compilation, compilation.assets)
       );
     } else {
-      // eslint-disable-next-line node/global-require
-      const Compilation = require("webpack/lib/Compilation");
+      // eslint-disable-next-line global-require
+      const Compilation = require('webpack/lib/Compilation');
 
       compiler.hooks.compilation.tap(pluginName, (compilation) => {
         compilation.hooks.processAssets.tapPromise(
@@ -240,4 +240,8 @@ class ImageMinimizerPlugin {
   }
 }
 
-module.exports = ImageMinimizerPlugin;
+ImageMinimizerPlugin.loader = require.resolve('./loader');
+
+ImageMinimizerPlugin.normalizeConfig = require('./utils/normalize-config').default;
+
+export default ImageMinimizerPlugin;
