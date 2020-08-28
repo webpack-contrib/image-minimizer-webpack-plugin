@@ -11,7 +11,7 @@ module.exports = {
     {
       extends: ["plugin:itgalaxy/dirty", "plugin:itgalaxy/jest"],
       excludedFiles: ["**/*.md"],
-      files: ["**/__tests__/**/*", "**/__mocks__/**/*"],
+      files: ["**/test/**/*", "**/__mocks__/**/*"],
       rules: {
         // Allow to use `console` (example - `mocking`)
         "no-console": "off",
