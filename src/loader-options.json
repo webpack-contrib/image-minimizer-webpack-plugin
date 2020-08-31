@@ -2,8 +2,8 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "imageminOptions": {
-      "description": "Options for `imagemin`.",
+    "minimizerOptions": {
+      "description": "Options for `imageMinimizerOptions`.",
       "additionalProperties": true,
       "type": "object"
     },

@@ -86,85 +86,85 @@ exports[`validate options should throw an error on the "filter" option with "tru
    -> Allows filtering of images for optimization."
 `;
 
-exports[`validate options should throw an error on the "imageminOptions" option with "[]" value 1`] = `
+exports[`validate options should throw an error on the "minimizerOptions" option with "[]" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.imageminOptions should be an object:
+ - options.minimizerOptions should be an object:
    object { … }
-   -> Options for \`imagemin\`."
+   -> Options for \`imageMinimizerOptions\`."
 `;
 
-exports[`validate options should throw an error on the "imageminOptions" option with "1" value 1`] = `
+exports[`validate options should throw an error on the "minimizerOptions" option with "1" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.imageminOptions should be an object:
+ - options.minimizerOptions should be an object:
    object { … }
-   -> Options for \`imagemin\`."
+   -> Options for \`imageMinimizerOptions\`."
 `;
 
-exports[`validate options should throw an error on the "imageminOptions" option with "false" value 1`] = `
+exports[`validate options should throw an error on the "minimizerOptions" option with "false" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.imageminOptions should be an object:
+ - options.minimizerOptions should be an object:
    object { … }
-   -> Options for \`imagemin\`."
+   -> Options for \`imageMinimizerOptions\`."
 `;
 
-exports[`validate options should throw an error on the "imageminOptions" option with "null" value 1`] = `
+exports[`validate options should throw an error on the "minimizerOptions" option with "null" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.imageminOptions should be an object:
+ - options.minimizerOptions should be an object:
    object { … }
-   -> Options for \`imagemin\`."
+   -> Options for \`imageMinimizerOptions\`."
 `;
 
-exports[`validate options should throw an error on the "imageminOptions" option with "true" value 1`] = `
+exports[`validate options should throw an error on the "minimizerOptions" option with "true" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.imageminOptions should be an object:
+ - options.minimizerOptions should be an object:
    object { … }
-   -> Options for \`imagemin\`."
+   -> Options for \`imageMinimizerOptions\`."
 `;
 
 exports[`validate options should throw an error on the "unknown" option with "/test/" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { imageminOptions?, cache?, filter?, bail? }"
+   object { minimizerOptions?, cache?, filter?, bail? }"
 `;
 
 exports[`validate options should throw an error on the "unknown" option with "[]" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { imageminOptions?, cache?, filter?, bail? }"
+   object { minimizerOptions?, cache?, filter?, bail? }"
 `;
 
 exports[`validate options should throw an error on the "unknown" option with "{"foo":"bar"}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { imageminOptions?, cache?, filter?, bail? }"
+   object { minimizerOptions?, cache?, filter?, bail? }"
 `;
 
 exports[`validate options should throw an error on the "unknown" option with "{}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { imageminOptions?, cache?, filter?, bail? }"
+   object { minimizerOptions?, cache?, filter?, bail? }"
 `;
 
 exports[`validate options should throw an error on the "unknown" option with "1" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { imageminOptions?, cache?, filter?, bail? }"
+   object { minimizerOptions?, cache?, filter?, bail? }"
 `;
 
 exports[`validate options should throw an error on the "unknown" option with "false" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { imageminOptions?, cache?, filter?, bail? }"
+   object { minimizerOptions?, cache?, filter?, bail? }"
 `;
 
 exports[`validate options should throw an error on the "unknown" option with "test" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { imageminOptions?, cache?, filter?, bail? }"
+   object { minimizerOptions?, cache?, filter?, bail? }"
 `;
 
 exports[`validate options should throw an error on the "unknown" option with "true" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { imageminOptions?, cache?, filter?, bail? }"
+   object { minimizerOptions?, cache?, filter?, bail? }"
 `;

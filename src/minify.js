@@ -73,7 +73,7 @@ function minify(tasks = [], options = {}) {
           return result;
         }
 
-        const imageminOptions = getConfigForFile(options, result);
+        const minimizerOptions = getConfigForFile(options, result);
 
         let cacheKey;
         let output;
@@ -82,7 +82,7 @@ function minify(tasks = [], options = {}) {
           cacheKey = serialize({
             hash: crypto.createHash('md4').update(result.input).digest('hex'),
             imagemin: imageminVersion,
-            'imagemin-options': imageminOptions,
+            'imagemin-options': minimizerOptions,
             'imagemin-webpack': packageVersion,
           });
 
@@ -100,7 +100,7 @@ function minify(tasks = [], options = {}) {
         }
 
         try {
-          output = await runImagemin(result.input, imageminOptions);
+          output = await runImagemin(result.input, minimizerOptions);
 
           result.output = output;
 

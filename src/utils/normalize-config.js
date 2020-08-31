@@ -16,21 +16,21 @@ function log(error, metaData, type = null) {
   throw error;
 }
 
-function normalizeConfig(imageminOptions, metaData = {}) {
+function normalizeConfig(minimizerOptions, metaData = {}) {
   if (
-    !imageminOptions ||
-    !imageminOptions.plugins ||
-    (imageminOptions.plugins && imageminOptions.plugins.length === 0)
+    !minimizerOptions ||
+    !minimizerOptions.plugins ||
+    (minimizerOptions.plugins && minimizerOptions.plugins.length === 0)
   ) {
     log(
       new Error('No plugins found for `imagemin`. Please read documentation.'),
       metaData
     );
 
-    return imageminOptions;
+    return minimizerOptions;
   }
 
-  const imageminConfig = klona(imageminOptions);
+  const imageminConfig = klona(minimizerOptions);
 
   if (!imageminConfig.pluginsMeta) {
     imageminConfig.pluginsMeta = [];

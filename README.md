@@ -78,7 +78,7 @@ module.exports = {
   },
   plugins: [
     new ImageMinimizerPlugin({
-      imageminOptions: {
+      minimizerOptions: {
         // Lossless optimization with custom option
         // Feel free to experiment with options for better result for you
         plugins: [
@@ -131,7 +131,7 @@ module.exports = {
             options: {
               bail: false, // Ignore errors on corrupted images
               cache: true,
-              imageminOptions: {
+              minimizerOptions: {
                 plugins: ['gifsicle'],
               },
             },
@@ -169,7 +169,7 @@ module.exports = {
     new ImageminWebpack({
       bail: false, // Ignore errors on corrupted images
       cache: true,
-      imageminOptions: {
+      minimizerOptions: {
         plugins: ['gifsicle'],
       },
       // Disable `loader`
@@ -185,17 +185,17 @@ module.exports = {
 
 <!--lint disable no-html-->
 
-|         Name          |                   Type                    |                  Default                   | Description                                                                                                               |
-| :-------------------: | :---------------------------------------: | :----------------------------------------: | :------------------------------------------------------------------------------------------------------------------------ |
-|      **`test`**       | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|svg)\$/i</code> | Test to match files against                                                                                               |
-|     **`include`**     | `{String\/RegExp\|Array<String\|RegExp>}` |                `undefined`                 | Files to `include`                                                                                                        |
-|     **`exclude`**     | `{String\/RegExp\|Array<String\|RegExp>}` |                `undefined`                 | Files to `exclude`                                                                                                        |
-|     **`filter`**      |               `{Function}`                |                `() => true`                | Allows filtering of images for optimization                                                                               |
-|      **`cache`**      |            `{Boolean\|String}`            |                  `false`                   | Enable file caching                                                                                                       |
-|      **`bail`**       |                `{Boolean}`                |          `compiler.options.bail`           | Emit warnings instead errors                                                                                              |
-| **`imageminOptions`** |                `{Object}`                 |             `{ plugins: [] }`              | Options for `imagemin`                                                                                                    |
-|     **`loader`**      |                `{Boolean}`                |                   `true`                   | Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other) |
-| **`maxConcurrency`**  |                `{Number}`                 |    `Math.max(1, os.cpus().length - 1)`     | Maximum number of concurrency optimization processes in one time                                                          |
+|          Name          |                   Type                    |                  Default                   | Description                                                                                                               |
+| :--------------------: | :---------------------------------------: | :----------------------------------------: | :------------------------------------------------------------------------------------------------------------------------ |
+|       **`test`**       | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|svg)\$/i</code> | Test to match files against                                                                                               |
+|     **`include`**      | `{String\/RegExp\|Array<String\|RegExp>}` |                `undefined`                 | Files to `include`                                                                                                        |
+|     **`exclude`**      | `{String\/RegExp\|Array<String\|RegExp>}` |                `undefined`                 | Files to `exclude`                                                                                                        |
+|      **`filter`**      |               `{Function}`                |                `() => true`                | Allows filtering of images for optimization                                                                               |
+|      **`cache`**       |            `{Boolean\|String}`            |                  `false`                   | Enable file caching                                                                                                       |
+|       **`bail`**       |                `{Boolean}`                |          `compiler.options.bail`           | Emit warnings instead errors                                                                                              |
+| **`minimizerOptions`** |                `{Object}`                 |             `{ plugins: [] }`              | Options for `imagemin`                                                                                                    |
+|      **`loader`**      |                `{Boolean}`                |                   `true`                   | Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other) |
+|  **`maxConcurrency`**  |                `{Number}`                 |    `Math.max(1, os.cpus().length - 1)`     | Maximum number of concurrency optimization processes in one time                                                          |
 
 <!--lint enable no-html-->
 
@@ -339,7 +339,7 @@ module.exports = {
 };
 ```
 
-#### `imageminOptions`
+#### `minimizerOptions`
 
 Options for `imagemin`.
 
@@ -353,7 +353,7 @@ const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 module.exports = {
   plugins: [
     new ImageMinimizerPlugin({
-      imageminOptions: {
+      minimizerOptions: {
         plugins: [
           // Name
           'gifsicle',
@@ -402,12 +402,12 @@ module.exports = {
 
 ### Loader Options
 
-|         Name          |        Type         |         Default         | Description                                 |
-| :-------------------: | :-----------------: | :---------------------: | :------------------------------------------ |
-|     **`filter`**      |    `{Function}`     |       `undefined`       | Allows filtering of images for optimization |
-|      **`cache`**      | `{Boolean\|String}` |         `false`         | Enable file caching                         |
-|      **`bail`**       |     `{Boolean}`     | `compiler.options.bail` | Emit warnings instead errors                |
-| **`imageminOptions`** |     `{Object}`      |    `{ plugins: [] }`    | Options for `imagemin`                      |
+|          Name          |        Type         |         Default         | Description                                 |
+| :--------------------: | :-----------------: | :---------------------: | :------------------------------------------ |
+|      **`filter`**      |    `{Function}`     |       `undefined`       | Allows filtering of images for optimization |
+|      **`cache`**       | `{Boolean\|String}` |         `false`         | Enable file caching                         |
+|       **`bail`**       |     `{Boolean}`     | `compiler.options.bail` | Emit warnings instead errors                |
+| **`minimizerOptions`** |     `{Object}`      |    `{ plugins: [] }`    | Options for `imagemin`                      |
 
 #### `filter`
 
@@ -442,7 +442,7 @@ module.exports = {
 
                 return true;
               },
-              imageminOptions: {
+              minimizerOptions: {
                 plugins: ['gifsicle'],
               },
             },
@@ -480,7 +480,7 @@ module.exports = {
             loader: ImageMinimizerPlugin.loader,
             options: {
               cache: true,
-              imageminOptions: {
+              minimizerOptions: {
                 plugins: ['gifsicle'],
               },
             },
@@ -514,7 +514,7 @@ module.exports = {
             loader: ImageMinimizerPlugin.loader,
             options: {
               cache: 'path/to/cache',
-              imageminOptions: {
+              minimizerOptions: {
                 plugins: ['gifsicle'],
               },
             },
@@ -548,7 +548,7 @@ module.exports = {
             loader: ImageMinimizerPlugin.loader,
             options: {
               bail: true,
-              imageminOptions: {
+              minimizerOptions: {
                 plugins: ['gifsicle'],
               },
             },
@@ -560,7 +560,7 @@ module.exports = {
 };
 ```
 
-#### `imageminOptions`
+#### `minimizerOptions`
 
 Options for [`imagemin`](https://github.com/imagemin/imagemin)
 
@@ -582,7 +582,7 @@ module.exports = {
             loader: ImageMinimizerPlugin.loader,
             options: {
               bail: true,
-              imageminOptions: {
+              minimizerOptions: {
                 plugins: [
                   ['gifsicle', { interlaced: true, optimizationLevel: 3 }],
                 ],
@@ -664,7 +664,7 @@ module.exports = {
 
         return false;
       },
-      imageminOptions: {
+      minimizerOptions: {
         plugins: [['jpegtran', { progressive: true }]],
       },
     }),
@@ -677,7 +677,7 @@ module.exports = {
 
         return false;
       },
-      imageminOptions: {
+      minimizerOptions: {
         plugins: [['jpegtran', { progressive: false }]],
       },
     }),
