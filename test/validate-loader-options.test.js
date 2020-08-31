@@ -4,7 +4,7 @@ import { fixturesPath, plugins, webpack } from './helpers';
 
 describe('validate options', () => {
   const tests = {
-    imageminOptions: {
+    minimizerOptions: {
       success: [{ plugins: [] }, {}],
       failure: [1, true, false, [], null],
     },
@@ -49,7 +49,7 @@ describe('validate options', () => {
       };
 
       if (key === 'bail') {
-        options.imageminLoaderOptions.imageminOptions = { plugins };
+        options.imageminLoaderOptions.minimizerOptions = { plugins };
       }
 
       let stats;

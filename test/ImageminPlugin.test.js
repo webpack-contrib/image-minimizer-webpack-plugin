@@ -154,7 +154,7 @@ describe('imagemin plugin', () => {
       emitPlugin: true,
       imageminPluginOptions: {
         cache: true,
-        imageminOptions: { plugins },
+        minimizerOptions: { plugins },
       },
     };
     const stats = await webpack(options);
@@ -236,7 +236,7 @@ describe('imagemin plugin', () => {
       emitPlugin: true,
       imageminPluginOptions: {
         cache: cacheDir,
-        imageminOptions: { plugins },
+        minimizerOptions: { plugins },
       },
     };
     const stats = await webpack(options);
@@ -314,7 +314,7 @@ describe('imagemin plugin', () => {
       emitPlugin: true,
       imageminPluginOptions: {
         cache: false,
-        imageminOptions: { plugins },
+        minimizerOptions: { plugins },
       },
     });
 
@@ -351,7 +351,7 @@ describe('imagemin plugin', () => {
     const stats = await webpack({
       emitPlugin: true,
       imageminPluginOptions: {
-        imageminOptions: { plugins },
+        minimizerOptions: { plugins },
         loader: false,
       },
     });
@@ -395,7 +395,7 @@ describe('imagemin plugin', () => {
       emitPlugin: true,
       entry: path.join(fixturesPath, 'empty-entry.js'),
       imageminPluginOptions: {
-        imageminOptions: {
+        minimizerOptions: {
           plugins: [],
         },
       },
@@ -416,7 +416,7 @@ describe('imagemin plugin', () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, 'single-image-loader.js'),
       imageminPluginOptions: {
-        imageminOptions: {
+        minimizerOptions: {
           plugins: [],
         },
       },
@@ -442,7 +442,7 @@ describe('imagemin plugin', () => {
       entry: path.join(fixturesPath, 'empty-entry.js'),
       imageminPluginOptions: {
         bail: true,
-        imageminOptions: {
+        minimizerOptions: {
           plugins,
         },
       },
@@ -466,7 +466,7 @@ describe('imagemin plugin', () => {
       entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminPluginOptions: {
         bail: true,
-        imageminOptions: {
+        minimizerOptions: {
           plugins,
         },
       },
@@ -493,7 +493,7 @@ describe('imagemin plugin', () => {
       entry: path.join(fixturesPath, 'empty-entry.js'),
       imageminPluginOptions: {
         bail: false,
-        imageminOptions: {
+        minimizerOptions: {
           plugins,
         },
       },
@@ -517,7 +517,7 @@ describe('imagemin plugin', () => {
       entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminPluginOptions: {
         bail: false,
-        imageminOptions: {
+        minimizerOptions: {
           plugins,
         },
       },
@@ -544,7 +544,7 @@ describe('imagemin plugin', () => {
       },
       entry: path.join(fixturesPath, 'empty-entry.js'),
       imageminPluginOptions: {
-        imageminOptions: {
+        minimizerOptions: {
           plugins,
         },
       },
@@ -568,7 +568,7 @@ describe('imagemin plugin', () => {
       bail: true,
       entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminPluginOptions: {
-        imageminOptions: {
+        minimizerOptions: {
           plugins,
         },
       },
@@ -595,7 +595,7 @@ describe('imagemin plugin', () => {
       },
       entry: path.join(fixturesPath, 'empty-entry.js'),
       imageminPluginOptions: {
-        imageminOptions: {
+        minimizerOptions: {
           plugins,
         },
       },
@@ -619,7 +619,7 @@ describe('imagemin plugin', () => {
       bail: false,
       entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminPluginOptions: {
-        imageminOptions: {
+        minimizerOptions: {
           plugins,
         },
       },
@@ -644,7 +644,7 @@ describe('imagemin plugin', () => {
         fileNames: ['plugin-test.png'],
       },
       imageminPluginOptions: {
-        imageminOptions: { plugins },
+        minimizerOptions: { plugins },
       },
     });
     const { compilation } = stats;
@@ -682,7 +682,7 @@ describe('imagemin plugin', () => {
         fileNames: ['nested/deep/plugin-test.png'],
       },
       imageminPluginOptions: {
-        imageminOptions: { plugins },
+        minimizerOptions: { plugins },
       },
     });
     const { compilation } = stats;
@@ -730,7 +730,7 @@ describe('imagemin plugin', () => {
 
           return true;
         },
-        imageminOptions: {
+        minimizerOptions: {
           plugins,
         },
       },
@@ -783,7 +783,7 @@ describe('imagemin plugin', () => {
 
             return false;
           },
-          imageminOptions: {
+          minimizerOptions: {
             plugins,
           },
         },
@@ -797,7 +797,7 @@ describe('imagemin plugin', () => {
 
             return false;
           },
-          imageminOptions: {
+          minimizerOptions: {
             plugins,
           },
         },
@@ -852,7 +852,7 @@ describe('imagemin plugin', () => {
 
             return false;
           },
-          imageminOptions: {
+          minimizerOptions: {
             plugins,
           },
         },
@@ -875,7 +875,7 @@ describe('imagemin plugin', () => {
 
             return false;
           },
-          imageminOptions: {
+          minimizerOptions: {
             plugins,
           },
         },

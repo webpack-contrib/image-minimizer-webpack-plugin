@@ -42,7 +42,7 @@ module.exports = async function loader(content) {
       {
         bail,
         cache: options.cache,
-        imageminOptions: options.imageminOptions,
+        minimizerOptions: options.minimizerOptions,
         filter: options.filter,
       }
     );

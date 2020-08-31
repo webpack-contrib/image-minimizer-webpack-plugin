@@ -147,16 +147,16 @@ it('validation', () => {
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {
-    new ImageMinimizerPlugin({ imageminOptions: {} });
+    new ImageMinimizerPlugin({ minimizerOptions: {} });
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ imageminOptions: null });
+    new ImageMinimizerPlugin({ minimizerOptions: null });
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {
     new ImageMinimizerPlugin({
-      imageminOptions: { plugins: [] },
+      minimizerOptions: { plugins: [] },
     });
   }).not.toThrow();
 

@@ -90,7 +90,7 @@ function runWebpack(maybeOptions) {
           ? options.imageminLoaderOptions
           : {
               cache: false,
-              imageminOptions: { plugins },
+              minimizerOptions: { plugins },
             },
       });
     }
@@ -113,7 +113,7 @@ function runWebpack(maybeOptions) {
           typeof imageminPluginOptions === 'boolean'
             ? {
                 cache: false,
-                imageminOptions: {
+                minimizerOptions: {
                   plugins,
                 },
               }

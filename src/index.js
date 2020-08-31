@@ -26,7 +26,7 @@ class ImageMinimizerPlugin {
       include,
       exclude,
       bail = null,
-      imageminOptions = {
+      minimizerOptions = {
         plugins: [],
       },
       loader = true,
@@ -38,7 +38,7 @@ class ImageMinimizerPlugin {
       cache,
       filter,
       exclude,
-      imageminOptions,
+      minimizerOptions,
       include,
       loader,
       maxConcurrency,
@@ -77,7 +77,7 @@ class ImageMinimizerPlugin {
       bail,
       cache,
       filter,
-      imageminOptions,
+      minimizerOptions,
       maxConcurrency,
     } = this.options;
 
@@ -106,7 +106,7 @@ class ImageMinimizerPlugin {
           bail,
           filter,
           cache,
-          imageminOptions,
+          minimizerOptions,
           maxConcurrency,
         }
       );
@@ -180,7 +180,7 @@ class ImageMinimizerPlugin {
           include,
           exclude,
           bail,
-          imageminOptions,
+          minimizerOptions,
         } = this.options;
 
         const loader = {
@@ -193,7 +193,7 @@ class ImageMinimizerPlugin {
             bail,
             cache,
             filter,
-            imageminOptions,
+            minimizerOptions,
           },
         };
 
