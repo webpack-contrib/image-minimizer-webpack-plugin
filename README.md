@@ -28,7 +28,7 @@ This plugin uses [imagemin](https://github.com/imagemin/imagemin) to optimize yo
 
 ## Getting Started
 
-To begin, you'll need to install `css-minimizer-webpack-plugin`:
+To begin, you'll need to install `image-minimizer-webpack-plugin`:
 
 ```console
 $ npm install image-minimizer-webpack-plugin --save-dev
@@ -61,7 +61,7 @@ npm install imagemin-gifsicle imagemin-mozjpeg imagemin-pngquant imagemin-svgo -
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   module: {
@@ -70,7 +70,7 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader", // Or `url-loader` or your other loader
+            loader: 'file-loader', // Or `url-loader` or your other loader
           },
         ],
       },
@@ -82,11 +82,11 @@ module.exports = {
         // Lossless optimization with custom option
         // Feel free to experiment with options for better result for you
         plugins: [
-          ["gifsicle", { interlaced: true }],
-          ["jpegtran", { progressive: true }],
-          ["optipng", { optimizationLevel: 5 }],
+          ['gifsicle', { interlaced: true }],
+          ['jpegtran', { progressive: true }],
+          ['optipng', { optimizationLevel: 5 }],
           [
-            "svgo",
+            'svgo',
             {
               plugins: [
                 {
@@ -115,7 +115,7 @@ In your `webpack.config.js`, add the `ImageMinimizerPlugin.loader`, chained with
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   module: {
@@ -124,7 +124,7 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader", // Or `url-loader` or your other loader
+            loader: 'file-loader', // Or `url-loader` or your other loader
           },
           {
             loader: ImageMinimizerPlugin.loader,
@@ -132,7 +132,7 @@ module.exports = {
               bail: false, // Ignore errors on corrupted images
               cache: true,
               imageminOptions: {
-                plugins: ["gifsicle"],
+                plugins: ['gifsicle'],
               },
             },
           },
@@ -150,15 +150,15 @@ module.exports = {
 **webpack.config.js**
 
 ```js
-const ImageminWebpack = require("image-minimizer-webpack-plugin");
+const ImageminWebpack = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   module: {
     rules: [
       {
-        loader: "file-loader",
+        loader: 'file-loader',
         options: {
-          name: "[path][name].[ext]",
+          name: '[path][name].[ext]',
         },
         test: /\.(jpe?g|png|gif|svg)$/i,
       },
@@ -170,7 +170,7 @@ module.exports = {
       bail: false, // Ignore errors on corrupted images
       cache: true,
       imageminOptions: {
-        plugins: ["gifsicle"],
+        plugins: ['gifsicle'],
       },
       // Disable `loader`
       loader: false,
@@ -196,7 +196,6 @@ module.exports = {
 | **`imageminOptions`** |                `{Object}`                 |             `{ plugins: [] }`              | Options for `imagemin`                                                                                                    |
 |     **`loader`**      |                `{Boolean}`                |                   `true`                   | Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other) |
 | **`maxConcurrency`**  |                `{Number}`                 |    `Math.max(1, os.cpus().length - 1)`     | Maximum number of concurrency optimization processes in one time                                                          |
-|    **`manifest`**     |                `{Object}`                 |                `undefined`                 | Contain optimized list of images from other plugins                                                                       |
 
 <!--lint enable no-html-->
 
@@ -207,7 +206,7 @@ Test to match files against.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   plugins: [
@@ -225,7 +224,7 @@ Files to include.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   plugins: [
@@ -243,7 +242,7 @@ Files to exclude.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   plugins: [
@@ -263,7 +262,7 @@ Return `true` to optimize the image, `false` otherwise.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   plugins: [
@@ -293,7 +292,7 @@ Enable/disable file caching.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   plugins: [
@@ -311,12 +310,12 @@ Enable file caching and set path to cache directory.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   plugins: [
     new ImageMinimizerPlugin({
-      cache: "path/to/cache",
+      cache: 'path/to/cache',
     }),
   ],
 };
@@ -329,7 +328,7 @@ Emit warnings instead errors.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   plugins: [
@@ -349,7 +348,7 @@ More information and examples [here](https://github.com/imagemin/imagemin).
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   plugins: [
@@ -357,12 +356,12 @@ module.exports = {
       imageminOptions: {
         plugins: [
           // Name
-          "gifsicle",
+          'gifsicle',
           // Name with options
-          ["mozjpeg", { quality: 80 }],
+          ['mozjpeg', { quality: 80 }],
           // Full package name
           [
-            "imagemin-svgo",
+            'imagemin-svgo',
             {
               plugins: [
                 {
@@ -373,7 +372,7 @@ module.exports = {
           ],
           [
             // Custom package name
-            "nonstandard-imagemin-package-name",
+            'nonstandard-imagemin-package-name',
             { myOptions: true },
           ],
         ],
@@ -390,7 +389,7 @@ Maximum number of concurrency optimization processes in one time.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   plugins: [
@@ -419,7 +418,7 @@ Return `true` to optimize the image, `false` otherwise.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   module: {
@@ -428,7 +427,7 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader", // Or `url-loader` or your other loader
+            loader: 'file-loader', // Or `url-loader` or your other loader
           },
           {
             loader: ImageMinimizerPlugin.loader,
@@ -444,7 +443,7 @@ module.exports = {
                 return true;
               },
               imageminOptions: {
-                plugins: ["gifsicle"],
+                plugins: ['gifsicle'],
               },
             },
           },
@@ -466,7 +465,7 @@ Enable/disable file caching.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   module: {
@@ -475,14 +474,14 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader", // Or `url-loader` or your other loader
+            loader: 'file-loader', // Or `url-loader` or your other loader
           },
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
               cache: true,
               imageminOptions: {
-                plugins: ["gifsicle"],
+                plugins: ['gifsicle'],
               },
             },
           },
@@ -500,7 +499,7 @@ Enable file caching and set path to cache directory.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   module: {
@@ -509,14 +508,14 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader", // Or `url-loader` or your other loader
+            loader: 'file-loader', // Or `url-loader` or your other loader
           },
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
-              cache: "path/to/cache",
+              cache: 'path/to/cache',
               imageminOptions: {
-                plugins: ["gifsicle"],
+                plugins: ['gifsicle'],
               },
             },
           },
@@ -534,7 +533,7 @@ Emit warnings instead errors.
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   module: {
@@ -543,14 +542,14 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader", // Or `url-loader` or your other loader
+            loader: 'file-loader', // Or `url-loader` or your other loader
           },
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
               bail: true,
               imageminOptions: {
-                plugins: ["gifsicle"],
+                plugins: ['gifsicle'],
               },
             },
           },
@@ -568,7 +567,7 @@ Options for [`imagemin`](https://github.com/imagemin/imagemin)
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   module: {
@@ -577,7 +576,7 @@ module.exports = {
         test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
           {
-            loader: "file-loader", // Or `url-loader` or your other loader
+            loader: 'file-loader', // Or `url-loader` or your other loader
           },
           {
             loader: ImageMinimizerPlugin.loader,
@@ -585,7 +584,7 @@ module.exports = {
               bail: true,
               imageminOptions: {
                 plugins: [
-                  ["gifsicle", { interlaced: true, optimizationLevel: 3 }],
+                  ['gifsicle', { interlaced: true, optimizationLevel: 3 }],
                 ],
               },
             },
@@ -604,13 +603,13 @@ module.exports = {
 The function normalizes configuration (converts plugins names and options to `Function`s) for using in `imagemin` package directly.
 
 ```js
-const imagemin = require("imagemin");
-const { normalizeConfig } = require("image-minimizer-webpack-plugin");
+const imagemin = require('imagemin');
+const { normalizeConfig } = require('image-minimizer-webpack-plugin');
 const imageminConfig = normalizeConfig({
   plugins: [
-    "jpegtran",
+    'jpegtran',
     [
-      "pngquant",
+      'pngquant',
       {
         quality: [0.6, 0.8],
       },
@@ -631,8 +630,8 @@ const imageminConfig = normalizeConfig({
 */
 
 (async () => {
-  const files = await imagemin(["images/*.{jpg,png}"], {
-    destination: "build/images",
+  const files = await imagemin(['images/*.{jpg,png}'], {
+    destination: 'build/images',
     plugins: imageminConfig.plugins,
   });
 
@@ -652,7 +651,7 @@ What is `progressive` image? [`Answer here`](https://jmperezperez.com/medium-ima
 **webpack.config.js**
 
 ```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   minimizer: [
@@ -666,7 +665,7 @@ module.exports = {
         return false;
       },
       imageminOptions: {
-        plugins: [["jpegtran", { progressive: true }]],
+        plugins: [['jpegtran', { progressive: true }]],
       },
     }),
     new ImageMinimizerPlugin({
@@ -679,7 +678,7 @@ module.exports = {
         return false;
       },
       imageminOptions: {
-        plugins: [["jpegtran", { progressive: false }]],
+        plugins: [['jpegtran', { progressive: false }]],
       },
     }),
   ],

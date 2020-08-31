@@ -1,17 +1,23 @@
-"use strict";
+import path from 'path';
 
-const path = require("path");
+import loaderUtils from 'loader-utils';
+import validateOptions from 'schema-utils';
 
-const loaderUtils = require("loader-utils");
-
-const minify = require("./minify");
+import minify from './minify';
+import schema from './loader-options.json';
 
 module.exports = async function loader(content) {
   const options = loaderUtils.getOptions(this);
+
+  validateOptions(schema, options, {
+    name: 'Image Minimizer Plugin Loader',
+    baseDataPath: 'options',
+  });
+
   const callback = this.async();
 
   const bail =
-    typeof options.bail === "undefined"
+    typeof options.bail === 'undefined'
       ? // eslint-disable-next-line no-underscore-dangle
         (this._compiler &&
           // eslint-disable-next-line no-underscore-dangle

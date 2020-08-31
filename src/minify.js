@@ -1,13 +1,13 @@
-"use strict";
+import os from 'os';
+import crypto from 'crypto';
 
-const os = require("os");
-const crypto = require("crypto");
-const cacache = require("cacache");
-const serialize = require("serialize-javascript");
-const findCacheDir = require("find-cache-dir");
-const pLimit = require("p-limit");
-const getConfigForFile = require("./utils/get-config-for-file");
-const runImagemin = require("./utils/run-imagemin");
+import cacache from 'cacache';
+import serialize from 'serialize-javascript';
+import findCacheDir from 'find-cache-dir';
+import pLimit from 'p-limit';
+
+import getConfigForFile from './utils/get-config-for-file';
+import runImagemin from './utils/run-imagemin';
 
 function minify(tasks = [], options = {}) {
   if (tasks.length === 0) {
@@ -24,24 +24,24 @@ function minify(tasks = [], options = {}) {
   if (options.cache) {
     cacheDir =
       options.cache === true
-        ? findCacheDir({ name: "imagemin-webpack" }) || os.tmpdir()
+        ? findCacheDir({ name: 'imagemin-webpack' }) || os.tmpdir()
         : options.cache;
 
     try {
-      // eslint-disable-next-line node/global-require
-      imageminVersion = require("imagemin/package.json").version;
+      // eslint-disable-next-line global-require
+      imageminVersion = require('imagemin/package.json').version;
     } catch (ignoreError) {
       /* istanbul ignore next */
-      imageminVersion = "unknown";
+      imageminVersion = 'unknown';
       // Nothing
     }
 
     try {
-      // eslint-disable-next-line node/global-require
-      packageVersion = require("../package.json").version;
+      // eslint-disable-next-line global-require
+      packageVersion = require('../package.json').version;
     } catch (ignoreError) {
       /* istanbul ignore next */
-      packageVersion = "unknown";
+      packageVersion = 'unknown';
       // Nothing
     }
   }
@@ -59,7 +59,7 @@ function minify(tasks = [], options = {}) {
         };
 
         if (!result.input) {
-          result.errors.push(new Error("Empty input"));
+          result.errors.push(new Error('Empty input'));
 
           return result;
         }
@@ -80,10 +80,10 @@ function minify(tasks = [], options = {}) {
 
         if (options.cache) {
           cacheKey = serialize({
-            hash: crypto.createHash("md4").update(result.input).digest("hex"),
+            hash: crypto.createHash('md4').update(result.input).digest('hex'),
             imagemin: imageminVersion,
-            "imagemin-options": imageminOptions,
-            "imagemin-webpack": packageVersion,
+            'imagemin-options': imageminOptions,
+            'imagemin-webpack': packageVersion,
           });
 
           try {

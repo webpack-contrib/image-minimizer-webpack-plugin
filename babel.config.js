@@ -1,5 +1,3 @@
-"use strict";
-
 const MIN_BABEL_VERSION = 7;
 
 module.exports = (api) => {
@@ -9,10 +7,10 @@ module.exports = (api) => {
   return {
     presets: [
       [
-        "@babel/preset-env",
+        '@babel/preset-env',
         {
           targets: {
-            node: "10.13.0",
+            node: '10.13.0',
           },
         },
       ],

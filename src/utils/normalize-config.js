@@ -1,10 +1,8 @@
-"use strict";
-
-const { klona } = require("klona/full");
+import { klona } from 'klona/full';
 
 function log(error, metaData, type = null) {
   if (metaData.result) {
-    const shouldBeError = type === "error" ? true : metaData.options.bail;
+    const shouldBeError = type === 'error' ? true : metaData.options.bail;
 
     if (shouldBeError) {
       metaData.result.errors.push(error);
@@ -25,7 +23,7 @@ function normalizeConfig(imageminOptions, metaData = {}) {
     (imageminOptions.plugins && imageminOptions.plugins.length === 0)
   ) {
     log(
-      new Error("No plugins found for `imagemin`. Please read documentation."),
+      new Error('No plugins found for `imagemin`. Please read documentation.'),
       metaData
     );
 
@@ -42,7 +40,7 @@ function normalizeConfig(imageminOptions, metaData = {}) {
     .map((plugin) => {
       const isPluginArray = Array.isArray(plugin);
 
-      if (typeof plugin === "string" || isPluginArray) {
+      if (typeof plugin === 'string' || isPluginArray) {
         const pluginName = isPluginArray ? plugin[0] : plugin;
         // eslint-disable-next-line no-undefined
         const pluginOptions = isPluginArray ? plugin[1] : undefined;
@@ -51,16 +49,16 @@ function normalizeConfig(imageminOptions, metaData = {}) {
         let requiredPluginName = `imagemin-${pluginName}`;
 
         try {
-          // eslint-disable-next-line import/no-dynamic-require, node/global-require
+          // eslint-disable-next-line import/no-dynamic-require, global-require
           requiredPlugin = require(requiredPluginName)(pluginOptions);
         } catch (ignoreError) {
           requiredPluginName = pluginName;
 
           try {
-            // eslint-disable-next-line import/no-dynamic-require, node/global-require
+            // eslint-disable-next-line import/no-dynamic-require, global-require
             requiredPlugin = require(requiredPluginName)(pluginOptions);
           } catch (ignoreError1) {
-            const pluginNameForError = pluginName.startsWith("imagemin")
+            const pluginNameForError = pluginName.startsWith('imagemin')
               ? pluginName
               : `imagemin-${pluginName}`;
 
@@ -76,10 +74,10 @@ function normalizeConfig(imageminOptions, metaData = {}) {
           // Nothing
         }
 
-        let version = "unknown";
+        let version = 'unknown';
 
         try {
-          // eslint-disable-next-line import/no-dynamic-require, node/global-require
+          // eslint-disable-next-line import/no-dynamic-require, global-require
           ({ version } = require(`${requiredPluginName}/package.json`));
         } catch (ignoreVersion) {
           // Nothing
@@ -94,13 +92,13 @@ function normalizeConfig(imageminOptions, metaData = {}) {
         ]);
 
         return requiredPlugin;
-      } else if (typeof plugin === "function") {
+      } else if (typeof plugin === 'function') {
         log(
           new Error(
             "Do not use a function as plugin (i.e. '{ plugins: [imageminMozjpeg()] }'), it is not allowed invalidate a cache. It will be removed in next major release. You can rewrite this to '{ plugins: ['mozjpeg'] }' or '{ plugins: [['mozjpeg', options]] }', please see the documentation for more information."
           ),
           metaData,
-          "warning"
+          'warning'
         );
       } else {
         log(
@@ -122,4 +120,4 @@ function normalizeConfig(imageminOptions, metaData = {}) {
   return imageminConfig;
 }
 
-module.exports = normalizeConfig;
+export default normalizeConfig;

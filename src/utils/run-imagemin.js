@@ -1,9 +1,7 @@
-"use strict";
-
-const imagemin = require("imagemin");
+import imagemin from 'imagemin';
 
 function runImagemin(source, imageminOptions) {
   return imagemin.buffer(source, imageminOptions);
 }
 
-module.exports = runImagemin;
+export default runImagemin;

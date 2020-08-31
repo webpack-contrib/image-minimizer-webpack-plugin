@@ -2,40 +2,55 @@
   "name": "image-minimizer-webpack-plugin",
   "version": "5.1.0",
   "description": "Webpack loader and plugin to optimize (compress) images using imagemin",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin.git"
-  },
-  "homepage": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin",
-  "keywords": [
-    "webpack",
-    "loader",
-    "plugin",
-    "imagemin",
-    "images",
-    "minify",
-    "compress",
-    "optimize"
-  ],
-  "author": "Alexander Krasnoyarov (https://github.com/evilebottnawi)",
-  "bugs": {
-    "url": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues"
-  },
   "license": "MIT",
-  "main": "index.js",
-  "files": [
-    "src"
-  ],
+  "repository": "webpack-contrib/image-minimizer-webpack-plugin",
+  "author": "Alexander Krasnoyarov (https://github.com/evilebottnawi)",
+  "homepage": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin",
+  "bugs": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues",
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/webpack"
+  },
+  "main": "dist/cjs.js",
   "engines": {
     "node": ">= 10.13.0"
   },
+  "scripts": {
+    "start": "npm run build -- -w",
+    "clean": "del-cli dist",
+    "prebuild": "npm run clean",
+    "build": "cross-env NODE_ENV=production babel src -d dist --copy-files",
+    "commitlint": "commitlint --from=master",
+    "security": "npm audit",
+    "lint:prettier": "prettier \"{**/*,*}.{js,json,md,yml,css,ts}\" --list-different",
+    "lint:js": "eslint --cache .",
+    "lint": "npm-run-all -l -p \"lint:**\"",
+    "prettier": "npm run lint:prettier -- --write",
+    "fix:js": "npm run lint:script -- --fix",
+    "fix": "npm-run-all -p 'fix:**' -l prettier",
+    "test:only": "cross-env NODE_ENV=test jest --runInBand",
+    "test:watch": "npm run test:only -- --watch",
+    "test:coverage": "npm run test:only -- --collectCoverageFrom=\"src/**/*.js\" --coverage",
+    "pretest": "npm run lint",
+    "test": "npm run test:coverage",
+    "prepare": "npm run build",
+    "release": "standard-version",
+    "defaults": "webpack-defaults"
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "webpack": "^4.0.0 || ^5.0.0"
+  },
   "dependencies": {
     "cacache": "^15.0.5",
-    "klona": "^2.0.3",
     "find-cache-dir": "^3.3.1",
     "imagemin": "^7.0.1",
+    "klona": "^2.0.3",
     "loader-utils": "^2.0.0",
     "p-limit": "^3.0.2",
+    "schema-utils": "^2.7.0",
     "serialize-javascript": "^4.0.0",
     "webpack-sources": "^1.4.3"
   },
@@ -43,11 +58,18 @@
     "@babel/cli": "^7.10.5",
     "@babel/core": "^7.11.1",
     "@babel/preset-env": "^7.11.0",
+    "@commitlint/cli": "^9.1.2",
+    "@commitlint/config-conventional": "^10.0.0",
+    "@webpack-contrib/defaults": "^6.3.0",
+    "@webpack-contrib/eslint-config-webpack": "^3.0.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.3.0",
+    "cross-env": "^7.0.2",
     "css-loader": "^4.2.1",
     "del": "^5.1.0",
+    "del-cli": "^3.0.1",
     "eslint": "^7.7.0",
+    "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-ava": "^11.0.0",
     "eslint-plugin-html": "^6.0.3",
     "eslint-plugin-import": "^2.22.0",
@@ -69,7 +91,8 @@
     "jest": "^26.4.0",
     "lint-staged": "^10.2.11",
     "lodash.defaultsdeep": "^4.6.1",
-    "mini-css-extract-plugin": "^0.10.0",
+    "memfs": "^3.2.0",
+    "mini-css-extract-plugin": "^0.11.0",
     "npm-run-all": "^4.1.5",
     "pify": "^5.0.0",
     "prettier": "^2.0.5",
@@ -80,22 +103,14 @@
     "url-loader": "^4.1.0",
     "webpack": "^4.44.1"
   },
-  "peerDependencies": {
-    "webpack": "^4.0.0 || ^5.0.0"
-  },
-  "scripts": {
-    "security": "npm audit",
-    "lint:prettier": "prettier . --list-different --ignore-path .gitignore",
-    "lint:js": "eslint . --cache --report-unused-disable-directives --ignore-path .gitignore --ext '.js,.cjs,.mjs,.jsx,.md'",
-    "lint:md": "remark . LICENSE -f -q -i .gitignore",
-    "lint": "npm-run-all -l -p 'lint:**'",
-    "prettier": "npm run lint:prettier -- --write",
-    "fix:js": "npm run lint:script -- --fix",
-    "fix": "npm-run-all -p 'fix:**' -l prettier",
-    "pretest": "npm run lint",
-    "test:only": "jest --runInBand",
-    "test:coverage": "jest --coverage --runInBand",
-    "test": "npm run test:coverage",
-    "release": "standard-version"
-  }
+  "keywords": [
+    "webpack",
+    "loader",
+    "plugin",
+    "imagemin",
+    "images",
+    "minify",
+    "compress",
+    "optimize"
+  ]
 }

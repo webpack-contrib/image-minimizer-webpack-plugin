@@ -1,20 +1,23 @@
-import fs from "fs";
-import path from "path";
-import imagemin from "imagemin";
-import imageminGifsicle from "imagemin-gifsicle";
-import imageminMozjpeg from "imagemin-mozjpeg";
-import imageminPngquant from "imagemin-pngquant";
-import imageminSvgo from "imagemin-svgo";
-import pify from "pify";
-import tempy from "tempy";
-import webpack from "webpack";
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import EmitPlugin from "./fixtures/EmitWepbackPlugin.js";
-import ImageMinimizerPlugin from "../index.js";
+import fs from 'fs';
+import path from 'path';
 
-const plugins = ["gifsicle", "mozjpeg", "pngquant", "svgo"];
+import imagemin from 'imagemin';
+import imageminGifsicle from 'imagemin-gifsicle';
+import imageminMozjpeg from 'imagemin-mozjpeg';
+import imageminPngquant from 'imagemin-pngquant';
+import imageminSvgo from 'imagemin-svgo';
+import pify from 'pify';
+import tempy from 'tempy';
+import webpack from 'webpack';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
-const fixturesPath = path.join(__dirname, "./fixtures");
+import ImageMinimizerPlugin from '../src/index';
+
+import EmitPlugin from './fixtures/EmitWepbackPlugin';
+
+const plugins = ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'];
+
+const fixturesPath = path.join(__dirname, './fixtures');
 
 function runWebpack(maybeOptions) {
   const maybeMultiCompiler = Array.isArray(maybeOptions)
@@ -29,17 +32,17 @@ function runWebpack(maybeOptions) {
       context: fixturesPath,
       entry: options.entry
         ? options.entry
-        : path.join(fixturesPath, "./loader.js"),
-      mode: "development",
+        : path.join(fixturesPath, './loader.js'),
+      mode: 'development',
       module: {
         rules: [
           {
             test: options.test ? options.test : /\.(jpe?g|png|gif|svg)$/i,
             use: [
               {
-                loader: "file-loader",
+                loader: 'file-loader',
                 options: {
-                  name: options.name ? options.name : "[path][name].[ext]",
+                  name: options.name ? options.name : '[path][name].[ext]',
                 },
               },
             ],
@@ -53,7 +56,7 @@ function runWebpack(maybeOptions) {
                     {
                       loader: MiniCssExtractPlugin.loader,
                     },
-                    "css-loader",
+                    'css-loader',
                   ],
                 }
               : []
@@ -64,14 +67,14 @@ function runWebpack(maybeOptions) {
                   test: /child-compilation\.js$/,
                   loader: path.resolve(
                     __dirname,
-                    "./fixtures/emit-asset-in-child-compilation-loader.js"
+                    './fixtures/emit-asset-in-child-compilation-loader.js'
                   ),
                 }
               : []
           ),
       },
       output: {
-        filename: "bundle.js",
+        filename: 'bundle.js',
         path:
           options.output && options.output.path
             ? options.output.path
@@ -107,7 +110,7 @@ function runWebpack(maybeOptions) {
 
       imageminPluginsOptions.forEach((imageminPluginOptions) => {
         const ImageMinimizerPluginCreated = new ImageMinimizerPlugin(
-          typeof imageminPluginOptions === "boolean"
+          typeof imageminPluginOptions === 'boolean'
             ? {
                 cache: false,
                 imageminOptions: {
@@ -135,8 +138,8 @@ function runWebpack(maybeOptions) {
         new MiniCssExtractPlugin({
           // Options similar to the same options in webpackOptions.output
           // both options are optional
-          filename: "[name].css",
-          chunkFilename: "[id].css",
+          filename: '[name].css',
+          chunkFilename: '[id].css',
         })
       );
     }
