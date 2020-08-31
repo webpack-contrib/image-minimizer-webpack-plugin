@@ -1,11 +1,19 @@
 import path from 'path';
 
 import loaderUtils from 'loader-utils';
+import validateOptions from 'schema-utils';
 
 import minify from './minify';
+import schema from './loader-options.json';
 
 module.exports = async function loader(content) {
   const options = loaderUtils.getOptions(this);
+
+  validateOptions(schema, options, {
+    name: 'Image Minimizer Plugin Loader',
+    baseDataPath: 'options',
+  });
+
   const callback = this.async();
 
   const bail =

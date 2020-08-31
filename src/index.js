@@ -2,8 +2,10 @@ import path from 'path';
 
 import webpack from 'webpack';
 import ModuleFilenameHelpers from 'webpack/lib/ModuleFilenameHelpers';
+import validateOptions from 'schema-utils';
 
 import minify from './minify';
+import schema from './plugin-options.json';
 
 // webpack 5 exposes the sources property to ensure the right version of webpack-sources is used
 const { RawSource } =
@@ -12,6 +14,11 @@ const { RawSource } =
 
 class ImageMinimizerPlugin {
   constructor(options = {}) {
+    validateOptions(schema, options, {
+      name: 'Image Minimizer Plugin',
+      baseDataPath: 'options',
+    });
+
     const {
       cache = false,
       filter = () => true,

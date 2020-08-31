@@ -1,0 +1,150 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`validation 1`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.test should be one of these:
+   [RegExp | non-empty string, ...] | RegExp | non-empty string
+   -> Filtering rules.
+   Details:
+    * options.test should be an array:
+      [RegExp | non-empty string, ...]
+    * options.test should be one of these:
+      RegExp | non-empty string
+      -> Filtering rule as regex or string.
+      Details:
+       * options.test should be an instance of RegExp.
+       * options.test should be a non-empty string."
+`;
+
+exports[`validation 2`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.test should be one of these:
+   [RegExp | non-empty string, ...] | RegExp | non-empty string
+   -> Filtering rules.
+   Details:
+    * options.test[0] should be one of these:
+      RegExp | non-empty string
+      -> Filtering rule as regex or string.
+      Details:
+       * options.test[0] should be an instance of RegExp.
+       * options.test[0] should be a non-empty string."
+`;
+
+exports[`validation 3`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.include should be one of these:
+   [RegExp | non-empty string, ...] | RegExp | non-empty string
+   -> Filtering rules.
+   Details:
+    * options.include should be an array:
+      [RegExp | non-empty string, ...]
+    * options.include should be one of these:
+      RegExp | non-empty string
+      -> Filtering rule as regex or string.
+      Details:
+       * options.include should be an instance of RegExp.
+       * options.include should be a non-empty string."
+`;
+
+exports[`validation 4`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.include should be one of these:
+   [RegExp | non-empty string, ...] | RegExp | non-empty string
+   -> Filtering rules.
+   Details:
+    * options.include[0] should be one of these:
+      RegExp | non-empty string
+      -> Filtering rule as regex or string.
+      Details:
+       * options.include[0] should be an instance of RegExp.
+       * options.include[0] should be a non-empty string."
+`;
+
+exports[`validation 5`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.exclude should be one of these:
+   [RegExp | non-empty string, ...] | RegExp | non-empty string
+   -> Filtering rules.
+   Details:
+    * options.exclude should be an array:
+      [RegExp | non-empty string, ...]
+    * options.exclude should be one of these:
+      RegExp | non-empty string
+      -> Filtering rule as regex or string.
+      Details:
+       * options.exclude should be an instance of RegExp.
+       * options.exclude should be a non-empty string."
+`;
+
+exports[`validation 6`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.exclude should be one of these:
+   [RegExp | non-empty string, ...] | RegExp | non-empty string
+   -> Filtering rules.
+   Details:
+    * options.exclude[0] should be one of these:
+      RegExp | non-empty string
+      -> Filtering rule as regex or string.
+      Details:
+       * options.exclude[0] should be an instance of RegExp.
+       * options.exclude[0] should be a non-empty string."
+`;
+
+exports[`validation 7`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.filter should be an instance of function.
+   -> Allows filtering of images for optimization."
+`;
+
+exports[`validation 8`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.filter should be an instance of function.
+   -> Allows filtering of images for optimization."
+`;
+
+exports[`validation 9`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.cache should be one of these:
+   boolean | string
+   -> Enable file caching.
+   Details:
+    * options.cache should be a boolean.
+    * options.cache should be a string."
+`;
+
+exports[`validation 10`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.bail should be a boolean.
+   -> Emit warnings instead errors."
+`;
+
+exports[`validation 11`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.bail should be a boolean.
+   -> Emit warnings instead errors."
+`;
+
+exports[`validation 12`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.imageminOptions should be an object:
+   object { … }
+   -> Options for \`imagemin\`."
+`;
+
+exports[`validation 13`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.maxConcurrency should be a number.
+   -> Maximum number of concurrency optimization processes in one time."
+`;
+
+exports[`validation 14`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.maxConcurrency should be a number.
+   -> Maximum number of concurrency optimization processes in one time."
+`;
+
+exports[`validation 15`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.loader should be a boolean.
+   -> Automatically adding \`imagemin-loader\` (require for minification images using in \`url-loader\`, \`svg-url-loader\` or other)."
+`;
