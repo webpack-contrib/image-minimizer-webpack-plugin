@@ -1,6 +1,6 @@
 {
   "type": "object",
-  "additionalProperties": true,
+  "additionalProperties": false,
   "properties": {
     "imageminOptions": {
       "description": "Options for `imagemin`.",

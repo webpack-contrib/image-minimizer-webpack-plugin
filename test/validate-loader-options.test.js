@@ -22,7 +22,7 @@ describe('validate options', () => {
     },
     unknown: {
       success: [],
-      // failure: [1, true, false, 'test', /test/, [], {}, { foo: 'bar' }],
+      failure: [1, true, false, 'test', /test/, [], {}, { foo: 'bar' }],
     },
   };
 

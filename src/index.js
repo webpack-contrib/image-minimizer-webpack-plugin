@@ -181,7 +181,6 @@ class ImageMinimizerPlugin {
           exclude,
           bail,
           imageminOptions,
-          name,
         } = this.options;
 
         const loader = {
@@ -195,7 +194,6 @@ class ImageMinimizerPlugin {
             cache,
             filter,
             imageminOptions,
-            name,
           },
         };
 
