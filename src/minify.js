@@ -1,15 +1,15 @@
 import os from 'os';
-import crypto from 'crypto';
 
-import cacache from 'cacache';
-import serialize from 'serialize-javascript';
-import findCacheDir from 'find-cache-dir';
 import pLimit from 'p-limit';
+import webpack from 'webpack';
 
-import getConfigForFile from './utils/get-config-for-file';
-import runImagemin from './utils/run-imagemin';
+import { getConfigForFile, runImagemin } from './utils';
 
-function minify(tasks = [], options = {}) {
+const { RawSource } =
+  // eslint-disable-next-line global-require
+  webpack.sources || require('webpack-sources');
+
+function minify(tasks = [], options = {}, cache) {
   if (tasks.length === 0) {
     return [];
   }
@@ -17,43 +17,15 @@ function minify(tasks = [], options = {}) {
   const cpus = os.cpus() || { length: 1 };
   const limit = pLimit(options.maxConcurrency || Math.max(1, cpus.length - 1));
 
-  let cacheDir = null;
-  let imageminVersion = null;
-  let packageVersion = null;
-
-  if (options.cache) {
-    cacheDir =
-      options.cache === true
-        ? findCacheDir({ name: 'imagemin-webpack' }) || os.tmpdir()
-        : options.cache;
-
-    try {
-      // eslint-disable-next-line global-require
-      imageminVersion = require('imagemin/package.json').version;
-    } catch (ignoreError) {
-      /* istanbul ignore next */
-      imageminVersion = 'unknown';
-      // Nothing
-    }
-
-    try {
-      // eslint-disable-next-line global-require
-      packageVersion = require('../package.json').version;
-    } catch (ignoreError) {
-      /* istanbul ignore next */
-      packageVersion = 'unknown';
-      // Nothing
-    }
-  }
-
   return Promise.all(
     tasks.map((task) =>
       limit(async () => {
-        const { input, filename } = task;
+        const { source, input, filename, cacheKeys } = task;
         const result = {
+          source,
           input,
           filename,
-          output: input,
+          cacheKeys,
           warnings: [],
           errors: [],
         };
@@ -67,6 +39,14 @@ function minify(tasks = [], options = {}) {
         // Ensure that the contents i have are in the form of a buffer
         result.input = Buffer.isBuffer(input) ? input : Buffer.from(input);
 
+        if (options.loader) {
+          result.output = input;
+          result.source = result.source || input;
+        } else {
+          result.output = new RawSource(input);
+          result.source = result.source || new RawSource(input);
+        }
+
         if (options.filter && !options.filter(result.input, filename)) {
           result.filtered = true;
 
@@ -75,46 +55,42 @@ function minify(tasks = [], options = {}) {
 
         const minimizerOptions = getConfigForFile(options, result);
 
-        let cacheKey;
         let output;
 
-        if (options.cache) {
-          cacheKey = serialize({
-            hash: crypto.createHash('md4').update(result.input).digest('hex'),
-            imagemin: imageminVersion,
-            'imagemin-options': minimizerOptions,
-            'imagemin-webpack': packageVersion,
-          });
-
-          try {
-            output = (await cacache.get(cacheDir, cacheKey)).data;
-          } catch (ignoreError) {
-            // No cache found
-          }
+        if (cache) {
+          output = await cache.get(result, { RawSource });
         }
 
-        if (output) {
+        if (!output) {
+          try {
+            // eslint-disable-next-line no-param-reassign
+            output = options.loader
+              ? await runImagemin(result.input, minimizerOptions)
+              : new RawSource(
+                  await runImagemin(result.input, minimizerOptions)
+                );
+          } catch (error) {
+            const errored = error instanceof Error ? error : new Error(error);
+            if (options.bail) {
+              result.errors.push(errored);
+            } else {
+              result.warnings.push(errored);
+            }
+
+            return result;
+          }
+
           result.output = output;
+
+          if (cache) {
+            await cache.store(result);
+          }
 
           return result;
         }
 
-        try {
-          output = await runImagemin(result.input, minimizerOptions);
-
+        if (output) {
           result.output = output;
-
-          if (options.cache) {
-            await cacache.put(cacheDir, cacheKey, output);
-          }
-        } catch (error) {
-          const errored = error instanceof Error ? error : new Error(error);
-
-          if (options.bail) {
-            result.errors.push(errored);
-          } else {
-            result.warnings.push(errored);
-          }
         }
 
         return result;

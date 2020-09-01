@@ -16,6 +16,7 @@ export default class EmitWepbackPlugin {
 
   apply(compiler) {
     const plugin = { name: "EmitPlugin" };
+    const mapCache = new Map();
 
     compiler.hooks.thisCompilation.tap(plugin, (compilation) => {
       compilation.hooks.additionalAssets.tapPromise(plugin, () => {
@@ -26,7 +27,14 @@ export default class EmitWepbackPlugin {
             const filePath = path.join(__dirname, fileName);
             const data = await pify(fs.readFile)(filePath);
 
-            compilation.emitAsset(fileName, new RawSource(data));
+            let source = mapCache.get(fileName);
+
+            if (!source) {
+              source = new RawSource(data);
+              mapCache.set(fileName, source);
+            }
+
+            compilation.emitAsset(fileName, source);
           })
         );
       });
