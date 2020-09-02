@@ -81,6 +81,17 @@ function runWebpack(maybeOptions, getCompiler = false) {
                   ),
                 }
               : []
+          )
+          .concat(
+            options.emitAssetPlugin
+              ? {
+                  test: /simple-emit\.js$/,
+                  loader: path.resolve(
+                    __dirname,
+                    './fixtures/emitAssetLoader.js'
+                  ),
+                }
+              : []
           ),
       },
       output: {

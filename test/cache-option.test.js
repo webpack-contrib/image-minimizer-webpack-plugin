@@ -7,7 +7,125 @@ import del from 'del';
 import cacache from 'cacache';
 import findCacheDir from 'find-cache-dir';
 
-import { isOptimized, plugins, webpack, compile } from './helpers';
+import {
+  isOptimized,
+  plugins,
+  webpack,
+  compile,
+  fixturesPath,
+} from './helpers';
+
+describe('cache option - persistent cache', () => {
+  it('should work persistent cache (loader + plugin)', async () => {
+    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
+
+    await cacache.rm.all(cacheDir);
+
+    const compiler = await webpack(
+      {
+        entry: path.join(fixturesPath, './simple.js'),
+        emitPlugin: true,
+        emitAssetPlugin: true,
+        imageminPluginOptions: {
+          cache: true,
+          minimizerOptions: { plugins },
+        },
+      },
+      true
+    );
+
+    const stats = await compile(compiler);
+
+    const { compilation } = stats;
+
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(stats.compilation.assets).filter(
+          (assetName) => stats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(3);
+    } else {
+      expect(stats.compilation.emittedAssets.size).toBe(3);
+    }
+
+    const secondStats = await compile(compiler);
+    const {
+      warnings: secondWarnings,
+      errors: secondErrors,
+    } = secondStats.compilation;
+
+    expect(secondWarnings).toHaveLength(0);
+    expect(secondErrors).toHaveLength(0);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(secondStats.compilation.assets).filter(
+          (assetName) => secondStats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(0);
+    } else {
+      expect(secondStats.compilation.emittedAssets.size).toBe(0);
+    }
+  });
+
+  it('should work persistent cache when cache is false', async () => {
+    const compiler = await webpack(
+      {
+        entry: path.join(fixturesPath, './simple.js'),
+        emitPlugin: true,
+        emitAssetPlugin: true,
+        imageminPluginOptions: {
+          cache: false,
+          minimizerOptions: { plugins },
+        },
+      },
+      true
+    );
+
+    const stats = await compile(compiler);
+
+    const { compilation } = stats;
+
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(stats.compilation.assets).filter(
+          (assetName) => stats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(3);
+    } else {
+      expect(stats.compilation.emittedAssets.size).toBe(3);
+    }
+
+    const secondStats = await compile(compiler);
+    const {
+      warnings: secondWarnings,
+      errors: secondErrors,
+    } = secondStats.compilation;
+
+    expect(secondWarnings).toHaveLength(0);
+    expect(secondErrors).toHaveLength(0);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(secondStats.compilation.assets).filter(
+          (assetName) => secondStats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(0);
+    } else {
+      expect(secondStats.compilation.emittedAssets.size).toBe(0);
+    }
+  });
+});
 
 if (webpack.isWebpack4()) {
   describe('cache option', () => {
