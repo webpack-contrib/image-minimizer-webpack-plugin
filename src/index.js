@@ -23,7 +23,7 @@ class ImageMinimizerPlugin {
       test = /\.(jpe?g|png|gif|tif|webp|svg)$/i,
       include,
       exclude,
-      bail = null,
+      severityError,
       minimizerOptions = {
         plugins: [],
       },
@@ -32,7 +32,7 @@ class ImageMinimizerPlugin {
     } = options;
 
     this.options = {
-      bail,
+      severityError,
       cache,
       filter,
       exclude,
@@ -78,7 +78,13 @@ class ImageMinimizerPlugin {
     CacheEngine,
     weakCache
   ) {
-    const { bail, filter, minimizerOptions, maxConcurrency } = this.options;
+    const {
+      severityError,
+      isProductionMode,
+      filter,
+      minimizerOptions,
+      maxConcurrency,
+    } = this.options;
     const cache = new CacheEngine(
       compilation,
       {
@@ -131,7 +137,8 @@ class ImageMinimizerPlugin {
           return task;
         }),
         {
-          bail,
+          severityError,
+          isProductionMode,
           filter,
           cache: this.options.cache,
           minimizerOptions,
@@ -171,11 +178,10 @@ class ImageMinimizerPlugin {
   }
 
   apply(compiler) {
-    const pluginName = this.constructor.name;
+    this.options.isProductionMode =
+      compiler.options.mode === 'production' || !compiler.options.mode;
 
-    if (typeof this.options.bail !== 'boolean') {
-      this.options.bail = compiler.options.bail;
-    }
+    const pluginName = this.constructor.name;
 
     const matchObject = ModuleFilenameHelpers.matchObject.bind(
       // eslint-disable-next-line no-undefined
@@ -203,7 +209,7 @@ class ImageMinimizerPlugin {
           test,
           include,
           exclude,
-          bail,
+          severityError,
           minimizerOptions,
         } = this.options;
 
@@ -214,7 +220,7 @@ class ImageMinimizerPlugin {
           enforce: 'pre',
           loader: path.join(__dirname, 'loader.js'),
           options: {
-            bail,
+            severityError,
             cache,
             filter,
             minimizerOptions,

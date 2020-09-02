@@ -114,14 +114,18 @@ exports[`validation 9`] = `
 
 exports[`validation 10`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.bail should be a boolean.
-   -> Emit warnings instead errors."
+ - options.severityError should be one of these:
+   boolean | string
+   -> Allows to choose how errors are displayed.
+   Details:
+    * options.severityError should be a boolean.
+    * options.severityError should be a string."
 `;
 
 exports[`validation 11`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.bail should be a boolean.
-   -> Emit warnings instead errors."
+ - options has an unknown property 'bail'. These properties are valid:
+   object { test?, include?, exclude?, minimizerOptions?, cache?, filter?, severityError?, loader?, maxConcurrency? }"
 `;
 
 exports[`validation 12`] = `

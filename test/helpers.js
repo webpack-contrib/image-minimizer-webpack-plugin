@@ -42,7 +42,10 @@ function runWebpack(maybeOptions, getCompiler = false) {
       entry: options.entry
         ? options.entry
         : path.join(fixturesPath, './loader.js'),
-      mode: 'development',
+      mode: options.mode || 'development',
+      optimization: {
+        noEmitOnErrors: false,
+      },
       cache: options.cache,
       module: {
         rules: [

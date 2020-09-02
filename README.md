@@ -129,7 +129,7 @@ module.exports = {
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
-              bail: false, // Ignore errors on corrupted images
+              severityError: 'warning', // Ignore errors on corrupted images
               cache: true,
               minimizerOptions: {
                 plugins: ['gifsicle'],
@@ -167,7 +167,7 @@ module.exports = {
   plugins: [
     // Make sure that the plugin placed after any plugins that added images
     new ImageminWebpack({
-      bail: false, // Ignore errors on corrupted images
+      severityError: 'warning', // Ignore errors on corrupted images
       cache: true,
       minimizerOptions: {
         plugins: ['gifsicle'],
@@ -192,7 +192,7 @@ module.exports = {
 |     **`exclude`**      | `{String\/RegExp\|Array<String\|RegExp>}` |                `undefined`                 | Files to `exclude`                                                                                                        |
 |      **`filter`**      |               `{Function}`                |                `() => true`                | Allows filtering of images for optimization                                                                               |
 |      **`cache`**       |            `{Boolean\|String}`            |                  `false`                   | Enable file caching                                                                                                       |
-|       **`bail`**       |                `{Boolean}`                |          `compiler.options.bail`           | Emit warnings instead errors                                                                                              |
+|  **`severityError`**   |            `{Boolean\|String}`            |                   `auto`                   | Allows to choose how errors are displayed                                                                                 |
 | **`minimizerOptions`** |                `{Object}`                 |             `{ plugins: [] }`              | Options for `imagemin`                                                                                                    |
 |      **`loader`**      |                `{Boolean}`                |                   `true`                   | Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other) |
 |  **`maxConcurrency`**  |                `{Number}`                 |    `Math.max(1, os.cpus().length - 1)`     | Maximum number of concurrency optimization processes in one time                                                          |
@@ -321,9 +321,19 @@ module.exports = {
 };
 ```
 
-#### `bail`
+#### `severityError`
 
-Emit warnings instead errors.
+Type: `Boolean|String`
+Default: `'auto'`
+
+Allows to choose how errors are displayed.
+
+Сan have the following values:
+
+- `'auto'` - emit warnings in `development` mode and emit errors in `production` mode (default behavior)
+- `false` or `'off'` - suppresses errors and warnings
+- `'warning'` - emit warnings instead errors
+- `true` or `'error'` - emit errors
 
 **webpack.config.js**
 
@@ -333,7 +343,7 @@ const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 module.exports = {
   plugins: [
     new ImageMinimizerPlugin({
-      bail: true,
+      severityError: 'warning',
     }),
   ],
 };
@@ -402,12 +412,12 @@ module.exports = {
 
 ### Loader Options
 
-|          Name          |        Type         |         Default         | Description                                 |
-| :--------------------: | :-----------------: | :---------------------: | :------------------------------------------ |
-|      **`filter`**      |    `{Function}`     |       `undefined`       | Allows filtering of images for optimization |
-|      **`cache`**       | `{Boolean\|String}` |         `false`         | Enable file caching                         |
-|       **`bail`**       |     `{Boolean}`     | `compiler.options.bail` | Emit warnings instead errors                |
-| **`minimizerOptions`** |     `{Object}`      |    `{ plugins: [] }`    | Options for `imagemin`                      |
+|          Name          |        Type         |      Default      | Description                                 |
+| :--------------------: | :-----------------: | :---------------: | :------------------------------------------ |
+|      **`filter`**      |    `{Function}`     |    `undefined`    | Allows filtering of images for optimization |
+|      **`cache`**       | `{Boolean\|String}` |      `false`      | Enable file caching                         |
+|  **`severityError`**   | `{Boolean\|String}` |      `auto`       | Allows to choose how errors are displayed   |
+| **`minimizerOptions`** |     `{Object}`      | `{ plugins: [] }` | Options for `imagemin`                      |
 
 #### `filter`
 
@@ -526,9 +536,19 @@ module.exports = {
 };
 ```
 
-#### `bail`
+#### `severityError`
 
-Emit warnings instead errors.
+Type: `Boolean|String`
+Default: `'auto'`
+
+Allows to choose how errors are displayed.
+
+Сan have the following values:
+
+- `'auto'` - emit warnings in `development` mode and emit errors in `production` mode (default behavior)
+- `false` or `'off'` - suppresses errors and warnings
+- `'warning'` - emit warnings instead errors
+- `true` or `'error'` - emit errors
 
 **webpack.config.js**
 
@@ -547,7 +567,7 @@ module.exports = {
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
-              bail: true,
+              severityError: 'warning',
               minimizerOptions: {
                 plugins: ['gifsicle'],
               },
@@ -581,7 +601,7 @@ module.exports = {
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
-              bail: true,
+              severityError: 'warning',
               minimizerOptions: {
                 plugins: [
                   ['gifsicle', { interlaced: true, optimizationLevel: 3 }],

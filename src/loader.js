@@ -24,17 +24,6 @@ module.exports = async function loader(content) {
 
   const callback = this.async();
 
-  const bail =
-    typeof options.bail === 'undefined'
-      ? // eslint-disable-next-line no-underscore-dangle
-        (this._compiler &&
-          // eslint-disable-next-line no-underscore-dangle
-          this._compiler.options &&
-          // eslint-disable-next-line no-underscore-dangle
-          this._compiler.options.bail) ||
-        false
-      : options.bail;
-
   const { resourcePath } = this;
 
   const task = {
@@ -73,7 +62,8 @@ module.exports = async function loader(content) {
     [result] = await minify(
       [task],
       {
-        bail,
+        isProductionMode: this.mode === 'production' || !this.mode,
+        severityError: options.severityError,
         loader: true,
         cache: options.cache,
         minimizerOptions: options.minimizerOptions,

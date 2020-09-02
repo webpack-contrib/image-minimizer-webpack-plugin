@@ -212,56 +212,6 @@ describe('minify', () => {
     expect(result[0].output.source().equals(input)).toBe(true);
   });
 
-  it('should throw warning on broken image (no `bail` option)', async () => {
-    const filename = path.resolve(__dirname, './fixtures/test-corrupted.jpg');
-    const input = await pify(fs.readFile)(filename);
-    const result = await minify([{ input, filename }], {
-      minimizerOptions: { plugins: ['mozjpeg'] },
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(1);
-    expect(result[0].errors).toHaveLength(0);
-    expect([...result[0].warnings][0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
-    );
-    expect(result[0].output.source().equals(input)).toBe(true);
-  });
-
-  it('should throw warning on broken image (`bail` option with `false` value)', async () => {
-    const filename = path.resolve(__dirname, './fixtures/test-corrupted.jpg');
-    const input = await pify(fs.readFile)(filename);
-    const result = await minify([{ input, filename }], {
-      bail: false,
-      minimizerOptions: { plugins: ['mozjpeg'] },
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(1);
-    expect(result[0].errors).toHaveLength(0);
-    expect([...result[0].warnings][0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
-    );
-    expect(result[0].output.source().equals(input)).toBe(true);
-  });
-
-  it('should throw error on broken image (`bail` option with `true` value)', async () => {
-    const filename = path.resolve(__dirname, './fixtures/test-corrupted.jpg');
-    const input = await pify(fs.readFile)(filename);
-    const result = await minify([{ input, filename }], {
-      bail: true,
-      minimizerOptions: { plugins: ['mozjpeg'] },
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(0);
-    expect(result[0].errors).toHaveLength(1);
-    expect([...result[0].errors][0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
-    );
-    expect(result[0].output.source().equals(input)).toBe(true);
-  });
-
   it('should return original content on invalid content (`String`)', async () => {
     const input = 'Foo';
     const result = await minify([{ input, filename: 'foo.jpg' }], {
