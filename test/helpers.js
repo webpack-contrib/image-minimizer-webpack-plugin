@@ -19,7 +19,16 @@ const plugins = ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'];
 
 const fixturesPath = path.join(__dirname, './fixtures');
 
-function runWebpack(maybeOptions) {
+function compile(compiler) {
+  return new Promise((resolve, reject) => {
+    compiler.run((err, stats) => {
+      if (err) return reject(err);
+      return resolve(stats);
+    });
+  });
+}
+
+function runWebpack(maybeOptions, getCompiler = false) {
   const maybeMultiCompiler = Array.isArray(maybeOptions)
     ? maybeOptions
     : [maybeOptions];
@@ -34,6 +43,7 @@ function runWebpack(maybeOptions) {
         ? options.entry
         : path.join(fixturesPath, './loader.js'),
       mode: 'development',
+      cache: options.cache,
       module: {
         rules: [
           {
@@ -68,6 +78,17 @@ function runWebpack(maybeOptions) {
                   loader: path.resolve(
                     __dirname,
                     './fixtures/emit-asset-in-child-compilation-loader.js'
+                  ),
+                }
+              : []
+          )
+          .concat(
+            options.emitAssetPlugin
+              ? {
+                  test: /simple-emit\.js$/,
+                  loader: path.resolve(
+                    __dirname,
+                    './fixtures/emitAssetLoader.js'
                   ),
                 }
               : []
@@ -147,6 +168,10 @@ function runWebpack(maybeOptions) {
     configs.push(config);
   });
 
+  if (getCompiler) {
+    return webpack(configs.length === 1 ? configs[0] : configs);
+  }
+
   return pify(webpack)(configs.length === 1 ? configs[0] : configs);
 }
 
@@ -202,4 +227,13 @@ function hasLoader(id, modules) {
   });
 }
 
-export { runWebpack as webpack, isOptimized, plugins, fixturesPath, hasLoader };
+runWebpack.isWebpack4 = () => webpack.version[0] === '4';
+
+export {
+  runWebpack as webpack,
+  compile,
+  isOptimized,
+  plugins,
+  fixturesPath,
+  hasLoader,
+};

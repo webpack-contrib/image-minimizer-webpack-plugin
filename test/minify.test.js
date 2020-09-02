@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 
-import cacache from 'cacache';
-import findCacheDir from 'find-cache-dir';
 import imagemin from 'imagemin';
 import imageminMozjpeg from 'imagemin-mozjpeg';
 import imageminSvgo from 'imagemin-svgo';
@@ -50,7 +48,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (relative filename)', async () => {
@@ -75,7 +73,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize multiple images', async () => {
@@ -109,8 +107,8 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result[0].output.equals(optimizedFirstSource)).toBe(true);
-    expect(result[1].output.equals(optimizedSecondSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedFirstSource)).toBe(true);
+    expect(result[1].output.source().equals(optimizedSecondSource)).toBe(true);
   });
 
   it('should return optimized image even when optimized image large then original', async () => {
@@ -141,7 +139,7 @@ describe('minify', () => {
       plugins: [imageminSvgo(svgoOptions)],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should not throw error on empty', async () => {
@@ -175,7 +173,7 @@ describe('minify', () => {
     expect(result[0].errors).toHaveLength(0);
     expect(result[0].filename).toBe(filename);
     expect(result[0].input.equals(input)).toBe(true);
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
   });
 
   it('should throw error on empty `imagemin.plugins` options', async () => {
@@ -193,7 +191,7 @@ describe('minify', () => {
     expect(result[0].errors).toHaveLength(0);
     expect(result[0].filename).toBe(filename);
     expect(result[0].input.equals(input)).toBe(true);
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
   });
 
   it('should throw error on invalid `imagemin.plugins` options', async () => {
@@ -211,7 +209,7 @@ describe('minify', () => {
     expect(result[0].errors).toHaveLength(0);
     expect(result[0].filename).toBe(filename);
     expect(result[0].input.equals(input)).toBe(true);
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
   });
 
   it('should throw warning on broken image (no `bail` option)', async () => {
@@ -227,7 +225,7 @@ describe('minify', () => {
     expect([...result[0].warnings][0].message).toMatch(
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
   });
 
   it('should throw warning on broken image (`bail` option with `false` value)', async () => {
@@ -244,7 +242,7 @@ describe('minify', () => {
     expect([...result[0].warnings][0].message).toMatch(
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
   });
 
   it('should throw error on broken image (`bail` option with `true` value)', async () => {
@@ -261,7 +259,7 @@ describe('minify', () => {
     expect([...result[0].errors][0].message).toMatch(
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
   });
 
   it('should return original content on invalid content (`String`)', async () => {
@@ -273,478 +271,7 @@ describe('minify', () => {
     expect(result).toHaveLength(1);
     expect(result[0].warnings).toHaveLength(0);
     expect(result[0].errors).toHaveLength(0);
-    expect(result[0].output.toString()).toBe(input);
-  });
-
-  it('should optimize and cache (`cache` option with `true` value)', async () => {
-    const spyGet = jest.spyOn(cacache, 'get');
-    const spyPut = jest.spyOn(cacache, 'put');
-
-    const cacheDir = findCacheDir({ name: 'imagemin-webpack' });
-
-    await cacache.rm.all(cacheDir);
-
-    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
-    const input = await pify(fs.readFile)(filename);
-    const result = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: ['mozjpeg'] },
-    });
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(0);
-    expect(result[0].errors).toHaveLength(0);
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
-
-    // Try to found cached files, but we don't have their in cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    // Put files in cache
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    spyGet.mockClear();
-    spyPut.mockClear();
-
-    const secondResult = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: ['mozjpeg'] },
-    });
-
-    expect(secondResult).toHaveLength(1);
-    expect(secondResult[0].warnings).toHaveLength(0);
-    expect(secondResult[0].errors).toHaveLength(0);
-    expect(secondResult[0].output.equals(optimizedSource)).toBe(true);
-
-    // Now we have cached files so we get their and don't put
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    expect(spyPut).toHaveBeenCalledTimes(0);
-
-    await cacache.rm.all(cacheDir);
-
-    spyGet.mockRestore();
-    spyPut.mockRestore();
-  });
-
-  it('should optimize and cache (`cache` option with `true` value and with `string` and `array` configuration)', async () => {
-    const spyGet = jest.spyOn(cacache, 'get');
-    const spyPut = jest.spyOn(cacache, 'put');
-
-    const cacheDir = findCacheDir({ name: 'imagemin-webpack' });
-
-    await cacache.rm.all(cacheDir);
-
-    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
-    const input = await pify(fs.readFile)(filename);
-    const result = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: ['mozjpeg'] },
-    });
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(0);
-    expect(result[0].errors).toHaveLength(0);
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
-
-    // Try to found cached files, but we don't have their in cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    // Put files in cache
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    spyGet.mockClear();
-    spyPut.mockClear();
-
-    const secondResult = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: [['mozjpeg']] },
-    });
-
-    expect(secondResult).toHaveLength(1);
-    expect(secondResult[0].warnings).toHaveLength(0);
-    expect(secondResult[0].errors).toHaveLength(0);
-    expect(secondResult[0].output.equals(optimizedSource)).toBe(true);
-
-    // Now we have cached files so we get their and don't put
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    expect(spyPut).toHaveBeenCalledTimes(0);
-
-    await cacache.rm.all(cacheDir);
-
-    spyGet.mockRestore();
-    spyPut.mockRestore();
-  });
-
-  it('should optimize and cache (`cache` option with `true` value and with same `array` configuration)', async () => {
-    const spyGet = jest.spyOn(cacache, 'get');
-    const spyPut = jest.spyOn(cacache, 'put');
-
-    const cacheDir = findCacheDir({ name: 'imagemin-webpack' });
-
-    await cacache.rm.all(cacheDir);
-
-    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
-    const input = await pify(fs.readFile)(filename);
-    const result = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: [['mozjpeg']] },
-    });
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(0);
-    expect(result[0].errors).toHaveLength(0);
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
-
-    // Try to found cached files, but we don't have their in cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    // Put files in cache
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    spyGet.mockClear();
-    spyPut.mockClear();
-
-    const secondResult = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: [['mozjpeg', {}]] },
-    });
-
-    expect(secondResult).toHaveLength(1);
-    expect(secondResult[0].warnings).toHaveLength(0);
-    expect(secondResult[0].errors).toHaveLength(0);
-    expect(secondResult[0].output.equals(optimizedSource)).toBe(true);
-
-    // Now we have cached files so we get their and don't put
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    expect(spyPut).toHaveBeenCalledTimes(0);
-
-    await cacache.rm.all(cacheDir);
-
-    spyGet.mockRestore();
-    spyPut.mockRestore();
-  });
-
-  it('should optimize and cache and invalidate cache with other `minimizerOptions`', async () => {
-    const spyGet = jest.spyOn(cacache, 'get');
-    const spyPut = jest.spyOn(cacache, 'put');
-
-    const cacheDir = findCacheDir({ name: 'imagemin-webpack' });
-
-    await cacache.rm.all(cacheDir);
-
-    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
-    const input = await pify(fs.readFile)(filename);
-    const result = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: [['mozjpeg', {}]] },
-    });
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(0);
-    expect(result[0].errors).toHaveLength(0);
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
-
-    // Try to found cached files, but we don't have their in cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    // Put files in cache
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    spyGet.mockClear();
-    spyPut.mockClear();
-
-    const secondResult = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: [['mozjpeg', { quality: 0 }]] },
-    });
-    const secondOptimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg({ quality: 0 })],
-    });
-
-    expect(secondResult).toHaveLength(1);
-    expect(secondResult[0].warnings).toHaveLength(0);
-    expect(secondResult[0].errors).toHaveLength(0);
-    expect(secondResult[0].output.equals(secondOptimizedSource)).toBe(true);
-
-    // Due invalidation of cache we try to get cache and put new cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    await cacache.rm.all(cacheDir);
-
-    spyGet.mockRestore();
-    spyPut.mockRestore();
-  });
-
-  it('should optimize and cache and invalidate cache with other version of `imagemin` plugin', async () => {
-    const spyGet = jest.spyOn(cacache, 'get');
-    const spyPut = jest.spyOn(cacache, 'put');
-
-    const cacheDir = findCacheDir({ name: 'imagemin-webpack' });
-
-    await cacache.rm.all(cacheDir);
-
-    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
-    const input = await pify(fs.readFile)(filename);
-
-    const result = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: [['mozjpeg', {}]] },
-    });
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(0);
-    expect(result[0].errors).toHaveLength(0);
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
-
-    // Try to found cached files, but we don't have their in cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    // Put files in cache
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    spyGet.mockClear();
-    spyPut.mockClear();
-
-    jest.doMock('imagemin-mozjpeg/package.json', () => ({
-      name: 'imagemin-mozjpeg',
-      version: '999999.99999.99999',
-    }));
-
-    const secondResult = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: [['mozjpeg', {}]] },
-    });
-    const secondOptimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(secondResult).toHaveLength(1);
-    expect(secondResult[0].warnings).toHaveLength(0);
-    expect(secondResult[0].errors).toHaveLength(0);
-    expect(secondResult[0].output.equals(secondOptimizedSource)).toBe(true);
-
-    // Due invalidation of cache we try to get cache and put new cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    await cacache.rm.all(cacheDir);
-
-    spyGet.mockRestore();
-    spyPut.mockRestore();
-
-    jest.dontMock('imagemin-mozjpeg/package.json');
-  });
-
-  it('should optimize and cache and invalidate cache with other version of `imagemin`', async () => {
-    const spyGet = jest.spyOn(cacache, 'get');
-    const spyPut = jest.spyOn(cacache, 'put');
-
-    const cacheDir = findCacheDir({ name: 'imagemin-webpack' });
-
-    await cacache.rm.all(cacheDir);
-
-    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
-    const input = await pify(fs.readFile)(filename);
-
-    const result = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: [['mozjpeg', {}]] },
-    });
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(0);
-    expect(result[0].errors).toHaveLength(0);
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
-
-    // Try to found cached files, but we don't have their in cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    // Put files in cache
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    spyGet.mockClear();
-    spyPut.mockClear();
-
-    jest.doMock('imagemin/package.json', () => ({
-      name: 'imagemin',
-      version: '999999.99999.99999',
-    }));
-
-    const secondResult = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: [['mozjpeg', {}]] },
-    });
-    const secondOptimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(secondResult).toHaveLength(1);
-    expect(secondResult[0].warnings).toHaveLength(0);
-    expect(secondResult[0].errors).toHaveLength(0);
-    expect(secondResult[0].output.equals(secondOptimizedSource)).toBe(true);
-
-    // Due invalidation of cache we try to get cache and put new cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    await cacache.rm.all(cacheDir);
-
-    spyGet.mockRestore();
-    spyPut.mockRestore();
-
-    jest.dontMock('imagemin-mozjpeg/package.json');
-  });
-
-  it('should optimize and cache and invalidate cache with other version of `imagemin-webpack`', async () => {
-    const spyGet = jest.spyOn(cacache, 'get');
-    const spyPut = jest.spyOn(cacache, 'put');
-
-    const cacheDir = findCacheDir({ name: 'imagemin-webpack' });
-
-    await cacache.rm.all(cacheDir);
-
-    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
-    const input = await pify(fs.readFile)(filename);
-
-    const result = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: [['mozjpeg', {}]] },
-    });
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(0);
-    expect(result[0].errors).toHaveLength(0);
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
-
-    // Try to found cached files, but we don't have their in cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    // Put files in cache
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    spyGet.mockClear();
-    spyPut.mockClear();
-
-    jest.doMock('image-minimizer-webpack-plugin/package.json', () => ({
-      name: 'imagemin-webpack',
-      version: '999999.99999.99999',
-    }));
-
-    const secondResult = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: [['mozjpeg', {}]] },
-    });
-    const secondOptimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(secondResult).toHaveLength(1);
-    expect(secondResult[0].warnings).toHaveLength(0);
-    expect(secondResult[0].errors).toHaveLength(0);
-    expect(secondResult[0].output.equals(secondOptimizedSource)).toBe(true);
-
-    // Due invalidation of cache we try to get cache and put new cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    await cacache.rm.all(cacheDir);
-
-    spyGet.mockRestore();
-    spyPut.mockRestore();
-
-    jest.dontMock('imagemin-mozjpeg/package.json');
-  });
-
-  it('should optimize and cache (`cache` option with `{String}` value)', async () => {
-    const spyGet = jest.spyOn(cacache, 'get');
-    const spyPut = jest.spyOn(cacache, 'put');
-
-    const cacheDir = findCacheDir({ name: 'minify-cache' });
-
-    await cacache.rm.all(cacheDir);
-
-    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
-    const input = await pify(fs.readFile)(filename);
-    const result = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: ['mozjpeg'] },
-    });
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(0);
-    expect(result[0].errors).toHaveLength(0);
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
-
-    // Try to found cached files, but we don't have their in cache
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    // Put files in cache
-    expect(spyPut).toHaveBeenCalledTimes(1);
-
-    spyGet.mockClear();
-    spyPut.mockClear();
-
-    const secondResult = await minify([{ input, filename }], {
-      cache: cacheDir,
-      minimizerOptions: { plugins: ['mozjpeg'] },
-    });
-
-    expect(secondResult).toHaveLength(1);
-    expect(secondResult[0].warnings).toHaveLength(0);
-    expect(secondResult[0].errors).toHaveLength(0);
-    expect(secondResult[0].output.equals(optimizedSource)).toBe(true);
-
-    // Now we have cached files so we get their and don't put
-    expect(spyGet).toHaveBeenCalledTimes(1);
-    expect(spyPut).toHaveBeenCalledTimes(0);
-
-    await cacache.rm.all(cacheDir);
-
-    spyGet.mockRestore();
-    spyPut.mockRestore();
-  });
-
-  it("should optimize and doesn't cache (`cache` option with `false` value)", async () => {
-    const spyGet = jest.spyOn(cacache, 'get');
-    const spyPut = jest.spyOn(cacache, 'put');
-
-    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
-    const input = await pify(fs.readFile)(filename);
-    const result = await minify([{ input, filename }], {
-      cache: false,
-      minimizerOptions: { plugins: ['mozjpeg'] },
-    });
-
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result).toHaveLength(1);
-    expect(result[0].warnings).toHaveLength(0);
-    expect(result[0].errors).toHaveLength(0);
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
-
-    expect(spyGet).toHaveBeenCalledTimes(0);
-    expect(spyPut).toHaveBeenCalledTimes(0);
-
-    spyGet.mockRestore();
-    spyPut.mockRestore();
+    expect(result[0].output.source().toString()).toBe(input);
   });
 
   it('should not optimize filtered', async () => {
@@ -767,7 +294,7 @@ describe('minify', () => {
     expect(result).toHaveLength(1);
     expect(result[0].warnings).toHaveLength(0);
     expect(result[0].errors).toHaveLength(0);
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
     expect(result[0].filename).toBe(filename);
     expect(result[0].filtered).toBe(true);
   });
@@ -791,7 +318,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `string`)', async () => {
@@ -813,7 +340,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `array`)', async () => {
@@ -835,7 +362,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg({ quality: 0 })],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `array` without options)', async () => {
@@ -857,7 +384,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `string` with full name)', async () => {
@@ -879,7 +406,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `array` with full name)', async () => {
@@ -901,7 +428,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg({ quality: 0 })],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `array` with full name and without options)', async () => {
@@ -923,7 +450,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should throw warning on empty `imagemin` options (configuration using `string`) (`bail` is not specify)', async () => {
@@ -943,7 +470,7 @@ describe('minify', () => {
     expect(result[0].errors).toHaveLength(0);
     expect(result[0].filename).toBe(path.resolve(filename));
     expect(result[0].input.equals(input)).toBe(true);
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
 
     expect(result).toHaveLength(1);
   });
@@ -966,7 +493,7 @@ describe('minify', () => {
     );
     expect(result[0].filename).toBe(filename);
     expect(result[0].input.equals(input)).toBe(true);
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
 
     expect(result).toHaveLength(1);
   });
@@ -989,7 +516,7 @@ describe('minify', () => {
     expect(result[0].errors).toHaveLength(0);
     expect(result[0].filename).toBe(filename);
     expect(result[0].input.equals(input)).toBe(true);
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
 
     expect(result).toHaveLength(1);
   });
@@ -1011,7 +538,7 @@ describe('minify', () => {
     expect(result[0].errors).toHaveLength(0);
     expect(result[0].filename).toBe(filename);
     expect(result[0].input.equals(input)).toBe(true);
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
 
     expect(result).toHaveLength(1);
   });
@@ -1038,7 +565,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize and throw warning on using `Function` configuration', async () => {
@@ -1063,7 +590,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 
   it('should throw error on invalid plugin configuration (`bail` is `true`)', async () => {
@@ -1084,7 +611,7 @@ describe('minify', () => {
     );
     expect(result[0].filename).toBe(filename);
     expect(result[0].input.equals(input)).toBe(true);
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
 
     expect(result).toHaveLength(1);
   });
@@ -1107,7 +634,7 @@ describe('minify', () => {
     expect(result[0].errors).toHaveLength(0);
     expect(result[0].filename).toBe(filename);
     expect(result[0].input.equals(input)).toBe(true);
-    expect(result[0].output.equals(input)).toBe(true);
+    expect(result[0].output.source().equals(input)).toBe(true);
 
     expect(result).toHaveLength(1);
   });
@@ -1137,6 +664,6 @@ describe('minify', () => {
       plugins: [imageminSvgo(svgoOptions)],
     });
 
-    expect(result[0].output.equals(optimizedSource)).toBe(true);
+    expect(result[0].output.source().equals(optimizedSource)).toBe(true);
   });
 });
