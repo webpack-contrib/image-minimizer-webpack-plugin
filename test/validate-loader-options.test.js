@@ -16,9 +16,9 @@ describe('validate options', () => {
       success: [() => false],
       failure: [1, true, false, {}, [], null],
     },
-    bail: {
-      success: [true, false],
-      failure: [1, {}, [], null, 'true'],
+    severityError: {
+      success: [true, false, 'error'],
+      failure: [{}, [], () => {}],
     },
     unknown: {
       success: [],

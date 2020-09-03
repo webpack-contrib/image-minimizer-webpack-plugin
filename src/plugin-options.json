@@ -79,9 +79,16 @@
       "description": "Allows filtering of images for optimization.",
       "instanceof": "Function"
     },
-    "bail": {
-      "description": "Emit warnings instead errors.",
-      "type": "boolean"
+    "severityError": {
+      "description": "Allows to choose how errors are displayed.",
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        }
+      ]
     },
     "loader": {
       "description": "Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other).",

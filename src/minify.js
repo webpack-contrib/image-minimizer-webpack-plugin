@@ -71,10 +71,25 @@ function minify(tasks = [], options = {}, cache) {
                 );
           } catch (error) {
             const errored = error instanceof Error ? error : new Error(error);
-            if (options.bail) {
-              result.errors.push(errored);
-            } else {
-              result.warnings.push(errored);
+
+            switch (options.severityError) {
+              case 'off':
+              case false:
+                break;
+              case 'error':
+              case true:
+                result.errors.push(errored);
+                break;
+              case 'warning':
+                result.warnings.push(errored);
+                break;
+              case 'auto':
+              default:
+                if (options.isProductionMode) {
+                  result.errors.push(errored);
+                } else {
+                  result.warnings.push(errored);
+                }
             }
 
             return result;

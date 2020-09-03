@@ -131,15 +131,19 @@ it('validation', () => {
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {
-    new ImageMinimizerPlugin({ bail: false });
+    new ImageMinimizerPlugin({ severityError: false });
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ bail: true });
+    new ImageMinimizerPlugin({ severityError: true });
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ bail: 'true' });
+    new ImageMinimizerPlugin({ severityError: 'error' });
+  }).not.toThrow();
+
+  expect(() => {
+    new ImageMinimizerPlugin({ severityError: () => {} });
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {

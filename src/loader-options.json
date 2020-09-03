@@ -22,9 +22,16 @@
       "description": "Allows filtering of images for optimization.",
       "instanceof": "Function"
     },
-    "bail": {
-      "description": "Emit warnings instead errors.",
-      "type": "boolean"
+    "severityError": {
+      "description": "Allows to choose how errors are displayed.",
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        }
+      ]
     }
   }
 }
