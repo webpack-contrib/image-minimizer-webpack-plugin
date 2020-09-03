@@ -43,24 +43,27 @@ function runWebpack(maybeOptions, getCompiler = false) {
         ? options.entry
         : path.join(fixturesPath, './loader.js'),
       mode: options.mode || 'development',
-      optimization: {
-        noEmitOnErrors: false,
-      },
+      optimization: options.optimization,
       cache: options.cache,
       module: {
-        rules: [
-          {
-            test: options.test ? options.test : /\.(jpe?g|png|gif|svg)$/i,
-            use: [
-              {
-                loader: 'file-loader',
-                options: {
-                  name: options.name ? options.name : '[path][name].[ext]',
-                },
-              },
-            ],
-          },
-        ]
+        rules: []
+          .concat(
+            !options.fileLoaderOff
+              ? {
+                  test: options.test ? options.test : /\.(jpe?g|png|gif|svg)$/i,
+                  use: [
+                    {
+                      loader: 'file-loader',
+                      options: {
+                        name: options.name
+                          ? options.name
+                          : '[path][name].[ext]',
+                      },
+                    },
+                  ],
+                }
+              : []
+          )
           .concat(
             options.MCEP
               ? {
@@ -95,6 +98,22 @@ function runWebpack(maybeOptions, getCompiler = false) {
                   ),
                 }
               : []
+          )
+          .concat(
+            options.assetResource
+              ? {
+                  test: /\.(jpe?g|png|gif|svg)$/i,
+                  type: 'asset/resource',
+                }
+              : []
+          )
+          .concat(
+            options.assetInline
+              ? {
+                  test: /\.(jpe?g|png|gif|svg)$/i,
+                  type: 'asset/inline',
+                }
+              : []
           ),
       },
       output: {
@@ -106,6 +125,14 @@ function runWebpack(maybeOptions, getCompiler = false) {
       },
       plugins: [],
     };
+
+    if (options.experiments) {
+      config.experiments = options.experiments;
+    }
+
+    if (options.output && options.output.assetModuleFilename) {
+      config.output.assetModuleFilename = options.output.assetModuleFilename;
+    }
 
     if (options.imageminLoader || options.imageminLoaderOptions) {
       config.module.rules[0].use = config.module.rules[0].use.concat({
@@ -230,6 +257,28 @@ function hasLoader(id, modules) {
   });
 }
 
+function readAsset(asset, compiler, stats) {
+  const usedFs = compiler.outputFileSystem;
+  const outputPath = stats.compilation.outputOptions.path;
+
+  let data = '';
+  let targetFile = asset;
+
+  const queryStringIdx = targetFile.indexOf('?');
+
+  if (queryStringIdx >= 0) {
+    targetFile = targetFile.substr(0, queryStringIdx);
+  }
+
+  try {
+    data = usedFs.readFileSync(path.join(outputPath, targetFile));
+  } catch (error) {
+    data = error.toString();
+  }
+
+  return data;
+}
+
 runWebpack.isWebpack4 = () => webpack.version[0] === '4';
 
 export {
@@ -239,4 +288,5 @@ export {
   plugins,
   fixturesPath,
   hasLoader,
+  readAsset,
 };

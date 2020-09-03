@@ -208,6 +208,9 @@ describe('loader', () => {
   it('should throws error on corrupted images using mode `production` and `severityError` option with `auto` value', async () => {
     const stats = await webpack({
       mode: 'production',
+      optimization: {
+        noEmitOnErrors: false,
+      },
       entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminLoaderOptions: {
         severityError: 'auto',
@@ -232,6 +235,9 @@ describe('loader', () => {
   it('should throws error on corrupted images using mode `production` and `severityError` option not specify value', async () => {
     const stats = await webpack({
       mode: 'production',
+      optimization: {
+        noEmitOnErrors: false,
+      },
       entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminLoaderOptions: { minimizerOptions: { plugins } },
     });
