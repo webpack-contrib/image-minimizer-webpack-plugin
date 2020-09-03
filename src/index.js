@@ -70,14 +70,37 @@ class ImageMinimizerPlugin {
     compilation.assets[name] = newSource;
   }
 
-  async runTasks(
+  async optimize(
     compiler,
     compilation,
-    assetNames,
+    assets,
     moduleAssets,
     CacheEngine,
     weakCache
   ) {
+    const matchObject = ModuleFilenameHelpers.matchObject.bind(
+      // eslint-disable-next-line no-undefined
+      undefined,
+      this.options
+    );
+
+    const assetNames = Object.keys(assets).filter((assetName) => {
+      if (!matchObject(assetName)) {
+        return false;
+      }
+
+      // Exclude already optimized assets from `image-minimizer-webpack-loader`
+      if (this.options.loader && moduleAssets.has(assetName)) {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (assetNames.length === 0) {
+      return Promise.resolve();
+    }
+
     const {
       severityError,
       isProductionMode,
@@ -183,12 +206,6 @@ class ImageMinimizerPlugin {
 
     const pluginName = this.constructor.name;
 
-    const matchObject = ModuleFilenameHelpers.matchObject.bind(
-      // eslint-disable-next-line no-undefined
-      undefined,
-      this.options
-    );
-
     const moduleAssets = new Set();
 
     if (this.options.loader) {
@@ -233,42 +250,19 @@ class ImageMinimizerPlugin {
 
     const weakCache = new WeakMap();
 
-    const optimizeFn = async (compilation, CacheEngine, assets) => {
-      const assetNames = Object.keys(assets).filter((assetName) => {
-        if (!matchObject(assetName)) {
-          return false;
-        }
-
-        // Exclude already optimized assets from `image-minimizer-webpack-loader`
-        if (this.options.loader && moduleAssets.has(assetName)) {
-          return false;
-        }
-
-        return true;
-      });
-
-      if (assetNames.length === 0) {
-        return Promise.resolve();
-      }
-
-      await this.runTasks(
-        compiler,
-        compilation,
-        assetNames,
-        moduleAssets,
-        CacheEngine,
-        weakCache
-      );
-
-      return Promise.resolve();
-    };
-
     if (ImageMinimizerPlugin.isWebpack4()) {
       // eslint-disable-next-line global-require
       const CacheEngine = require('./Webpack4Cache').default;
 
       compiler.hooks.emit.tapPromise({ name: pluginName }, (compilation) =>
-        optimizeFn(compilation, CacheEngine, compilation.assets)
+        this.optimize(
+          compiler,
+          compilation,
+          compilation.assets,
+          moduleAssets,
+          CacheEngine,
+          weakCache
+        )
       );
     } else {
       // eslint-disable-next-line global-require
@@ -283,7 +277,15 @@ class ImageMinimizerPlugin {
             name: pluginName,
             stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
           },
-          (assets) => optimizeFn(compilation, CacheEngine, assets)
+          (assets) =>
+            this.optimize(
+              compiler,
+              compilation,
+              assets,
+              moduleAssets,
+              CacheEngine,
+              weakCache
+            )
         );
       });
     }
