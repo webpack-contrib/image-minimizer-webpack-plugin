@@ -32,6 +32,7 @@ module.exports = async function loader(content) {
 
   const task = {
     input: content,
+    source: content,
     filename: path.relative(this.rootContext, resourcePath),
   };
 
@@ -72,13 +73,12 @@ module.exports = async function loader(content) {
       severityError,
       filter,
       minimizerOptions,
-      loader: true,
       isProductionMode: this.mode === 'production' || !this.mode,
     };
 
     result = await minify(task, minifyOptions);
 
-    await cache.store({...result, ...cacheData});
+    await cache.store({ ...result, ...cacheData });
   }
 
   if (result.warnings && result.warnings.length > 0) {

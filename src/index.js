@@ -13,6 +13,7 @@ import validateOptions from 'schema-utils';
 
 import minify from './minify';
 import schema from './plugin-options.json';
+import { runImagemin } from './utils';
 
 const { RawSource } =
   // eslint-disable-next-line global-require
@@ -180,8 +181,12 @@ class ImageMinimizerPlugin {
 
             result = await minify(cacheData, minifyOptions);
 
+            if (!result.output.source) {
+              result.output = new RawSource(result.output);
+            }
+
             if (result.warnings.length === 0 && result.errors.length === 0) {
-              await cache.store({...result, ...cacheData});
+              await cache.store({ ...result, ...cacheData });
             }
           }
 
