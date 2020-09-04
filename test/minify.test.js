@@ -42,7 +42,6 @@ describe('minify', () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
-    expect(result.input).toBeInstanceOf(Buffer);
     expect(result.filename).toBe(filename);
 
     const optimizedSource = await imagemin.buffer(input, {
@@ -65,7 +64,6 @@ describe('minify', () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
-    expect(result.input).toBeInstanceOf(Buffer);
     expect(result.filename).toBe(path.relative(process.cwd(), filename));
 
     const optimizedSource = await imagemin.buffer(input, {
@@ -129,7 +127,6 @@ describe('minify', () => {
     );
     expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
-    expect(result.input.equals(input)).toBe(true);
     expect(result.compressed.equals(input)).toBe(true);
   });
 
@@ -148,7 +145,6 @@ describe('minify', () => {
     );
     expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
-    expect(result.input.equals(input)).toBe(true);
     expect(result.compressed.equals(input)).toBe(true);
   });
 
@@ -167,7 +163,6 @@ describe('minify', () => {
     );
     expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
-    expect(result.input.equals(input)).toBe(true);
     expect(result.compressed.equals(input)).toBe(true);
   });
 
@@ -197,7 +192,6 @@ describe('minify', () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
-    expect(result.input).toBeInstanceOf(Buffer);
     expect(result.filename).toBe(filename);
 
     const optimizedSource = await imagemin.buffer(input, {
@@ -220,7 +214,6 @@ describe('minify', () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
-    expect(result.input).toBeInstanceOf(Buffer);
     expect(result.filename).toBe(filename);
 
     const optimizedSource = await imagemin.buffer(input, {
@@ -243,7 +236,6 @@ describe('minify', () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
-    expect(result.input).toBeInstanceOf(Buffer);
     expect(result.filename).toBe(filename);
 
     const optimizedSource = await imagemin.buffer(input, {
@@ -266,7 +258,6 @@ describe('minify', () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
-    expect(result.input).toBeInstanceOf(Buffer);
     expect(result.filename).toBe(filename);
 
     const optimizedSource = await imagemin.buffer(input, {
@@ -289,7 +280,6 @@ describe('minify', () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
-    expect(result.input).toBeInstanceOf(Buffer);
     expect(result.filename).toBe(filename);
 
     const optimizedSource = await imagemin.buffer(input, {
@@ -312,7 +302,6 @@ describe('minify', () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
-    expect(result.input).toBeInstanceOf(Buffer);
     expect(result.filename).toBe(filename);
 
     const optimizedSource = await imagemin.buffer(input, {
@@ -335,7 +324,6 @@ describe('minify', () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
-    expect(result.input).toBeInstanceOf(Buffer);
     expect(result.filename).toBe(filename);
 
     const optimizedSource = await imagemin.buffer(input, {
@@ -362,7 +350,6 @@ describe('minify', () => {
     );
     expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
-    expect(result.input.equals(input)).toBe(true);
     expect(result.compressed.equals(input)).toBe(true);
   });
 
@@ -382,7 +369,6 @@ describe('minify', () => {
       /Unknown plugin: imagemin-unknown/
     );
     expect(result.errors).toHaveLength(0);
-    expect(result.input).toBeInstanceOf(Buffer);
     expect(result.filename).toBe(filename);
 
     const optimizedSource = await imagemin.buffer(input, {
@@ -408,7 +394,6 @@ describe('minify', () => {
       /Do not use a function as plugin/
     );
     expect(result.errors).toHaveLength(0);
-    expect(result.input).toBeInstanceOf(Buffer);
     expect(result.filename).toBe(filename);
 
     const optimizedSource = await imagemin.buffer(input, {

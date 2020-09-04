@@ -74,7 +74,6 @@ module.exports = async function loader(content) {
 
     const minifyOptions = {
       input,
-      source: input,
       filename,
       severityError,
       minimizerOptions,

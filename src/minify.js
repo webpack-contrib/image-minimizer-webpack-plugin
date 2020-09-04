@@ -1,10 +1,9 @@
 import { getConfigForFile, runImagemin } from './utils';
 
 async function minify(options = {}) {
-  const { source, input, filename, severityError, isProductionMode } = options;
+  const { input, filename, severityError, isProductionMode } = options;
 
   const result = {
-    source,
     input,
     filename,
     warnings: [],
@@ -49,14 +48,20 @@ async function minify(options = {}) {
         }
     }
 
-    result.compressed = input;
-
-    return result;
+    return {
+      filename,
+      compressed: input,
+      warnings: result.warnings,
+      errors: result.errors,
+    };
   }
 
-  result.compressed = output;
-
-  return result;
+  return {
+    filename,
+    compressed: output,
+    warnings: result.warnings,
+    errors: result.errors,
+  };
 }
 
 module.exports = minify;

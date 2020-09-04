@@ -174,10 +174,8 @@ class ImageMinimizerPlugin {
             } = this.options;
 
             const minifyOptions = {
-              source: assetSource,
               input: assetSource.source(),
               filename: assetName,
-              assetSource,
               severityError,
               isProductionMode,
               minimizerOptions,
