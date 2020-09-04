@@ -1,7 +1,8 @@
 import { getConfigForFile, runImagemin } from './utils';
 
-async function minify(task, options = {}) {
-  const { source, input, filename } = task;
+async function minify(options = {}) {
+  const { source, input, filename, severityError, isProductionMode } = options;
+
   const result = {
     source,
     input,
@@ -19,18 +20,16 @@ async function minify(task, options = {}) {
   // Ensure that the contents i have are in the form of a buffer
   result.input = Buffer.isBuffer(input) ? input : Buffer.from(input);
 
-  result.output = result.source;
+  let output;
 
   const minimizerOptions = getConfigForFile(options, result);
-
-  let output;
 
   try {
     output = await runImagemin(result.input, minimizerOptions);
   } catch (error) {
     const errored = error instanceof Error ? error : new Error(error);
 
-    switch (options.severityError) {
+    switch (severityError) {
       case 'off':
       case false:
         break;
@@ -43,17 +42,19 @@ async function minify(task, options = {}) {
         break;
       case 'auto':
       default:
-        if (options.isProductionMode) {
+        if (isProductionMode) {
           result.errors.push(errored);
         } else {
           result.warnings.push(errored);
         }
     }
 
+    result.compressed = input;
+
     return result;
   }
 
-  result.output = output;
+  result.compressed = output;
 
   return result;
 }

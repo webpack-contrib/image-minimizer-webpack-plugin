@@ -37,18 +37,13 @@ module.exports = async function loader(content) {
     return;
   }
 
-  const task = {
-    input: content,
-    source: content,
-    filename,
-  };
-
+  const input = content;
   let cache;
   let cacheData;
-  let result;
+  let output;
 
   if (isWebpack4()) {
-    cacheData = { assetName: task.filename, input: task.input };
+    cacheData = { assetName: filename, input };
 
     // eslint-disable-next-line global-require
     const CacheEngine = require('./Webpack4Cache').default;
@@ -67,42 +62,49 @@ module.exports = async function loader(content) {
       // eslint-disable-next-line global-require
       'image-minimizer-webpack-plugin': require('../package.json').version,
       'image-minimizer-webpack-plugin-options': options,
-      assetName: task.filename,
-      contentHash: crypto.createHash('md4').update(task.input).digest('hex'),
+      assetName: filename,
+      contentHash: crypto.createHash('md4').update(input).digest('hex'),
     };
 
-    result = await cache.get(cacheData, { RawSource });
+    output = await cache.get(cacheData, { RawSource });
   }
 
-  if (!result) {
+  if (!output) {
     const { severityError, minimizerOptions } = options;
 
     const minifyOptions = {
+      input,
+      source: input,
+      filename,
       severityError,
       minimizerOptions,
       isProductionMode: this.mode === 'production' || !this.mode,
     };
 
-    result = await minify(task, minifyOptions);
+    output = await minify(minifyOptions);
+
+    if (output.errors && output.errors.length > 0) {
+      output.errors.forEach((warning) => {
+        this.emitError(warning);
+      });
+
+      callback(null, content);
+
+      return;
+    }
 
     if (isWebpack4()) {
-      await cache.store({ ...result, ...cacheData });
+      await cache.store({ ...output, ...cacheData });
     }
   }
 
-  if (result.warnings && result.warnings.length > 0) {
-    result.warnings.forEach((warning) => {
+  if (output.warnings && output.warnings.length > 0) {
+    output.warnings.forEach((warning) => {
       this.emitWarning(warning);
     });
   }
 
-  if (result.errors && result.errors.length > 0) {
-    result.errors.forEach((warning) => {
-      this.emitError(warning);
-    });
-  }
-
-  const data = result.output ? result.output : result.input;
+  const data = output.compressed || output.input;
 
   callback(null, data);
 };

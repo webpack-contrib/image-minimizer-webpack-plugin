@@ -13,7 +13,6 @@ import validateOptions from 'schema-utils';
 
 import minify from './minify';
 import schema from './plugin-options.json';
-import { runImagemin } from './utils';
 
 const { RawSource } =
   // eslint-disable-next-line global-require
@@ -127,7 +126,7 @@ class ImageMinimizerPlugin {
     for (const assetName of assetNames) {
       scheduledTasks.push(
         limit(async () => {
-          const { source, info } = ImageMinimizerPlugin.getAsset(
+          const { source: assetSource, info } = ImageMinimizerPlugin.getAsset(
             compilation,
             assetName
           );
@@ -138,14 +137,13 @@ class ImageMinimizerPlugin {
 
           if (
             this.options.filter &&
-            !this.options.filter(source.source(), assetName)
+            !this.options.filter(assetSource.source(), assetName)
           ) {
             return;
           }
 
           const cacheData = {
-            source,
-            input: source.source(),
+            source: assetSource,
             filename: assetName,
           };
 
@@ -160,42 +158,49 @@ class ImageMinimizerPlugin {
                 assetName,
                 contentHash: crypto
                   .createHash('md4')
-                  .update(cacheData.input)
+                  .update(assetSource.source())
                   .digest('hex'),
               };
             }
           }
 
-          let result = await cache.get(cacheData, { RawSource });
+          let output = await cache.get(cacheData, { RawSource });
 
-          if (!result) {
+          if (!output) {
             const {
               severityError,
               isProductionMode,
               minimizerOptions,
-              maxConcurrency,
             } = this.options;
 
             const minifyOptions = {
+              source: assetSource,
+              input: assetSource.source(),
+              filename: assetName,
+              assetSource,
               severityError,
               isProductionMode,
-              cache: this.options.cache,
               minimizerOptions,
-              maxConcurrency,
             };
 
-            result = await minify(cacheData, minifyOptions);
+            output = await minify(minifyOptions);
 
-            if (!result.output.source) {
-              result.output = new RawSource(result.output);
+            if (output.errors.length > 0) {
+              output.errors.forEach((error) => {
+                compilation.errors.push(error);
+              });
+
+              return;
             }
 
-            if (result.warnings.length === 0 && result.errors.length === 0) {
-              await cache.store({ ...result, ...cacheData });
+            if (output.compressed && !output.compressed.source) {
+              output.compressed = new RawSource(output.compressed);
             }
+
+            await cache.store({ ...output, ...cacheData });
           }
 
-          const { output, filename, warnings, errors } = result;
+          const { compressed, filename, warnings } = output;
 
           if (warnings && warnings.length > 0) {
             warnings.forEach((warning) => {
@@ -203,13 +208,7 @@ class ImageMinimizerPlugin {
             });
           }
 
-          if (errors && errors.length > 0) {
-            errors.forEach((warning) => {
-              compilation.errors.push(warning);
-            });
-          }
-
-          ImageMinimizerPlugin.updateAsset(compilation, filename, output, {
+          ImageMinimizerPlugin.updateAsset(compilation, filename, compressed, {
             minimized: true,
           });
         })
