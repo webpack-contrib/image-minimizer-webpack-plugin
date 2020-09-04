@@ -20,11 +20,11 @@ export default class Webpack4Cache {
     );
   }
 
-  async get(task, sources) {
+  async get(cacheData, sources) {
     let weakOutput;
 
     if (!this.loader) {
-      weakOutput = this.weakCache.get(task.source);
+      weakOutput = this.weakCache.get(cacheData.source);
 
       if (weakOutput) {
         return weakOutput;
@@ -37,30 +37,37 @@ export default class Webpack4Cache {
     }
 
     // eslint-disable-next-line no-param-reassign
-    task.cacheIdent = task.cacheIdent || serialize(task.cacheKeys);
+    cacheData.cacheIdent =
+      cacheData.cacheIdent || serialize(cacheData.cacheKeys);
 
     let cachedResult;
 
     try {
-      cachedResult = await cacache.get(this.cache, task.cacheIdent);
+      cachedResult = await cacache.get(this.cache, cacheData.cacheIdent);
     } catch (ignoreError) {
       // eslint-disable-next-line no-undefined
       return undefined;
     }
 
-    const result = Buffer.from(JSON.parse(cachedResult.data).data);
+    const result = JSON.parse(cachedResult.data);
+
+    result.output = Buffer.isBuffer(result.output)
+      ? result.output
+      : Buffer.from(result.output);
 
     if (this.loader) {
       return result;
     }
 
-    return new sources.RawSource(result);
+    result.output = new sources.RawSource(result.output);
+
+    return result;
   }
 
-  async store(task) {
+  async store(cacheData) {
     if (!this.loader) {
-      if (!this.weakCache.has(task.source)) {
-        this.weakCache.set(task.source, task.output);
+      if (!this.weakCache.has(cacheData.source)) {
+        this.weakCache.set(cacheData.source, cacheData);
       }
     }
 
@@ -69,13 +76,18 @@ export default class Webpack4Cache {
       return undefined;
     }
 
-    const { cacheIdent } = task;
-    let { output } = task;
+    const { cacheIdent } = cacheData;
+
+    let output = cacheData.output;
 
     if (!this.loader) {
-      output = output.source();
+      output = cacheData.output.source();
     }
 
-    return cacache.put(this.cache, cacheIdent, JSON.stringify(output));
+    return cacache.put(
+      this.cache,
+      cacheIdent,
+      JSON.stringify({ ...cacheData, output })
+    );
   }
 }

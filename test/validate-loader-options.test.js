@@ -9,7 +9,11 @@ describe('validate options', () => {
       failure: [1, true, false, [], null],
     },
     cache: {
-      success: [false, true, 'path/to/cache'],
+      success: [
+        false,
+        true,
+        path.resolve(__dirname, './outputs/type-filesystem'),
+      ],
       failure: [{}, []],
     },
     filter: {
@@ -48,7 +52,7 @@ describe('validate options', () => {
         },
       };
 
-      if (key === 'bail') {
+      if (key === 'severityError') {
         options.imageminLoaderOptions.minimizerOptions = { plugins };
       }
 

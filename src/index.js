@@ -1,6 +1,10 @@
 import path from 'path';
 
+import os from 'os';
+
 import crypto from 'crypto';
+
+import pLimit from 'p-limit';
 
 import webpack from 'webpack';
 import ModuleFilenameHelpers from 'webpack/lib/ModuleFilenameHelpers';
@@ -9,6 +13,10 @@ import validateOptions from 'schema-utils';
 
 import minify from './minify';
 import schema from './plugin-options.json';
+
+const { RawSource } =
+  // eslint-disable-next-line global-require
+  webpack.sources || require('webpack-sources');
 
 class ImageMinimizerPlugin {
   constructor(options = {}) {
@@ -101,13 +109,6 @@ class ImageMinimizerPlugin {
       return Promise.resolve();
     }
 
-    const {
-      severityError,
-      isProductionMode,
-      filter,
-      minimizerOptions,
-      maxConcurrency,
-    } = this.options;
     const cache = new CacheEngine(
       compilation,
       {
@@ -116,33 +117,33 @@ class ImageMinimizerPlugin {
       weakCache
     );
 
-    let results;
+    const cpus = os.cpus() || { length: 1 };
+    const limit = pLimit(
+      this.options.maxConcurrency || Math.max(1, cpus.length - 1)
+    );
+    const scheduledTasks = [];
 
-    const tasks = assetNames.filter((assetName) => {
-      const { info: assetInfo } = ImageMinimizerPlugin.getAsset(
-        compilation,
-        assetName
-      );
+    for (const assetName of assetNames) {
+      scheduledTasks.push(
+        limit(async () => {
+          const { source, info } = ImageMinimizerPlugin.getAsset(
+            compilation,
+            assetName
+          );
 
-      if (assetInfo.minimized) {
-        return false;
-      }
+          if (info.minimized) {
+            return;
+          }
 
-      return true;
-    });
-
-    try {
-      results = await minify(
-        tasks.map((assetName) => {
-          const task = {
-            source: compilation.getAsset(assetName).source,
-            input: compilation.getAsset(assetName).source.source(),
+          const cacheData = {
+            source,
+            input: source.source(),
             filename: assetName,
           };
 
           if (ImageMinimizerPlugin.isWebpack4()) {
             if (this.options.cache) {
-              task.cacheKeys = {
+              cacheData.cacheKeys = {
                 nodeVersion: process.version,
                 // eslint-disable-next-line global-require
                 'image-minimizer-webpack-plugin': require('../package.json')
@@ -151,53 +152,65 @@ class ImageMinimizerPlugin {
                 assetName,
                 contentHash: crypto
                   .createHash('md4')
-                  .update(task.input)
+                  .update(cacheData.input)
                   .digest('hex'),
               };
             }
           }
 
-          return task;
-        }),
-        {
-          severityError,
-          isProductionMode,
-          filter,
-          cache: this.options.cache,
-          minimizerOptions,
-          maxConcurrency,
-        },
-        cache
+          let result = await cache.get(cacheData, { RawSource });
+
+          if (!result) {
+            const {
+              severityError,
+              isProductionMode,
+              filter,
+              minimizerOptions,
+              maxConcurrency,
+            } = this.options;
+
+            const minifyOptions = {
+              severityError,
+              isProductionMode,
+              filter,
+              cache: this.options.cache,
+              minimizerOptions,
+              maxConcurrency,
+            };
+
+            result = await minify(cacheData, minifyOptions);
+
+            if (result.warnings.length === 0 && result.errors.length === 0) {
+              await cache.store({...result, ...cacheData});
+            }
+          }
+
+          const { filtered, output, filename, warnings, errors } = result;
+
+          if (filtered) {
+            return;
+          }
+
+          if (warnings && warnings.length > 0) {
+            warnings.forEach((warning) => {
+              compilation.warnings.push(warning);
+            });
+          }
+
+          if (errors && errors.length > 0) {
+            errors.forEach((warning) => {
+              compilation.errors.push(warning);
+            });
+          }
+
+          ImageMinimizerPlugin.updateAsset(compilation, filename, output, {
+            minimized: true,
+          });
+        })
       );
-    } catch (error) {
-      return Promise.reject(error);
     }
 
-    results.forEach((result) => {
-      const { filtered, output, filename, warnings, errors } = result;
-
-      if (filtered) {
-        return;
-      }
-
-      if (warnings && warnings.length > 0) {
-        warnings.forEach((warning) => {
-          compilation.warnings.push(warning);
-        });
-      }
-
-      if (errors && errors.length > 0) {
-        errors.forEach((warning) => {
-          compilation.errors.push(warning);
-        });
-      }
-
-      ImageMinimizerPlugin.updateAsset(compilation, filename, output, {
-        minimized: true,
-      });
-    });
-
-    return Promise.resolve();
+    return Promise.all(scheduledTasks);
   }
 
   apply(compiler) {

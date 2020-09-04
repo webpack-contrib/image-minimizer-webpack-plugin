@@ -14,6 +14,10 @@ const isWebpack4 = () => {
   return webpack.version[0] === '4';
 };
 
+const { RawSource } =
+  // eslint-disable-next-line global-require
+  webpack.sources || require('webpack-sources');
+
 module.exports = async function loader(content) {
   const options = loaderUtils.getOptions(this);
 
@@ -32,8 +36,11 @@ module.exports = async function loader(content) {
   };
 
   let cache;
+  let cacheData;
 
   if (isWebpack4()) {
+    cacheData = { assetName: task.filename, input: task.input };
+
     // eslint-disable-next-line global-require
     const CacheEngine = require('./Webpack4Cache').default;
 
@@ -46,7 +53,7 @@ module.exports = async function loader(content) {
       true
     );
 
-    task.cacheKeys = {
+    cacheData.cacheKeys = {
       nodeVersion: process.version,
       // eslint-disable-next-line global-require
       'image-minimizer-webpack-plugin': require('../package.json').version,
@@ -56,25 +63,22 @@ module.exports = async function loader(content) {
     };
   }
 
-  let result;
+  let result = await cache.get(cacheData, { RawSource });
 
-  try {
-    [result] = await minify(
-      [task],
-      {
-        isProductionMode: this.mode === 'production' || !this.mode,
-        severityError: options.severityError,
-        loader: true,
-        cache: options.cache,
-        minimizerOptions: options.minimizerOptions,
-        filter: options.filter,
-      },
-      cache
-    );
-  } catch (error) {
-    callback(error);
+  if (!result) {
+    const { severityError, filter, minimizerOptions } = options;
 
-    return;
+    const minifyOptions = {
+      severityError,
+      filter,
+      minimizerOptions,
+      loader: true,
+      isProductionMode: this.mode === 'production' || !this.mode,
+    };
+
+    result = await minify(task, minifyOptions);
+
+    await cache.store({...result, ...cacheData});
   }
 
   if (result.warnings && result.warnings.length > 0) {
