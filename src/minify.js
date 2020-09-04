@@ -21,12 +21,6 @@ async function minify(task, options = {}) {
 
   result.output = result.source;
 
-  if (options.filter && !options.filter(result.input, filename)) {
-    result.filtered = true;
-
-    return result;
-  }
-
   const minimizerOptions = getConfigForFile(options, result);
 
   let output;

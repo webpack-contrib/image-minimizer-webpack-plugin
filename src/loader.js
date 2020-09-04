@@ -29,15 +29,23 @@ module.exports = async function loader(content) {
   const callback = this.async();
 
   const { resourcePath } = this;
+  const filename = path.relative(this.rootContext, resourcePath);
+
+  if (options.filter && !options.filter(content, filename)) {
+    callback(null, content);
+
+    return;
+  }
 
   const task = {
     input: content,
     source: content,
-    filename: path.relative(this.rootContext, resourcePath),
+    filename,
   };
 
   let cache;
   let cacheData;
+  let result;
 
   if (isWebpack4()) {
     cacheData = { assetName: task.filename, input: task.input };
@@ -62,9 +70,9 @@ module.exports = async function loader(content) {
       assetName: task.filename,
       contentHash: crypto.createHash('md4').update(task.input).digest('hex'),
     };
-  }
 
-  let result = await cache.get(cacheData, { RawSource });
+    result = await cache.get(cacheData, { RawSource });
+  }
 
   if (!result) {
     const { severityError, filter, minimizerOptions } = options;
@@ -78,7 +86,9 @@ module.exports = async function loader(content) {
 
     result = await minify(task, minifyOptions);
 
-    await cache.store({ ...result, ...cacheData });
+    if (isWebpack4()) {
+      await cache.store({ ...result, ...cacheData });
+    }
   }
 
   if (result.warnings && result.warnings.length > 0) {

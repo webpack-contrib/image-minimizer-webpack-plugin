@@ -136,6 +136,13 @@ class ImageMinimizerPlugin {
             return;
           }
 
+          if (
+            this.options.filter &&
+            !this.options.filter(source.source(), assetName)
+          ) {
+            return;
+          }
+
           const cacheData = {
             source,
             input: source.source(),
@@ -190,11 +197,7 @@ class ImageMinimizerPlugin {
             }
           }
 
-          const { filtered, output, filename, warnings, errors } = result;
-
-          if (filtered) {
-            return;
-          }
+          const { output, filename, warnings, errors } = result;
 
           if (warnings && warnings.length > 0) {
             warnings.forEach((warning) => {

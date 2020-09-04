@@ -12,6 +12,6 @@ export default class Cache {
   }
 
   async store(task) {
-    return this.cache.storePromise(task.filename, task.eTag, task.output);
+    return this.cache.storePromise(task.filename, task.eTag, task);
   }
 }
