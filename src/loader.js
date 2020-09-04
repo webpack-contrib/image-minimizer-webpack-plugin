@@ -75,11 +75,10 @@ module.exports = async function loader(content) {
   }
 
   if (!result) {
-    const { severityError, filter, minimizerOptions } = options;
+    const { severityError, minimizerOptions } = options;
 
     const minifyOptions = {
       severityError,
-      filter,
       minimizerOptions,
       isProductionMode: this.mode === 'production' || !this.mode,
     };

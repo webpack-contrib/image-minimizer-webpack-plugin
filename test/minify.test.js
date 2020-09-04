@@ -1,0 +1,576 @@
+import fs from 'fs';
+import path from 'path';
+
+import imagemin from 'imagemin';
+import imageminMozjpeg from 'imagemin-mozjpeg';
+import imageminSvgo from 'imagemin-svgo';
+import pify from 'pify';
+
+import minify from '../src/minify';
+
+function isPromise(obj) {
+  return (
+    Boolean(obj) &&
+    (typeof obj === 'object' || typeof obj === 'function') &&
+    typeof obj.then === 'function'
+  );
+}
+
+describe('minify', () => {
+  it('minify should be is function', () =>
+    expect(typeof minify === 'function').toBe(true));
+
+  it('should return `Promise`', () =>
+    expect(
+      isPromise(
+        minify([{ input: Buffer.from('Foo') }], {
+          minimizerOptions: { plugins: ['mozjpeg'] },
+        })
+      )
+    ).toBe(true));
+
+  it('should optimize', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: ['mozjpeg'],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.input).toBeInstanceOf(Buffer);
+    expect(result.filename).toBe(filename);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg()],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should optimize (relative filename)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename: path.relative(process.cwd(), filename) },
+      {
+        minimizerOptions: {
+          plugins: ['mozjpeg'],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.input).toBeInstanceOf(Buffer);
+    expect(result.filename).toBe(path.relative(process.cwd(), filename));
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg()],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should return optimized image even when optimized image large then original', async () => {
+    const svgoOptions = {
+      plugins: [
+        {
+          addAttributesToSVGElement: {
+            attributes: [{ xmlns: 'http://www.w3.org/2000/svg' }],
+          },
+        },
+      ],
+    };
+
+    const filename = path.resolve(
+      __dirname,
+      './fixtures/large-after-optimization.svg'
+    );
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: { plugins: [['svgo', svgoOptions]] },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminSvgo(svgoOptions)],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should throw error on empty', async () => {
+    const result = await minify([{}]);
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(/Empty input/);
+    expect(result.filename).toBeUndefined();
+    expect(result.input).toBeUndefined();
+    expect(result.output).toBeUndefined();
+  });
+
+  it('should throw error on empty `imagemin` options', async () => {
+    const input = Buffer.from('Foo');
+    const filename = path.resolve('foo.png');
+    const result = await minify({ input, filename });
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(
+      /No plugins found for `imagemin`/
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.filename).toBe(filename);
+    expect(result.input.equals(input)).toBe(true);
+    expect(result.output.equals(input)).toBe(true);
+  });
+
+  it('should throw error on empty `imagemin.plugins` options', async () => {
+    const input = Buffer.from('Foo');
+    const filename = path.resolve('foo.png');
+    const result = await minify({
+      input,
+      filename,
+      minimizerOptions: { plugins: [] },
+    });
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(
+      /No plugins found for `imagemin`/
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.filename).toBe(filename);
+    expect(result.input.equals(input)).toBe(true);
+    expect(result.output.equals(input)).toBe(true);
+  });
+
+  it('should throw error on invalid `imagemin.plugins` options', async () => {
+    const input = Buffer.from('Foo');
+    const filename = path.resolve('foo.png');
+    const result = await minify({
+      input,
+      filename,
+      minimizerOptions: { plugins: false },
+    });
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(
+      /No plugins found for `imagemin`/
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.filename).toBe(filename);
+    expect(result.input.equals(input)).toBe(true);
+    expect(result.output.equals(input)).toBe(true);
+  });
+
+  it('should return original content on invalid content (`String`)', async () => {
+    const input = 'Foo';
+    const result = await minify(
+      { input, filename: 'foo.jpg' },
+      {
+        minimizerOptions: { plugins: ['mozjpeg'] },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.output.toString()).toBe(input);
+  });
+
+  it('should optimize (configuration using `function`)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: ['mozjpeg'],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.input).toBeInstanceOf(Buffer);
+    expect(result.filename).toBe(filename);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg()],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should optimize (configuration using `string`)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: ['mozjpeg'],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.input).toBeInstanceOf(Buffer);
+    expect(result.filename).toBe(filename);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg()],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should optimize (configuration using `array`)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: [['mozjpeg', { quality: 0 }]],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.input).toBeInstanceOf(Buffer);
+    expect(result.filename).toBe(filename);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg({ quality: 0 })],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should optimize (configuration using `array` without options)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: [['mozjpeg']],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.input).toBeInstanceOf(Buffer);
+    expect(result.filename).toBe(filename);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg()],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should optimize (configuration using `string` with full name)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: ['imagemin-mozjpeg'],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.input).toBeInstanceOf(Buffer);
+    expect(result.filename).toBe(filename);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg()],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should optimize (configuration using `array` with full name)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: [['imagemin-mozjpeg', { quality: 0 }]],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.input).toBeInstanceOf(Buffer);
+    expect(result.filename).toBe(filename);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg({ quality: 0 })],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should optimize (configuration using `array` with full name and without options)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: [['imagemin-mozjpeg']],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.input).toBeInstanceOf(Buffer);
+    expect(result.filename).toBe(filename);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg()],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should throw warning on empty `imagemin` options (configuration using `string`) (`bail` is not specify)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: ['unknown'],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(
+      /Unknown plugin: imagemin-unknown/
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.filename).toBe(path.resolve(filename));
+    expect(result.input.equals(input)).toBe(true);
+    expect(result.output.equals(input)).toBe(true);
+  });
+
+  it('should throw error on empty `imagemin` options (configuration using `string`) (`bail` is `true`)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        bail: true,
+        minimizerOptions: {
+          plugins: ['unknown'],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(
+      /Unknown plugin: imagemin-unknown/
+    );
+    expect(result.filename).toBe(filename);
+    expect(result.input.equals(input)).toBe(true);
+    expect(result.output.equals(input)).toBe(true);
+  });
+
+  it('should throw warning on empty `imagemin` options (configuration using `string`) (`bail` is `false`)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        bail: false,
+        minimizerOptions: {
+          plugins: ['unknown'],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(
+      /Unknown plugin: imagemin-unknown/
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.filename).toBe(filename);
+    expect(result.input.equals(input)).toBe(true);
+    expect(result.output.equals(input)).toBe(true);
+  });
+
+  it('should throw error on empty `imagemin` options (configuration using `string` and starting with `imagemin`)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: ['imagemin-unknown'],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(
+      /Unknown plugin: imagemin-unknown/
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.filename).toBe(filename);
+    expect(result.input.equals(input)).toBe(true);
+    expect(result.output.equals(input)).toBe(true);
+  });
+
+  it('should optimize and throw error on unknown plugin (configuration using `string`)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: ['imagemin-mozjpeg', 'unknown'],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(
+      /Unknown plugin: imagemin-unknown/
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.input).toBeInstanceOf(Buffer);
+    expect(result.filename).toBe(filename);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg()],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should optimize and throw warning on using `Function` configuration', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: {
+          plugins: [imageminMozjpeg()],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(
+      /Do not use a function as plugin/
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.input).toBeInstanceOf(Buffer);
+    expect(result.filename).toBe(filename);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg()],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should throw error on invalid plugin configuration (`bail` is `true`)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        bail: true,
+        minimizerOptions: {
+          plugins: [{ foo: 'bar' }],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(/Invalid plugin configuration/);
+    expect(result.filename).toBe(filename);
+    expect(result.input.equals(input)).toBe(true);
+    expect(result.output.equals(input)).toBe(true);
+  });
+
+  it('should throw warning on invalid plugin configuration (`bail` is `false`)', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        bail: false,
+        minimizerOptions: {
+          plugins: [{ foo: 'bar' }],
+        },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(
+      /Invalid plugin configuration/
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.filename).toBe(filename);
+    expect(result.input.equals(input)).toBe(true);
+    expect(result.output.equals(input)).toBe(true);
+  });
+
+  it('should support svgo options', async () => {
+    const svgoOptions = {
+      plugins: [
+        {
+          cleanupIDs: {
+            prefix: 'qwerty',
+          },
+        },
+      ],
+    };
+
+    const filename = path.resolve(__dirname, './fixtures/svg-with-id.svg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify(
+      { input, filename },
+      {
+        minimizerOptions: { plugins: [['svgo', svgoOptions]] },
+      }
+    );
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminSvgo(svgoOptions)],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+});

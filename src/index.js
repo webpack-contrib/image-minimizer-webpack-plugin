@@ -172,7 +172,6 @@ class ImageMinimizerPlugin {
             const {
               severityError,
               isProductionMode,
-              filter,
               minimizerOptions,
               maxConcurrency,
             } = this.options;
@@ -180,7 +179,6 @@ class ImageMinimizerPlugin {
             const minifyOptions = {
               severityError,
               isProductionMode,
-              filter,
               cache: this.options.cache,
               minimizerOptions,
               maxConcurrency,
