@@ -378,6 +378,23 @@ describe('minify', () => {
     expect(result.compressed.equals(optimizedSource)).toBe(true);
   });
 
+  it('should optimize and throw warning on using `Function` configuration', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify({
+      input,
+      filename,
+      minimizerOptions: {
+        plugins: [imageminMozjpeg()],
+      },
+    });
+
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(/Invalid plugin configuration/);
+    expect(result.warnings).toHaveLength(0);
+    expect(result.filename).toBe(filename);
+  });
+
   it('should support svgo options', async () => {
     const svgoOptions = {
       plugins: [
