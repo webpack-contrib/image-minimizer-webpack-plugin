@@ -20,10 +20,11 @@ async function minify(options = {}) {
   result.input = Buffer.isBuffer(input) ? input : Buffer.from(input);
 
   let output;
-
-  const minimizerOptions = getConfigForFile(options, result);
+  let minimizerOptions;
 
   try {
+    minimizerOptions = getConfigForFile(options, result);
+
     output = await runImagemin(result.input, minimizerOptions);
   } catch (error) {
     const errored = error instanceof Error ? error : new Error(error);

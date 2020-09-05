@@ -389,18 +389,10 @@ describe('minify', () => {
       },
     });
 
-    expect(result.warnings).toHaveLength(1);
-    expect(result.warnings[0].toString()).toMatch(
-      /Do not use a function as plugin/
-    );
-    expect(result.errors).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(/Invalid plugin configuration/);
+    expect(result.warnings).toHaveLength(0);
     expect(result.filename).toBe(filename);
-
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result.compressed.equals(optimizedSource)).toBe(true);
   });
 
   it('should support svgo options', async () => {
