@@ -1,6 +1,10 @@
 import path from 'path';
 
+import os from 'os';
+
 import crypto from 'crypto';
+
+import pLimit from 'p-limit';
 
 import webpack from 'webpack';
 import ModuleFilenameHelpers from 'webpack/lib/ModuleFilenameHelpers';
@@ -9,6 +13,10 @@ import validateOptions from 'schema-utils';
 
 import minify from './minify';
 import schema from './plugin-options.json';
+
+const { RawSource } =
+  // eslint-disable-next-line global-require
+  webpack.sources || require('webpack-sources');
 
 class ImageMinimizerPlugin {
   constructor(options = {}) {
@@ -70,21 +78,37 @@ class ImageMinimizerPlugin {
     compilation.assets[name] = newSource;
   }
 
-  async runTasks(
+  async optimize(
     compiler,
     compilation,
-    assetNames,
+    assets,
     moduleAssets,
     CacheEngine,
     weakCache
   ) {
-    const {
-      severityError,
-      isProductionMode,
-      filter,
-      minimizerOptions,
-      maxConcurrency,
-    } = this.options;
+    const matchObject = ModuleFilenameHelpers.matchObject.bind(
+      // eslint-disable-next-line no-undefined
+      undefined,
+      this.options
+    );
+
+    const assetNames = Object.keys(assets).filter((assetName) => {
+      if (!matchObject(assetName)) {
+        return false;
+      }
+
+      // Exclude already optimized assets from `image-minimizer-webpack-loader`
+      if (this.options.loader && moduleAssets.has(assetName)) {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (assetNames.length === 0) {
+      return Promise.resolve();
+    }
+
     const cache = new CacheEngine(
       compilation,
       {
@@ -93,33 +117,39 @@ class ImageMinimizerPlugin {
       weakCache
     );
 
-    let results;
+    const cpus = os.cpus() || { length: 1 };
+    const limit = pLimit(
+      this.options.maxConcurrency || Math.max(1, cpus.length - 1)
+    );
+    const scheduledTasks = [];
 
-    const tasks = assetNames.filter((assetName) => {
-      const { info: assetInfo } = ImageMinimizerPlugin.getAsset(
-        compilation,
-        assetName
-      );
+    for (const assetName of assetNames) {
+      scheduledTasks.push(
+        limit(async () => {
+          const { source: assetSource, info } = ImageMinimizerPlugin.getAsset(
+            compilation,
+            assetName
+          );
 
-      if (assetInfo.minimized) {
-        return false;
-      }
+          if (info.minimized) {
+            return;
+          }
 
-      return true;
-    });
+          if (
+            this.options.filter &&
+            !this.options.filter(assetSource.source(), assetName)
+          ) {
+            return;
+          }
 
-    try {
-      results = await minify(
-        tasks.map((assetName) => {
-          const task = {
-            source: compilation.getAsset(assetName).source,
-            input: compilation.getAsset(assetName).source.source(),
+          const cacheData = {
+            source: assetSource,
             filename: assetName,
           };
 
           if (ImageMinimizerPlugin.isWebpack4()) {
             if (this.options.cache) {
-              task.cacheKeys = {
+              cacheData.cacheKeys = {
                 nodeVersion: process.version,
                 // eslint-disable-next-line global-require
                 'image-minimizer-webpack-plugin': require('../package.json')
@@ -128,53 +158,62 @@ class ImageMinimizerPlugin {
                 assetName,
                 contentHash: crypto
                   .createHash('md4')
-                  .update(task.input)
+                  .update(assetSource.source())
                   .digest('hex'),
               };
             }
           }
 
-          return task;
-        }),
-        {
-          severityError,
-          isProductionMode,
-          filter,
-          cache: this.options.cache,
-          minimizerOptions,
-          maxConcurrency,
-        },
-        cache
+          let output = await cache.get(cacheData, { RawSource });
+
+          if (!output) {
+            const {
+              severityError,
+              isProductionMode,
+              minimizerOptions,
+            } = this.options;
+
+            const minifyOptions = {
+              input: assetSource.source(),
+              filename: assetName,
+              severityError,
+              isProductionMode,
+              minimizerOptions,
+            };
+
+            output = await minify(minifyOptions);
+
+            if (output.errors.length > 0) {
+              output.errors.forEach((error) => {
+                compilation.errors.push(error);
+              });
+
+              return;
+            }
+
+            if (output.compressed && !output.compressed.source) {
+              output.compressed = new RawSource(output.compressed);
+            }
+
+            await cache.store({ ...output, ...cacheData });
+          }
+
+          const { compressed, filename, warnings } = output;
+
+          if (warnings && warnings.length > 0) {
+            warnings.forEach((warning) => {
+              compilation.warnings.push(warning);
+            });
+          }
+
+          ImageMinimizerPlugin.updateAsset(compilation, filename, compressed, {
+            minimized: true,
+          });
+        })
       );
-    } catch (error) {
-      return Promise.reject(error);
     }
 
-    results.forEach((result) => {
-      const { filtered, output, filename, warnings, errors } = result;
-
-      if (filtered) {
-        return;
-      }
-
-      if (warnings && warnings.length > 0) {
-        warnings.forEach((warning) => {
-          compilation.warnings.push(warning);
-        });
-      }
-
-      if (errors && errors.length > 0) {
-        errors.forEach((warning) => {
-          compilation.errors.push(warning);
-        });
-      }
-
-      ImageMinimizerPlugin.updateAsset(compilation, filename, output, {
-        minimized: true,
-      });
-    });
-
-    return Promise.resolve();
+    return Promise.all(scheduledTasks);
   }
 
   apply(compiler) {
@@ -182,12 +221,6 @@ class ImageMinimizerPlugin {
       compiler.options.mode === 'production' || !compiler.options.mode;
 
     const pluginName = this.constructor.name;
-
-    const matchObject = ModuleFilenameHelpers.matchObject.bind(
-      // eslint-disable-next-line no-undefined
-      undefined,
-      this.options
-    );
 
     const moduleAssets = new Set();
 
@@ -233,42 +266,19 @@ class ImageMinimizerPlugin {
 
     const weakCache = new WeakMap();
 
-    const optimizeFn = async (compilation, CacheEngine, assets) => {
-      const assetNames = Object.keys(assets).filter((assetName) => {
-        if (!matchObject(assetName)) {
-          return false;
-        }
-
-        // Exclude already optimized assets from `image-minimizer-webpack-loader`
-        if (this.options.loader && moduleAssets.has(assetName)) {
-          return false;
-        }
-
-        return true;
-      });
-
-      if (assetNames.length === 0) {
-        return Promise.resolve();
-      }
-
-      await this.runTasks(
-        compiler,
-        compilation,
-        assetNames,
-        moduleAssets,
-        CacheEngine,
-        weakCache
-      );
-
-      return Promise.resolve();
-    };
-
     if (ImageMinimizerPlugin.isWebpack4()) {
       // eslint-disable-next-line global-require
       const CacheEngine = require('./Webpack4Cache').default;
 
       compiler.hooks.emit.tapPromise({ name: pluginName }, (compilation) =>
-        optimizeFn(compilation, CacheEngine, compilation.assets)
+        this.optimize(
+          compiler,
+          compilation,
+          compilation.assets,
+          moduleAssets,
+          CacheEngine,
+          weakCache
+        )
       );
     } else {
       // eslint-disable-next-line global-require
@@ -283,7 +293,15 @@ class ImageMinimizerPlugin {
             name: pluginName,
             stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
           },
-          (assets) => optimizeFn(compilation, CacheEngine, assets)
+          (assets) =>
+            this.optimize(
+              compiler,
+              compilation,
+              assets,
+              moduleAssets,
+              CacheEngine,
+              weakCache
+            )
         );
       });
     }

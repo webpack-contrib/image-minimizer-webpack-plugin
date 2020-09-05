@@ -1044,6 +1044,7 @@ if (webpack.isWebpack4()) {
           entry: path.join(fixturesPath, 'empty-entry.js'),
           imageminPluginOptions: {
             cache: true,
+            severityError: true,
             minimizerOptions: { plugins },
           },
         },
@@ -1089,9 +1090,9 @@ if (webpack.isWebpack4()) {
       // Store cached assets
       expect(storeCounter).toBe(1);
 
-      expect(warnings).toHaveLength(1);
-      expect(errors).toHaveLength(0);
-      expect(warnings[0].message).toMatch(
+      expect(warnings).toHaveLength(0);
+      expect(errors).toHaveLength(1);
+      expect(errors[0].message).toMatch(
         /(Corrupt JPEG data|Command failed with EPIPE)/
       );
 
@@ -1116,9 +1117,9 @@ if (webpack.isWebpack4()) {
       // Store cached assets
       expect(storeCounter).toBe(0);
 
-      expect(secondWarnings).toHaveLength(1);
-      expect(secondErrors).toHaveLength(0);
-      expect(secondWarnings[0].message).toMatch(
+      expect(secondWarnings).toHaveLength(0);
+      expect(secondErrors).toHaveLength(1);
+      expect(secondErrors[0].message).toMatch(
         /(Corrupt JPEG data|Command failed with EPIPE)/
       );
 

@@ -14,6 +14,10 @@ const isWebpack4 = () => {
   return webpack.version[0] === '4';
 };
 
+const { RawSource } =
+  // eslint-disable-next-line global-require
+  webpack.sources || require('webpack-sources');
+
 module.exports = async function loader(content) {
   const options = loaderUtils.getOptions(this);
 
@@ -25,15 +29,22 @@ module.exports = async function loader(content) {
   const callback = this.async();
 
   const { resourcePath } = this;
+  const filename = path.relative(this.rootContext, resourcePath);
 
-  const task = {
-    input: content,
-    filename: path.relative(this.rootContext, resourcePath),
-  };
+  if (options.filter && !options.filter(content, filename)) {
+    callback(null, content);
 
+    return;
+  }
+
+  const input = content;
   let cache;
+  let cacheData;
+  let output;
 
   if (isWebpack4()) {
+    cacheData = { assetName: filename, input };
+
     // eslint-disable-next-line global-require
     const CacheEngine = require('./Webpack4Cache').default;
 
@@ -46,50 +57,53 @@ module.exports = async function loader(content) {
       true
     );
 
-    task.cacheKeys = {
+    cacheData.cacheKeys = {
       nodeVersion: process.version,
       // eslint-disable-next-line global-require
       'image-minimizer-webpack-plugin': require('../package.json').version,
       'image-minimizer-webpack-plugin-options': options,
-      assetName: task.filename,
-      contentHash: crypto.createHash('md4').update(task.input).digest('hex'),
+      assetName: filename,
+      contentHash: crypto.createHash('md4').update(input).digest('hex'),
     };
+
+    output = await cache.get(cacheData, { RawSource });
   }
 
-  let result;
+  if (!output) {
+    const { severityError, minimizerOptions } = options;
 
-  try {
-    [result] = await minify(
-      [task],
-      {
-        isProductionMode: this.mode === 'production' || !this.mode,
-        severityError: options.severityError,
-        loader: true,
-        cache: options.cache,
-        minimizerOptions: options.minimizerOptions,
-        filter: options.filter,
-      },
-      cache
-    );
-  } catch (error) {
-    callback(error);
+    const minifyOptions = {
+      input,
+      filename,
+      severityError,
+      minimizerOptions,
+      isProductionMode: this.mode === 'production' || !this.mode,
+    };
 
-    return;
+    output = await minify(minifyOptions);
+
+    if (output.errors && output.errors.length > 0) {
+      output.errors.forEach((warning) => {
+        this.emitError(warning);
+      });
+
+      callback(null, content);
+
+      return;
+    }
+
+    if (isWebpack4()) {
+      await cache.store({ ...output, ...cacheData });
+    }
   }
 
-  if (result.warnings && result.warnings.length > 0) {
-    result.warnings.forEach((warning) => {
+  if (output.warnings && output.warnings.length > 0) {
+    output.warnings.forEach((warning) => {
       this.emitWarning(warning);
     });
   }
 
-  if (result.errors && result.errors.length > 0) {
-    result.errors.forEach((warning) => {
-      this.emitError(warning);
-    });
-  }
-
-  const data = result.output ? result.output : result.input;
+  const data = output.compressed || output.input;
 
   callback(null, data);
 };

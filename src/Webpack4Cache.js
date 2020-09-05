@@ -20,11 +20,11 @@ export default class Webpack4Cache {
     );
   }
 
-  async get(task, sources) {
+  async get(cacheData, sources) {
     let weakOutput;
 
     if (!this.loader) {
-      weakOutput = this.weakCache.get(task.source);
+      weakOutput = this.weakCache.get(cacheData.source);
 
       if (weakOutput) {
         return weakOutput;
@@ -37,30 +37,35 @@ export default class Webpack4Cache {
     }
 
     // eslint-disable-next-line no-param-reassign
-    task.cacheIdent = task.cacheIdent || serialize(task.cacheKeys);
+    cacheData.cacheIdent =
+      cacheData.cacheIdent || serialize(cacheData.cacheKeys);
 
     let cachedResult;
 
     try {
-      cachedResult = await cacache.get(this.cache, task.cacheIdent);
+      cachedResult = await cacache.get(this.cache, cacheData.cacheIdent);
     } catch (ignoreError) {
       // eslint-disable-next-line no-undefined
       return undefined;
     }
 
-    const result = Buffer.from(JSON.parse(cachedResult.data).data);
+    const result = JSON.parse(cachedResult.data);
+
+    result.compressed = Buffer.from(result.compressed);
 
     if (this.loader) {
       return result;
     }
 
-    return new sources.RawSource(result);
+    result.compressed = new sources.RawSource(result.compressed);
+
+    return result;
   }
 
-  async store(task) {
+  async store(cacheData) {
     if (!this.loader) {
-      if (!this.weakCache.has(task.source)) {
-        this.weakCache.set(task.source, task.output);
+      if (!this.weakCache.has(cacheData.source)) {
+        this.weakCache.set(cacheData.source, cacheData);
       }
     }
 
@@ -69,13 +74,19 @@ export default class Webpack4Cache {
       return undefined;
     }
 
-    const { cacheIdent } = task;
-    let { output } = task;
+    const { cacheIdent } = cacheData;
+    let { compressed } = cacheData;
 
     if (!this.loader) {
-      output = output.source();
+      compressed = cacheData.compressed.source();
     }
 
-    return cacache.put(this.cache, cacheIdent, JSON.stringify(output));
+    const { filename, warnings } = cacheData;
+
+    return cacache.put(
+      this.cache,
+      cacheIdent,
+      JSON.stringify({ filename, compressed, warnings, cacheIdent })
+    );
   }
 }
