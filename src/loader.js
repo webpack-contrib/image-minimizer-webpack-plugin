@@ -105,41 +105,6 @@ module.exports = async function loader(content) {
 
   const data = output.compressed || output.input;
 
-  if (options.filename) {
-    const newFilename = loaderUtils.interpolateName(this, options.filename, {
-      content: data,
-      context: this.context,
-    });
-
-    const dirName = path.dirname(
-      path.relative(this.rootContext, this.resourcePath)
-    );
-
-    this.emitFile(path.join(dirName, newFilename), data, null, {
-      minimized: true,
-    });
-
-    if (isWebpack4) {
-      this._compiler.hooks.afterCompile.tap(
-        'ImageMinimizerPlugin',
-        (compilation) => {
-          // eslint-disable-next-line no-param-reassign
-          delete compilation.assets[filename];
-        }
-      );
-    } else {
-      this._compiler.hooks.compilation.tap(
-        'ImageMinimizerPlugin',
-        (compilation) => {
-          compilation.hooks.processAssets.tap('ImageMinimizerPlugin', () => {
-            // eslint-disable-next-line no-param-reassign
-            delete compilation.assets[filename];
-          });
-        }
-      );
-    }
-  }
-
   callback(null, data);
 };
 

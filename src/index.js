@@ -230,25 +230,19 @@ class ImageMinimizerPlugin {
           }
 
           if (this.options.filename) {
-            const resourcePath = path.resolve(compiler.context, filename);
             const newFilename = loaderUtils.interpolateName(
-              { resourcePath },
+              { resourcePath: filename },
               this.options.filename,
               {
                 content: compressed.toString(),
-                context: compiler.context,
               }
-            );
-
-            const dirName = path.dirname(
-              path.relative(compiler.context, resourcePath)
             );
 
             ImageMinimizerPlugin.deleteAsset(compilation, filename);
 
             ImageMinimizerPlugin.emitAsset(
               compilation,
-              path.join(dirName, newFilename),
+              newFilename,
               compressed,
               { minimized: true }
             );
