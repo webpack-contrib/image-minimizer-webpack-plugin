@@ -1,10 +1,10 @@
 import { klona } from 'klona/full';
 
-function log(error, metaData, type = null) {
-  if (metaData.result) {
-    const shouldBeError = type === 'error' ? true : metaData.options.bail;
+class InvalidConfigError extends Error {}
 
-    if (shouldBeError) {
+function log(error, metaData, type) {
+  if (metaData.result) {
+    if (type === 'error') {
       metaData.result.errors.push(error);
     } else {
       metaData.result.warnings.push(error);
@@ -92,28 +92,19 @@ function normalizeConfig(minimizerOptions, metaData = {}) {
         ]);
 
         return requiredPlugin;
-      } else if (typeof plugin === 'function') {
-        log(
-          new Error(
-            "Do not use a function as plugin (i.e. '{ plugins: [imageminMozjpeg()] }'), it is not allowed invalidate a cache. It will be removed in next major release. You can rewrite this to '{ plugins: ['mozjpeg'] }' or '{ plugins: [['mozjpeg', options]] }', please see the documentation for more information."
-          ),
-          metaData,
-          'warning'
-        );
-      } else {
-        log(
-          new Error(
-            `Invalid plugin configuration "${JSON.stringify(
-              plugin
-            )}, plugin configuraion should be 'string' or '[string, object]'"`
-          ),
-          metaData
-        );
-
-        return false;
       }
 
-      return plugin;
+      log(
+        new InvalidConfigError(
+          `Invalid plugin configuration "${JSON.stringify(
+            plugin
+          )}, plugin configuraion should be 'string' or '[string, object]'"`
+        ),
+        metaData,
+        'error'
+      );
+
+      return false;
     })
     .filter(Boolean);
 

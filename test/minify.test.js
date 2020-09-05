@@ -378,31 +378,6 @@ describe('minify', () => {
     expect(result.compressed.equals(optimizedSource)).toBe(true);
   });
 
-  it('should optimize and throw warning on using `Function` configuration', async () => {
-    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
-    const input = await pify(fs.readFile)(filename);
-    const result = await minify({
-      input,
-      filename,
-      minimizerOptions: {
-        plugins: [imageminMozjpeg()],
-      },
-    });
-
-    expect(result.warnings).toHaveLength(1);
-    expect(result.warnings[0].toString()).toMatch(
-      /Do not use a function as plugin/
-    );
-    expect(result.errors).toHaveLength(0);
-    expect(result.filename).toBe(filename);
-
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result.compressed.equals(optimizedSource)).toBe(true);
-  });
-
   it('should support svgo options', async () => {
     const svgoOptions = {
       plugins: [
