@@ -8,6 +8,7 @@ import pLimit from 'p-limit';
 
 import webpack from 'webpack';
 import ModuleFilenameHelpers from 'webpack/lib/ModuleFilenameHelpers';
+import loaderUtils from 'loader-utils';
 
 import validateOptions from 'schema-utils';
 
@@ -37,6 +38,7 @@ class ImageMinimizerPlugin {
       },
       loader = true,
       maxConcurrency,
+      filename,
     } = options;
 
     this.options = {
@@ -49,6 +51,7 @@ class ImageMinimizerPlugin {
       loader,
       maxConcurrency,
       test,
+      filename,
     };
   }
 
@@ -76,6 +79,26 @@ class ImageMinimizerPlugin {
 
     // eslint-disable-next-line no-param-reassign
     compilation.assets[name] = newSource;
+  }
+
+  static emitAsset(compilation, name, source, assetInfo) {
+    // New API
+    if (compilation.emitAsset) {
+      compilation.emitAsset(name, source, assetInfo);
+    }
+
+    // eslint-disable-next-line no-param-reassign
+    compilation.assets[name] = source;
+  }
+
+  static deleteAsset(compilation, name) {
+    // New API
+    if (compilation.deleteAsset) {
+      compilation.deleteAsset(name);
+    }
+
+    // eslint-disable-next-line no-param-reassign
+    delete compilation.assets[name];
   }
 
   async optimize(
@@ -206,9 +229,39 @@ class ImageMinimizerPlugin {
             });
           }
 
-          ImageMinimizerPlugin.updateAsset(compilation, filename, compressed, {
-            minimized: true,
-          });
+          if (this.options.filename) {
+            const resourcePath = path.resolve(compiler.context, filename);
+            const newFilename = loaderUtils.interpolateName(
+              { resourcePath },
+              this.options.filename,
+              {
+                content: compressed.toString(),
+                context: compiler.context,
+              }
+            );
+
+            const dirName = path.dirname(
+              path.relative(compiler.context, resourcePath)
+            );
+
+            ImageMinimizerPlugin.deleteAsset(compilation, filename);
+
+            ImageMinimizerPlugin.emitAsset(
+              compilation,
+              path.join(dirName, newFilename),
+              compressed,
+              { minimized: true }
+            );
+          } else {
+            ImageMinimizerPlugin.updateAsset(
+              compilation,
+              filename,
+              compressed,
+              {
+                minimized: true,
+              }
+            );
+          }
         })
       );
     }
@@ -237,6 +290,7 @@ class ImageMinimizerPlugin {
 
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
         const {
+          filename,
           cache,
           filter,
           test,
@@ -253,6 +307,7 @@ class ImageMinimizerPlugin {
           enforce: 'pre',
           loader: path.join(__dirname, 'loader.js'),
           options: {
+            filename,
             severityError,
             cache,
             filter,

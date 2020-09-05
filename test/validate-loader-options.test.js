@@ -24,6 +24,10 @@ describe('validate options', () => {
       success: [true, false, 'error'],
       failure: [{}, [], () => {}],
     },
+    filename: {
+      success: ['[name].[ext]'],
+      failure: [{}, [], () => {}, true],
+    },
     unknown: {
       success: [],
       failure: [1, true, false, 'test', /test/, [], {}, { foo: 'bar' }],

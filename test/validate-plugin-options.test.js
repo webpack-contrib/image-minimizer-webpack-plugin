@@ -131,6 +131,18 @@ it('validation', () => {
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {
+    new ImageMinimizerPlugin({ filename: '[name].[ext]' });
+  }).not.toThrow();
+
+  expect(() => {
+    new ImageMinimizerPlugin({ filename: true });
+  }).toThrowErrorMatchingSnapshot();
+
+  expect(() => {
+    new ImageMinimizerPlugin({ filename: {} });
+  }).toThrowErrorMatchingSnapshot();
+
+  expect(() => {
     new ImageMinimizerPlugin({ severityError: false });
   }).not.toThrow();
 

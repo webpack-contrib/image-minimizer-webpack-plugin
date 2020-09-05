@@ -32,6 +32,9 @@
           "type": "string"
         }
       ]
+    },
+    "filename": {
+      "type": "string"
     }
   }
 }
