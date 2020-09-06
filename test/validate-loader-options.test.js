@@ -28,6 +28,10 @@ describe('validate options', () => {
       success: ['[name].[ext]'],
       failure: [{}, [], () => {}, true],
     },
+    keepOriginal: {
+      success: [true, false],
+      failure: [{}, [], () => {}],
+    },
     unknown: {
       success: [],
       failure: [1, true, false, 'test', /test/, [], {}, { foo: 'bar' }],

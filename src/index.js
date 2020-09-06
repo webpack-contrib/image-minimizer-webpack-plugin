@@ -39,6 +39,7 @@ class ImageMinimizerPlugin {
       loader = true,
       maxConcurrency,
       filename,
+      keepOriginal,
     } = options;
 
     this.options = {
@@ -52,6 +53,7 @@ class ImageMinimizerPlugin {
       maxConcurrency,
       test,
       filename,
+      keepOriginal,
     };
   }
 
@@ -238,7 +240,9 @@ class ImageMinimizerPlugin {
               }
             );
 
-            ImageMinimizerPlugin.deleteAsset(compilation, filename);
+            if (!this.options.keepOriginal) {
+              ImageMinimizerPlugin.deleteAsset(compilation, filename);
+            }
 
             ImageMinimizerPlugin.emitAsset(
               compilation,
@@ -285,6 +289,7 @@ class ImageMinimizerPlugin {
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
         const {
           filename,
+          keepOriginal,
           cache,
           filter,
           test,
@@ -302,6 +307,7 @@ class ImageMinimizerPlugin {
           loader: path.join(__dirname, 'loader.js'),
           options: {
             filename,
+            keepOriginal,
             severityError,
             cache,
             filter,

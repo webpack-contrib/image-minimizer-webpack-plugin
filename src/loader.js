@@ -105,6 +105,24 @@ module.exports = async function loader(content) {
 
   const data = output.compressed || output.input;
 
+  if (options.filename && options.keepOriginal) {
+    const newFilename = loaderUtils.interpolateName(
+      { resourcePath: filename },
+      options.filename,
+      {
+        content: data,
+      }
+    );
+
+    this.emitFile(newFilename, data, null, {
+      minimized: true,
+    });
+
+    callback(null, content);
+
+    return;
+  }
+
   callback(null, data);
 };
 

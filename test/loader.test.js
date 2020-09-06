@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import pify from 'pify';
+import fileType from 'file-type';
 
 import { fixturesPath, isOptimized, webpack } from './helpers';
 
@@ -69,5 +70,32 @@ describe('loader', () => {
     await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
       true
     );
+  });
+
+  it('should transform image source to webp', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, './loader-single.js'),
+      output: {
+        path: path.resolve(__dirname, 'outputs'),
+      },
+      imageminPluginOptions: {
+        minimizerOptions: {
+          plugins: ['imagemin-webp'],
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const file = path.resolve(
+      __dirname,
+      'outputs',
+      './nested/deep/loader-test.jpg'
+    );
+    const ext = await fileType.fromFile(file);
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
   });
 });
