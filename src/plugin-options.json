@@ -97,6 +97,9 @@
     "maxConcurrency": {
       "description": "Maximum number of concurrency optimization processes in one time.",
       "type": "number"
+    },
+    "filename": {
+      "type": "string"
     }
   }
 }
