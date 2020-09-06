@@ -835,6 +835,34 @@ module.exports = {
 };
 ```
 
+### Optimize and conversion images to WEBP
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    // PNG images are converted to WEBP
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      // if need to keep the original file, set the option `keepOriginal` to `true`
+      keepOriginal: false,
+      filename: '[path][name].webp',
+      minimizerOptions: {
+        plugins: ['imagemin-webp'],
+      },
+    }),
+    // if need to keep and compress the original file, add the ImageMinimizerPlugin again
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      minimizerOptions: {
+        plugins: ['pngquant'],
+      },
+    }),
+  ],
+};
+```
+
 ## Contributing
 
 Please take a moment to read our contributing guidelines if you haven't yet done so.
