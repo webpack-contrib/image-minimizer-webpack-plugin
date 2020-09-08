@@ -196,6 +196,8 @@ module.exports = {
 | **`minimizerOptions`** |                `{Object}`                 |             `{ plugins: [] }`              | Options for `imagemin`                                                                                                    |
 |      **`loader`**      |                `{Boolean}`                |                   `true`                   | Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other) |
 |  **`maxConcurrency`**  |                `{Number}`                 |    `Math.max(1, os.cpus().length - 1)`     | Maximum number of concurrency optimization processes in one time                                                          |
+|     **`filename`**     |                `{string}`                 |                `undefined`                 | Allows to set the filename for the generated asset. For example, when converting to a `webp`                              |
+|   **`keepOriginal`**   |                `{Boolean}`                |                `undefined`                 | Allows to keep the original asset. For example, when converting to a `webp`                                               |
 
 <!--lint enable no-html-->
 
@@ -349,6 +351,84 @@ module.exports = {
 };
 ```
 
+#### `filename`
+
+Type: `String`
+Default: `undefined`
+
+Allows to set the filename for the generated asset. For example, when converting to a `webp`.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    // PNG images are converted to WEBP
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      filename: '[path][name].webp',
+      minimizerOptions: {
+        plugins: ['imagemin-webp'],
+      },
+    }),
+  ],
+};
+```
+
+#### `keepOriginal`
+
+Type: `Boolean`
+Default: `undefined`
+
+Allows to keep the original asset. For example, when converting to a `webp`.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    // PNG images are converted to WEBP, and the originals will keep
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      keepOriginal: true,
+      filename: '[path][name].webp',
+      minimizerOptions: {
+        plugins: ['imagemin-webp'],
+      },
+    }),
+  ],
+};
+```
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    // PNG images are converted to WEBP
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      keepOriginal: false,
+      filename: '[path][name].webp',
+      minimizerOptions: {
+        plugins: ['imagemin-webp'],
+      },
+    }),
+    // And the originals will compressed
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      minimizerOptions: {
+        plugins: ['pngquant'],
+      },
+    }),
+  ],
+};
+```
+
 #### `minimizerOptions`
 
 Options for `imagemin`.
@@ -412,12 +492,14 @@ module.exports = {
 
 ### Loader Options
 
-|          Name          |        Type         |      Default      | Description                                 |
-| :--------------------: | :-----------------: | :---------------: | :------------------------------------------ |
-|      **`filter`**      |    `{Function}`     |    `undefined`    | Allows filtering of images for optimization |
-|      **`cache`**       | `{Boolean\|String}` |      `false`      | Enable file caching                         |
-|  **`severityError`**   | `{Boolean\|String}` |      `auto`       | Allows to choose how errors are displayed   |
-| **`minimizerOptions`** |     `{Object}`      | `{ plugins: [] }` | Options for `imagemin`                      |
+|          Name          |        Type         |      Default      | Description                                                                                  |
+| :--------------------: | :-----------------: | :---------------: | :------------------------------------------------------------------------------------------- |
+|      **`filter`**      |    `{Function}`     |    `undefined`    | Allows filtering of images for optimization                                                  |
+|      **`cache`**       | `{Boolean\|String}` |      `false`      | Enable file caching                                                                          |
+|  **`severityError`**   | `{Boolean\|String}` |      `auto`       | Allows to choose how errors are displayed                                                    |
+| **`minimizerOptions`** |     `{Object}`      | `{ plugins: [] }` | Options for `imagemin`                                                                       |
+|     **`filename`**     |     `{string}`      |    `undefined`    | Allows to set the filename for the generated asset. For example, when converting to a `webp` |
+|   **`keepOriginal`**   |     `{Boolean}`     |    `undefined`    | Allows to keep the original asset. For example, when converting to a `webp`                  |
 
 #### `filter`
 
@@ -580,6 +662,54 @@ module.exports = {
 };
 ```
 
+#### `filename`
+
+Type: `String`
+Default: `undefined`
+
+Allows to set the filename for the generated asset. For example, when converting to a `webp`.
+
+> i Should only be used in conjunction with the `keepOriginal` option
+
+#### `keepOriginal`
+
+Type: `Boolean`
+Default: `undefined`
+
+Allows to keep the original asset. For example, when converting to a `webp`.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(png)$/i,
+        use: [
+          {
+            loader: 'file-loader', // Or `url-loader` or your other loader
+          },
+          {
+            loader: ImageMinimizerPlugin.loader,
+            options: {
+              // PNG images are converted to WEBP, and the originals will keep
+              keepOriginal: true,
+              filename: '[path][name].webp',
+              minimizerOptions: {
+                plugins: ['imagemin-webp'],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```
+
 #### `minimizerOptions`
 
 Options for [`imagemin`](https://github.com/imagemin/imagemin)
@@ -699,6 +829,34 @@ module.exports = {
       },
       minimizerOptions: {
         plugins: [['jpegtran', { progressive: false }]],
+      },
+    }),
+  ],
+};
+```
+
+### Optimize and conversion images to WEBP
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    // PNG images are converted to WEBP
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      // if need to keep the original file, set the option `keepOriginal` to `true`
+      keepOriginal: false,
+      filename: '[path][name].webp',
+      minimizerOptions: {
+        plugins: ['imagemin-webp'],
+      },
+    }),
+    // if need to keep and compress the original file, add the ImageMinimizerPlugin again
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      minimizerOptions: {
+        plugins: ['pngquant'],
       },
     }),
   ],
