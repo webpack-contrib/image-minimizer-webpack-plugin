@@ -16,7 +16,7 @@ import {
 } from './helpers';
 
 describe('cache option - persistent cache', () => {
-  it('should work persistent cache (loader + plugin)', async () => {
+  it('should work and cache (loader + plugin)', async () => {
     const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
 
     await cacache.rm.all(cacheDir);
@@ -73,7 +73,7 @@ describe('cache option - persistent cache', () => {
     }
   });
 
-  it('should work persistent cache when cache is false', async () => {
+  it('should work and do not cache when cache is "false"', async () => {
     const compiler = await webpack(
       {
         entry: path.join(fixturesPath, './simple.js'),
@@ -120,9 +120,9 @@ describe('cache option - persistent cache', () => {
         Object.keys(secondStats.compilation.assets).filter(
           (assetName) => secondStats.compilation.assets[assetName].emitted
         ).length
-      ).toBe(0);
+      ).toBe(1);
     } else {
-      expect(secondStats.compilation.emittedAssets.size).toBe(0);
+      expect(secondStats.compilation.emittedAssets.size).toBe(1);
     }
   });
 });

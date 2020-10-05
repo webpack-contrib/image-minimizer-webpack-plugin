@@ -111,14 +111,14 @@ class ImageMinimizerPlugin {
     CacheEngine,
     weakCache
   ) {
-    const matchObject = ModuleFilenameHelpers.matchObject.bind(
-      // eslint-disable-next-line no-undefined
-      undefined,
-      this.options
-    );
-
     const assetNames = Object.keys(assets).filter((assetName) => {
-      if (!matchObject(assetName)) {
+      if (
+        !ModuleFilenameHelpers.matchObject.bind(
+          // eslint-disable-next-line no-undefined
+          undefined,
+          this.options
+        )(assetName)
+      ) {
         return false;
       }
 
@@ -134,6 +134,11 @@ class ImageMinimizerPlugin {
       return Promise.resolve();
     }
 
+    const cpus = os.cpus() || { length: 1 };
+    const limit = pLimit(
+      this.options.maxConcurrency || Math.max(1, cpus.length - 1)
+    );
+    const scheduledTasks = [];
     const cache = new CacheEngine(
       compilation,
       {
@@ -141,12 +146,6 @@ class ImageMinimizerPlugin {
       },
       weakCache
     );
-
-    const cpus = os.cpus() || { length: 1 };
-    const limit = pLimit(
-      this.options.maxConcurrency || Math.max(1, cpus.length - 1)
-    );
-    const scheduledTasks = [];
 
     for (const assetName of assetNames) {
       scheduledTasks.push(
@@ -160,10 +159,13 @@ class ImageMinimizerPlugin {
             return;
           }
 
-          if (
-            this.options.filter &&
-            !this.options.filter(assetSource.source(), assetName)
-          ) {
+          let input = assetSource.source();
+
+          if (!Buffer.isBuffer(input)) {
+            input = Buffer.from(input);
+          }
+
+          if (this.options.filter && !this.options.filter(input, assetName)) {
             return;
           }
 
@@ -183,7 +185,7 @@ class ImageMinimizerPlugin {
                 assetName,
                 contentHash: crypto
                   .createHash('md4')
-                  .update(assetSource.source())
+                  .update(input)
                   .digest('hex'),
               };
             }
@@ -199,8 +201,8 @@ class ImageMinimizerPlugin {
             } = this.options;
 
             const minifyOptions = {
-              input: assetSource.source(),
               filename: assetName,
+              input,
               severityError,
               isProductionMode,
               minimizerOptions,
@@ -251,13 +253,17 @@ class ImageMinimizerPlugin {
               { minimized: true }
             );
           } else {
+            // TODO `...` required only for webpack@4
+            const newOriginalInfo = {
+              ...info,
+              minimized: true,
+            };
+
             ImageMinimizerPlugin.updateAsset(
               compilation,
               filename,
               compressed,
-              {
-                minimized: true,
-              }
+              newOriginalInfo
             );
           }
         })

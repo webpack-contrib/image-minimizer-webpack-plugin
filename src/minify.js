@@ -16,8 +16,7 @@ async function minify(options = {}) {
     return result;
   }
 
-  // Ensure that the contents i have are in the form of a buffer
-  result.input = Buffer.isBuffer(input) ? input : Buffer.from(input);
+  result.input = input;
 
   let output;
   let minimizerOptions;
