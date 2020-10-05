@@ -25,40 +25,32 @@ module.exports = async function loader(content) {
   const callback = this.async();
 
   const { resourcePath } = this;
-  const filename = path.relative(this.rootContext, resourcePath);
+  const name = path.relative(this.rootContext, resourcePath);
 
-  if (options.filter && !options.filter(content, filename)) {
+  if (options.filter && !options.filter(content, name)) {
     callback(null, content);
 
     return;
   }
 
   const input = content;
+
   let cache;
-  let cacheData;
+  const cacheData = {};
+
   let output;
 
   if (isWebpack4()) {
-    cacheData = { assetName: filename, input };
-
     // eslint-disable-next-line global-require
     const CacheEngine = require('./Webpack4Cache').default;
 
-    cache = new CacheEngine(
-      null,
-      {
-        cache: options.cache,
-      },
-      false,
-      true
-    );
+    cache = new CacheEngine(null, { cache: options.cache }, false, true);
 
     cacheData.cacheKeys = {
-      nodeVersion: process.version,
       // eslint-disable-next-line global-require
       'image-minimizer-webpack-plugin': require('../package.json').version,
       'image-minimizer-webpack-plugin-options': options,
-      assetName: filename,
+      name,
       contentHash: crypto.createHash('md4').update(input).digest('hex'),
     };
 
@@ -70,7 +62,7 @@ module.exports = async function loader(content) {
 
     const minifyOptions = {
       input,
-      filename,
+      filename: name,
       severityError,
       minimizerOptions,
       isProductionMode: this.mode === 'production' || !this.mode,
@@ -88,6 +80,8 @@ module.exports = async function loader(content) {
       return;
     }
 
+    output.source = output.output;
+
     if (isWebpack4()) {
       await cache.store({ ...output, ...cacheData });
     }
@@ -99,11 +93,11 @@ module.exports = async function loader(content) {
     });
   }
 
-  const data = output.compressed || output.input;
+  const data = output.source;
 
   if (options.filename && options.keepOriginal) {
     const newFilename = loaderUtils.interpolateName(
-      { resourcePath: filename },
+      { resourcePath: name },
       options.filename,
       {
         content: data,

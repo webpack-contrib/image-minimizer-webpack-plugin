@@ -208,12 +208,12 @@ class ImageMinimizerPlugin {
               return;
             }
 
-            output.compressed = new RawSource(output.compressed);
+            output.source = new RawSource(output.output);
 
             await cache.store({ ...output, ...cacheData });
           }
 
-          const { compressed, warnings } = output;
+          const { source, warnings } = output;
 
           if (warnings && warnings.length > 0) {
             warnings.forEach((warning) => {
@@ -226,7 +226,7 @@ class ImageMinimizerPlugin {
               { resourcePath: name },
               this.options.filename,
               {
-                content: compressed.toString(),
+                content: source.toString(),
               }
             );
 
@@ -234,12 +234,9 @@ class ImageMinimizerPlugin {
               ImageMinimizerPlugin.deleteAsset(compilation, name);
             }
 
-            ImageMinimizerPlugin.emitAsset(
-              compilation,
-              newFilename,
-              compressed,
-              { minimized: true }
-            );
+            ImageMinimizerPlugin.emitAsset(compilation, newFilename, source, {
+              minimized: true,
+            });
           } else {
             // TODO `...` required only for webpack@4
             const newOriginalInfo = {
@@ -250,7 +247,7 @@ class ImageMinimizerPlugin {
             ImageMinimizerPlugin.updateAsset(
               compilation,
               name,
-              compressed,
+              source,
               newOriginalInfo
             );
           }

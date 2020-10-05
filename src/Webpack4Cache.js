@@ -50,13 +50,13 @@ export default class Webpack4Cache {
 
     const result = JSON.parse(cachedResult.data);
 
-    result.compressed = Buffer.from(result.compressed);
+    result.source = Buffer.from(result.source);
 
     if (this.loader) {
       return result;
     }
 
-    result.compressed = new sources.RawSource(result.compressed);
+    result.source = new sources.RawSource(result.source);
 
     return result;
   }
@@ -71,10 +71,10 @@ export default class Webpack4Cache {
       this.weakCache.set(cacheData.inputSource, cacheData);
     }
 
-    let { compressed } = cacheData;
+    let { source } = cacheData;
 
     if (!this.loader) {
-      compressed = cacheData.compressed.source();
+      source = source.source();
     }
 
     const { cacheIdent, warnings } = cacheData;
@@ -82,7 +82,7 @@ export default class Webpack4Cache {
     return cacache.put(
       this.cache,
       cacheIdent,
-      JSON.stringify({ compressed, warnings, cacheIdent })
+      JSON.stringify({ source, warnings, cacheIdent })
     );
   }
 }

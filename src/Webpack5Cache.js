@@ -12,10 +12,10 @@ export default class Cache {
   }
 
   async store(cacheData) {
-    const { compressed, warnings } = cacheData;
+    const { source, warnings } = cacheData;
 
     return this.cache.storePromise(cacheData.name, cacheData.eTag, {
-      compressed,
+      source,
       warnings,
     });
   }

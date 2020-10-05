@@ -50,7 +50,7 @@ async function minify(options = {}) {
 
     return {
       filename,
-      compressed: input,
+      output: input,
       warnings: result.warnings,
       errors: result.errors,
     };
@@ -58,7 +58,7 @@ async function minify(options = {}) {
 
   return {
     filename,
-    compressed: output,
+    output,
     warnings: result.warnings,
     errors: result.errors,
   };
