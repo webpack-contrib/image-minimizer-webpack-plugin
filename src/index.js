@@ -172,19 +172,14 @@ class ImageMinimizerPlugin {
           const cacheData = { name, source: assetSource };
 
           if (ImageMinimizerPlugin.isWebpack4()) {
-            if (this.options.cache) {
-              cacheData.cacheKeys = {
-                nodeVersion: process.version,
-                // eslint-disable-next-line global-require
-                'image-minimizer-webpack-plugin': require('../package.json')
-                  .version,
-                'image-minimizer-webpack-plugin-options': this.options,
-                contentHash: crypto
-                  .createHash('md4')
-                  .update(input)
-                  .digest('hex'),
-              };
-            }
+            cacheData.cacheKeys = {
+              nodeVersion: process.version,
+              // eslint-disable-next-line global-require
+              'image-minimizer-webpack-plugin': require('../package.json')
+                .version,
+              'image-minimizer-webpack-plugin-options': this.options,
+              contentHash: crypto.createHash('md4').update(input).digest('hex'),
+            };
           }
 
           let output = await cache.get(cacheData, { RawSource });
