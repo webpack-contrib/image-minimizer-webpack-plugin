@@ -166,7 +166,7 @@ describe('minify', () => {
     expect(result.compressed.equals(input)).toBe(true);
   });
 
-  it('should return original content on invalid content (`String`)', async () => {
+  it('should return original content and emit a warning on invalid content (`String`)', async () => {
     const input = 'Foo';
     const result = await minify({
       input,
@@ -174,9 +174,9 @@ describe('minify', () => {
       minimizerOptions: { plugins: ['mozjpeg'] },
     });
 
-    expect(result.warnings).toHaveLength(0);
+    expect(result.warnings).toHaveLength(1);
     expect(result.errors).toHaveLength(0);
-    expect(result.compressed.toString()).toBe(input);
+    expect(result.compressed).toBe(input);
   });
 
   it('should optimize (configuration using `function`)', async () => {

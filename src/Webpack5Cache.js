@@ -13,10 +13,9 @@ export default class Cache {
   }
 
   async store(cacheData) {
-    const { filename, compressed, warnings } = cacheData;
+    const { compressed, warnings } = cacheData;
 
     return this.cache.storePromise(cacheData.filename, cacheData.eTag, {
-      filename,
       compressed,
       warnings,
     });

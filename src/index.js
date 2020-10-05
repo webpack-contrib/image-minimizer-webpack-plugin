@@ -225,7 +225,7 @@ class ImageMinimizerPlugin {
             await cache.store({ ...output, ...cacheData });
           }
 
-          const { compressed, filename, warnings } = output;
+          const { compressed, warnings } = output;
 
           if (warnings && warnings.length > 0) {
             warnings.forEach((warning) => {
@@ -235,7 +235,7 @@ class ImageMinimizerPlugin {
 
           if (this.options.filename) {
             const newFilename = loaderUtils.interpolateName(
-              { resourcePath: filename },
+              { resourcePath: assetName },
               this.options.filename,
               {
                 content: compressed.toString(),
@@ -243,7 +243,7 @@ class ImageMinimizerPlugin {
             );
 
             if (!this.options.keepOriginal) {
-              ImageMinimizerPlugin.deleteAsset(compilation, filename);
+              ImageMinimizerPlugin.deleteAsset(compilation, assetName);
             }
 
             ImageMinimizerPlugin.emitAsset(
@@ -261,7 +261,7 @@ class ImageMinimizerPlugin {
 
             ImageMinimizerPlugin.updateAsset(
               compilation,
-              filename,
+              assetName,
               compressed,
               newOriginalInfo
             );

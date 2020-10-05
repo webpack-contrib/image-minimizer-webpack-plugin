@@ -63,15 +63,15 @@ export default class Webpack4Cache {
   }
 
   async store(cacheData) {
+    if (!this.cache) {
+      // eslint-disable-next-line no-undefined
+      return undefined;
+    }
+
     if (!this.loader) {
       if (!this.weakCache.has(cacheData.source)) {
         this.weakCache.set(cacheData.source, cacheData);
       }
-    }
-
-    if (!this.cache) {
-      // eslint-disable-next-line no-undefined
-      return undefined;
     }
 
     const { cacheIdent } = cacheData;
@@ -81,12 +81,12 @@ export default class Webpack4Cache {
       compressed = cacheData.compressed.source();
     }
 
-    const { filename, warnings } = cacheData;
+    const { warnings } = cacheData;
 
     return cacache.put(
       this.cache,
       cacheIdent,
-      JSON.stringify({ filename, compressed, warnings, cacheIdent })
+      JSON.stringify({ compressed, warnings, cacheIdent })
     );
   }
 }
