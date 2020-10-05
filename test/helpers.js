@@ -280,6 +280,16 @@ function readAsset(asset, compiler, stats) {
   return data;
 }
 
+function normalizePath(string) {
+  const isWin = process.platform === 'win32';
+
+  if (isWin) {
+    return string.replace(/\\/g, '/');
+  }
+
+  return string;
+}
+
 runWebpack.isWebpack4 = () => webpack.version[0] === '4';
 
 export {
@@ -290,4 +300,5 @@ export {
   fixturesPath,
   hasLoader,
   readAsset,
+  normalizePath,
 };
