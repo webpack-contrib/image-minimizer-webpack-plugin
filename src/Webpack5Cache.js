@@ -9,13 +9,13 @@ export default class Cache {
     cacheData.eTag =
       cacheData.eTag || this.cache.getLazyHashedEtag(cacheData.source);
 
-    return this.cache.getPromise(cacheData.filename, cacheData.eTag);
+    return this.cache.getPromise(cacheData.name, cacheData.eTag);
   }
 
   async store(cacheData) {
     const { compressed, warnings } = cacheData;
 
-    return this.cache.storePromise(cacheData.filename, cacheData.eTag, {
+    return this.cache.storePromise(cacheData.name, cacheData.eTag, {
       compressed,
       warnings,
     });

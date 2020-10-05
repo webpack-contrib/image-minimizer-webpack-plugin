@@ -147,12 +147,12 @@ class ImageMinimizerPlugin {
       weakCache
     );
 
-    for (const assetName of assetNames) {
+    for (const name of assetNames) {
       scheduledTasks.push(
         limit(async () => {
           const { source: assetSource, info } = ImageMinimizerPlugin.getAsset(
             compilation,
-            assetName
+            name
           );
 
           if (info.minimized) {
@@ -165,14 +165,11 @@ class ImageMinimizerPlugin {
             input = Buffer.from(input);
           }
 
-          if (this.options.filter && !this.options.filter(input, assetName)) {
+          if (this.options.filter && !this.options.filter(input, name)) {
             return;
           }
 
-          const cacheData = {
-            source: assetSource,
-            filename: assetName,
-          };
+          const cacheData = { name, source: assetSource };
 
           if (ImageMinimizerPlugin.isWebpack4()) {
             if (this.options.cache) {
@@ -182,7 +179,6 @@ class ImageMinimizerPlugin {
                 'image-minimizer-webpack-plugin': require('../package.json')
                   .version,
                 'image-minimizer-webpack-plugin-options': this.options,
-                assetName,
                 contentHash: crypto
                   .createHash('md4')
                   .update(input)
@@ -201,7 +197,7 @@ class ImageMinimizerPlugin {
             } = this.options;
 
             const minifyOptions = {
-              filename: assetName,
+              filename: name,
               input,
               severityError,
               isProductionMode,
@@ -235,7 +231,7 @@ class ImageMinimizerPlugin {
 
           if (this.options.filename) {
             const newFilename = loaderUtils.interpolateName(
-              { resourcePath: assetName },
+              { resourcePath: name },
               this.options.filename,
               {
                 content: compressed.toString(),
@@ -243,7 +239,7 @@ class ImageMinimizerPlugin {
             );
 
             if (!this.options.keepOriginal) {
-              ImageMinimizerPlugin.deleteAsset(compilation, assetName);
+              ImageMinimizerPlugin.deleteAsset(compilation, name);
             }
 
             ImageMinimizerPlugin.emitAsset(
@@ -261,7 +257,7 @@ class ImageMinimizerPlugin {
 
             ImageMinimizerPlugin.updateAsset(
               compilation,
-              assetName,
+              name,
               compressed,
               newOriginalInfo
             );
