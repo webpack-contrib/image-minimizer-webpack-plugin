@@ -21,6 +21,11 @@ export default class Webpack4Cache {
   }
 
   async get(cacheData, sources) {
+    if (!this.cache) {
+      // eslint-disable-next-line no-undefined
+      return undefined;
+    }
+
     let weakOutput;
 
     if (!this.loader) {
@@ -29,11 +34,6 @@ export default class Webpack4Cache {
       if (weakOutput) {
         return weakOutput;
       }
-    }
-
-    if (!this.cache) {
-      // eslint-disable-next-line no-undefined
-      return undefined;
     }
 
     // eslint-disable-next-line no-param-reassign
