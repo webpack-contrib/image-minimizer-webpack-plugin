@@ -76,6 +76,7 @@ describe('cache option - persistent cache', () => {
   it('should work and do not cache when cache is "false"', async () => {
     const compiler = await webpack(
       {
+        ...(webpack.isWebpack4() ? {} : { cache: false }),
         entry: path.join(fixturesPath, './simple.js'),
         emitPlugin: true,
         emitAssetPlugin: true,
@@ -122,7 +123,7 @@ describe('cache option - persistent cache', () => {
         ).length
       ).toBe(1);
     } else {
-      expect(secondStats.compilation.emittedAssets.size).toBe(1);
+      expect(secondStats.compilation.emittedAssets.size).toBe(3);
     }
   });
 });
