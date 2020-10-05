@@ -154,6 +154,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
     const { warnings, errors, assets } = compilation;
     const assetsKeys = Object.keys(assets);
 
+    // eslint-disable-next-line no-console
+    console.log(assetsKeys);
+
     [
       'nested/deep/loader-test.webp',
       'nested/deep/loader-test.jpg',
