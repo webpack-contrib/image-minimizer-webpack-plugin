@@ -82,7 +82,7 @@ export default class Webpack4Cache {
     return cacache.put(
       this.cache,
       cacheIdent,
-      JSON.stringify({ source, warnings, cacheIdent })
+      JSON.stringify({ source, warnings })
     );
   }
 }
