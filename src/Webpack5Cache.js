@@ -1,5 +1,4 @@
 export default class Cache {
-  // eslint-disable-next-line no-unused-vars
   constructor(compilation) {
     this.cache = compilation.getCache('ImageMinimizerWebpackPlugin');
   }
@@ -7,17 +6,16 @@ export default class Cache {
   async get(cacheData) {
     // eslint-disable-next-line no-param-reassign
     cacheData.eTag =
-      cacheData.eTag || this.cache.getLazyHashedEtag(cacheData.source);
+      cacheData.eTag || this.cache.getLazyHashedEtag(cacheData.inputSource);
 
-    return this.cache.getPromise(cacheData.filename, cacheData.eTag);
+    return this.cache.getPromise(cacheData.name, cacheData.eTag);
   }
 
   async store(cacheData) {
-    const { filename, compressed, warnings } = cacheData;
+    const { source, warnings } = cacheData;
 
-    return this.cache.storePromise(cacheData.filename, cacheData.eTag, {
-      filename,
-      compressed,
+    return this.cache.storePromise(cacheData.name, cacheData.eTag, {
+      source,
       warnings,
     });
   }

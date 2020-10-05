@@ -21,19 +21,18 @@ export default class Webpack4Cache {
   }
 
   async get(cacheData, sources) {
-    let weakOutput;
-
-    if (!this.loader) {
-      weakOutput = this.weakCache.get(cacheData.source);
-
-      if (weakOutput) {
-        return weakOutput;
-      }
-    }
-
     if (!this.cache) {
       // eslint-disable-next-line no-undefined
       return undefined;
+    }
+
+    const weakOutput = this.loader
+      ? // eslint-disable-next-line no-undefined
+        undefined
+      : this.weakCache.get(cacheData.inputSource);
+
+    if (weakOutput) {
+      return weakOutput;
     }
 
     // eslint-disable-next-line no-param-reassign
@@ -51,42 +50,39 @@ export default class Webpack4Cache {
 
     const result = JSON.parse(cachedResult.data);
 
-    result.compressed = Buffer.from(result.compressed);
+    result.source = Buffer.from(result.source);
 
     if (this.loader) {
       return result;
     }
 
-    result.compressed = new sources.RawSource(result.compressed);
+    result.source = new sources.RawSource(result.source);
 
     return result;
   }
 
   async store(cacheData) {
-    if (!this.loader) {
-      if (!this.weakCache.has(cacheData.source)) {
-        this.weakCache.set(cacheData.source, cacheData);
-      }
-    }
-
     if (!this.cache) {
       // eslint-disable-next-line no-undefined
       return undefined;
     }
 
-    const { cacheIdent } = cacheData;
-    let { compressed } = cacheData;
-
-    if (!this.loader) {
-      compressed = cacheData.compressed.source();
+    if (!this.loader && !this.weakCache.has(cacheData.inputSource)) {
+      this.weakCache.set(cacheData.inputSource, cacheData);
     }
 
-    const { filename, warnings } = cacheData;
+    let { source } = cacheData;
+
+    if (!this.loader) {
+      source = source.source();
+    }
+
+    const { cacheIdent, warnings } = cacheData;
 
     return cacache.put(
       this.cache,
       cacheIdent,
-      JSON.stringify({ filename, compressed, warnings, cacheIdent })
+      JSON.stringify({ source, warnings })
     );
   }
 }

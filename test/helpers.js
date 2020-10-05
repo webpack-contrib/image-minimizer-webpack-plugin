@@ -117,6 +117,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
           ),
       },
       output: {
+        publicPath: '',
         filename: 'bundle.js',
         path:
           options.output && options.output.path

@@ -28,7 +28,7 @@ describe('validate options', () => {
       success: ['[name].[ext]'],
       failure: [{}, [], () => {}, true],
     },
-    keepOriginal: {
+    deleteOriginalAssets: {
       success: [true, false],
       failure: [{}, [], () => {}],
     },

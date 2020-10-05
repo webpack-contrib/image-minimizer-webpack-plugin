@@ -1,4 +1,6 @@
-import { getConfigForFile, runImagemin } from './utils';
+import imagemin from 'imagemin';
+
+import normalizeConfig from './utils/normalize-config';
 
 async function minify(options = {}) {
   const { input, filename, severityError, isProductionMode } = options;
@@ -16,16 +18,19 @@ async function minify(options = {}) {
     return result;
   }
 
-  // Ensure that the contents i have are in the form of a buffer
-  result.input = Buffer.isBuffer(input) ? input : Buffer.from(input);
+  result.input = input;
 
   let output;
   let minimizerOptions;
 
   try {
-    minimizerOptions = getConfigForFile(options, result);
+    // Implement autosearch config on root directory of project in future
+    minimizerOptions = normalizeConfig(options.minimizerOptions, {
+      options,
+      result,
+    });
 
-    output = await runImagemin(result.input, minimizerOptions);
+    output = await imagemin.buffer(result.input, minimizerOptions);
   } catch (error) {
     const errored = error instanceof Error ? error : new Error(error);
 
@@ -51,7 +56,7 @@ async function minify(options = {}) {
 
     return {
       filename,
-      compressed: input,
+      output: input,
       warnings: result.warnings,
       errors: result.errors,
     };
@@ -59,7 +64,7 @@ async function minify(options = {}) {
 
   return {
     filename,
-    compressed: output,
+    output,
     warnings: result.warnings,
     errors: result.errors,
   };

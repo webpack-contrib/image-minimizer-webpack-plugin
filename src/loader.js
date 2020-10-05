@@ -8,15 +8,12 @@ import validateOptions from 'schema-utils';
 import webpack from 'webpack';
 
 import minify from './minify';
+import interpolateName from './utils/interpolate-name';
 import schema from './loader-options.json';
 
 const isWebpack4 = () => {
   return webpack.version[0] === '4';
 };
-
-const { RawSource } =
-  // eslint-disable-next-line global-require
-  webpack.sources || require('webpack-sources');
 
 module.exports = async function loader(content) {
   const options = loaderUtils.getOptions(this);
@@ -28,45 +25,36 @@ module.exports = async function loader(content) {
 
   const callback = this.async();
 
-  const { resourcePath } = this;
-  const filename = path.relative(this.rootContext, resourcePath);
+  const name = path.relative(this.rootContext, this.resourcePath);
 
-  if (options.filter && !options.filter(content, filename)) {
+  if (options.filter && !options.filter(content, name)) {
     callback(null, content);
 
     return;
   }
 
   const input = content;
+
   let cache;
-  let cacheData;
+  const cacheData = {};
+
   let output;
 
   if (isWebpack4()) {
-    cacheData = { assetName: filename, input };
-
     // eslint-disable-next-line global-require
     const CacheEngine = require('./Webpack4Cache').default;
 
-    cache = new CacheEngine(
-      null,
-      {
-        cache: options.cache,
-      },
-      false,
-      true
-    );
+    cache = new CacheEngine(null, { cache: options.cache }, false, true);
 
     cacheData.cacheKeys = {
-      nodeVersion: process.version,
       // eslint-disable-next-line global-require
       'image-minimizer-webpack-plugin': require('../package.json').version,
       'image-minimizer-webpack-plugin-options': options,
-      assetName: filename,
+      name,
       contentHash: crypto.createHash('md4').update(input).digest('hex'),
     };
 
-    output = await cache.get(cacheData, { RawSource });
+    output = await cache.get(cacheData);
   }
 
   if (!output) {
@@ -74,7 +62,7 @@ module.exports = async function loader(content) {
 
     const minifyOptions = {
       input,
-      filename,
+      filename: name,
       severityError,
       minimizerOptions,
       isProductionMode: this.mode === 'production' || !this.mode,
@@ -92,6 +80,8 @@ module.exports = async function loader(content) {
       return;
     }
 
+    output.source = output.output;
+
     if (isWebpack4()) {
       await cache.store({ ...output, ...cacheData });
     }
@@ -103,27 +93,28 @@ module.exports = async function loader(content) {
     });
   }
 
-  const data = output.compressed || output.input;
+  const { source } = output;
+  const newName = interpolateName(
+    name,
+    options.filename || '[path][name][ext]'
+  );
+  const isNewAsset = name !== newName;
 
-  if (options.filename && options.keepOriginal) {
-    const newFilename = loaderUtils.interpolateName(
-      { resourcePath: filename },
-      options.filename,
-      {
-        content: data,
-      }
-    );
+  if (isNewAsset) {
+    if (options.deleteOriginalAssets) {
+      callback(null, source);
+    } else {
+      this.emitFile(newName, source, null, {
+        minimized: true,
+      });
 
-    this.emitFile(newFilename, data, null, {
-      minimized: true,
-    });
-
-    callback(null, content);
+      callback(null, content);
+    }
 
     return;
   }
 
-  callback(null, data);
+  callback(null, source);
 };
 
 module.exports.raw = true;
