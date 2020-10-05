@@ -1,5 +1,4 @@
 export default class Cache {
-  // eslint-disable-next-line no-unused-vars
   constructor(compilation) {
     this.cache = compilation.getCache('ImageMinimizerWebpackPlugin');
   }

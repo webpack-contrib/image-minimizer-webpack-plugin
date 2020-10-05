@@ -26,14 +26,13 @@ export default class Webpack4Cache {
       return undefined;
     }
 
-    let weakOutput;
+    const weakOutput = this.loader
+      ? // eslint-disable-next-line no-undefined
+        undefined
+      : this.weakCache.get(cacheData.inputSource);
 
-    if (!this.loader) {
-      weakOutput = this.weakCache.get(cacheData.inputSource);
-
-      if (weakOutput) {
-        return weakOutput;
-      }
+    if (weakOutput) {
+      return weakOutput;
     }
 
     // eslint-disable-next-line no-param-reassign
@@ -68,20 +67,17 @@ export default class Webpack4Cache {
       return undefined;
     }
 
-    if (!this.loader) {
-      if (!this.weakCache.has(cacheData.inputSource)) {
-        this.weakCache.set(cacheData.inputSource, cacheData);
-      }
+    if (!this.loader && !this.weakCache.has(cacheData.inputSource)) {
+      this.weakCache.set(cacheData.inputSource, cacheData);
     }
 
-    const { cacheIdent } = cacheData;
     let { compressed } = cacheData;
 
     if (!this.loader) {
       compressed = cacheData.compressed.source();
     }
 
-    const { warnings } = cacheData;
+    const { cacheIdent, warnings } = cacheData;
 
     return cacache.put(
       this.cache,

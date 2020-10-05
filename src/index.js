@@ -166,7 +166,7 @@ class ImageMinimizerPlugin {
             return;
           }
 
-          const cacheData = { name, inputSource };
+          const cacheData = { inputSource };
 
           if (ImageMinimizerPlugin.isWebpack4()) {
             cacheData.cacheKeys = {
@@ -174,8 +174,11 @@ class ImageMinimizerPlugin {
               'image-minimizer-webpack-plugin': require('../package.json')
                 .version,
               'image-minimizer-webpack-plugin-options': this.options,
+              name,
               contentHash: crypto.createHash('md4').update(input).digest('hex'),
             };
+          } else {
+            cacheData.name = name;
           }
 
           let output = await cache.get(cacheData, { RawSource });
