@@ -208,9 +208,7 @@ class ImageMinimizerPlugin {
               return;
             }
 
-            if (output.compressed && !output.compressed.source) {
-              output.compressed = new RawSource(output.compressed);
-            }
+            output.compressed = new RawSource(output.compressed);
 
             await cache.store({ ...output, ...cacheData });
           }
