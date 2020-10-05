@@ -173,7 +173,6 @@ class ImageMinimizerPlugin {
 
           if (ImageMinimizerPlugin.isWebpack4()) {
             cacheData.cacheKeys = {
-              nodeVersion: process.version,
               // eslint-disable-next-line global-require
               'image-minimizer-webpack-plugin': require('../package.json')
                 .version,
