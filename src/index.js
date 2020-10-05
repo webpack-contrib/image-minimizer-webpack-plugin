@@ -8,11 +8,11 @@ import pLimit from 'p-limit';
 
 import webpack from 'webpack';
 import ModuleFilenameHelpers from 'webpack/lib/ModuleFilenameHelpers';
-import loaderUtils from 'loader-utils';
 
 import validateOptions from 'schema-utils';
 
 import minify from './minify';
+import interpolateName from './utils/interpolate-name';
 import schema from './plugin-options.json';
 
 const { RawSource } =
@@ -38,8 +38,8 @@ class ImageMinimizerPlugin {
       },
       loader = true,
       maxConcurrency,
-      filename,
-      keepOriginal,
+      filename = '[path][name][ext]',
+      deleteOriginalAssets = false,
     } = options;
 
     this.options = {
@@ -53,7 +53,7 @@ class ImageMinimizerPlugin {
       maxConcurrency,
       test,
       filename,
-      keepOriginal,
+      deleteOriginalAssets,
     };
   }
 
@@ -221,22 +221,27 @@ class ImageMinimizerPlugin {
             });
           }
 
-          if (this.options.filename) {
-            const newFilename = loaderUtils.interpolateName(
-              { resourcePath: name },
-              this.options.filename,
-              {
-                content: source.toString(),
-              }
+          const newName = interpolateName(name, this.options.filename);
+
+          const isNewAsset = name !== newName;
+
+          if (isNewAsset) {
+            // TODO `...` required only for webpack@4
+            const newInfo = {
+              related: { minimized: newName, ...info.related },
+              minimized: true,
+            };
+
+            ImageMinimizerPlugin.emitAsset(
+              compilation,
+              newName,
+              source,
+              newInfo
             );
 
-            if (!this.options.keepOriginal) {
+            if (this.options.deleteOriginalAssets) {
               ImageMinimizerPlugin.deleteAsset(compilation, name);
             }
-
-            ImageMinimizerPlugin.emitAsset(compilation, newFilename, source, {
-              minimized: true,
-            });
           } else {
             // TODO `...` required only for webpack@4
             const newOriginalInfo = {
@@ -280,7 +285,7 @@ class ImageMinimizerPlugin {
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
         const {
           filename,
-          keepOriginal,
+          deleteOriginalAssets,
           cache,
           filter,
           test,
@@ -298,7 +303,7 @@ class ImageMinimizerPlugin {
           loader: path.join(__dirname, 'loader.js'),
           options: {
             filename,
-            keepOriginal,
+            deleteOriginalAssets,
             severityError,
             cache,
             filter,

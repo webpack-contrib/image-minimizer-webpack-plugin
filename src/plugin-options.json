@@ -101,7 +101,7 @@
     "filename": {
       "type": "string"
     },
-    "keepOriginal": {
+    "deleteOriginalAssets": {
       "type": "boolean"
     }
   }

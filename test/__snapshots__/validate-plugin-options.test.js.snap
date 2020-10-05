@@ -134,7 +134,7 @@ exports[`validation 12`] = `
 
 exports[`validation 13`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.keepOriginal should be a boolean."
+ - options.deleteOriginalAssets should be a boolean."
 `;
 
 exports[`validation 14`] = `

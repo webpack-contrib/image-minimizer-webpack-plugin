@@ -159,15 +159,15 @@ it('validation', () => {
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {
-    new ImageMinimizerPlugin({ keepOriginal: false });
+    new ImageMinimizerPlugin({ deleteOriginalAssets: false });
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ keepOriginal: {} });
+    new ImageMinimizerPlugin({ deleteOriginalAssets: {} });
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {
-    new ImageMinimizerPlugin({ keepOriginal: true });
+    new ImageMinimizerPlugin({ deleteOriginalAssets: true });
   }).not.toThrow();
 
   expect(() => {

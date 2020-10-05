@@ -8,6 +8,7 @@ import validateOptions from 'schema-utils';
 import webpack from 'webpack';
 
 import minify from './minify';
+import interpolateName from './utils/interpolate-name';
 import schema from './loader-options.json';
 
 const isWebpack4 = () => {
@@ -93,21 +94,22 @@ module.exports = async function loader(content) {
   }
 
   const { source } = output;
+  const newName = interpolateName(
+    name,
+    options.filename || '[path][name][ext]'
+  );
+  const isNewAsset = name !== newName;
 
-  if (options.filename && options.keepOriginal) {
-    const newFilename = loaderUtils.interpolateName(
-      { resourcePath: name },
-      options.filename,
-      {
-        content: source,
-      }
-    );
+  if (isNewAsset) {
+    if (options.deleteOriginalAssets) {
+      callback(null, source);
+    } else {
+      this.emitFile(newName, source, null, {
+        minimized: true,
+      });
 
-    this.emitFile(newFilename, source, null, {
-      minimized: true,
-    });
-
-    callback(null, content);
+      callback(null, content);
+    }
 
     return;
   }
