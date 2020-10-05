@@ -111,19 +111,16 @@ class ImageMinimizerPlugin {
     CacheEngine,
     weakCache
   ) {
-    const assetNames = Object.keys(assets).filter((assetName) => {
+    const assetNames = Object.keys(assets).filter((name) => {
       if (
-        !ModuleFilenameHelpers.matchObject.bind(
-          // eslint-disable-next-line no-undefined
-          undefined,
-          this.options
-        )(assetName)
+        // eslint-disable-next-line no-undefined
+        !ModuleFilenameHelpers.matchObject.bind(undefined, this.options)(name)
       ) {
         return false;
       }
 
       // Exclude already optimized assets from `image-minimizer-webpack-loader`
-      if (this.options.loader && moduleAssets.has(assetName)) {
+      if (this.options.loader && moduleAssets.has(name)) {
         return false;
       }
 
@@ -150,7 +147,7 @@ class ImageMinimizerPlugin {
     for (const name of assetNames) {
       scheduledTasks.push(
         limit(async () => {
-          const { source: assetSource, info } = ImageMinimizerPlugin.getAsset(
+          const { source: inputSource, info } = ImageMinimizerPlugin.getAsset(
             compilation,
             name
           );
@@ -159,7 +156,7 @@ class ImageMinimizerPlugin {
             return;
           }
 
-          let input = assetSource.source();
+          let input = inputSource.source();
 
           if (!Buffer.isBuffer(input)) {
             input = Buffer.from(input);
@@ -169,7 +166,7 @@ class ImageMinimizerPlugin {
             return;
           }
 
-          const cacheData = { name, source: assetSource };
+          const cacheData = { name, inputSource };
 
           if (ImageMinimizerPlugin.isWebpack4()) {
             cacheData.cacheKeys = {

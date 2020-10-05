@@ -29,7 +29,7 @@ export default class Webpack4Cache {
     let weakOutput;
 
     if (!this.loader) {
-      weakOutput = this.weakCache.get(cacheData.source);
+      weakOutput = this.weakCache.get(cacheData.inputSource);
 
       if (weakOutput) {
         return weakOutput;
@@ -69,8 +69,8 @@ export default class Webpack4Cache {
     }
 
     if (!this.loader) {
-      if (!this.weakCache.has(cacheData.source)) {
-        this.weakCache.set(cacheData.source, cacheData);
+      if (!this.weakCache.has(cacheData.inputSource)) {
+        this.weakCache.set(cacheData.inputSource, cacheData);
       }
     }
 

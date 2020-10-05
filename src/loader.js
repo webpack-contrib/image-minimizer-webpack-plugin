@@ -14,10 +14,6 @@ const isWebpack4 = () => {
   return webpack.version[0] === '4';
 };
 
-const { RawSource } =
-  // eslint-disable-next-line global-require
-  webpack.sources || require('webpack-sources');
-
 module.exports = async function loader(content) {
   const options = loaderUtils.getOptions(this);
 
@@ -66,7 +62,7 @@ module.exports = async function loader(content) {
       contentHash: crypto.createHash('md4').update(input).digest('hex'),
     };
 
-    output = await cache.get(cacheData, { RawSource });
+    output = await cache.get(cacheData);
   }
 
   if (!output) {
