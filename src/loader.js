@@ -24,8 +24,7 @@ module.exports = async function loader(content) {
 
   const callback = this.async();
 
-  const { resourcePath } = this;
-  const name = path.relative(this.rootContext, resourcePath);
+  const name = path.relative(this.rootContext, this.resourcePath);
 
   if (options.filter && !options.filter(content, name)) {
     callback(null, content);
@@ -93,18 +92,18 @@ module.exports = async function loader(content) {
     });
   }
 
-  const data = output.source;
+  const { source } = output;
 
   if (options.filename && options.keepOriginal) {
     const newFilename = loaderUtils.interpolateName(
       { resourcePath: name },
       options.filename,
       {
-        content: data,
+        content: source,
       }
     );
 
-    this.emitFile(newFilename, data, null, {
+    this.emitFile(newFilename, source, null, {
       minimized: true,
     });
 
@@ -113,7 +112,7 @@ module.exports = async function loader(content) {
     return;
   }
 
-  callback(null, data);
+  callback(null, source);
 };
 
 module.exports.raw = true;
