@@ -201,6 +201,9 @@ module.exports = {
 
 #### `test`
 
+Type: `String|RegExp|Array<String|RegExp>`
+Default: `/\.(jpe?g\|png\|gif\|tif\|webp\|svg\|avif)\$/i`
+
 Test to match files against.
 
 **webpack.config.js**
@@ -218,6 +221,9 @@ module.exports = {
 ```
 
 #### `include`
+
+Type: `String|RegExp|Array<String|RegExp>`
+Default: `undefined`
 
 Files to include.
 
@@ -237,6 +243,9 @@ module.exports = {
 
 #### `exclude`
 
+Type: `String|RegExp|Array<String|RegExp>`
+Default: `undefined`
+
 Files to exclude.
 
 **webpack.config.js**
@@ -254,6 +263,9 @@ module.exports = {
 ```
 
 #### `filter`
+
+Type: `Function`
+Default: `() => true`
 
 Allows filtering of images for optimization.
 
@@ -282,6 +294,11 @@ module.exports = {
 ```
 
 #### `cache`
+
+> ⚠ Ignored in webpack 5! Please use https://webpack.js.org/configuration/other-options/#cache.
+
+Type: `Boolean|String`
+Default: `false`
 
 Enable/disable file caching. Default path to cache directory: `node_modules/.cache/image-minimizer-webpack-plugin`.
 
@@ -351,7 +368,10 @@ module.exports = {
 
 #### `minimizerOptions`
 
-Options for `imagemin`.
+Type: `Object`
+Default: `{ plugins: [] }`
+
+Options for [`imagemin`](https://github.com/imagemin/imagemin).
 
 More information and examples [here](https://github.com/imagemin/imagemin).
 
@@ -392,7 +412,31 @@ module.exports = {
 };
 ```
 
+#### `loader`
+
+Type: `Boolean`
+Default: `true`
+
+Automatically adding `imagemin-loader`.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    new ImageMinimizerPlugin({
+      loader: false,
+    }),
+  ],
+};
+```
+
 #### `maxConcurrency`
+
+Type: `Number`
+Default: `Math.max(1, os.cpus().length - 1)`
 
 Maximum number of concurrency optimization processes in one time.
 
@@ -505,6 +549,9 @@ module.exports = {
 
 #### `filter`
 
+Type: `Function`
+Default: `() => true`
+
 Allows filtering of images for optimization.
 
 Return `true` to optimize the image, `false` otherwise.
@@ -549,6 +596,9 @@ module.exports = {
 ```
 
 #### `cache`
+
+Type: `Boolean\|String`
+Default: `false`
 
 Enable file caching. Default path to cache directory: `node_modules/.cache/image-minimizer-webpack-plugin`.
 
@@ -666,6 +716,11 @@ module.exports = {
 
 #### `minimizerOptions`
 
+Type: `Object`
+Default: `{ plugins: [] }`
+
+Options for `imagemin`.
+
 Options for [`imagemin`](https://github.com/imagemin/imagemin)
 
 **webpack.config.js**
@@ -706,6 +761,36 @@ Type: `String`
 Default: `'[path][name][ext]'`
 
 Allows to set the filename for the generated asset. Useful for converting to a `webp`.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader', // Or `url-loader` or your other loader
+          },
+          {
+            loader: ImageMinimizerPlugin.loader,
+            options: {
+              filename: '[path][name].webp',
+              minimizerOptions: {
+                plugins: ['imagemin-webp'],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```
 
 #### `deleteOriginalAssets`
 
