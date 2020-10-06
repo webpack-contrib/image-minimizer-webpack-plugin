@@ -2,7 +2,7 @@ import path from 'path';
 
 import fileType from 'file-type';
 
-import { fixturesPath, isOptimized, webpack } from './helpers';
+import { fixturesPath, isOptimized, webpack, normalizePath } from './helpers';
 
 describe('plugin "deleteOriginalAssets" option', () => {
   it('should transform asset and keep original asset (default behavior)', async () => {
@@ -152,7 +152,7 @@ describe('plugin "deleteOriginalAssets" option', () => {
     });
     const { compilation } = stats;
     const { warnings, errors, assets } = compilation;
-    const assetsKeys = Object.keys(assets);
+    const assetsKeys = Object.keys(assets).map((asset) => normalizePath(asset));
 
     [
       'nested/deep/loader-test.webp',
