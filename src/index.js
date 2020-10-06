@@ -9,7 +9,7 @@ import pLimit from 'p-limit';
 import webpack from 'webpack';
 import ModuleFilenameHelpers from 'webpack/lib/ModuleFilenameHelpers';
 
-import validateOptions from 'schema-utils';
+import { validate } from 'schema-utils';
 import serialize from 'serialize-javascript';
 
 import minify from './minify';
@@ -22,7 +22,7 @@ const { RawSource } =
 
 class ImageMinimizerPlugin {
   constructor(options = {}) {
-    validateOptions(schema, options, {
+    validate(schema, options, {
       name: 'Image Minimizer Plugin',
       baseDataPath: 'options',
     });

@@ -3,7 +3,7 @@ import path from 'path';
 import crypto from 'crypto';
 
 import loaderUtils from 'loader-utils';
-import validateOptions from 'schema-utils';
+import { validate } from 'schema-utils';
 
 import webpack from 'webpack';
 
@@ -18,7 +18,7 @@ const isWebpack4 = () => {
 module.exports = async function loader(content) {
   const options = loaderUtils.getOptions(this);
 
-  validateOptions(schema, options, {
+  validate(schema, options, {
     name: 'Image Minimizer Plugin Loader',
     baseDataPath: 'options',
   });

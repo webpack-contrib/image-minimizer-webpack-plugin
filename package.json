@@ -50,9 +50,9 @@
     "klona": "^2.0.4",
     "loader-utils": "^2.0.0",
     "p-limit": "^3.0.2",
-    "schema-utils": "^2.7.0",
+    "schema-utils": "^3.0.0",
     "serialize-javascript": "^5.0.1",
-    "webpack-sources": "^1.4.3"
+    "webpack-sources": "^2.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
@@ -63,7 +63,7 @@
     "@webpack-contrib/defaults": "^6.3.0",
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
     "babel-eslint": "^10.1.0",
-    "babel-jest": "^26.5.0",
+    "babel-jest": "^26.5.2",
     "cross-env": "^7.0.2",
     "css-loader": "^4.3.0",
     "del": "^6.0.0",
@@ -74,7 +74,7 @@
     "eslint-plugin-html": "^6.1.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-itgalaxy": "^129.0.0",
-    "eslint-plugin-jest": "^24.0.2",
+    "eslint-plugin-jest": "^24.1.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-lodash": "^7.1.0",
     "eslint-plugin-markdown": "^1.0.2",
@@ -90,7 +90,7 @@
     "imagemin-pngquant": "^9.0.1",
     "imagemin-svgo": "^8.0.0",
     "imagemin-webp": "^6.0.0",
-    "jest": "^26.5.0",
+    "jest": "^26.5.2",
     "lint-staged": "^10.4.0",
     "memfs": "^3.2.0",
     "mini-css-extract-plugin": "^0.11.3",
