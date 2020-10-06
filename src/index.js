@@ -10,6 +10,7 @@ import webpack from 'webpack';
 import ModuleFilenameHelpers from 'webpack/lib/ModuleFilenameHelpers';
 
 import validateOptions from 'schema-utils';
+import serialize from 'serialize-javascript';
 
 import minify from './minify';
 import interpolateName from './utils/interpolate-name';
@@ -178,7 +179,10 @@ class ImageMinimizerPlugin {
               contentHash: crypto.createHash('md4').update(input).digest('hex'),
             };
           } else {
-            cacheData.name = name;
+            cacheData.name = serialize({
+              name,
+              minimizerOptions: this.options.minimizerOptions,
+            });
           }
 
           let output = await cache.get(cacheData, { RawSource });

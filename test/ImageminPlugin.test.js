@@ -5,6 +5,8 @@ import crypto from 'crypto';
 import findCacheDir from 'find-cache-dir';
 import cacache from 'cacache';
 
+import fileType from 'file-type';
+
 import {
   fixturesPath,
   isOptimized,
@@ -13,6 +15,7 @@ import {
   webpack,
   compile,
   readAsset,
+  clearDirectory,
 } from './helpers';
 
 const IS_WEBPACK_VERSION_NEXT = process.env.WEBPACK_VERSION === 'next';
@@ -702,6 +705,104 @@ describe('imagemin plugin - persistent cache', () => {
       ).toBe(3);
     } else {
       expect(secondStats.compilation.emittedAssets.size).toBe(3);
+    }
+  });
+
+  it('should work and use the persistent cache when transform asset (loader + plugin)', async () => {
+    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
+
+    await cacache.rm.all(cacheDir);
+
+    const outputDir = path.resolve(__dirname, 'outputs', 'cache-webp');
+
+    const compiler = await webpack(
+      {
+        mode: 'development',
+        entry: path.join(fixturesPath, './simple.js'),
+        output: {
+          path: outputDir,
+        },
+        emitPlugin: true,
+        emitAssetPlugin: true,
+        imageminPluginOptions: [
+          {
+            cache: true,
+            filename: '[name].webp',
+            minimizerOptions: {
+              plugins: ['imagemin-webp'],
+            },
+          },
+          {
+            cache: true,
+            filename: '[name].json',
+            minimizerOptions: {
+              plugins: ['../../test/imagemin-base64.js'],
+            },
+          },
+        ],
+      },
+      true
+    );
+
+    clearDirectory(outputDir);
+
+    const stats = await compile(compiler);
+
+    const { compilation } = stats;
+
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(stats.compilation.assets).filter(
+          (assetName) => stats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(7);
+    } else {
+      expect(stats.compilation.emittedAssets.size).toBe(7);
+    }
+
+    const secondStats = await compile(compiler);
+    const { compilation: secondCompilation } = secondStats;
+    const {
+      warnings: secondWarnings,
+      errors: secondErrors,
+    } = secondCompilation;
+
+    expect(secondWarnings).toHaveLength(0);
+    expect(secondErrors).toHaveLength(0);
+
+    const extPluginWebp = await fileType.fromFile(
+      path.resolve(outputDir, 'plugin-test.webp')
+    );
+    const extPluginJson = await fileType.fromFile(
+      path.resolve(outputDir, 'plugin-test.json')
+    );
+    const extLoaderWebp = await fileType.fromFile(
+      path.resolve(outputDir, 'loader-test.webp')
+    );
+    const extLoaderJson = await fileType.fromFile(
+      path.resolve(outputDir, 'loader-test.json')
+    );
+
+    // eslint-disable-next-line no-undefined
+    expect(extPluginJson).toBe(undefined);
+    // eslint-disable-next-line no-undefined
+    expect(extLoaderJson).toBe(undefined);
+    expect(/image\/webp/i.test(extPluginWebp.mime)).toBe(true);
+    expect(/image\/webp/i.test(extLoaderWebp.mime)).toBe(true);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(secondStats.compilation.assets).filter(
+          (assetName) => secondStats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(0);
+    } else {
+      expect(secondStats.compilation.emittedAssets.size).toBe(0);
     }
   });
 });
