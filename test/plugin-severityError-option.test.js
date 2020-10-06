@@ -1,8 +1,16 @@
 import path from 'path';
 
+import findCacheDir from 'find-cache-dir';
+import cacache from 'cacache';
+
 import { fixturesPath, isOptimized, plugins, webpack } from './helpers';
 
 describe('plugin severityError option', () => {
+  beforeEach(async () => {
+    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
+    await cacache.rm.all(cacheDir);
+  });
+
   it('should optimizes images and throws error on corrupted images using `plugin.severityError` option with `true` value (by plugin)', async () => {
     const stats = await webpack({
       emitPluginOptions: {

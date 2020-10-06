@@ -1,10 +1,17 @@
 import path from 'path';
 
 import fileType from 'file-type';
+import findCacheDir from 'find-cache-dir';
+import cacache from 'cacache';
 
 import { fixturesPath, webpack } from './helpers';
 
 describe('loader "deleteOriginalAssets" option', () => {
+  beforeEach(async () => {
+    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
+    await cacache.rm.all(cacheDir);
+  });
+
   it('should transform asset and keep original asset (default behavior)', async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, './loader-single.js'),
