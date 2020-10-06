@@ -189,7 +189,7 @@ module.exports = {
 |       **`include`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `include`                                                                                                        |
 |       **`exclude`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `exclude`                                                                                                        |
 |        **`filter`**        |               `{Function}`                |                        `() => true`                         | Allows filtering of images for optimization                                                                               |
-|        **`cache`**         |            `{Boolean\|String}`            |                           `false`                           | Enable file caching                                                                                                       |
+|        **`cache`**         |            `{Boolean\|String}`            |                           `true`                            | Enable file caching                                                                                                       |
 |    **`severityError`**     |            `{Boolean\|String}`            |                          `'auto'`                           | Allows to choose how errors are displayed                                                                                 |
 |   **`minimizerOptions`**   |                `{Object}`                 |                      `{ plugins: [] }`                      | Options for `imagemin`                                                                                                    |
 |        **`loader`**        |                `{Boolean}`                |                           `true`                            | Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other) |
@@ -298,7 +298,7 @@ module.exports = {
 > ⚠ Ignored in webpack 5! Please use https://webpack.js.org/configuration/other-options/#cache.
 
 Type: `Boolean|String`
-Default: `false`
+Default: `true`
 
 Enable/disable file caching. Default path to cache directory: `node_modules/.cache/image-minimizer-webpack-plugin`.
 
@@ -314,7 +314,7 @@ const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 module.exports = {
   plugins: [
     new ImageMinimizerPlugin({
-      cache: true,
+      cache: false,
     }),
   ],
 };
@@ -541,7 +541,7 @@ module.exports = {
 |            Name            |        Type         |        Default        | Description                                                                                       |
 | :------------------------: | :-----------------: | :-------------------: | :------------------------------------------------------------------------------------------------ |
 |        **`filter`**        |    `{Function}`     |      `undefined`      | Allows filtering of images for optimization                                                       |
-|        **`cache`**         | `{Boolean\|String}` |        `false`        | Enable file caching                                                                               |
+|        **`cache`**         | `{Boolean\|String}` |        `true`         | Enable file caching                                                                               |
 |    **`severityError`**     | `{Boolean\|String}` |       `'auto'`        | Allows to choose how errors are displayed                                                         |
 |   **`minimizerOptions`**   |     `{Object}`      |   `{ plugins: [] }`   | Options for `imagemin`                                                                            |
 |       **`filename`**       |     `{string}`      | `'[path][name][ext]'` | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
@@ -598,7 +598,7 @@ module.exports = {
 #### `cache`
 
 Type: `Boolean\|String`
-Default: `false`
+Default: `true`
 
 Enable file caching. Default path to cache directory: `node_modules/.cache/image-minimizer-webpack-plugin`.
 
@@ -623,7 +623,7 @@ module.exports = {
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
-              cache: true,
+              cache: false,
               minimizerOptions: {
                 plugins: ['gifsicle'],
               },
