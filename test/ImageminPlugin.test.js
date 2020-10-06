@@ -654,7 +654,7 @@ describe('imagemin plugin - persistent cache', () => {
 
     const compiler = await webpack(
       {
-        ...(webpack.isWebpack4() ? { cache: false } : {}),
+        cache: false,
         entry: path.join(fixturesPath, './simple.js'),
         emitPlugin: true,
         emitAssetPlugin: true,
