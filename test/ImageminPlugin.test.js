@@ -2,6 +2,9 @@ import path from 'path';
 
 import crypto from 'crypto';
 
+import findCacheDir from 'find-cache-dir';
+import cacache from 'cacache';
+
 import {
   fixturesPath,
   isOptimized,
@@ -15,6 +18,11 @@ import {
 const IS_WEBPACK_VERSION_NEXT = process.env.WEBPACK_VERSION === 'next';
 
 describe('imagemin plugin', () => {
+  beforeEach(async () => {
+    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
+    await cacache.rm.all(cacheDir);
+  });
+
   it('should optimizes all images (loader + plugin)', async () => {
     const stats = await webpack({ emitPlugin: true, imageminPlugin: true });
     const { compilation } = stats;
@@ -521,4 +529,179 @@ describe('imagemin plugin', () => {
       expect(errors).toHaveLength(0);
     });
   }
+});
+
+describe('imagemin plugin - persistent cache', () => {
+  it('should work and use the persistent cache by default (loader + plugin)', async () => {
+    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
+
+    await cacache.rm.all(cacheDir);
+
+    const compiler = await webpack(
+      {
+        mode: 'development',
+        entry: path.join(fixturesPath, './simple.js'),
+        emitPlugin: true,
+        emitAssetPlugin: true,
+        imageminPluginOptions: {
+          minimizerOptions: { plugins },
+        },
+      },
+      true
+    );
+
+    const stats = await compile(compiler);
+
+    const { compilation } = stats;
+
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(stats.compilation.assets).filter(
+          (assetName) => stats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(3);
+    } else {
+      expect(stats.compilation.emittedAssets.size).toBe(3);
+    }
+
+    const secondStats = await compile(compiler);
+    const {
+      warnings: secondWarnings,
+      errors: secondErrors,
+    } = secondStats.compilation;
+
+    expect(secondWarnings).toHaveLength(0);
+    expect(secondErrors).toHaveLength(0);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(secondStats.compilation.assets).filter(
+          (assetName) => secondStats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(0);
+    } else {
+      expect(secondStats.compilation.emittedAssets.size).toBe(0);
+    }
+  });
+
+  it('should work and use the persistent cache when "cache" option is true (loader + plugin)', async () => {
+    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
+
+    await cacache.rm.all(cacheDir);
+
+    const compiler = await webpack(
+      {
+        mode: 'development',
+        entry: path.join(fixturesPath, './simple.js'),
+        emitPlugin: true,
+        emitAssetPlugin: true,
+        imageminPluginOptions: {
+          cache: true,
+          minimizerOptions: { plugins },
+        },
+      },
+      true
+    );
+
+    const stats = await compile(compiler);
+
+    const { compilation } = stats;
+
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(stats.compilation.assets).filter(
+          (assetName) => stats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(3);
+    } else {
+      expect(stats.compilation.emittedAssets.size).toBe(3);
+    }
+
+    const secondStats = await compile(compiler);
+    const {
+      warnings: secondWarnings,
+      errors: secondErrors,
+    } = secondStats.compilation;
+
+    expect(secondWarnings).toHaveLength(0);
+    expect(secondErrors).toHaveLength(0);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(secondStats.compilation.assets).filter(
+          (assetName) => secondStats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(0);
+    } else {
+      expect(secondStats.compilation.emittedAssets.size).toBe(0);
+    }
+  });
+
+  it('should work and do not use persistent cache when "cache" option is "false"', async () => {
+    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
+
+    await cacache.rm.all(cacheDir);
+
+    const compiler = await webpack(
+      {
+        cache: false,
+        entry: path.join(fixturesPath, './simple.js'),
+        emitPlugin: true,
+        emitAssetPlugin: true,
+        imageminPluginOptions: {
+          cache: false,
+          minimizerOptions: { plugins },
+        },
+      },
+      true
+    );
+
+    const stats = await compile(compiler);
+
+    const { compilation } = stats;
+
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(stats.compilation.assets).filter(
+          (assetName) => stats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(3);
+    } else {
+      expect(stats.compilation.emittedAssets.size).toBe(3);
+    }
+
+    const secondStats = await compile(compiler);
+    const {
+      warnings: secondWarnings,
+      errors: secondErrors,
+    } = secondStats.compilation;
+
+    expect(secondWarnings).toHaveLength(0);
+    expect(secondErrors).toHaveLength(0);
+
+    if (webpack.isWebpack4()) {
+      expect(
+        Object.keys(secondStats.compilation.assets).filter(
+          (assetName) => secondStats.compilation.assets[assetName].emitted
+        ).length
+      ).toBe(3);
+    } else {
+      expect(secondStats.compilation.emittedAssets.size).toBe(3);
+    }
+  });
 });

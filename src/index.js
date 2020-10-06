@@ -27,7 +27,7 @@ class ImageMinimizerPlugin {
     });
 
     const {
-      cache = false,
+      cache = true,
       filter = () => true,
       test = /\.(jpe?g|png|gif|tif|webp|svg|avif)$/i,
       include,
