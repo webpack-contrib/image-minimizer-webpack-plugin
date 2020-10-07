@@ -4,7 +4,7 @@ import fileType from 'file-type';
 import findCacheDir from 'find-cache-dir';
 import cacache from 'cacache';
 
-import { fixturesPath, webpack } from './helpers';
+import { fixturesPath, webpack, clearDirectory } from './helpers';
 
 describe('loader "deleteOriginalAssets" option', () => {
   beforeEach(async () => {
@@ -83,11 +83,16 @@ describe('loader "deleteOriginalAssets" option', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it.skip('should transform asset and keep original asset when the "deleteOriginalAssets" option is "true"', async () => {
+  // TODO remove original asset
+  it('should transform asset and remove original asset when the "deleteOriginalAssets" option is "true"', async () => {
+    const outputDir = path.resolve(__dirname, 'outputs', 'DOA');
+
+    clearDirectory(outputDir);
+
     const stats = await webpack({
       entry: path.join(fixturesPath, './loader-single.js'),
       output: {
-        path: path.resolve(__dirname, 'outputs'),
+        path: outputDir,
       },
       imageminPluginOptions: {
         deleteOriginalAssets: true,
@@ -101,13 +106,11 @@ describe('loader "deleteOriginalAssets" option', () => {
     const { warnings, errors } = compilation;
 
     const originalAsset = path.resolve(
-      __dirname,
-      'outputs',
-      './nested/deep/loader-test.webp'
+      outputDir,
+      './nested/deep/loader-test.jpg'
     );
     const transformedAsset = path.resolve(
-      __dirname,
-      'outputs',
+      outputDir,
       './nested/deep/loader-test.webp'
     );
     const originalExt = await fileType.fromFile(originalAsset);

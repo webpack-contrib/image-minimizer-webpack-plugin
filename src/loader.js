@@ -101,15 +101,15 @@ module.exports = async function loader(content) {
   const isNewAsset = name !== newName;
 
   if (isNewAsset) {
-    if (options.deleteOriginalAssets) {
-      callback(null, source);
-    } else {
-      this.emitFile(newName, source, null, {
-        minimized: true,
-      });
+    this.emitFile(newName, source, null, {
+      minimized: true,
+    });
 
-      callback(null, content);
+    if (options.deleteOriginalAssets) {
+      // TODO remove original asset
     }
+
+    callback(null, content);
 
     return;
   }
