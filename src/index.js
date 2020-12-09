@@ -54,7 +54,8 @@ class ImageMinimizerPlugin {
     };
   }
 
-  async optimize(compiler, compilation, assets, moduleAssets, CacheEngine) {
+  async optimize(compiler, compilation, assets, moduleAssets) {
+    const cache = compilation.getCache('ImageMinimizerWebpackPlugin');
     const assetNames = Object.keys(assets).filter((name) => {
       if (
         // eslint-disable-next-line no-undefined
@@ -80,9 +81,6 @@ class ImageMinimizerPlugin {
       this.options.maxConcurrency || Math.max(1, cpus.length - 1)
     );
     const scheduledTasks = [];
-    const cache = new CacheEngine(compilation, {
-      cache: this.options.cache,
-    });
 
     for (const name of assetNames) {
       scheduledTasks.push(
@@ -103,14 +101,14 @@ class ImageMinimizerPlugin {
             return;
           }
 
-          const cacheData = { inputSource };
-
-          cacheData.name = serialize({
+          const cacheName = serialize({
             name,
             minimizerOptions: this.options.minimizerOptions,
           });
 
-          let output = await cache.get(cacheData, { RawSource });
+          const eTag = cache.getLazyHashedEtag(inputSource);
+          const cacheItem = cache.getItemCache(cacheName, eTag);
+          let output = await cacheItem.getPromise();
 
           if (!output) {
             const {
@@ -139,7 +137,10 @@ class ImageMinimizerPlugin {
 
             output.source = new RawSource(output.output);
 
-            await cache.store({ ...output, ...cacheData });
+            await cacheItem.storePromise({
+              source: output.source,
+              warnings: output.warnings,
+            });
           }
 
           const { source, warnings } = output;
@@ -233,9 +234,6 @@ class ImageMinimizerPlugin {
     }
 
     // eslint-disable-next-line global-require
-    const CacheEngine = require('./Webpack5Cache').default;
-
-    // eslint-disable-next-line global-require
     const Compilation = require('webpack/lib/Compilation');
 
     compiler.hooks.compilation.tap(pluginName, (compilation) => {
@@ -244,14 +242,7 @@ class ImageMinimizerPlugin {
           name: pluginName,
           stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
         },
-        (assets) =>
-          this.optimize(
-            compiler,
-            compilation,
-            assets,
-            moduleAssets,
-            CacheEngine
-          )
+        (assets) => this.optimize(compiler, compilation, assets, moduleAssets)
       );
     });
   }
