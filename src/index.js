@@ -2,8 +2,6 @@ import path from 'path';
 
 import os from 'os';
 
-import crypto from 'crypto';
-
 import pLimit from 'p-limit';
 
 import webpack from 'webpack';
@@ -28,7 +26,6 @@ class ImageMinimizerPlugin {
     });
 
     const {
-      cache = true,
       filter = () => true,
       test = /\.(jpe?g|png|gif|tif|webp|svg|avif)$/i,
       include,
@@ -45,7 +42,6 @@ class ImageMinimizerPlugin {
 
     this.options = {
       severityError,
-      cache,
       filter,
       exclude,
       minimizerOptions,
@@ -58,60 +54,7 @@ class ImageMinimizerPlugin {
     };
   }
 
-  static isWebpack4() {
-    return webpack.version[0] === '4';
-  }
-
-  // eslint-disable-next-line consistent-return
-  static getAsset(compilation, name) {
-    // New API
-    if (compilation.getAsset) {
-      return compilation.getAsset(name);
-    }
-
-    if (compilation.assets[name]) {
-      return { name, source: compilation.assets[name], info: {} };
-    }
-  }
-
-  static updateAsset(compilation, name, newSource, assetInfo) {
-    // New API
-    if (compilation.updateAsset) {
-      compilation.updateAsset(name, newSource, assetInfo);
-    }
-
-    // eslint-disable-next-line no-param-reassign
-    compilation.assets[name] = newSource;
-  }
-
-  static emitAsset(compilation, name, source, assetInfo) {
-    // New API
-    if (compilation.emitAsset) {
-      compilation.emitAsset(name, source, assetInfo);
-    }
-
-    // eslint-disable-next-line no-param-reassign
-    compilation.assets[name] = source;
-  }
-
-  static deleteAsset(compilation, name) {
-    // New API
-    if (compilation.deleteAsset) {
-      compilation.deleteAsset(name);
-    }
-
-    // eslint-disable-next-line no-param-reassign
-    delete compilation.assets[name];
-  }
-
-  async optimize(
-    compiler,
-    compilation,
-    assets,
-    moduleAssets,
-    CacheEngine,
-    weakCache
-  ) {
+  async optimize(compiler, compilation, assets, moduleAssets, CacheEngine) {
     const assetNames = Object.keys(assets).filter((name) => {
       if (
         // eslint-disable-next-line no-undefined
@@ -137,21 +80,14 @@ class ImageMinimizerPlugin {
       this.options.maxConcurrency || Math.max(1, cpus.length - 1)
     );
     const scheduledTasks = [];
-    const cache = new CacheEngine(
-      compilation,
-      {
-        cache: this.options.cache,
-      },
-      weakCache
-    );
+    const cache = new CacheEngine(compilation, {
+      cache: this.options.cache,
+    });
 
     for (const name of assetNames) {
       scheduledTasks.push(
         limit(async () => {
-          const { source: inputSource, info } = ImageMinimizerPlugin.getAsset(
-            compilation,
-            name
-          );
+          const { source: inputSource, info } = compilation.getAsset(name);
 
           if (info.minimized) {
             return;
@@ -169,21 +105,10 @@ class ImageMinimizerPlugin {
 
           const cacheData = { inputSource };
 
-          if (ImageMinimizerPlugin.isWebpack4()) {
-            cacheData.cacheKeys = {
-              // eslint-disable-next-line global-require
-              'image-minimizer-webpack-plugin': require('../package.json')
-                .version,
-              'image-minimizer-webpack-plugin-options': this.options,
-              name,
-              contentHash: crypto.createHash('md4').update(input).digest('hex'),
-            };
-          } else {
-            cacheData.name = serialize({
-              name,
-              minimizerOptions: this.options.minimizerOptions,
-            });
-          }
+          cacheData.name = serialize({
+            name,
+            minimizerOptions: this.options.minimizerOptions,
+          });
 
           let output = await cache.get(cacheData, { RawSource });
 
@@ -236,15 +161,10 @@ class ImageMinimizerPlugin {
               minimized: true,
             };
 
-            ImageMinimizerPlugin.emitAsset(
-              compilation,
-              newName,
-              source,
-              newInfo
-            );
+            compilation.emitAsset(newName, source, newInfo);
 
             if (this.options.deleteOriginalAssets) {
-              ImageMinimizerPlugin.deleteAsset(compilation, name);
+              compilation.deleteAsset(name);
             }
           } else {
             // TODO `...` required only for webpack@4
@@ -253,12 +173,7 @@ class ImageMinimizerPlugin {
               minimized: true,
             };
 
-            ImageMinimizerPlugin.updateAsset(
-              compilation,
-              name,
-              source,
-              newOriginalInfo
-            );
+            compilation.updateAsset(name, source, newOriginalInfo);
           }
         })
       );
@@ -290,7 +205,6 @@ class ImageMinimizerPlugin {
         const {
           filename,
           deleteOriginalAssets,
-          cache,
           filter,
           test,
           include,
@@ -309,7 +223,6 @@ class ImageMinimizerPlugin {
             filename,
             deleteOriginalAssets,
             severityError,
-            cache,
             filter,
             minimizerOptions,
           },
@@ -319,47 +232,28 @@ class ImageMinimizerPlugin {
       });
     }
 
-    const weakCache = new WeakMap();
+    // eslint-disable-next-line global-require
+    const CacheEngine = require('./Webpack5Cache').default;
 
-    if (ImageMinimizerPlugin.isWebpack4()) {
-      // eslint-disable-next-line global-require
-      const CacheEngine = require('./Webpack4Cache').default;
+    // eslint-disable-next-line global-require
+    const Compilation = require('webpack/lib/Compilation');
 
-      compiler.hooks.emit.tapPromise({ name: pluginName }, (compilation) =>
-        this.optimize(
-          compiler,
-          compilation,
-          compilation.assets,
-          moduleAssets,
-          CacheEngine,
-          weakCache
-        )
+    compiler.hooks.compilation.tap(pluginName, (compilation) => {
+      compilation.hooks.processAssets.tapPromise(
+        {
+          name: pluginName,
+          stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
+        },
+        (assets) =>
+          this.optimize(
+            compiler,
+            compilation,
+            assets,
+            moduleAssets,
+            CacheEngine
+          )
       );
-    } else {
-      // eslint-disable-next-line global-require
-      const CacheEngine = require('./Webpack5Cache').default;
-
-      // eslint-disable-next-line global-require
-      const Compilation = require('webpack/lib/Compilation');
-
-      compiler.hooks.compilation.tap(pluginName, (compilation) => {
-        compilation.hooks.processAssets.tapPromise(
-          {
-            name: pluginName,
-            stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
-          },
-          (assets) =>
-            this.optimize(
-              compiler,
-              compilation,
-              assets,
-              moduleAssets,
-              CacheEngine,
-              weakCache
-            )
-        );
-      });
-    }
+    });
   }
 }
 

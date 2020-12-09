@@ -141,7 +141,6 @@ function runWebpack(maybeOptions, getCompiler = false) {
         options: options.imageminLoaderOptions
           ? options.imageminLoaderOptions
           : {
-              cache: false,
               minimizerOptions: { plugins },
             },
       });
@@ -164,7 +163,6 @@ function runWebpack(maybeOptions, getCompiler = false) {
         const ImageMinimizerPluginCreated = new ImageMinimizerPlugin(
           typeof imageminPluginOptions === 'boolean'
             ? {
-                cache: false,
                 minimizerOptions: {
                   plugins,
                 },
@@ -312,8 +310,6 @@ function clearDirectory(dirPath) {
 
   fs.rmdirSync(dirPath);
 }
-
-runWebpack.isWebpack4 = () => webpack.version[0] === '4';
 
 export {
   runWebpack as webpack,

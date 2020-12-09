@@ -2,9 +2,6 @@ import path from 'path';
 
 import crypto from 'crypto';
 
-import findCacheDir from 'find-cache-dir';
-import cacache from 'cacache';
-
 import fileType from 'file-type';
 
 import {
@@ -18,14 +15,7 @@ import {
   clearDirectory,
 } from './helpers';
 
-const IS_WEBPACK_VERSION_NEXT = process.env.WEBPACK_VERSION === 'next';
-
 describe('imagemin plugin', () => {
-  beforeEach(async () => {
-    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
-    await cacache.rm.all(cacheDir);
-  });
-
   it('should optimizes all images (loader + plugin)', async () => {
     const stats = await webpack({ emitPlugin: true, imageminPlugin: true });
     const { compilation } = stats;
@@ -322,224 +312,194 @@ describe('imagemin plugin', () => {
     ).resolves.toBe(true);
   });
 
-  if (!IS_WEBPACK_VERSION_NEXT) {
-    it('should optimizes all images (loader + plugin) from `mini-css-extract-plugin`', async () => {
-      const stats = await webpack({
+  it('should generate real content hash', async () => {
+    const compiler = await webpack(
+      {
+        output: {
+          path: path.resolve(__dirname, 'outputs'),
+        },
+        name: '[name].[contenthash].[fullhash].[ext]',
+        optimization: {
+          minimize: false,
+          realContentHash: true,
+        },
         emitPlugin: true,
         imageminPlugin: true,
-        entry: path.join(fixturesPath, 'entry-with-css.js'),
-        MCEP: true,
-      });
-      const { compilation } = stats;
-      const { warnings, errors } = stats.compilation;
+      },
+      true
+    );
 
-      expect(warnings).toHaveLength(0);
-      expect(errors).toHaveLength(0);
+    const stats = await compile(compiler);
 
-      // Bug in mini-css-extract-plugin
-      // expect(hasLoader("url.png", modules)).toBe(true);
+    const {
+      warnings,
+      errors,
+      assets,
+      options: { output },
+    } = stats.compilation;
 
-      await expect(isOptimized('url.png', compilation)).resolves.toBe(true);
-      await expect(isOptimized('plugin-test.jpg', compilation)).resolves.toBe(
-        true
-      );
-    });
-  }
+    expect.assertions(6);
 
-  if (IS_WEBPACK_VERSION_NEXT) {
-    it('should generate real content hash', async () => {
-      const compiler = await webpack(
-        {
-          output: {
-            path: path.resolve(__dirname, 'outputs'),
-          },
-          name: '[name].[contenthash].[fullhash].[ext]',
-          optimization: {
-            minimize: false,
-            realContentHash: true,
-          },
-          emitPlugin: true,
-          imageminPlugin: true,
-        },
-        true
-      );
+    for (const assetName of Object.keys(assets)) {
+      const match = assetName.match(/^.+?\.(.+?)\..+$/);
 
-      const stats = await compile(compiler);
-
-      const {
-        warnings,
-        errors,
-        assets,
-        options: { output },
-      } = stats.compilation;
-
-      expect.assertions(6);
-
-      for (const assetName of Object.keys(assets)) {
-        const match = assetName.match(/^.+?\.(.+?)\..+$/);
-
-        if (!match) {
-          // eslint-disable-next-line no-continue
-          continue;
-        }
-
-        const [, webpackHash] = assetName.match(/^.+?\.(.+?)\..+$/);
-
-        const { hashDigest, hashFunction } = output;
-        const cryptoHash = crypto
-          .createHash(hashFunction)
-          .update(readAsset(assetName, compiler, stats))
-          .digest(hashDigest);
-
-        expect(webpackHash).toBe(cryptoHash);
+      if (!match) {
+        // eslint-disable-next-line no-continue
+        continue;
       }
 
-      expect(warnings).toHaveLength(0);
-      expect(errors).toHaveLength(0);
-    });
+      const [, webpackHash] = assetName.match(/^.+?\.(.+?)\..+$/);
 
-    it('should work with asset/resource', async () => {
-      const compiler = await webpack(
-        {
-          fileLoaderOff: true,
-          assetResource: true,
-          output: {
-            assetModuleFilename: '[name][ext]',
-          },
-          experiments: {
-            asset: true,
-          },
-          emitPlugin: true,
-          imageminPlugin: true,
+      const { hashDigest, hashFunction } = output;
+      const cryptoHash = crypto
+        .createHash(hashFunction)
+        .update(readAsset(assetName, compiler, stats))
+        .digest(hashDigest);
+
+      expect(webpackHash).toBe(cryptoHash);
+    }
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('should work with asset/resource', async () => {
+    const compiler = await webpack(
+      {
+        fileLoaderOff: true,
+        assetResource: true,
+        output: {
+          assetModuleFilename: '[name][ext]',
         },
-        true
-      );
-
-      const stats = await compile(compiler);
-      const { compilation } = stats;
-      const { warnings, errors, modules } = compilation;
-
-      expect(warnings).toHaveLength(0);
-      expect(errors).toHaveLength(0);
-
-      expect(hasLoader('loader-test.gif', modules)).toBe(true);
-      expect(hasLoader('loader-test.jpg', modules)).toBe(true);
-      expect(hasLoader('loader-test.png', modules)).toBe(true);
-      expect(hasLoader('loader-test.svg', modules)).toBe(true);
-
-      await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
-        true
-      );
-      await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
-        true
-      );
-      // Todo resolve png minification
-      // await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
-      //   true
-      // );
-      await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
-        true
-      );
-      await expect(isOptimized('plugin-test.jpg', compilation)).resolves.toBe(
-        true
-      );
-    });
-
-    it('should generate real content hash with asset/resource', async () => {
-      const compiler = await webpack(
-        {
-          fileLoaderOff: true,
-          assetResource: true,
-          output: {
-            path: path.resolve(__dirname, 'outputs'),
-            assetModuleFilename: '[name].[contenthash].[fullhash].[ext]',
-          },
-          experiments: {
-            asset: true,
-          },
-          optimization: {
-            minimize: false,
-            realContentHash: true,
-          },
-          emitPlugin: true,
-          imageminPlugin: true,
+        experiments: {
+          asset: true,
         },
-        true
-      );
+        emitPlugin: true,
+        imageminPlugin: true,
+      },
+      true
+    );
 
-      const stats = await compile(compiler);
+    const stats = await compile(compiler);
+    const { compilation } = stats;
+    const { warnings, errors, modules } = compilation;
 
-      const {
-        warnings,
-        errors,
-        assets,
-        options: { output },
-      } = stats.compilation;
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
 
-      expect.assertions(6);
+    expect(hasLoader('loader-test.gif', modules)).toBe(true);
+    expect(hasLoader('loader-test.jpg', modules)).toBe(true);
+    expect(hasLoader('loader-test.png', modules)).toBe(true);
+    expect(hasLoader('loader-test.svg', modules)).toBe(true);
 
-      for (const assetName of Object.keys(assets)) {
-        const match = assetName.match(/^.+?\.(.+?)\..+$/);
+    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
+      true
+    );
+    // Todo resolve png minification
+    // await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    //   true
+    // );
+    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized('plugin-test.jpg', compilation)).resolves.toBe(
+      true
+    );
+  });
 
-        if (!match) {
-          // eslint-disable-next-line no-continue
-          continue;
-        }
+  it('should generate real content hash with asset/resource', async () => {
+    const compiler = await webpack(
+      {
+        fileLoaderOff: true,
+        assetResource: true,
+        output: {
+          path: path.resolve(__dirname, 'outputs'),
+          assetModuleFilename: '[name].[contenthash].[fullhash].[ext]',
+        },
+        experiments: {
+          asset: true,
+        },
+        optimization: {
+          minimize: false,
+          realContentHash: true,
+        },
+        emitPlugin: true,
+        imageminPlugin: true,
+      },
+      true
+    );
 
-        const [, webpackHash] = assetName.match(/^.+?\.(.+?)\..+$/);
+    const stats = await compile(compiler);
 
-        const { hashDigestLength, hashDigest, hashFunction } = output;
-        const cryptoHash = crypto
-          .createHash(hashFunction)
-          .update(readAsset(assetName, compiler, stats))
-          .digest(hashDigest)
-          .slice(0, hashDigestLength);
+    const {
+      warnings,
+      errors,
+      assets,
+      options: { output },
+    } = stats.compilation;
 
-        expect(webpackHash).toBe(cryptoHash);
+    expect.assertions(6);
+
+    for (const assetName of Object.keys(assets)) {
+      const match = assetName.match(/^.+?\.(.+?)\..+$/);
+
+      if (!match) {
+        // eslint-disable-next-line no-continue
+        continue;
       }
 
-      expect(warnings).toHaveLength(0);
-      expect(errors).toHaveLength(0);
-    });
+      const [, webpackHash] = assetName.match(/^.+?\.(.+?)\..+$/);
 
-    it('should work with asset/inline', async () => {
-      const compiler = await webpack(
-        {
-          fileLoaderOff: true,
-          assetInline: true,
-          experiments: {
-            asset: true,
-          },
-          entry: path.join(fixturesPath, './asset-inline.js'),
-          emitPlugin: true,
-          imageminPlugin: true,
+      const { hashDigestLength, hashDigest, hashFunction } = output;
+      const cryptoHash = crypto
+        .createHash(hashFunction)
+        .update(readAsset(assetName, compiler, stats))
+        .digest(hashDigest)
+        .slice(0, hashDigestLength);
+
+      expect(webpackHash).toBe(cryptoHash);
+    }
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('should work with asset/inline', async () => {
+    const compiler = await webpack(
+      {
+        fileLoaderOff: true,
+        assetInline: true,
+        experiments: {
+          asset: true,
         },
-        true
-      );
+        entry: path.join(fixturesPath, './asset-inline.js'),
+        emitPlugin: true,
+        imageminPlugin: true,
+      },
+      true
+    );
 
-      const stats = await compile(compiler);
-      const { compilation } = stats;
-      const { warnings, errors } = compilation;
+    const stats = await compile(compiler);
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
 
-      const result = readAsset('bundle.js', compiler, stats).toString();
+    const result = readAsset('bundle.js', compiler, stats).toString();
 
-      const isInlineSvg = /data:image\/svg\+xml;base64,PHN2Zz48c3R5bGUvPjwvc3ZnPg==/.test(
-        result
-      );
+    const isInlineSvg = /data:image\/svg\+xml;base64,PHN2Zz48c3R5bGUvPjwvc3ZnPg==/.test(
+      result
+    );
 
-      expect(isInlineSvg).toBe(true);
-      expect(warnings).toHaveLength(0);
-      expect(errors).toHaveLength(0);
-    });
-  }
+    expect(isInlineSvg).toBe(true);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
 });
 
 describe('imagemin plugin - persistent cache', () => {
   it('should work and use the persistent cache by default (loader + plugin)', async () => {
-    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
-
-    await cacache.rm.all(cacheDir);
-
     const compiler = await webpack(
       {
         mode: 'development',
@@ -562,15 +522,7 @@ describe('imagemin plugin - persistent cache', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    if (webpack.isWebpack4()) {
-      expect(
-        Object.keys(stats.compilation.assets).filter(
-          (assetName) => stats.compilation.assets[assetName].emitted
-        ).length
-      ).toBe(3);
-    } else {
-      expect(stats.compilation.emittedAssets.size).toBe(3);
-    }
+    expect(stats.compilation.emittedAssets.size).toBe(3);
 
     const secondStats = await compile(compiler);
     const {
@@ -581,22 +533,10 @@ describe('imagemin plugin - persistent cache', () => {
     expect(secondWarnings).toHaveLength(0);
     expect(secondErrors).toHaveLength(0);
 
-    if (webpack.isWebpack4()) {
-      expect(
-        Object.keys(secondStats.compilation.assets).filter(
-          (assetName) => secondStats.compilation.assets[assetName].emitted
-        ).length
-      ).toBe(0);
-    } else {
-      expect(secondStats.compilation.emittedAssets.size).toBe(0);
-    }
+    expect(secondStats.compilation.emittedAssets.size).toBe(0);
   });
 
   it('should work and use the persistent cache when "cache" option is true (loader + plugin)', async () => {
-    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
-
-    await cacache.rm.all(cacheDir);
-
     const compiler = await webpack(
       {
         mode: 'development',
@@ -604,7 +544,6 @@ describe('imagemin plugin - persistent cache', () => {
         emitPlugin: true,
         emitAssetPlugin: true,
         imageminPluginOptions: {
-          cache: true,
           minimizerOptions: { plugins },
         },
       },
@@ -620,15 +559,7 @@ describe('imagemin plugin - persistent cache', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    if (webpack.isWebpack4()) {
-      expect(
-        Object.keys(stats.compilation.assets).filter(
-          (assetName) => stats.compilation.assets[assetName].emitted
-        ).length
-      ).toBe(3);
-    } else {
-      expect(stats.compilation.emittedAssets.size).toBe(3);
-    }
+    expect(stats.compilation.emittedAssets.size).toBe(3);
 
     const secondStats = await compile(compiler);
     const {
@@ -639,22 +570,10 @@ describe('imagemin plugin - persistent cache', () => {
     expect(secondWarnings).toHaveLength(0);
     expect(secondErrors).toHaveLength(0);
 
-    if (webpack.isWebpack4()) {
-      expect(
-        Object.keys(secondStats.compilation.assets).filter(
-          (assetName) => secondStats.compilation.assets[assetName].emitted
-        ).length
-      ).toBe(0);
-    } else {
-      expect(secondStats.compilation.emittedAssets.size).toBe(0);
-    }
+    expect(secondStats.compilation.emittedAssets.size).toBe(0);
   });
 
   it('should work and do not use persistent cache when "cache" option is "false"', async () => {
-    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
-
-    await cacache.rm.all(cacheDir);
-
     const compiler = await webpack(
       {
         cache: false,
@@ -662,7 +581,6 @@ describe('imagemin plugin - persistent cache', () => {
         emitPlugin: true,
         emitAssetPlugin: true,
         imageminPluginOptions: {
-          cache: false,
           minimizerOptions: { plugins },
         },
       },
@@ -678,15 +596,7 @@ describe('imagemin plugin - persistent cache', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    if (webpack.isWebpack4()) {
-      expect(
-        Object.keys(stats.compilation.assets).filter(
-          (assetName) => stats.compilation.assets[assetName].emitted
-        ).length
-      ).toBe(3);
-    } else {
-      expect(stats.compilation.emittedAssets.size).toBe(3);
-    }
+    expect(stats.compilation.emittedAssets.size).toBe(3);
 
     const secondStats = await compile(compiler);
     const {
@@ -697,22 +607,10 @@ describe('imagemin plugin - persistent cache', () => {
     expect(secondWarnings).toHaveLength(0);
     expect(secondErrors).toHaveLength(0);
 
-    if (webpack.isWebpack4()) {
-      expect(
-        Object.keys(secondStats.compilation.assets).filter(
-          (assetName) => secondStats.compilation.assets[assetName].emitted
-        ).length
-      ).toBe(3);
-    } else {
-      expect(secondStats.compilation.emittedAssets.size).toBe(3);
-    }
+    expect(secondStats.compilation.emittedAssets.size).toBe(3);
   });
 
   it('should work and use the persistent cache when transform asset (loader + plugin)', async () => {
-    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
-
-    await cacache.rm.all(cacheDir);
-
     const outputDir = path.resolve(__dirname, 'outputs', 'cache-webp');
 
     const compiler = await webpack(
@@ -726,14 +624,12 @@ describe('imagemin plugin - persistent cache', () => {
         emitAssetPlugin: true,
         imageminPluginOptions: [
           {
-            cache: true,
             filename: '[name].webp',
             minimizerOptions: {
               plugins: ['imagemin-webp'],
             },
           },
           {
-            cache: true,
             filename: '[name].json',
             minimizerOptions: {
               plugins: ['../../test/imagemin-base64.js'],
@@ -755,15 +651,7 @@ describe('imagemin plugin - persistent cache', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    if (webpack.isWebpack4()) {
-      expect(
-        Object.keys(stats.compilation.assets).filter(
-          (assetName) => stats.compilation.assets[assetName].emitted
-        ).length
-      ).toBe(7);
-    } else {
-      expect(stats.compilation.emittedAssets.size).toBe(7);
-    }
+    expect(stats.compilation.emittedAssets.size).toBe(7);
 
     const secondStats = await compile(compiler);
     const { compilation: secondCompilation } = secondStats;
@@ -795,14 +683,6 @@ describe('imagemin plugin - persistent cache', () => {
     expect(/image\/webp/i.test(extPluginWebp.mime)).toBe(true);
     expect(/image\/webp/i.test(extLoaderWebp.mime)).toBe(true);
 
-    if (webpack.isWebpack4()) {
-      expect(
-        Object.keys(secondStats.compilation.assets).filter(
-          (assetName) => secondStats.compilation.assets[assetName].emitted
-        ).length
-      ).toBe(0);
-    } else {
-      expect(secondStats.compilation.emittedAssets.size).toBe(0);
-    }
+    expect(secondStats.compilation.emittedAssets.size).toBe(0);
   });
 });

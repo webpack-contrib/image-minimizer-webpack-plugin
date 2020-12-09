@@ -1,14 +1,6 @@
-import findCacheDir from 'find-cache-dir';
-import cacache from 'cacache';
-
 import { isOptimized, plugins, webpack } from './helpers';
 
 describe('plugin loader option', () => {
-  beforeEach(async () => {
-    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
-    await cacache.rm.all(cacheDir);
-  });
-
   it('should optimizes all images (plugin standalone)', async () => {
     const stats = await webpack({
       emitPlugin: true,

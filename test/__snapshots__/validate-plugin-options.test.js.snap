@@ -104,12 +104,7 @@ exports[`validation 8`] = `
 
 exports[`validation 9`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.cache should be one of these:
-   boolean | string
-   -> Enable file caching.
-   Details:
-    * options.cache should be a boolean.
-    * options.cache should be a string."
+ - options.filename should be a string."
 `;
 
 exports[`validation 10`] = `
@@ -119,11 +114,6 @@ exports[`validation 10`] = `
 
 exports[`validation 11`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.filename should be a string."
-`;
-
-exports[`validation 12`] = `
-"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.severityError should be one of these:
    boolean | string
    -> Allows to choose how errors are displayed.
@@ -132,16 +122,22 @@ exports[`validation 12`] = `
     * options.severityError should be a string."
 `;
 
-exports[`validation 13`] = `
+exports[`validation 12`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.deleteOriginalAssets should be a boolean."
 `;
 
-exports[`validation 14`] = `
+exports[`validation 13`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.minimizerOptions should be an object:
    object { … }
    -> Options for \`imageMinimizerOptions\`."
+`;
+
+exports[`validation 14`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.maxConcurrency should be a number.
+   -> Maximum number of concurrency optimization processes in one time."
 `;
 
 exports[`validation 15`] = `
@@ -151,12 +147,6 @@ exports[`validation 15`] = `
 `;
 
 exports[`validation 16`] = `
-"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.maxConcurrency should be a number.
-   -> Maximum number of concurrency optimization processes in one time."
-`;
-
-exports[`validation 17`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.loader should be a boolean.
    -> Automatically adding \`imagemin-loader\` (require for minification images using in \`url-loader\`, \`svg-url-loader\` or other)."

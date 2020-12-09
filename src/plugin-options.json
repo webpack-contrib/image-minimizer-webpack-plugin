@@ -64,17 +64,6 @@
       "additionalProperties": true,
       "type": "object"
     },
-    "cache": {
-      "description": "Enable file caching.",
-      "anyOf": [
-        {
-          "type": "boolean"
-        },
-        {
-          "type": "string"
-        }
-      ]
-    },
     "filter": {
       "description": "Allows filtering of images for optimization.",
       "instanceof": "Function"

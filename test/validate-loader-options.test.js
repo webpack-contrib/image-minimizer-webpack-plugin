@@ -8,14 +8,6 @@ describe('validate options', () => {
       success: [{ plugins: [] }, {}],
       failure: [1, true, false, [], null],
     },
-    cache: {
-      success: [
-        false,
-        true,
-        path.resolve(__dirname, './outputs/type-filesystem'),
-      ],
-      failure: [{}, []],
-    },
     filter: {
       success: [() => false],
       failure: [1, true, false, {}, [], null],

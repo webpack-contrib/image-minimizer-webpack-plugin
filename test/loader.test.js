@@ -3,17 +3,10 @@ import path from 'path';
 
 import pify from 'pify';
 import fileType from 'file-type';
-import findCacheDir from 'find-cache-dir';
-import cacache from 'cacache';
 
 import { fixturesPath, isOptimized, webpack } from './helpers';
 
 describe('loader', () => {
-  beforeEach(async () => {
-    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
-    await cacache.rm.all(cacheDir);
-  });
-
   it('should optimizes all images', async () => {
     const stats = await webpack({ imageminLoader: true });
     const { compilation } = stats;
