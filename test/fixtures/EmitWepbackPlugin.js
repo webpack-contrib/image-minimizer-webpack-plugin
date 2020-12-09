@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import RawSource from "webpack-sources/lib/RawSource.js";
 import pify from "pify";
 
 export default class EmitWepbackPlugin {
@@ -21,6 +20,7 @@ export default class EmitWepbackPlugin {
     compiler.hooks.thisCompilation.tap(plugin, (compilation) => {
       compilation.hooks.additionalAssets.tapPromise(plugin, () => {
         const { fileNames } = this.options;
+        const { RawSource } = compiler.webpack.sources;
 
         return Promise.all(
           fileNames.map(async (fileName) => {

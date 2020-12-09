@@ -49,8 +49,7 @@
     "loader-utils": "^2.0.0",
     "p-limit": "^3.0.2",
     "schema-utils": "^3.0.0",
-    "serialize-javascript": "^5.0.1",
-    "webpack-sources": "^1.4.3"
+    "serialize-javascript": "^5.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",

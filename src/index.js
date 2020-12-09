@@ -4,19 +4,12 @@ import os from 'os';
 
 import pLimit from 'p-limit';
 
-import webpack from 'webpack';
-import ModuleFilenameHelpers from 'webpack/lib/ModuleFilenameHelpers';
-
 import { validate } from 'schema-utils';
 import serialize from 'serialize-javascript';
 
 import minify from './minify';
 import interpolateName from './utils/interpolate-name';
 import schema from './plugin-options.json';
-
-const { RawSource } =
-  // eslint-disable-next-line global-require
-  webpack.sources || require('webpack-sources');
 
 class ImageMinimizerPlugin {
   constructor(options = {}) {
@@ -56,61 +49,80 @@ class ImageMinimizerPlugin {
 
   async optimize(compiler, compilation, assets, moduleAssets) {
     const cache = compilation.getCache('ImageMinimizerWebpackPlugin');
-    const assetNames = Object.keys(assets).filter((name) => {
-      if (
-        // eslint-disable-next-line no-undefined
-        !ModuleFilenameHelpers.matchObject.bind(undefined, this.options)(name)
-      ) {
-        return false;
-      }
+    const assetsForMinify = await Promise.all(
+      Object.keys(assets)
+        .filter((name) => {
+          const { info, source } = compilation.getAsset(name);
 
-      // Exclude already optimized assets from `image-minimizer-webpack-loader`
-      if (this.options.loader && moduleAssets.has(name)) {
-        return false;
-      }
-
-      return true;
-    });
-
-    if (assetNames.length === 0) {
-      return Promise.resolve();
-    }
-
-    const cpus = os.cpus() || { length: 1 };
-    const limit = pLimit(
-      this.options.maxConcurrency || Math.max(1, cpus.length - 1)
-    );
-    const scheduledTasks = [];
-
-    for (const name of assetNames) {
-      scheduledTasks.push(
-        limit(async () => {
-          const { source: inputSource, info } = compilation.getAsset(name);
-
+          // Skip double minimize assets from child compilation
           if (info.minimized) {
-            return;
+            return false;
           }
 
-          let input = inputSource.source();
-
-          if (!Buffer.isBuffer(input)) {
-            input = Buffer.from(input);
+          if (
+            !compiler.webpack.ModuleFilenameHelpers.matchObject.bind(
+              // eslint-disable-next-line no-undefined
+              undefined,
+              this.options
+            )(name)
+          ) {
+            return false;
           }
+
+          // Exclude already optimized assets from `image-minimizer-webpack-loader`
+          if (this.options.loader && moduleAssets.has(name)) {
+            return false;
+          }
+
+          const input = source.source();
 
           if (this.options.filter && !this.options.filter(input, name)) {
-            return;
+            return false;
           }
+
+          return true;
+        })
+        .map(async (name) => {
+          const { info, source } = compilation.getAsset(name);
 
           const cacheName = serialize({
             name,
             minimizerOptions: this.options.minimizerOptions,
           });
 
-          const eTag = cache.getLazyHashedEtag(inputSource);
+          const eTag = cache.getLazyHashedEtag(source);
           const cacheItem = cache.getItemCache(cacheName, eTag);
-          let output = await cacheItem.getPromise();
+          const output = await cacheItem.getPromise();
+
+          return { name, info, inputSource: source, output, cacheItem };
+        })
+    );
+
+    const cpus = os.cpus() || { length: 1 };
+    const limit = pLimit(
+      this.options.maxConcurrency || Math.max(1, cpus.length - 1)
+    );
+
+    const { RawSource } = compiler.webpack.sources;
+
+    const scheduledTasks = [];
+
+    for (const asset of assetsForMinify) {
+      scheduledTasks.push(
+        limit(async () => {
+          const { name, inputSource, cacheItem, info } = asset;
+          let { output } = asset;
+          let input;
+
+          const sourceFromInputSource = inputSource.source();
 
           if (!output) {
+            input = sourceFromInputSource;
+
+            if (!Buffer.isBuffer(input)) {
+              input = Buffer.from(input);
+            }
+
             const {
               severityError,
               isProductionMode,
@@ -156,7 +168,6 @@ class ImageMinimizerPlugin {
           const isNewAsset = name !== newName;
 
           if (isNewAsset) {
-            // TODO `...` required only for webpack@4
             const newInfo = {
               related: { minimized: newName, ...info.related },
               minimized: true,
@@ -168,19 +179,17 @@ class ImageMinimizerPlugin {
               compilation.deleteAsset(name);
             }
           } else {
-            // TODO `...` required only for webpack@4
-            const newOriginalInfo = {
-              ...info,
+            const updatedAssetsInfo = {
               minimized: true,
             };
 
-            compilation.updateAsset(name, source, newOriginalInfo);
+            compilation.updateAsset(name, source, updatedAssetsInfo);
           }
         })
       );
     }
 
-    return Promise.all(scheduledTasks);
+    await Promise.all(scheduledTasks);
   }
 
   apply(compiler) {
@@ -233,14 +242,12 @@ class ImageMinimizerPlugin {
       });
     }
 
-    // eslint-disable-next-line global-require
-    const Compilation = require('webpack/lib/Compilation');
-
     compiler.hooks.compilation.tap(pluginName, (compilation) => {
       compilation.hooks.processAssets.tapPromise(
         {
           name: pluginName,
-          stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
+          stage:
+            compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
         },
         (assets) => this.optimize(compiler, compilation, assets, moduleAssets)
       );
