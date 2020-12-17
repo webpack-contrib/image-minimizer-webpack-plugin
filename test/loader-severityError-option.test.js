@@ -141,7 +141,7 @@ describe('loader severityError option', () => {
     const stats = await webpack({
       mode: 'production',
       optimization: {
-        noEmitOnErrors: false,
+        emitOnErrors: true,
       },
       entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminLoaderOptions: {
@@ -168,7 +168,7 @@ describe('loader severityError option', () => {
     const stats = await webpack({
       mode: 'production',
       optimization: {
-        noEmitOnErrors: false,
+        emitOnErrors: true,
       },
       entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminLoaderOptions: { minimizerOptions: { plugins } },

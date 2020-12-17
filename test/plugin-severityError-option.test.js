@@ -190,7 +190,7 @@ describe('plugin severityError option', () => {
     const stats = await webpack({
       mode: 'production',
       optimization: {
-        noEmitOnErrors: false,
+        emitOnErrors: true,
       },
       emitPluginOptions: {
         fileNames: ['test-corrupted.jpg', 'plugin-test.png'],
@@ -317,7 +317,7 @@ describe('plugin severityError option', () => {
     const stats = await webpack({
       mode: 'production',
       optimization: {
-        noEmitOnErrors: false,
+        emitOnErrors: true,
       },
       entry: path.join(fixturesPath, 'loader-corrupted.js'),
       imageminPluginOptions: {
