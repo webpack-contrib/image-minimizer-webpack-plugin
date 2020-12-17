@@ -1,17 +1,10 @@
 import path from 'path';
 
 import fileType from 'file-type';
-import findCacheDir from 'find-cache-dir';
-import cacache from 'cacache';
 
 import { fixturesPath, webpack, clearDirectory } from './helpers';
 
 describe('loader "filename" option', () => {
-  beforeEach(async () => {
-    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
-    await cacache.rm.all(cacheDir);
-  });
-
   beforeAll(() => clearDirectory(path.resolve(__dirname, 'outputs')));
   afterAll(() => clearDirectory(path.resolve(__dirname, 'outputs')));
 

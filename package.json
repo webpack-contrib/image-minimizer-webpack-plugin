@@ -41,18 +41,15 @@
     "dist"
   ],
   "peerDependencies": {
-    "webpack": "^4.0.0 || ^5.0.0"
+    "webpack": "^5.1.0"
   },
   "dependencies": {
-    "cacache": "^15.0.5",
-    "find-cache-dir": "^3.3.1",
     "imagemin": "^7.0.1",
     "klona": "^2.0.4",
     "loader-utils": "^2.0.0",
     "p-limit": "^3.0.2",
     "schema-utils": "^3.0.0",
-    "serialize-javascript": "^5.0.1",
-    "webpack-sources": "^1.4.3"
+    "serialize-javascript": "^5.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
@@ -102,7 +99,7 @@
     "standard-version": "^9.0.0",
     "tempy": "^0.7.1",
     "url-loader": "^4.1.0",
-    "webpack": "^4.44.2"
+    "webpack": "^5.10.0"
   },
   "keywords": [
     "webpack",

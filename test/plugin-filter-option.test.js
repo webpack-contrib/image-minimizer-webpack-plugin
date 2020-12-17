@@ -1,8 +1,5 @@
 import path from 'path';
 
-import findCacheDir from 'find-cache-dir';
-import cacache from 'cacache';
-
 import {
   fixturesPath,
   isOptimized,
@@ -12,11 +9,6 @@ import {
 } from './helpers';
 
 describe('plugin filter option', () => {
-  beforeEach(async () => {
-    const cacheDir = findCacheDir({ name: 'image-minimizer-webpack-plugin' });
-    await cacache.rm.all(cacheDir);
-  });
-
   it('should optimizes all images (loader + plugin) exclude filtered', async () => {
     const stats = await webpack({
       emitPlugin: true,

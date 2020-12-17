@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const { RawSource } = require("webpack-sources");
 
 // eslint-disable-next-line node/no-sync
 const imageContent = fs.readFileSync(
@@ -14,6 +13,7 @@ class ChildCompilationPlugin {
 
   apply(compiler) {
     const plugin = { name: this.constructor.name };
+    const { RawSource } = compiler.webpack.sources;
 
     compiler.hooks.compilation.tap(plugin, (compilation) => {
       compilation.hooks.additionalAssets.tapAsync(plugin, (callback) => {

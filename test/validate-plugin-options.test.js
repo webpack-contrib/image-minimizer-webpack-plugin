@@ -115,22 +115,6 @@ it('validation', () => {
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {
-    new ImageMinimizerPlugin({ cache: false });
-  }).not.toThrow();
-
-  expect(() => {
-    new ImageMinimizerPlugin({ cache: true });
-  }).not.toThrow();
-
-  expect(() => {
-    new ImageMinimizerPlugin({ cache: 'path/to/cache' });
-  }).not.toThrow();
-
-  expect(() => {
-    new ImageMinimizerPlugin({ cache: {} });
-  }).toThrowErrorMatchingSnapshot();
-
-  expect(() => {
     new ImageMinimizerPlugin({ filename: '[name].[ext]' });
   }).not.toThrow();
 
