@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES5",
-    "outDir": "types",
-    "newLine": "LF",
+    "target": "esnext",
+    "moduleResolution": "node",
     "allowJs": true,
     "strict": true,
+    "types": ["node"],
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
-    "emitDeclarationOnly": true
+    "newLine": "LF"
   },
   "include": ["./src/**/*"]
 }
