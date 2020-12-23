@@ -1,6 +1,5 @@
-import path from 'path';
-
-import os from 'os';
+import * as path from 'path';
+import * as os from 'os';
 
 import pLimit from 'p-limit';
 
@@ -11,6 +10,34 @@ import minify from './minify';
 import interpolateName from './utils/interpolate-name';
 import schema from './plugin-options.json';
 
+/** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
+/** @typedef {import("webpack").Compiler} Compiler */
+/** @typedef {import("webpack").Compilation} Compilation */
+
+/**
+ * @callback Filter
+ * @param {Buffer} source `Buffer` of source file.
+ * @param {string} sourcePath Absolute path to source.
+ * @returns {boolean}
+ */
+
+/**
+ * @typedef {Object} PluginOptions
+ * @property {Filter} [filter=() => true] Allows filtering of images for optimization.
+ * @property {string|RegExp|Array<string|RegExp>} [test=/\.(jpe?g|png|gif|tif|webp|svg|avif)$/i] Test to match files against.
+ * @property {string|RegExp|Array<string|RegExp>} [include] Files to include.
+ * @property {string|RegExp|Array<string|RegExp>} [exclude] Files to exclude.
+ * @property {boolean|string} [severityError='auto'] Allows to choose how errors are displayed.
+ * @property {Object} [minimizerOptions={plugins: []}] Options for `imagemin`.
+ * @property {boolean} [loader=true] Automatically adding `imagemin-loader`.
+ * @property {number} [maxConcurrency=Math.max(1, os.cpus().length - 1)] Maximum number of concurrency optimization processes in one time.
+ * @property {string} [filename='[path][name][ext]'] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
+ * @property {boolean} [deleteOriginalAssets=false] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+ */
+
+/**
+ * @extends {WebpackPluginInstance}
+ */
 class ImageMinimizerPlugin {
   /**
    * @param {PluginOptions} [options={}] Plugin options.
@@ -50,6 +77,14 @@ class ImageMinimizerPlugin {
     };
   }
 
+  /**
+   * @private
+   * @param {Compiler} compiler
+   * @param {Compilation} compilation
+   * @param assets
+   * @param moduleAssets
+   * @returns {Promise<void>}
+   */
   async optimize(compiler, compilation, assets, moduleAssets) {
     const cache = compilation.getCache('ImageMinimizerWebpackPlugin');
     const assetsForMinify = await Promise.all(
@@ -195,6 +230,9 @@ class ImageMinimizerPlugin {
     await Promise.all(scheduledTasks);
   }
 
+  /**
+   * @param {import("webpack").Compiler} compiler
+   */
   apply(compiler) {
     this.options.isProductionMode =
       compiler.options.mode === 'production' || !compiler.options.mode;
@@ -257,27 +295,6 @@ class ImageMinimizerPlugin {
     });
   }
 }
-
-/**
- * @callback Filter
- * @param {Buffer} source `Buffer` of source file.
- * @param {string} sourcePath Absolute path to source.
- * @returns {boolean}
- */
-
-/**
- * @typedef {Object} PluginOptions
- * @property {Filter} [filter=() => true] Allows filtering of images for optimization.
- * @property {string|RegExp|Array<string|RegExp>} [test=/\.(jpe?g|png|gif|tif|webp|svg|avif)$/i] Test to match files against.
- * @property {string|RegExp|Array<string|RegExp>} [include] Files to include.
- * @property {string|RegExp|Array<string|RegExp>} [exclude] Files to exclude.
- * @property {boolean|string} [severityError='auto'] Allows to choose how errors are displayed.
- * @property {Object} [minimizerOptions={plugins: []}] Options for `imagemin`.
- * @property {boolean} [loader=true] Automatically adding `imagemin-loader`.
- * @property {number} [maxConcurrency=Math.max(1, os.cpus().length - 1)] Maximum number of concurrency optimization processes in one time.
- * @property {string} [filename='[path][name][ext]'] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
- * @property {boolean} [deleteOriginalAssets=false] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
- */
 
 ImageMinimizerPlugin.loader = require.resolve('./loader');
 
