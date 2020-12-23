@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v2.0.0...v2.1.0) (2020-12-23)
+
+
+### Features
+
+* add TypeScript definitions ([e78497b](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/e78497b3f50d2cfc6368fcdc9de548a7ad76f559))
+
 ## 2.0.0 (2020-12-17)
 
 
