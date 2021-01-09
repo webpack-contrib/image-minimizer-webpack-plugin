@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v2.1.0...v2.2.0) (2021-01-09)
+
+
+### Features
+
+* run optimize image assets added later by plugins ([#178](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/178)) ([4939f93](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/4939f93a55962c5812a693acc5eb441b78fe663c))
+
 ## [2.1.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v2.0.0...v2.1.0) (2020-12-23)
 
 
