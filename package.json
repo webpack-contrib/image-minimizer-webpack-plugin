@@ -51,7 +51,6 @@
   "dependencies": {
     "imagemin": "^7.0.1",
     "klona": "^2.0.4",
-    "loader-utils": "^2.0.0",
     "p-limit": "^3.1.0",
     "schema-utils": "^3.0.0",
     "serialize-javascript": "^5.0.1"

@@ -1,4 +1,5 @@
 {
+  "title": "Image Minimizer Plugin Loader options",
   "type": "object",
   "additionalProperties": false,
   "properties": {
