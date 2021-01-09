@@ -1,22 +1,12 @@
 import path from 'path';
 
-import loaderUtils from 'loader-utils';
-import { validate } from 'schema-utils';
-
 import minify from './minify';
 import interpolateName from './utils/interpolate-name';
 import schema from './loader-options.json';
 
 module.exports = async function loader(content) {
-  const options = loaderUtils.getOptions(this);
-
-  validate(schema, options, {
-    name: 'Image Minimizer Plugin Loader',
-    baseDataPath: 'options',
-  });
-
+  const options = this.getOptions(schema);
   const callback = this.async();
-
   const name = path.relative(this.rootContext, this.resourcePath);
 
   if (options.filter && !options.filter(content, name)) {
