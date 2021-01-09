@@ -685,4 +685,22 @@ describe('imagemin plugin - persistent cache', () => {
 
     expect(secondStats.compilation.emittedAssets.size).toBe(0);
   });
+
+  it('should run plugin against assets added later by plugins', async () => {
+    const stats = await webpack({
+      emitPlugin: true,
+      imageminPlugin: true,
+      EmitNewAssetPlugin: true,
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    await expect(isOptimized('plugin-test.jpg', compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized('newImg.png', compilation)).resolves.toBe(true);
+  });
 });

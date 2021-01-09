@@ -194,6 +194,15 @@ function runWebpack(maybeOptions, getCompiler = false) {
       );
     }
 
+    if (options.EmitNewAssetPlugin) {
+      config.plugins = config.plugins.concat(
+        // eslint-disable-next-line no-use-before-define
+        new EmitNewAssetPlugin({
+          name: 'newImg.png',
+        })
+      );
+    }
+
     configs.push(config);
   });
 
@@ -311,6 +320,35 @@ function clearDirectory(dirPath) {
   fs.rmdirSync(dirPath);
 }
 
+export default class EmitNewAssetPlugin {
+  constructor(options = {}) {
+    this.options = options;
+  }
+
+  apply(compiler) {
+    const pluginName = this.constructor.name;
+
+    const { RawSource } = compiler.webpack.sources;
+
+    compiler.hooks.compilation.tap(pluginName, (compilation) => {
+      compilation.hooks.processAssets.tap(
+        {
+          name: pluginName,
+          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT,
+        },
+        () => {
+          const file = fs.readFileSync(
+            path.resolve(__dirname, 'fixtures', 'newImg.png')
+          );
+
+          // eslint-disable-next-line no-param-reassign
+          compilation.emitAsset(this.options.name, new RawSource(file));
+        }
+      );
+    });
+  }
+}
+
 export {
   runWebpack as webpack,
   compile,
@@ -321,4 +359,5 @@ export {
   readAsset,
   normalizePath,
   clearDirectory,
+  EmitNewAssetPlugin,
 };
