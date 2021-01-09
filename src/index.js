@@ -289,6 +289,7 @@ class ImageMinimizerPlugin {
           name: pluginName,
           stage:
             compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
+          additionalAssets: true,
         },
         (assets) => this.optimize(compiler, compilation, assets, moduleAssets)
       );
