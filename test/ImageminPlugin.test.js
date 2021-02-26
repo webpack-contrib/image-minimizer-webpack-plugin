@@ -704,7 +704,7 @@ describe('imagemin plugin - persistent cache', () => {
     await expect(isOptimized('newImg.png', compilation)).resolves.toBe(true);
   });
 
-  it('should passed asset info (loader + plugin)', async () => {
+  it('should passed asset info (plugin)', async () => {
     const compiler = await webpack(
       {
         mode: 'development',
