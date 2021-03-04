@@ -10,6 +10,7 @@ import pify from 'pify';
 import tempy from 'tempy';
 import webpack from 'webpack';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import CopyPlugin from 'copy-webpack-plugin';
 
 import ImageMinimizerPlugin from '../src/index';
 
@@ -190,6 +191,14 @@ function runWebpack(maybeOptions, getCompiler = false) {
           // both options are optional
           filename: '[name].css',
           chunkFilename: '[id].css',
+        })
+      );
+    }
+
+    if (options.copyPlugin) {
+      config.plugins = config.plugins.concat(
+        new CopyPlugin({
+          patterns: [{ from: 'plugin-test.jpg' }],
         })
       );
     }

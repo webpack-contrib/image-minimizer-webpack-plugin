@@ -703,4 +703,27 @@ describe('imagemin plugin - persistent cache', () => {
     );
     await expect(isOptimized('newImg.png', compilation)).resolves.toBe(true);
   });
+
+  it('should passed asset info (plugin)', async () => {
+    const compiler = await webpack(
+      {
+        mode: 'development',
+        imageminPlugin: true,
+        copyPlugin: true,
+      },
+      true
+    );
+
+    const stats = await compile(compiler);
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const pluginAsset = compilation.getAsset('plugin-test.jpg');
+    const { info } = pluginAsset;
+
+    expect(info.copied).toBe(true);
+    expect(info.minimized).toBe(true);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
 });
