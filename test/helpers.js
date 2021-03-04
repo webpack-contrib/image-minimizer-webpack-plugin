@@ -197,9 +197,11 @@ function runWebpack(maybeOptions, getCompiler = false) {
 
     if (options.copyPlugin) {
       config.plugins = config.plugins.concat(
-        new CopyPlugin({
-          patterns: [{ from: 'plugin-test.jpg' }],
-        })
+        new CopyPlugin(
+          options.copyPluginOptions || {
+            patterns: [{ from: 'plugin-test.jpg' }],
+          }
+        )
       );
     }
 

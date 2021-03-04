@@ -217,11 +217,51 @@ class ImageMinimizerPlugin {
               compilation.deleteAsset(name);
             }
           } else {
+            let newAssetName;
             const updatedAssetsInfo = {
               minimized: true,
             };
 
+            if (info.contenthash) {
+              const { outputOptions } = compilation;
+              const {
+                hashDigest,
+                hashDigestLength,
+                hashFunction,
+                hashSalt,
+              } = outputOptions;
+              const hash = compiler.webpack.util.createHash(hashFunction);
+
+              if (hashSalt) {
+                hash.update(hashSalt);
+              }
+
+              hash.update(source.source());
+
+              const fullContentHash = hash.digest(hashDigest);
+
+              updatedAssetsInfo.contenthash = fullContentHash.slice(
+                0,
+                hashDigestLength
+              );
+
+              const oldContentHash =
+                typeof info.contenthash === 'string'
+                  ? info.contenthash
+                  : info.contenthash[0];
+              const regExp = new RegExp(oldContentHash, 'gi');
+
+              newAssetName = name.replace(
+                regExp,
+                updatedAssetsInfo.contenthash
+              );
+            }
+
             compilation.updateAsset(name, source, updatedAssetsInfo);
+
+            if (newAssetName) {
+              compilation.renameAsset(name, newAssetName);
+            }
           }
         })
       );

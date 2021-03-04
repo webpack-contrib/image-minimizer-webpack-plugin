@@ -467,6 +467,47 @@ describe('imagemin plugin', () => {
     expect(errors).toHaveLength(0);
   });
 
+  it('should regenerate contenthash after minimize', async () => {
+    const compiler = await webpack(
+      {
+        fileLoaderOff: true,
+        entry: path.join(fixturesPath, './simple-emit.js'),
+        assetResource: true,
+        output: {
+          path: path.resolve(__dirname, 'outputs'),
+          filename: '[name].[contenthash].[fullhash].[ext]',
+        },
+        experiments: {
+          asset: true,
+        },
+        imageminPlugin: true,
+        copyPlugin: true,
+        copyPluginOptions: {
+          patterns: [
+            {
+              from: 'plugin-test.jpg',
+              to: '[name].[contenthash]-[contenthash][ext]',
+            },
+          ],
+        },
+      },
+      true
+    );
+
+    const stats = await compile(compiler);
+
+    const { warnings, errors } = stats.compilation;
+
+    const expectedName =
+      'plugin-test.f48748954547acf94595-f48748954547acf94595.jpg';
+
+    const { info } = stats.compilation.getAsset(expectedName);
+
+    expect(info.contenthash).toBe('f48748954547acf94595');
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
   it('should work with asset/inline', async () => {
     const compiler = await webpack(
       {
