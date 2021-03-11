@@ -149,7 +149,7 @@ module.exports = {
 **webpack.config.js**
 
 ```js
-const ImageminWebpack = require('image-minimizer-webpack-plugin');
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 
 module.exports = {
   module: {
@@ -165,7 +165,7 @@ module.exports = {
   },
   plugins: [
     // Make sure that the plugin placed after any plugins that added images
-    new ImageminWebpack({
+    new ImageMinimizerPlugin({
       severityError: 'warning', // Ignore errors on corrupted images
       minimizerOptions: {
         plugins: ['gifsicle'],
