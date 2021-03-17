@@ -68,11 +68,7 @@ module.exports = {
     rules: [
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
-        use: [
-          {
-            loader: 'file-loader', // Or `url-loader` or your other loader
-          },
-        ],
+        type: 'asset/resource', // Or `asset/inline`
       },
     ],
   },
@@ -110,7 +106,7 @@ module.exports = {
 
 [Documentation: Using loaders](https://webpack.js.org/concepts/loaders/)
 
-In your `webpack.config.js`, add the `ImageMinimizerPlugin.loader`, chained with the [file-loader](https://github.com/webpack/file-loader) or [url-loader](https://github.com/webpack-contrib/url-loader):
+In your `webpack.config.js`, add the `ImageMinimizerPlugin.loader` and specify the [asset modules options](https://webpack.js.org/guides/asset-modules/):
 
 **webpack.config.js**
 
@@ -122,10 +118,11 @@ module.exports = {
     rules: [
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
-          {
-            loader: 'file-loader', // Or `url-loader` or your other loader
-          },
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
@@ -155,11 +152,8 @@ module.exports = {
   module: {
     rules: [
       {
-        loader: 'file-loader',
-        options: {
-          name: '[path][name].[ext]',
-        },
         test: /\.(jpe?g|png|gif|svg)$/i,
+        type: 'asset/resource',
       },
     ],
   },
@@ -183,18 +177,18 @@ module.exports = {
 
 <!--lint disable no-html-->
 
-|            Name            |                   Type                    |                           Default                           | Description                                                                                                               |
-| :------------------------: | :---------------------------------------: | :---------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------ |
-|         **`test`**         | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|tif\|webp\|svg\|avif)\$/i</code> | Test to match files against                                                                                               |
-|       **`include`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `include`                                                                                                        |
-|       **`exclude`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `exclude`                                                                                                        |
-|        **`filter`**        |               `{Function}`                |                        `() => true`                         | Allows filtering of images for optimization                                                                               |
-|    **`severityError`**     |            `{Boolean\|String}`            |                          `'auto'`                           | Allows to choose how errors are displayed                                                                                 |
-|   **`minimizerOptions`**   |                `{Object}`                 |                      `{ plugins: [] }`                      | Options for `imagemin`                                                                                                    |
-|        **`loader`**        |                `{Boolean}`                |                           `true`                            | Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other) |
-|    **`maxConcurrency`**    |                `{Number}`                 |             `Math.max(1, os.cpus().length - 1)`             | Maximum number of concurrency optimization processes in one time                                                          |
-|       **`filename`**       |                `{string}`                 |                    `'[path][name][ext]'`                    | Allows to set the filename for the generated asset. Useful for converting to a `webp`                                     |
-| **`deleteOriginalAssets`** |                `{Boolean}`                |                           `false`                           | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets                         |
+|            Name            |                   Type                    |                           Default                           | Description                                                                                       |
+| :------------------------: | :---------------------------------------: | :---------------------------------------------------------: | :------------------------------------------------------------------------------------------------ |
+|         **`test`**         | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|tif\|webp\|svg\|avif)\$/i</code> | Test to match files against                                                                       |
+|       **`include`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `include`                                                                                |
+|       **`exclude`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `exclude`                                                                                |
+|        **`filter`**        |               `{Function}`                |                        `() => true`                         | Allows filtering of images for optimization                                                       |
+|    **`severityError`**     |            `{Boolean\|String}`            |                          `'auto'`                           | Allows to choose how errors are displayed                                                         |
+|   **`minimizerOptions`**   |                `{Object}`                 |                      `{ plugins: [] }`                      | Options for `imagemin`                                                                            |
+|        **`loader`**        |                `{Boolean}`                |                           `true`                            | Automatically adding `imagemin-loader`                                                            |
+|    **`maxConcurrency`**    |                `{Number}`                 |             `Math.max(1, os.cpus().length - 1)`             | Maximum number of concurrency optimization processes in one time                                  |
+|       **`filename`**       |                `{string}`                 |                    `'[path][name][ext]'`                    | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
+| **`deleteOriginalAssets`** |                `{Boolean}`                |                           `false`                           | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
 
 <!--lint enable no-html-->
 
@@ -519,10 +513,11 @@ module.exports = {
     rules: [
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
-          {
-            loader: 'file-loader', // Or `url-loader` or your other loader
-          },
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
@@ -572,10 +567,11 @@ module.exports = {
     rules: [
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
+        type: 'asset/resource', // Or `asset/inline`
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
-          {
-            loader: 'file-loader', // Or `url-loader` or your other loader
-          },
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
@@ -611,10 +607,11 @@ module.exports = {
     rules: [
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
+        type: 'asset/resource', // Or `asset/inline`
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
         use: [
-          {
-            loader: 'file-loader', // Or `url-loader` or your other loader
-          },
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
@@ -652,7 +649,8 @@ module.exports = {
         test: /\.(jpe?g|png|gif)$/i,
         use: [
           {
-            loader: 'file-loader', // Or `url-loader` or your other loader
+            test: /\.(jpe?g|png|gif|svg)$/i,
+            type: 'asset/resource', // Or `asset/inline`
           },
           {
             loader: ImageMinimizerPlugin.loader,
@@ -691,7 +689,8 @@ module.exports = {
         test: /\.(png)$/i,
         use: [
           {
-            loader: 'file-loader', // Or `url-loader` or your other loader
+            test: /\.(jpe?g|png|gif|svg)$/i,
+            type: 'asset/resource', // Or `asset/inline`
           },
           {
             loader: ImageMinimizerPlugin.loader,
