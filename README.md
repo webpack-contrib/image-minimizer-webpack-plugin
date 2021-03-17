@@ -68,7 +68,7 @@ module.exports = {
     rules: [
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
-        type: 'asset/resource', // Or `asset/inline`
+        type: 'asset',
       },
     ],
   },
@@ -118,7 +118,7 @@ module.exports = {
     rules: [
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
-        type: 'asset/resource',
+        type: 'asset',
       },
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
@@ -153,7 +153,7 @@ module.exports = {
     rules: [
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
-        type: 'asset/resource',
+        type: 'asset',
       },
     ],
   },
@@ -513,7 +513,7 @@ module.exports = {
     rules: [
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
-        type: 'asset/resource',
+        type: 'asset',
       },
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
@@ -567,7 +567,7 @@ module.exports = {
     rules: [
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
-        type: 'asset/resource', // Or `asset/inline`
+        type: 'asset',
       },
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
@@ -607,7 +607,7 @@ module.exports = {
     rules: [
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
-        type: 'asset/resource', // Or `asset/inline`
+        type: 'asset',
       },
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
@@ -650,7 +650,7 @@ module.exports = {
         use: [
           {
             test: /\.(jpe?g|png|gif|svg)$/i,
-            type: 'asset/resource', // Or `asset/inline`
+            type: 'asset',
           },
           {
             loader: ImageMinimizerPlugin.loader,
@@ -690,7 +690,7 @@ module.exports = {
         use: [
           {
             test: /\.(jpe?g|png|gif|svg)$/i,
-            type: 'asset/resource', // Or `asset/inline`
+            type: 'asset',
           },
           {
             loader: ImageMinimizerPlugin.loader,
