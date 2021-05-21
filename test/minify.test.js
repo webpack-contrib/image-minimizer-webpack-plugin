@@ -389,9 +389,11 @@ describe('minify', () => {
       },
     });
 
-    expect(result.errors).toHaveLength(1);
-    expect(result.errors[0].toString()).toMatch(/Invalid plugin configuration/);
-    expect(result.warnings).toHaveLength(0);
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(
+      /Invalid plugin configuration/
+    );
+    expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
   });
 
@@ -419,6 +421,32 @@ describe('minify', () => {
 
     const optimizedSource = await imagemin.buffer(input, {
       plugins: [imageminSvgo(svgoOptions)],
+    });
+
+    expect(result.output.equals(optimizedSource)).toBe(true);
+  });
+
+  it('should optimize and throw warning on invalid plugin value', async () => {
+    const filename = path.resolve(__dirname, './fixtures/loader-test.jpg');
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify({
+      input,
+      filename,
+      severityError: 'warning',
+      minimizerOptions: {
+        plugins: ['imagemin-mozjpeg', true],
+      },
+    });
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(
+      /plugin configuraion should be 'string' or '\[string, object\]'/
+    );
+    expect(result.errors).toHaveLength(0);
+    expect(result.filename).toBe(filename);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg()],
     });
 
     expect(result.output.equals(optimizedSource)).toBe(true);

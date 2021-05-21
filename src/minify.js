@@ -22,6 +22,7 @@ async function minify(options = {}) {
 
   let output;
   let minimizerOptions;
+  const errors = [];
 
   try {
     // Implement autosearch config on root directory of project in future
@@ -34,32 +35,32 @@ async function minify(options = {}) {
   } catch (error) {
     const errored = error instanceof Error ? error : new Error(error);
 
+    errors.push(errored);
+    output = input;
+  }
+
+  for (const error of [...result.errors, ...errors]) {
+    result.errors = [];
+
     switch (severityError) {
       case 'off':
       case false:
         break;
       case 'error':
       case true:
-        result.errors.push(errored);
+        result.errors.push(error);
         break;
       case 'warning':
-        result.warnings.push(errored);
+        result.warnings.push(error);
         break;
       case 'auto':
       default:
         if (isProductionMode) {
-          result.errors.push(errored);
+          result.errors.push(error);
         } else {
-          result.warnings.push(errored);
+          result.warnings.push(error);
         }
     }
-
-    return {
-      filename,
-      output: input,
-      warnings: result.warnings,
-      errors: result.errors,
-    };
   }
 
   return {
