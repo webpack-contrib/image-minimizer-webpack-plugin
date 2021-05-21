@@ -22,7 +22,7 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
+      /(Corrupt JPEG data|Command failed with EPIPE|Command failed with ENOTCONN)/
     );
 
     await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
@@ -49,7 +49,7 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
+      /(Corrupt JPEG data|Command failed with EPIPE|Command failed with ENOTCONN)/
     );
 
     await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
@@ -124,7 +124,7 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
     expect(warnings[0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
+      /(Corrupt JPEG data|Command failed with EPIPE|Command failed with ENOTCONN)/
     );
 
     await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
@@ -152,7 +152,7 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
     expect(warnings[0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
+      /(Corrupt JPEG data|Command failed with EPIPE|Command failed with ENOTCONN)/
     );
 
     await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
@@ -209,7 +209,7 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
+      /(Corrupt JPEG data|Command failed with EPIPE|Command failed with ENOTCONN)/
     );
 
     await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
@@ -233,7 +233,7 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
+      /(Corrupt JPEG data|Command failed with EPIPE|Command failed with ENOTCONN)/
     );
 
     await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
@@ -257,7 +257,7 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
+      /(Corrupt JPEG data|Command failed with EPIPE|Command failed with ENOTCONN)/
     );
 
     await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
@@ -282,7 +282,7 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
     expect(warnings[0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
+      /(Corrupt JPEG data|Command failed with EPIPE|Command failed with ENOTCONN)/
     );
 
     await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
@@ -305,7 +305,7 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
     expect(warnings[0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
+      /(Corrupt JPEG data|Command failed with EPIPE|Command failed with ENOTCONN)/
     );
 
     await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
@@ -333,7 +333,7 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /(Corrupt JPEG data|Command failed with EPIPE)/
+      /(Corrupt JPEG data|Command failed with EPIPE|Command failed with ENOTCONN)/
     );
 
     await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
