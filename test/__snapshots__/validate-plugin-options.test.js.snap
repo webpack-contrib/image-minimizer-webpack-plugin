@@ -129,9 +129,14 @@ exports[`validation 12`] = `
 
 exports[`validation 13`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.minimizerOptions should be an object:
-   object { … }
-   -> Options for \`imageMinimizerOptions\`."
+ - options.minimizerOptions should be one of these:
+   object { … } | [object { … }, ...] (should not have fewer than 1 item)
+   -> Options for \`imageMinimizerOptions\`.
+   Details:
+    * options.minimizerOptions should be an object:
+      object { … }
+    * options.minimizerOptions should be an array:
+      [object { … }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validation 14`] = `
@@ -150,4 +155,15 @@ exports[`validation 16`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.loader should be a boolean.
    -> Automatically adding \`imagemin-loader\` (require for minification images using in \`url-loader\`, \`svg-url-loader\` or other)."
+`;
+
+exports[`validation 17`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.minify should be one of these:
+   function | [function, ...] (should not have fewer than 1 item)
+   -> Allows you to override default minify function.
+   Details:
+    * options.minify should be an instance of function.
+    * options.minify should be an array:
+      [function, ...] (should not have fewer than 1 item)"
 `;

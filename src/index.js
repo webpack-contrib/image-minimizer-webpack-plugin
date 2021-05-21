@@ -6,9 +6,10 @@ import pLimit from 'p-limit';
 import { validate } from 'schema-utils';
 import serialize from 'serialize-javascript';
 
-import minify from './minify';
+import minifyFn from './minify';
 import interpolateName from './utils/interpolate-name';
 import schema from './plugin-options.json';
+import imageminMinify from './utils/imageminMinify';
 
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
 /** @typedef {import("webpack").Compiler} Compiler */
@@ -49,6 +50,7 @@ class ImageMinimizerPlugin {
     });
 
     const {
+      minify = imageminMinify,
       filter = () => true,
       test = /\.(jpe?g|png|gif|tif|webp|svg|avif)$/i,
       include,
@@ -64,6 +66,7 @@ class ImageMinimizerPlugin {
     } = options;
 
     this.options = {
+      minify,
       severityError,
       filter,
       exclude,
@@ -165,6 +168,7 @@ class ImageMinimizerPlugin {
               severityError,
               isProductionMode,
               minimizerOptions,
+              minify,
             } = this.options;
 
             const minifyOptions = {
@@ -173,9 +177,10 @@ class ImageMinimizerPlugin {
               severityError,
               isProductionMode,
               minimizerOptions,
+              minify,
             };
 
-            output = await minify(minifyOptions);
+            output = await minifyFn(minifyOptions);
 
             if (output.errors.length > 0) {
               output.errors.forEach((error) => {
@@ -254,6 +259,7 @@ class ImageMinimizerPlugin {
 
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
         const {
+          minify,
           filename,
           deleteOriginalAssets,
           filter,
@@ -271,6 +277,7 @@ class ImageMinimizerPlugin {
           enforce: 'pre',
           loader: path.join(__dirname, 'loader.js'),
           options: {
+            minify,
             filename,
             deleteOriginalAssets,
             severityError,
@@ -300,5 +307,7 @@ class ImageMinimizerPlugin {
 ImageMinimizerPlugin.loader = require.resolve('./loader');
 
 ImageMinimizerPlugin.normalizeConfig = require('./utils/normalize-config').default;
+
+ImageMinimizerPlugin.imageminMinify = imageminMinify;
 
 export default ImageMinimizerPlugin;

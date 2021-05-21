@@ -1,40 +1,33 @@
-import imagemin from 'imagemin';
-
-import normalizeConfig from './utils/normalize-config';
-
 async function minify(options = {}) {
-  const { input, filename, severityError, isProductionMode } = options;
+  const minifyFns =
+    typeof options.minify === 'function' ? [options.minify] : options.minify;
 
   const result = {
-    input,
-    filename,
+    code: options.input,
+    filename: options.filename,
     warnings: [],
     errors: [],
   };
 
-  if (!result.input) {
+  if (!result.code) {
     result.errors.push(new Error('Empty input'));
 
     return result;
   }
 
-  result.input = input;
-
-  let output;
-  let minimizerOptions;
-
   try {
-    // Implement autosearch config on root directory of project in future
-    minimizerOptions = normalizeConfig(options.minimizerOptions, {
-      options,
-      result,
-    });
-
-    output = await imagemin.buffer(result.input, minimizerOptions);
+    for (let i = 0; i <= minifyFns.length - 1; i++) {
+      const minifyFn = minifyFns[i];
+      const minifyOptions = Array.isArray(options.minimizerOptions)
+        ? options.minimizerOptions[i]
+        : options.minimizerOptions;
+      // eslint-disable-next-line no-await-in-loop
+      result.code = await minifyFn(result.code, minifyOptions, { result });
+    }
   } catch (error) {
     const errored = error instanceof Error ? error : new Error(error);
 
-    switch (severityError) {
+    switch (options.severityError) {
       case 'off':
       case false:
         break;
@@ -47,24 +40,18 @@ async function minify(options = {}) {
         break;
       case 'auto':
       default:
-        if (isProductionMode) {
+        if (options.isProductionMode) {
           result.errors.push(errored);
         } else {
           result.warnings.push(errored);
         }
     }
-
-    return {
-      filename,
-      output: input,
-      warnings: result.warnings,
-      errors: result.errors,
-    };
+    result.code = options.input;
   }
 
   return {
-    filename,
-    output,
+    filename: result.filename,
+    output: result.code,
     warnings: result.warnings,
     errors: result.errors,
   };
