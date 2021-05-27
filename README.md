@@ -451,8 +451,14 @@ module.exports = {
     new ImageMinimizerPlugin({
       minify: [
         ImageMinimizerPlugin.imageminMinify,
-        (input, minimizerOptions, metaData) => {
-          return `<Buffer>`;
+        async (data, minimizerOptions) => {
+          const [[, input]] = Object.entries(data);
+          // To do something
+          return {
+            code: `<Buffer>`,
+            warnings: [],
+            errors: [],
+          };
         },
       ],
       minimizerOptions: [
@@ -706,11 +712,6 @@ Allows to override default minify function.
 By default plugin uses [imagemin](https://github.com/imagemin/imagemin) package.
 Useful for using and testing unpublished versions or forks.
 
-Possible options:
-
-- ImageMinimizerPlugin.imageminMinify
-- async (input, minimizerOptions, metadata) => {return `<Buffer>`}
-
 ##### `Function`
 
 **webpack.config.js**
@@ -731,9 +732,14 @@ module.exports = {
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
-              minify: async (input, minimizerOptions, metaData) => {
+              minify: async (data, minimizerOptions) => {
+                const [[, input]] = Object.entries(data);
                 // To do something
-                return `<Buffer>`;
+                return {
+                  code: `<Buffer>`,
+                  warnings: [],
+                  errors: [],
+                };
               },
               minimizerOptions: {},
             },
@@ -771,8 +777,14 @@ module.exports = {
             options: {
               minify: [
                 ImageMinimizerPlugin.imageminMinify,
-                (input, minimizerOptions, metaData) => {
-                  return `<Buffer>`;
+                async (data, minimizerOptions) => {
+                  const [[, input]] = Object.entries(data);
+                  // To do something
+                  return {
+                    code: `<Buffer>`,
+                    warnings: [],
+                    errors: [],
+                  };
                 },
               ],
               minimizerOptions: [
@@ -860,8 +872,14 @@ module.exports = {
             options: {
               minify: [
                 ImageMinimizerPlugin.imageminMinify,
-                (input, minimizerOptions, metaData) => {
-                  return `<Buffer>`;
+                async (data, minimizerOptions) => {
+                  const [[, input]] = Object.entries(data);
+                  // To do something
+                  return {
+                    code: `<Buffer>`,
+                    warnings: [],
+                    errors: [],
+                  };
                 },
               ],
               minimizerOptions: [
