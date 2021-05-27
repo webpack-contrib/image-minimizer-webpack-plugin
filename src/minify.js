@@ -73,12 +73,7 @@ async function minify(options = {}) {
     result.errors = errors;
   }
 
-  return {
-    filename: result.filename,
-    code: result.code,
-    warnings: result.warnings,
-    errors: result.errors,
-  };
+  return result;
 }
 
 module.exports = minify;

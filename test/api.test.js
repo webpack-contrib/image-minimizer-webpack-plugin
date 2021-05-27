@@ -11,7 +11,7 @@ describe('api', () => {
     });
   });
 
-  describe('normalizeConfig', () => {
+  describe('normalizeImageminConfig', () => {
     it('should works', () => {
       expect(() =>
         ImageMinimizerPlugin.normalizeImageminConfig({})
@@ -43,6 +43,12 @@ describe('api', () => {
         ImageMinimizerPlugin.normalizeImageminConfig({
           plugins: [['mozjpeg', { quality: 0 }]],
         })
+      ).toMatchSnapshot();
+      expect(
+        ImageMinimizerPlugin.normalizeImageminConfig({}, {})
+      ).toMatchSnapshot();
+      expect(
+        ImageMinimizerPlugin.normalizeImageminConfig({ plugins: [true] }, {})
       ).toMatchSnapshot();
     });
   });
