@@ -58,10 +58,13 @@ npm install imagemin-gifsicle imagemin-jpegtran imagemin-optipng imagemin-svgo -
 npm install imagemin-gifsicle imagemin-mozjpeg imagemin-pngquant imagemin-svgo --save-dev
 ```
 
+For `imagemin-svgo` v9.0.0+ need use svgo [configuration](https://github.com/svg/svgo#configuration)
+
 **webpack.config.js**
 
 ```js
 const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const { extendDefaultPlugins } = require("svgo");
 
 module.exports = {
   module: {
@@ -81,14 +84,22 @@ module.exports = {
           ["gifsicle", { interlaced: true }],
           ["jpegtran", { progressive: true }],
           ["optipng", { optimizationLevel: 5 }],
+          // Svgo configuration here https://github.com/svg/svgo#configuration
           [
             "svgo",
             {
-              plugins: [
+              plugins: extendDefaultPlugins([
                 {
-                  removeViewBox: false,
+                  name: "removeViewBox",
+                  active: false,
                 },
-              ],
+                {
+                  name: "addAttributesToSVGElement",
+                  params: {
+                    attributes: [{ xmlns: "http://www.w3.org/2000/svg" }],
+                  },
+                },
+              ]),
             },
           ],
         ],
