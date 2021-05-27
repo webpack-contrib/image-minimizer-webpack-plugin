@@ -1,9 +1,9 @@
-import path from 'path';
+import path from "path";
 
-import minify from './minify';
-import interpolateName from './utils/interpolate-name';
-import schema from './loader-options.json';
-import imageminMinify from './utils/imageminMinify';
+import minify from "./minify";
+import interpolateName from "./utils/interpolate-name";
+import schema from "./loader-options.json";
+import imageminMinify from "./utils/imageminMinify";
 
 module.exports = async function loader(content) {
   const options = this.getOptions(schema);
@@ -26,7 +26,7 @@ module.exports = async function loader(content) {
     filename: name,
     severityError,
     minimizerOptions,
-    isProductionMode: this.mode === 'production' || !this.mode,
+    isProductionMode: this.mode === "production" || !this.mode,
   };
 
   const output = await minify(minifyOptions);
@@ -52,7 +52,7 @@ module.exports = async function loader(content) {
   const { source } = output;
   const newName = interpolateName(
     name,
-    options.filename || '[path][name][ext]'
+    options.filename || "[path][name][ext]"
   );
   const isNewAsset = name !== newName;
 

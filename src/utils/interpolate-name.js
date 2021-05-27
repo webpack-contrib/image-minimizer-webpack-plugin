@@ -1,10 +1,10 @@
-import path from 'path';
+import path from "path";
 
 function interpolateName(name, filename) {
   const match = /^([^?#]*)(\?[^#]*)?(#.*)?$/.exec(name);
   const [, replacerFile] = match;
-  const replacerQuery = match[2] || '';
-  const replacerFragment = match[3] || '';
+  const replacerQuery = match[2] || "";
+  const replacerFragment = match[3] || "";
   const replacerExt = path.extname(replacerFile);
   const replacerBase = path.basename(replacerFile);
   const replacerName = replacerBase.slice(
@@ -22,12 +22,12 @@ function interpolateName(name, filename) {
     path: replacerPath,
     base: replacerBase,
     name: replacerName,
-    ext: replacerExt || '',
+    ext: replacerExt || "",
   };
 
   let newName = filename;
 
-  if (typeof newName === 'function') {
+  if (typeof newName === "function") {
     newName = newName(pathData);
   }
 

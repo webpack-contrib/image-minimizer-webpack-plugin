@@ -1,7 +1,7 @@
-import { isOptimized, plugins, webpack } from './helpers';
+import { isOptimized, plugins, webpack } from "./helpers";
 
-describe('plugin loader option', () => {
-  it('should optimizes all images (plugin standalone)', async () => {
+describe("plugin loader option", () => {
+  it("should optimizes all images (plugin standalone)", async () => {
     const stats = await webpack({
       emitPlugin: true,
       imageminPluginOptions: {
@@ -15,19 +15,19 @@ describe('plugin loader option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('plugin-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
       true
     );
   });

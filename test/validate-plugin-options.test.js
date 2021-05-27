@@ -1,13 +1,13 @@
-import ImageMinimizerPlugin from '../src';
+import ImageMinimizerPlugin from "../src";
 
-it('validation', () => {
+it("validation", () => {
   /* eslint-disable no-new */
   expect(() => {
     new ImageMinimizerPlugin({ test: /foo/ });
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ test: 'foo' });
+    new ImageMinimizerPlugin({ test: "foo" });
   }).not.toThrow();
 
   expect(() => {
@@ -19,11 +19,11 @@ it('validation', () => {
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ test: ['foo', 'bar'] });
+    new ImageMinimizerPlugin({ test: ["foo", "bar"] });
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ test: [/foo/, 'bar'] });
+    new ImageMinimizerPlugin({ test: [/foo/, "bar"] });
   }).not.toThrow();
 
   expect(() => {
@@ -39,7 +39,7 @@ it('validation', () => {
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ include: 'foo' });
+    new ImageMinimizerPlugin({ include: "foo" });
   }).not.toThrow();
 
   expect(() => {
@@ -51,11 +51,11 @@ it('validation', () => {
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ include: ['foo', 'bar'] });
+    new ImageMinimizerPlugin({ include: ["foo", "bar"] });
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ include: [/foo/, 'bar'] });
+    new ImageMinimizerPlugin({ include: [/foo/, "bar"] });
   }).not.toThrow();
 
   expect(() => {
@@ -71,7 +71,7 @@ it('validation', () => {
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ exclude: 'foo' });
+    new ImageMinimizerPlugin({ exclude: "foo" });
   }).not.toThrow();
 
   expect(() => {
@@ -83,11 +83,11 @@ it('validation', () => {
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ exclude: ['foo', 'bar'] });
+    new ImageMinimizerPlugin({ exclude: ["foo", "bar"] });
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ exclude: [/foo/, 'bar'] });
+    new ImageMinimizerPlugin({ exclude: [/foo/, "bar"] });
   }).not.toThrow();
 
   expect(() => {
@@ -115,7 +115,7 @@ it('validation', () => {
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {
-    new ImageMinimizerPlugin({ filename: '[name].[ext]' });
+    new ImageMinimizerPlugin({ filename: "[name].[ext]" });
   }).not.toThrow();
 
   expect(() => {
@@ -135,7 +135,7 @@ it('validation', () => {
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ severityError: 'error' });
+    new ImageMinimizerPlugin({ severityError: "error" });
   }).not.toThrow();
 
   expect(() => {
@@ -177,7 +177,7 @@ it('validation', () => {
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {
-    new ImageMinimizerPlugin({ maxConcurrency: 'true' });
+    new ImageMinimizerPlugin({ maxConcurrency: "true" });
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {
@@ -189,7 +189,7 @@ it('validation', () => {
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ loader: 'true' });
+    new ImageMinimizerPlugin({ loader: "true" });
   }).toThrowErrorMatchingSnapshot();
 
   expect(() => {
@@ -201,7 +201,7 @@ it('validation', () => {
   }).not.toThrow();
 
   expect(() => {
-    new ImageMinimizerPlugin({ minify: 'true' });
+    new ImageMinimizerPlugin({ minify: "true" });
   }).toThrowErrorMatchingSnapshot();
   /* eslint-enable no-new */
 });

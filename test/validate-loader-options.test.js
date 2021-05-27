@@ -1,10 +1,10 @@
-import path from 'path';
+import path from "path";
 
-import ImageMinimizerPlugin from '../src';
+import ImageMinimizerPlugin from "../src";
 
-import { fixturesPath, plugins, webpack } from './helpers';
+import { fixturesPath, plugins, webpack } from "./helpers";
 
-describe('validate options', () => {
+describe("validate options", () => {
   const tests = {
     minify: {
       success: [
@@ -22,11 +22,11 @@ describe('validate options', () => {
       failure: [1, true, false, {}, [], null],
     },
     severityError: {
-      success: [true, false, 'error'],
+      success: [true, false, "error"],
       failure: [{}, [], () => {}],
     },
     filename: {
-      success: ['[name].[ext]'],
+      success: ["[name].[ext]"],
       failure: [{}, [], () => {}, true],
     },
     deleteOriginalAssets: {
@@ -35,14 +35,14 @@ describe('validate options', () => {
     },
     unknown: {
       success: [],
-      failure: [1, true, false, 'test', /test/, [], {}, { foo: 'bar' }],
+      failure: [1, true, false, "test", /test/, [], {}, { foo: "bar" }],
     },
   };
 
   function stringifyValue(value) {
     if (
       Array.isArray(value) ||
-      (value && typeof value === 'object' && value.constructor === Object)
+      (value && typeof value === "object" && value.constructor === Object)
     ) {
       return JSON.stringify(value);
     }
@@ -52,16 +52,16 @@ describe('validate options', () => {
 
   async function createTestCase(key, value, type) {
     it(`should ${
-      type === 'success' ? 'successfully validate' : 'throw an error on'
+      type === "success" ? "successfully validate" : "throw an error on"
     } the "${key}" option with "${stringifyValue(value)}" value`, async () => {
       const options = {
-        entry: path.join(fixturesPath, 'validate-options.js'),
+        entry: path.join(fixturesPath, "validate-options.js"),
         imageminLoaderOptions: {
           [key]: value,
         },
       };
 
-      if (key === 'severityError') {
+      if (key === "severityError") {
         options.imageminLoaderOptions.minimizerOptions = { plugins };
       }
 
@@ -70,9 +70,9 @@ describe('validate options', () => {
       try {
         stats = await webpack(options);
       } finally {
-        if (type === 'success') {
+        if (type === "success") {
           expect(stats.hasErrors()).toBe(false);
-        } else if (type === 'failure') {
+        } else if (type === "failure") {
           const {
             compilation: { errors },
           } = stats;

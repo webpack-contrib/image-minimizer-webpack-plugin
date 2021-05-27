@@ -1,20 +1,20 @@
-import path from 'path';
+import path from "path";
 
-import fileType from 'file-type';
+import fileType from "file-type";
 
-import { fixturesPath, webpack, clearDirectory } from './helpers';
+import { fixturesPath, webpack, clearDirectory } from "./helpers";
 
 describe('loader "deleteOriginalAssets" option', () => {
-  it('should transform asset and keep original asset (default behavior)', async () => {
+  it("should transform asset and keep original asset (default behavior)", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, './loader-single.js'),
+      entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
-        path: path.resolve(__dirname, 'outputs'),
+        path: path.resolve(__dirname, "outputs"),
       },
       imageminPluginOptions: {
-        filename: '[path][name].webp',
+        filename: "[path][name].webp",
         minimizerOptions: {
-          plugins: ['imagemin-webp'],
+          plugins: ["imagemin-webp"],
         },
       },
     });
@@ -23,13 +23,13 @@ describe('loader "deleteOriginalAssets" option', () => {
 
     const originalAsset = path.resolve(
       __dirname,
-      'outputs',
-      './nested/deep/loader-test.jpg'
+      "outputs",
+      "./nested/deep/loader-test.jpg"
     );
     const transformedAsset = path.resolve(
       __dirname,
-      'outputs',
-      './nested/deep/loader-test.webp'
+      "outputs",
+      "./nested/deep/loader-test.webp"
     );
     const originalExt = await fileType.fromFile(originalAsset);
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -42,15 +42,15 @@ describe('loader "deleteOriginalAssets" option', () => {
 
   it('should transform asset and keep original asset when the "deleteOriginalAssets" option is "false"', async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, './loader-single.js'),
+      entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
-        path: path.resolve(__dirname, 'outputs'),
+        path: path.resolve(__dirname, "outputs"),
       },
       imageminPluginOptions: {
         deleteOriginalAssets: false,
-        filename: '[path][name].webp',
+        filename: "[path][name].webp",
         minimizerOptions: {
-          plugins: ['imagemin-webp'],
+          plugins: ["imagemin-webp"],
         },
       },
     });
@@ -59,13 +59,13 @@ describe('loader "deleteOriginalAssets" option', () => {
 
     const originalAsset = path.resolve(
       __dirname,
-      'outputs',
-      './nested/deep/loader-test.jpg'
+      "outputs",
+      "./nested/deep/loader-test.jpg"
     );
     const transformedAsset = path.resolve(
       __dirname,
-      'outputs',
-      './nested/deep/loader-test.webp'
+      "outputs",
+      "./nested/deep/loader-test.webp"
     );
     const originalExt = await fileType.fromFile(originalAsset);
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -78,20 +78,20 @@ describe('loader "deleteOriginalAssets" option', () => {
 
   // TODO remove original asset
   it('should transform asset and remove original asset when the "deleteOriginalAssets" option is "true"', async () => {
-    const outputDir = path.resolve(__dirname, 'outputs', 'DOA');
+    const outputDir = path.resolve(__dirname, "outputs", "DOA");
 
     clearDirectory(outputDir);
 
     const stats = await webpack({
-      entry: path.join(fixturesPath, './loader-single.js'),
+      entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: outputDir,
       },
       imageminPluginOptions: {
         deleteOriginalAssets: true,
-        filename: '[path][name].webp',
+        filename: "[path][name].webp",
         minimizerOptions: {
-          plugins: ['imagemin-webp'],
+          plugins: ["imagemin-webp"],
         },
       },
     });
@@ -100,11 +100,11 @@ describe('loader "deleteOriginalAssets" option', () => {
 
     const originalAsset = path.resolve(
       outputDir,
-      './nested/deep/loader-test.jpg'
+      "./nested/deep/loader-test.jpg"
     );
     const transformedAsset = path.resolve(
       outputDir,
-      './nested/deep/loader-test.webp'
+      "./nested/deep/loader-test.webp"
     );
     const originalExt = await fileType.fromFile(originalAsset);
     const transformedExt = await fileType.fromFile(transformedAsset);

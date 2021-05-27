@@ -1,25 +1,25 @@
-import path from 'path';
+import path from "path";
 
-import ImageMinimizerPlugin from '../src';
+import ImageMinimizerPlugin from "../src";
 
-import { fixturesPath, webpack, isOptimized } from './helpers';
+import { fixturesPath, webpack, isOptimized } from "./helpers";
 
-describe('plugin minify option', () => {
+describe("plugin minify option", () => {
   it('should work with "imagemin" minifier', async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, './empty-entry.js'),
+      entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
         minify: ImageMinimizerPlugin.imageminMinify,
         minimizerOptions: {
-          plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
+          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
         },
       },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    await expect(isOptimized('plugin-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
       true
     );
 
@@ -27,11 +27,11 @@ describe('plugin minify option', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should work when minify is custom function', async () => {
+  it("should work when minify is custom function", async () => {
     expect.assertions(5);
 
     const stats = await webpack({
-      entry: path.join(fixturesPath, './empty-entry.js'),
+      entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
         minify: (data, minifiOptions) => {
@@ -45,14 +45,14 @@ describe('plugin minify option', () => {
           };
         },
         minimizerOptions: {
-          plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
+          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
         },
       },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    await expect(isOptimized('plugin-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
       false
     );
 
@@ -60,11 +60,11 @@ describe('plugin minify option', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should work if minify is array && minimizerOptions is object', async () => {
+  it("should work if minify is array && minimizerOptions is object", async () => {
     expect.assertions(5);
 
     const stats = await webpack({
-      entry: path.join(fixturesPath, './empty-entry.js'),
+      entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
         minify: [
@@ -81,14 +81,14 @@ describe('plugin minify option', () => {
           },
         ],
         minimizerOptions: {
-          plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
+          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
         },
       },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    await expect(isOptimized('plugin-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
       true
     );
 
@@ -96,11 +96,11 @@ describe('plugin minify option', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should work if minify is array && minimizerOptions is array', async () => {
+  it("should work if minify is array && minimizerOptions is array", async () => {
     expect.assertions(5);
 
     const stats = await webpack({
-      entry: path.join(fixturesPath, './empty-entry.js'),
+      entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
         minify: [
@@ -108,7 +108,7 @@ describe('plugin minify option', () => {
           (data, minifiOptions) => {
             const [[, input]] = Object.entries(data);
 
-            expect('options2' in minifiOptions).toBe(true);
+            expect("options2" in minifiOptions).toBe(true);
 
             return {
               code: input,
@@ -117,7 +117,7 @@ describe('plugin minify option', () => {
           (data, minifiOptions) => {
             const [[, input]] = Object.entries(data);
 
-            expect('options3' in minifiOptions).toBe(true);
+            expect("options3" in minifiOptions).toBe(true);
 
             return {
               code: input,
@@ -126,13 +126,13 @@ describe('plugin minify option', () => {
         ],
         minimizerOptions: [
           {
-            plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
           },
           {
-            options2: 'passed',
+            options2: "passed",
           },
           {
-            options3: 'passed',
+            options3: "passed",
           },
         ],
       },
@@ -140,7 +140,7 @@ describe('plugin minify option', () => {
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    await expect(isOptimized('plugin-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
       true
     );
 

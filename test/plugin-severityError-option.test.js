@@ -1,14 +1,14 @@
-import path from 'path';
+import path from "path";
 
-import { fixturesPath, isOptimized, plugins, webpack } from './helpers';
+import { fixturesPath, isOptimized, plugins, webpack } from "./helpers";
 
-describe('plugin severityError option', () => {
-  it('should optimizes images and throws error on corrupted images using `plugin.severityError` option with `true` value (by plugin)', async () => {
+describe("plugin severityError option", () => {
+  it("should optimizes images and throws error on corrupted images using `plugin.severityError` option with `true` value (by plugin)", async () => {
     const stats = await webpack({
       emitPluginOptions: {
-        fileNames: ['test-corrupted.jpg', 'plugin-test.png'],
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
-      entry: path.join(fixturesPath, 'empty-entry.js'),
+      entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
         severityError: true,
         minimizerOptions: {
@@ -25,19 +25,19 @@ describe('plugin severityError option', () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should optimizes images and throws error on corrupted images using `plugin.severityError` option with `error` value (by plugin)', async () => {
+  it("should optimizes images and throws error on corrupted images using `plugin.severityError` option with `error` value (by plugin)", async () => {
     const stats = await webpack({
       emitPluginOptions: {
-        fileNames: ['test-corrupted.jpg', 'plugin-test.png'],
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
-      entry: path.join(fixturesPath, 'empty-entry.js'),
+      entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
-        severityError: 'error',
+        severityError: "error",
         minimizerOptions: {
           plugins,
         },
@@ -52,19 +52,19 @@ describe('plugin severityError option', () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should optimizes images and not throws error or warnings on corrupted images using `plugin.severityError` option with `off` value (by plugin)', async () => {
+  it("should optimizes images and not throws error or warnings on corrupted images using `plugin.severityError` option with `off` value (by plugin)", async () => {
     const stats = await webpack({
       emitPluginOptions: {
-        fileNames: ['test-corrupted.jpg', 'plugin-test.png'],
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
-      entry: path.join(fixturesPath, 'empty-entry.js'),
+      entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
-        severityError: 'off',
+        severityError: "off",
         minimizerOptions: {
           plugins,
         },
@@ -76,17 +76,17 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should optimizes images and not throws error or warnings on corrupted images using `plugin.severityError` option with false value (by plugin)', async () => {
+  it("should optimizes images and not throws error or warnings on corrupted images using `plugin.severityError` option with false value (by plugin)", async () => {
     const stats = await webpack({
       emitPluginOptions: {
-        fileNames: ['test-corrupted.jpg', 'plugin-test.png'],
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
-      entry: path.join(fixturesPath, 'empty-entry.js'),
+      entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
         severityError: false,
         minimizerOptions: {
@@ -100,19 +100,19 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should optimizes images and throws warnings on corrupted images using `plugin.severityError` option with `warning` value (by plugin)', async () => {
+  it("should optimizes images and throws warnings on corrupted images using `plugin.severityError` option with `warning` value (by plugin)", async () => {
     const stats = await webpack({
       emitPluginOptions: {
-        fileNames: ['test-corrupted.jpg', 'plugin-test.png'],
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
-      entry: path.join(fixturesPath, 'empty-entry.js'),
+      entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
-        severityError: 'warning',
+        severityError: "warning",
         minimizerOptions: {
           plugins,
         },
@@ -127,20 +127,20 @@ describe('plugin severityError option', () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should optimizes images and throws error on corrupted images using mode `development` and `plugin.severityError` option with `auto` value (by plugin)', async () => {
+  it("should optimizes images and throws error on corrupted images using mode `development` and `plugin.severityError` option with `auto` value (by plugin)", async () => {
     const stats = await webpack({
-      mode: 'development',
+      mode: "development",
       emitPluginOptions: {
-        fileNames: ['test-corrupted.jpg', 'plugin-test.png'],
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
-      entry: path.join(fixturesPath, 'empty-entry.js'),
+      entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
-        severityError: 'auto',
+        severityError: "auto",
         minimizerOptions: {
           plugins,
         },
@@ -155,17 +155,17 @@ describe('plugin severityError option', () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should optimizes images and throws error on corrupted images when `plugin.severityError` option not specify (by plugin)', async () => {
+  it("should optimizes images and throws error on corrupted images when `plugin.severityError` option not specify (by plugin)", async () => {
     const stats = await webpack({
       emitPluginOptions: {
-        fileNames: ['test-corrupted.jpg', 'plugin-test.png'],
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
-      entry: path.join(fixturesPath, 'empty-entry.js'),
+      entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
         minimizerOptions: {
           plugins,
@@ -181,23 +181,23 @@ describe('plugin severityError option', () => {
       /(Corrupt JPEG data|Command failed with EPIPE|Command failed with ENOTCONN)/
     );
 
-    await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should optimizes images and throws error on corrupted images using mode `production` and `plugin.severityError` option with `auto` value (by plugin)', async () => {
+  it("should optimizes images and throws error on corrupted images using mode `production` and `plugin.severityError` option with `auto` value (by plugin)", async () => {
     const stats = await webpack({
-      mode: 'production',
+      mode: "production",
       optimization: {
         emitOnErrors: true,
       },
       emitPluginOptions: {
-        fileNames: ['test-corrupted.jpg', 'plugin-test.png'],
+        fileNames: ["test-corrupted.jpg", "plugin-test.png"],
       },
-      entry: path.join(fixturesPath, 'empty-entry.js'),
+      entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
-        severityError: 'auto',
+        severityError: "auto",
         minimizerOptions: {
           plugins,
         },
@@ -212,14 +212,14 @@ describe('plugin severityError option', () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized('plugin-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should optimizes images and throws errors on corrupted images using `plugin.severityError` option with `true` value (by loader)', async () => {
+  it("should optimizes images and throws errors on corrupted images using `plugin.severityError` option with `true` value (by loader)", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
         severityError: true,
         minimizerOptions: {
@@ -236,16 +236,16 @@ describe('plugin severityError option', () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should optimizes images and throws errors on corrupted images using `plugin.severityError` option with `error` value (by loader)', async () => {
+  it("should optimizes images and throws errors on corrupted images using `plugin.severityError` option with `error` value (by loader)", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
-        severityError: 'error',
+        severityError: "error",
         minimizerOptions: {
           plugins,
         },
@@ -260,17 +260,17 @@ describe('plugin severityError option', () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should throws errors on corrupted images using mode `development` and `plugin.severityError` option with `auto` value (by loader)', async () => {
+  it("should throws errors on corrupted images using mode `development` and `plugin.severityError` option with `auto` value (by loader)", async () => {
     const stats = await webpack({
-      mode: 'development',
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      mode: "development",
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
-        severityError: 'auto',
+        severityError: "auto",
         minimizerOptions: {
           plugins,
         },
@@ -285,14 +285,14 @@ describe('plugin severityError option', () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should throws errors on corrupted images when `plugin.severityError` option not specify (by loader)', async () => {
+  it("should throws errors on corrupted images when `plugin.severityError` option not specify (by loader)", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
         minimizerOptions: {
           plugins,
@@ -308,20 +308,20 @@ describe('plugin severityError option', () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should throws errors on corrupted images using mode `production` and `plugin.severityError` option with `auto` value (by loader)', async () => {
+  it("should throws errors on corrupted images using mode `production` and `plugin.severityError` option with `auto` value (by loader)", async () => {
     const stats = await webpack({
-      mode: 'production',
+      mode: "production",
       optimization: {
         emitOnErrors: true,
       },
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
-        severityError: 'auto',
+        severityError: "auto",
         minimizerOptions: {
           plugins,
         },
@@ -336,16 +336,16 @@ describe('plugin severityError option', () => {
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should optimizes images and throws errors on corrupted images using `plugin.severityError` option with `off` value (by loader)', async () => {
+  it("should optimizes images and throws errors on corrupted images using `plugin.severityError` option with `off` value (by loader)", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
-        severityError: 'off',
+        severityError: "off",
         minimizerOptions: {
           plugins,
         },
@@ -357,14 +357,14 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should optimizes images and throws errors on corrupted images using `plugin.severityError` option with `false` value (by loader)', async () => {
+  it("should optimizes images and throws errors on corrupted images using `plugin.severityError` option with `false` value (by loader)", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
         severityError: false,
         minimizerOptions: {
@@ -378,7 +378,7 @@ describe('plugin severityError option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });

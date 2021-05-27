@@ -1,24 +1,24 @@
-import path from 'path';
+import path from "path";
 
-import fileType from 'file-type';
+import fileType from "file-type";
 
-import { fixturesPath, webpack, clearDirectory } from './helpers';
+import { fixturesPath, webpack, clearDirectory } from "./helpers";
 
 describe('loader "filename" option', () => {
-  beforeAll(() => clearDirectory(path.resolve(__dirname, 'outputs')));
-  afterAll(() => clearDirectory(path.resolve(__dirname, 'outputs')));
+  beforeAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
+  afterAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
 
-  it('should emit new transformed to webp asset with flat filename', async () => {
-    const outputDir = path.resolve(__dirname, 'outputs', 'loader-filename-1');
+  it("should emit new transformed to webp asset with flat filename", async () => {
+    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-1");
     const stats = await webpack({
-      entry: path.join(fixturesPath, './loader-single.js'),
+      entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: outputDir,
       },
       imageminPluginOptions: {
-        filename: '[name].webp',
+        filename: "[name].webp",
         minimizerOptions: {
-          plugins: ['imagemin-webp'],
+          plugins: ["imagemin-webp"],
         },
       },
     });
@@ -28,7 +28,7 @@ describe('loader "filename" option', () => {
     const transformedAsset = path.resolve(
       __dirname,
       outputDir,
-      'loader-test.webp'
+      "loader-test.webp"
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -38,17 +38,17 @@ describe('loader "filename" option', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should emit new transformed to webp asset with nested filename', async () => {
-    const outputDir = path.resolve(__dirname, 'outputs', 'loader-filename-2');
+  it("should emit new transformed to webp asset with nested filename", async () => {
+    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-2");
     const stats = await webpack({
-      entry: path.join(fixturesPath, './loader-single.js'),
+      entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: outputDir,
       },
       imageminPluginOptions: {
-        filename: 'deep/[path][name].webp',
+        filename: "deep/[path][name].webp",
         minimizerOptions: {
-          plugins: ['imagemin-webp'],
+          plugins: ["imagemin-webp"],
         },
       },
     });
@@ -58,7 +58,7 @@ describe('loader "filename" option', () => {
     const transformedAsset = path.resolve(
       __dirname,
       outputDir,
-      'deep/nested/deep/loader-test.webp'
+      "deep/nested/deep/loader-test.webp"
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -68,17 +68,17 @@ describe('loader "filename" option', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should emit new transformed to webp asset with filename  pointing to other directory', async () => {
-    const outputDir = path.resolve(__dirname, 'outputs', 'loader-filename-3');
+  it("should emit new transformed to webp asset with filename  pointing to other directory", async () => {
+    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-3");
     const stats = await webpack({
-      entry: path.join(fixturesPath, './loader-single.js'),
+      entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: outputDir,
       },
       imageminPluginOptions: {
-        filename: 'other/[name].webp',
+        filename: "other/[name].webp",
         minimizerOptions: {
-          plugins: ['imagemin-webp'],
+          plugins: ["imagemin-webp"],
         },
       },
     });
@@ -88,7 +88,7 @@ describe('loader "filename" option', () => {
     const transformedAsset = path.resolve(
       __dirname,
       outputDir,
-      'other/loader-test.webp'
+      "other/loader-test.webp"
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);

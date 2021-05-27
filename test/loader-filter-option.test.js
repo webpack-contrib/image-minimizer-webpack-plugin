@@ -1,12 +1,12 @@
-import { isOptimized, plugins, webpack } from './helpers';
+import { isOptimized, plugins, webpack } from "./helpers";
 
-describe('loader filter option', () => {
-  it('should optimizes all images exclude filtered', async () => {
+describe("loader filter option", () => {
+  it("should optimizes all images exclude filtered", async () => {
     const stats = await webpack({
       imageminLoaderOptions: {
         filter: (source, filename) => {
           expect(source).toBeInstanceOf(Buffer);
-          expect(typeof filename).toBe('string');
+          expect(typeof filename).toBe("string");
 
           if (source.byteLength === 631) {
             return false;
@@ -25,16 +25,16 @@ describe('loader filter option', () => {
     expect(errors).toHaveLength(0);
     expect(Object.keys(assets)).toHaveLength(5);
 
-    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
       false
     );
   });

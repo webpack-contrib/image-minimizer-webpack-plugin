@@ -1,15 +1,15 @@
-import * as path from 'path';
-import * as os from 'os';
+import * as path from "path";
+import * as os from "os";
 
-import pLimit from 'p-limit';
+import pLimit from "p-limit";
 
-import { validate } from 'schema-utils';
-import serialize from 'serialize-javascript';
+import { validate } from "schema-utils";
+import serialize from "serialize-javascript";
 
-import minifyFn from './minify';
-import interpolateName from './utils/interpolate-name';
-import schema from './plugin-options.json';
-import imageminMinify from './utils/imageminMinify';
+import minifyFn from "./minify";
+import interpolateName from "./utils/interpolate-name";
+import schema from "./plugin-options.json";
+import imageminMinify from "./utils/imageminMinify";
 
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
 /** @typedef {import("webpack").Compiler} Compiler */
@@ -45,8 +45,8 @@ class ImageMinimizerPlugin {
    */
   constructor(options = {}) {
     validate(schema, options, {
-      name: 'Image Minimizer Plugin',
-      baseDataPath: 'options',
+      name: "Image Minimizer Plugin",
+      baseDataPath: "options",
     });
 
     const {
@@ -61,7 +61,7 @@ class ImageMinimizerPlugin {
       },
       loader = true,
       maxConcurrency,
-      filename = '[path][name][ext]',
+      filename = "[path][name][ext]",
       deleteOriginalAssets = false,
     } = options;
 
@@ -89,7 +89,7 @@ class ImageMinimizerPlugin {
    * @returns {Promise<void>}
    */
   async optimize(compiler, compilation, assets, moduleAssets) {
-    const cache = compilation.getCache('ImageMinimizerWebpackPlugin');
+    const cache = compilation.getCache("ImageMinimizerWebpackPlugin");
     const assetsForMinify = await Promise.all(
       Object.keys(assets)
         .filter((name) => {
@@ -240,7 +240,7 @@ class ImageMinimizerPlugin {
    */
   apply(compiler) {
     this.options.isProductionMode =
-      compiler.options.mode === 'production' || !compiler.options.mode;
+      compiler.options.mode === "production" || !compiler.options.mode;
 
     const pluginName = this.constructor.name;
 
@@ -274,8 +274,8 @@ class ImageMinimizerPlugin {
           test,
           include,
           exclude,
-          enforce: 'pre',
-          loader: path.join(__dirname, 'loader.js'),
+          enforce: "pre",
+          loader: path.join(__dirname, "loader.js"),
           options: {
             minify,
             filename,
@@ -304,9 +304,10 @@ class ImageMinimizerPlugin {
   }
 }
 
-ImageMinimizerPlugin.loader = require.resolve('./loader');
+ImageMinimizerPlugin.loader = require.resolve("./loader");
 
-ImageMinimizerPlugin.normalizeImageminConfig = require('./utils/imageminMinify').normalizeImageminConfig;
+ImageMinimizerPlugin.normalizeImageminConfig =
+  require("./utils/imageminMinify").normalizeImageminConfig;
 
 ImageMinimizerPlugin.imageminMinify = imageminMinify;
 

@@ -1,15 +1,15 @@
-import ImageMinimizerPlugin from '../src';
+import ImageMinimizerPlugin from "../src";
 
-import { webpack, isOptimized } from './helpers';
+import { webpack, isOptimized } from "./helpers";
 
-describe('loader minify option', () => {
+describe("loader minify option", () => {
   it('should work with "imagemin" minifier', async () => {
     const stats = await webpack({
       imageminLoader: true,
       imageminLoaderOptions: {
         minify: ImageMinimizerPlugin.imageminMinify,
         minimizerOptions: {
-          plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
+          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
         },
       },
     });
@@ -19,21 +19,21 @@ describe('loader minify option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should work when minify is custom function', async () => {
+  it("should work when minify is custom function", async () => {
     expect.assertions(14);
 
     const stats = await webpack({
@@ -50,7 +50,7 @@ describe('loader minify option', () => {
           };
         },
         minimizerOptions: {
-          plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
+          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
         },
       },
     });
@@ -60,21 +60,21 @@ describe('loader minify option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
       false
     );
-    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
       false
     );
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       false
     );
-    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
       false
     );
   });
 
-  it('should work if minify is array && minimizerOptions is object', async () => {
+  it("should work if minify is array && minimizerOptions is object", async () => {
     expect.assertions(14);
 
     const stats = await webpack({
@@ -94,7 +94,7 @@ describe('loader minify option', () => {
           },
         ],
         minimizerOptions: {
-          plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
+          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
         },
       },
     });
@@ -104,21 +104,21 @@ describe('loader minify option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should work if minify is array && minimizerOptions is array', async () => {
+  it("should work if minify is array && minimizerOptions is array", async () => {
     expect.assertions(14);
 
     const stats = await webpack({
@@ -129,7 +129,7 @@ describe('loader minify option', () => {
           (data, minifiOptions) => {
             const [[, input]] = Object.entries(data);
 
-            expect('options2' in minifiOptions).toBe(true);
+            expect("options2" in minifiOptions).toBe(true);
 
             return {
               code: input,
@@ -138,7 +138,7 @@ describe('loader minify option', () => {
           (data, minifiOptions) => {
             const [[, input]] = Object.entries(data);
 
-            expect('options3' in minifiOptions).toBe(true);
+            expect("options3" in minifiOptions).toBe(true);
 
             return {
               code: input,
@@ -147,13 +147,13 @@ describe('loader minify option', () => {
         ],
         minimizerOptions: [
           {
-            plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
           },
           {
-            options2: 'passed',
+            options2: "passed",
           },
           {
-            options3: 'passed',
+            options3: "passed",
           },
         ],
       },
@@ -164,26 +164,26 @@ describe('loader minify option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should emit warning', async () => {
+  it("should emit warning", async () => {
     const stats = await webpack({
       imageminLoader: true,
       imageminLoaderOptions: {
         minify: () => {
-          throw new Error('test error');
+          throw new Error("test error");
         },
       },
     });
@@ -193,16 +193,16 @@ describe('loader minify option', () => {
     expect(warnings).toHaveLength(4);
     expect(errors).toHaveLength(0);
 
-    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
       false
     );
-    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
       false
     );
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       false
     );
-    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
       false
     );
   });
