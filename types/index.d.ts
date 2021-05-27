@@ -76,6 +76,7 @@ declare class ImageMinimizerPlugin {
    */
   constructor(options?: PluginOptions | undefined);
   options: {
+    minify: any;
     severityError: string | boolean | undefined;
     filter: Filter;
     exclude: string | RegExp | (string | RegExp)[] | undefined;
@@ -106,6 +107,8 @@ declare class ImageMinimizerPlugin {
   apply(compiler: import('webpack').Compiler): void;
 }
 declare namespace ImageMinimizerPlugin {
-  const loader: string;
-  const normalizeConfig: typeof import('./utils/normalize-config').default;
+  export const loader: string;
+  export const normalizeImageminConfig: typeof import('./utils/imageminMinify').normalizeImageminConfig;
+  export { imageminMinify };
 }
+import imageminMinify from './utils/imageminMinify';

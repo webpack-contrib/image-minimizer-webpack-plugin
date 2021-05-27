@@ -184,7 +184,8 @@ module.exports = {
 |       **`exclude`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `exclude`                                                                                |
 |        **`filter`**        |               `{Function}`                |                        `() => true`                         | Allows filtering of images for optimization                                                       |
 |    **`severityError`**     |            `{Boolean\|String}`            |                          `'auto'`                           | Allows to choose how errors are displayed                                                         |
-|   **`minimizerOptions`**   |                `{Object}`                 |                      `{ plugins: [] }`                      | Options for `imagemin`                                                                            |
+|        **`minify`**        |      `{Function \| Array<Function>}`      |            `ImageMinimizerPlugin.imageminMinify`            | Allows to override default minify function                                                        |
+|   **`minimizerOptions`**   |         `{Object\|Array<Object>}`         |                      `{ plugins: [] }`                      | Options for `imagemin`                                                                            |
 |        **`loader`**        |                `{Boolean}`                |                           `true`                            | Automatically adding `imagemin-loader`                                                            |
 |    **`maxConcurrency`**    |                `{Number}`                 |             `Math.max(1, os.cpus().length - 1)`             | Maximum number of concurrency optimization processes in one time                                  |
 |       **`filename`**       |                `{string}`                 |                    `'[path][name][ext]'`                    | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
@@ -314,14 +315,89 @@ module.exports = {
 };
 ```
 
+#### `minify`
+
+Type: `Function|Array<Function>`
+Default: `ImageMinimizerPlugin.imageminMinify`
+
+Allows to override default minify function.
+By default plugin uses [imagemin](https://github.com/imagemin/imagemin) package.
+Useful for using and testing unpublished versions or forks.
+
+##### `Function`
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    new ImageMinimizerPlugin({
+      minify: async (data, minimizerOptions) => {
+        const [[, input]] = Object.entries(data);
+        // To do something
+        return {
+          code: `<Buffer>`,
+          warnings: [],
+          errors: [],
+        };
+      },
+      minimizerOptions: {},
+    }),
+  ],
+};
+```
+
+##### `Array`
+
+If an array of functions is passed to the `minify` option, the `minimizerOptions` can be an array or an object.
+If `minimizerOptions` is array, the function index in the `minify` array corresponds to the options object with the same index in the `minimizerOptions` array.
+If you use `minimizerOptions` like object, all `minify` function accept it.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    new ImageMinimizerPlugin({
+      minify: [
+        ImageMinimizerPlugin.imageminMinify,
+        (data, minimizerOptions) => {
+          const [[, input]] = Object.entries(data);
+          // To do something
+          return {
+            code: `<Buffer>`,
+            warnings: [],
+            errors: [],
+          };
+        },
+      ],
+      minimizerOptions: [
+        // Options for the first function (ImageMinimizerPlugin.imageminMinify)
+        {
+          plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
+        },
+        // Options for the second function
+        {},
+      ],
+    }),
+  ],
+};
+```
+
 #### `minimizerOptions`
 
-Type: `Object`
+Type: `Object|Array<Object>`
 Default: `{ plugins: [] }`
 
-Options for [`imagemin`](https://github.com/imagemin/imagemin).
+Options for `minify` functions. [`imagemin`](https://github.com/imagemin/imagemin) is default minify function.
 
 More information and examples [here](https://github.com/imagemin/imagemin).
+
+##### `Object`
 
 **webpack.config.js**
 
@@ -355,6 +431,44 @@ module.exports = {
           ],
         ],
       },
+    }),
+  ],
+};
+```
+
+##### `Array`
+
+The function index in the `minify` array corresponds to the options object with the same index in the `minimizerOptions` array.
+If you use `minimizerOptions` like object, all `minify` function accept it.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  plugins: [
+    new ImageMinimizerPlugin({
+      minify: [
+        ImageMinimizerPlugin.imageminMinify,
+        async (data, minimizerOptions) => {
+          const [[, input]] = Object.entries(data);
+          // To do something
+          return {
+            code: `<Buffer>`,
+            warnings: [],
+            errors: [],
+          };
+        },
+      ],
+      minimizerOptions: [
+        // Options for the first function (ImageMinimizerPlugin.imageminMinify)
+        {
+          plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
+        },
+        // Options for the second function
+        {},
+      ],
     }),
   ],
 };
@@ -486,13 +600,14 @@ module.exports = {
 
 ### Loader Options
 
-|            Name            |        Type         |        Default        | Description                                                                                       |
-| :------------------------: | :-----------------: | :-------------------: | :------------------------------------------------------------------------------------------------ |
-|        **`filter`**        |    `{Function}`     |      `undefined`      | Allows filtering of images for optimization                                                       |
-|    **`severityError`**     | `{Boolean\|String}` |       `'auto'`        | Allows to choose how errors are displayed                                                         |
-|   **`minimizerOptions`**   |     `{Object}`      |   `{ plugins: [] }`   | Options for `imagemin`                                                                            |
-|       **`filename`**       |     `{string}`      | `'[path][name][ext]'` | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
-| **`deleteOriginalAssets`** |     `{Boolean}`     |        `false`        | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
+|            Name            |              Type               |                Default                | Description                                                                                       |
+| :------------------------: | :-----------------------------: | :-----------------------------------: | :------------------------------------------------------------------------------------------------ |
+|        **`filter`**        |          `{Function}`           |              `undefined`              | Allows filtering of images for optimization                                                       |
+|    **`severityError`**     |       `{Boolean\|String}`       |               `'auto'`                | Allows to choose how errors are displayed                                                         |
+|        **`minify`**        | `{Function \| Array<Function>}` | `ImageMinimizerPlugin.imageminMinify` | Allows to override default minify function                                                        |
+|   **`minimizerOptions`**   |    `{Object\|Array<Object>}`    |           `{ plugins: [] }`           | Options for `imagemin`                                                                            |
+|       **`filename`**       |           `{string}`            |         `'[path][name][ext]'`         | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
+| **`deleteOriginalAssets`** |           `{Boolean}`           |                `false`                | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
 
 #### `filter`
 
@@ -588,14 +703,16 @@ module.exports = {
 };
 ```
 
-#### `minimizerOptions`
+#### `minify`
 
-Type: `Object`
-Default: `{ plugins: [] }`
+Type: `Function|Array<Function>`
+Default: `ImageMinimizerPlugin.imageminMinify`
 
-Options for `imagemin`.
+Allows to override default minify function.
+By default plugin uses [imagemin](https://github.com/imagemin/imagemin) package.
+Useful for using and testing unpublished versions or forks.
 
-Options for [`imagemin`](https://github.com/imagemin/imagemin)
+##### `Function`
 
 **webpack.config.js**
 
@@ -615,12 +732,166 @@ module.exports = {
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
-              severityError: 'warning',
+              minify: async (data, minimizerOptions) => {
+                const [[, input]] = Object.entries(data);
+                // To do something
+                return {
+                  code: `<Buffer>`,
+                  warnings: [],
+                  errors: [],
+                };
+              },
+              minimizerOptions: {},
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```
+
+##### `Array`
+
+If an array of functions is passed to the `minify` option, the `minimizerOptions` can be an array or an object.
+If `minimizerOptions` is array, the function index in the `minify` array corresponds to the options object with the same index in the `minimizerOptions` array.
+If you use `minimizerOptions` like object, all `minify` function accept it.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        type: 'asset',
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          {
+            loader: ImageMinimizerPlugin.loader,
+            options: {
+              minify: [
+                ImageMinimizerPlugin.imageminMinify,
+                async (data, minimizerOptions) => {
+                  const [[, input]] = Object.entries(data);
+                  // To do something
+                  return {
+                    code: `<Buffer>`,
+                    warnings: [],
+                    errors: [],
+                  };
+                },
+              ],
+              minimizerOptions: [
+                // Options for the first function (ImageMinimizerPlugin.imageminMinify)
+                {
+                  plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
+                },
+                // Options for the second function
+                {},
+              ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```
+
+#### `minimizerOptions`
+
+Type: `Object|Array<Object>`
+Default: `{ plugins: [] }`
+
+Options for `minify` functions. [`imagemin`](https://github.com/imagemin/imagemin) is default minify function.
+
+More information and examples [here](https://github.com/imagemin/imagemin).
+
+##### `Object`
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        type: 'asset',
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          {
+            loader: ImageMinimizerPlugin.loader,
+            options: {
               minimizerOptions: {
                 plugins: [
                   ['gifsicle', { interlaced: true, optimizationLevel: 3 }],
                 ],
               },
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```
+
+##### `Array`
+
+The function index in the `minify` array corresponds to the options object with the same index in the `minimizerOptions` array.
+If you use `minimizerOptions` like object, all `minify` function accept it.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        type: 'asset',
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          {
+            loader: ImageMinimizerPlugin.loader,
+            options: {
+              minify: [
+                ImageMinimizerPlugin.imageminMinify,
+                async (data, minimizerOptions) => {
+                  const [[, input]] = Object.entries(data);
+                  // To do something
+                  return {
+                    code: `<Buffer>`,
+                    warnings: [],
+                    errors: [],
+                  };
+                },
+              ],
+              minimizerOptions: [
+                // Options for the first function (ImageMinimizerPlugin.imageminMinify)
+                {
+                  plugins: [
+                    ['gifsicle', { interlaced: true, optimizationLevel: 3 }],
+                  ],
+                },
+                // Options for the second function
+                {},
+              ],
             },
           },
         ],
@@ -712,14 +983,14 @@ module.exports = {
 
 ## Additional API
 
-### `normalizeConfig(config)`
+### `normalizeImageminConfig(config)`
 
 The function normalizes configuration (converts plugins names and options to `Function`s) for using in `imagemin` package directly.
 
 ```js
 const imagemin = require('imagemin');
-const { normalizeConfig } = require('image-minimizer-webpack-plugin');
-const imageminConfig = normalizeConfig({
+const { normalizeImageminConfig } = require('image-minimizer-webpack-plugin');
+const imageminConfig = normalizeImageminConfig({
   plugins: [
     'jpegtran',
     [

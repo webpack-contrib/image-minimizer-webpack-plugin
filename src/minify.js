@@ -1,73 +1,79 @@
-import imagemin from 'imagemin';
-
-import normalizeConfig from './utils/normalize-config';
-
 async function minify(options = {}) {
-  const { input, filename, severityError, isProductionMode } = options;
+  const minifyFns =
+    typeof options.minify === 'function' ? [options.minify] : options.minify;
 
   const result = {
-    input,
-    filename,
+    code: options.input,
+    filename: options.filename,
     warnings: [],
     errors: [],
   };
 
-  if (!result.input) {
+  if (!result.code) {
     result.errors.push(new Error('Empty input'));
 
     return result;
   }
 
-  result.input = input;
-
-  let output;
-  let minimizerOptions;
-
   try {
-    // Implement autosearch config on root directory of project in future
-    minimizerOptions = normalizeConfig(options.minimizerOptions, {
-      options,
-      result,
-    });
+    for (let i = 0; i <= minifyFns.length - 1; i++) {
+      const minifyFn = minifyFns[i];
+      const minifyOptions = Array.isArray(options.minimizerOptions)
+        ? options.minimizerOptions[i]
+        : options.minimizerOptions;
+      // eslint-disable-next-line no-await-in-loop
+      const minifyResult = await minifyFn(
+        { [options.filename]: result.code },
+        minifyOptions
+      );
 
-    output = await imagemin.buffer(result.input, minimizerOptions);
+      result.code = minifyResult.code;
+      result.warnings = result.warnings.concat(minifyResult.warnings || []);
+      result.errors = result.errors.concat(minifyResult.errors || []);
+    }
   } catch (error) {
     const errored = error instanceof Error ? error : new Error(error);
 
-    switch (severityError) {
-      case 'off':
-      case false:
-        break;
-      case 'error':
-      case true:
-        result.errors.push(errored);
-        break;
-      case 'warning':
-        result.warnings.push(errored);
-        break;
-      case 'auto':
-      default:
-        if (isProductionMode) {
-          result.errors.push(errored);
-        } else {
-          result.warnings.push(errored);
-        }
-    }
-
-    return {
-      filename,
-      output: input,
-      warnings: result.warnings,
-      errors: result.errors,
-    };
+    result.errors.push(errored);
+    result.code = options.input;
   }
 
-  return {
-    filename,
-    output,
-    warnings: result.warnings,
-    errors: result.errors,
-  };
+  if (result.errors.length > 0) {
+    const errors = [];
+
+    for (const error of result.errors) {
+      if (error.name === 'ConfigurationError') {
+        errors.push(error);
+
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      switch (options.severityError) {
+        case 'off':
+        case false:
+          break;
+        case 'error':
+        case true:
+          errors.push(error);
+          break;
+        case 'warning':
+          result.warnings.push(error);
+          break;
+        case 'auto':
+        default:
+          if (options.isProductionMode) {
+            errors.push(error);
+          } else {
+            result.warnings.push(error);
+          }
+      }
+    }
+
+    result.errors = errors;
+  }
+
+  return result;
 }
 
 module.exports = minify;

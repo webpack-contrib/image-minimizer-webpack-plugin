@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`api normalizeConfig should works 1`] = `"No plugins found for \`imagemin\`. Please read documentation."`;
+exports[`api normalizeImageminConfig should works 1`] = `"No plugins found for \`imagemin\`. Please read documentation."`;
 
-exports[`api normalizeConfig should works 2`] = `"No plugins found for \`imagemin\`. Please read documentation."`;
+exports[`api normalizeImageminConfig should works 2`] = `"No plugins found for \`imagemin\`. Please read documentation."`;
 
-exports[`api normalizeConfig should works 3`] = `
+exports[`api normalizeImageminConfig should works 3`] = `
 "Unknown plugin: imagemin-unknown
 
 Did you forget to install the plugin?
@@ -14,7 +14,7 @@ $ npm install imagemin-unknown --save-dev
 $ yarn add imagemin-unknown --dev"
 `;
 
-exports[`api normalizeConfig should works 4`] = `
+exports[`api normalizeImageminConfig should works 4`] = `
 "Unknown plugin: imagemin-unknown
 
 Did you forget to install the plugin?
@@ -24,7 +24,7 @@ $ npm install imagemin-unknown --save-dev
 $ yarn add imagemin-unknown --dev"
 `;
 
-exports[`api normalizeConfig should works 5`] = `
+exports[`api normalizeImageminConfig should works 5`] = `
 Object {
   "plugins": Array [
     [Function],
@@ -41,7 +41,7 @@ Object {
 }
 `;
 
-exports[`api normalizeConfig should works 6`] = `
+exports[`api normalizeImageminConfig should works 6`] = `
 Object {
   "plugins": Array [
     [Function],
@@ -58,7 +58,7 @@ Object {
 }
 `;
 
-exports[`api normalizeConfig should works 7`] = `
+exports[`api normalizeImageminConfig should works 7`] = `
 Object {
   "plugins": Array [
     [Function],
@@ -75,7 +75,7 @@ Object {
 }
 `;
 
-exports[`api normalizeConfig should works 8`] = `
+exports[`api normalizeImageminConfig should works 8`] = `
 Object {
   "plugins": Array [
     [Function],
@@ -91,5 +91,14 @@ Object {
       },
     ],
   ],
+}
+`;
+
+exports[`api normalizeImageminConfig should works 9`] = `Object {}`;
+
+exports[`api normalizeImageminConfig should works 10`] = `
+Object {
+  "plugins": Array [],
+  "pluginsMeta": Array [],
 }
 `;

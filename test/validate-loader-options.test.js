@@ -1,9 +1,18 @@
 import path from 'path';
 
+import ImageMinimizerPlugin from '../src';
+
 import { fixturesPath, plugins, webpack } from './helpers';
 
 describe('validate options', () => {
   const tests = {
+    minify: {
+      success: [
+        ImageMinimizerPlugin.imageminMinify,
+        [ImageMinimizerPlugin.imageminMinify],
+      ],
+      failure: [1, true, false, null],
+    },
     minimizerOptions: {
       success: [{ plugins: [] }, {}],
       failure: [1, true, false, [], null],

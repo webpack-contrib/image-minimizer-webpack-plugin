@@ -1,13 +1,51 @@
+import imagemin from 'imagemin';
+
 import { klona } from 'klona/full';
+
+export default async function imageminMinify(data, minimizerOptions) {
+  const [[, input]] = Object.entries(data);
+  const result = {
+    code: input,
+    warnings: [],
+    errors: [],
+  };
+
+  // Implement autosearch config on root directory of project in future
+  const minimizerOptionsNormalized = normalizeImageminConfig(
+    minimizerOptions,
+    result
+  );
+
+  try {
+    result.code = await imagemin.buffer(input, minimizerOptionsNormalized);
+  } catch (error) {
+    result.errors.push(error);
+  }
+
+  return result;
+}
 
 class InvalidConfigError extends Error {}
 
 function log(error, metaData, type) {
-  if (metaData.result) {
+  if (metaData) {
     if (type === 'error') {
-      metaData.result.errors.push(error);
+      if (typeof metaData.errors === 'undefined') {
+        // eslint-disable-next-line no-param-reassign
+        metaData.errors = [];
+      }
+
+      // eslint-disable-next-line no-param-reassign
+      error.name = 'ConfigurationError';
+
+      metaData.errors.push(error);
     } else {
-      metaData.result.warnings.push(error);
+      if (typeof metaData.warnings === 'undefined') {
+        // eslint-disable-next-line no-param-reassign
+        metaData.warnings = [];
+      }
+
+      metaData.warnings.push(error);
     }
 
     return;
@@ -16,7 +54,7 @@ function log(error, metaData, type) {
   throw error;
 }
 
-function normalizeConfig(minimizerOptions, metaData = {}) {
+export function normalizeImageminConfig(minimizerOptions, metaData) {
   if (
     !minimizerOptions ||
     !minimizerOptions.plugins ||
@@ -110,5 +148,3 @@ function normalizeConfig(minimizerOptions, metaData = {}) {
 
   return imageminConfig;
 }
-
-export default normalizeConfig;

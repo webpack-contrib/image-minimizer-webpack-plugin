@@ -191,5 +191,17 @@ it('validation', () => {
   expect(() => {
     new ImageMinimizerPlugin({ loader: 'true' });
   }).toThrowErrorMatchingSnapshot();
+
+  expect(() => {
+    new ImageMinimizerPlugin({ minify: [ImageMinimizerPlugin.imageminMinify] });
+  }).not.toThrow();
+
+  expect(() => {
+    new ImageMinimizerPlugin({ minify: ImageMinimizerPlugin.imageminMinify });
+  }).not.toThrow();
+
+  expect(() => {
+    new ImageMinimizerPlugin({ minify: 'true' });
+  }).toThrowErrorMatchingSnapshot();
   /* eslint-enable no-new */
 });

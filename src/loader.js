@@ -3,6 +3,7 @@ import path from 'path';
 import minify from './minify';
 import interpolateName from './utils/interpolate-name';
 import schema from './loader-options.json';
+import imageminMinify from './utils/imageminMinify';
 
 module.exports = async function loader(content) {
   const options = this.getOptions(schema);
@@ -20,6 +21,7 @@ module.exports = async function loader(content) {
   const { severityError, minimizerOptions } = options;
 
   const minifyOptions = {
+    minify: options.minify || imageminMinify,
     input,
     filename: name,
     severityError,
@@ -39,7 +41,7 @@ module.exports = async function loader(content) {
     return;
   }
 
-  output.source = output.output;
+  output.source = output.code;
 
   if (output.warnings && output.warnings.length > 0) {
     output.warnings.forEach((warning) => {
