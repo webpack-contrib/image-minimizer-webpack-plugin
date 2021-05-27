@@ -1,24 +1,24 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
-import imagemin from 'imagemin';
-import imageminGifsicle from 'imagemin-gifsicle';
-import imageminMozjpeg from 'imagemin-mozjpeg';
-import imageminPngquant from 'imagemin-pngquant';
-import imageminSvgo from 'imagemin-svgo';
-import pify from 'pify';
-import tempy from 'tempy';
-import webpack from 'webpack';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import CopyPlugin from 'copy-webpack-plugin';
+import imagemin from "imagemin";
+import imageminGifsicle from "imagemin-gifsicle";
+import imageminMozjpeg from "imagemin-mozjpeg";
+import imageminPngquant from "imagemin-pngquant";
+import imageminSvgo from "imagemin-svgo";
+import pify from "pify";
+import tempy from "tempy";
+import webpack from "webpack";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import CopyPlugin from "copy-webpack-plugin";
 
-import ImageMinimizerPlugin from '../src/index';
+import ImageMinimizerPlugin from "../src/index";
 
-import EmitPlugin from './fixtures/EmitWepbackPlugin';
+import EmitPlugin from "./fixtures/EmitWepbackPlugin";
 
-const plugins = ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'];
+const plugins = ["gifsicle", "mozjpeg", "pngquant", "svgo"];
 
-const fixturesPath = path.join(__dirname, './fixtures');
+const fixturesPath = path.join(__dirname, "./fixtures");
 
 function compile(compiler) {
   return new Promise((resolve, reject) => {
@@ -42,8 +42,8 @@ function runWebpack(maybeOptions, getCompiler = false) {
       context: fixturesPath,
       entry: options.entry
         ? options.entry
-        : path.join(fixturesPath, './loader.js'),
-      mode: options.mode || 'development',
+        : path.join(fixturesPath, "./loader.js"),
+      mode: options.mode || "development",
       optimization: options.optimization,
       cache: options.cache,
       module: {
@@ -54,11 +54,11 @@ function runWebpack(maybeOptions, getCompiler = false) {
                   test: options.test ? options.test : /\.(jpe?g|png|gif|svg)$/i,
                   use: [
                     {
-                      loader: 'file-loader',
+                      loader: "file-loader",
                       options: {
                         name: options.name
                           ? options.name
-                          : '[path][name].[ext]',
+                          : "[path][name].[ext]",
                       },
                     },
                   ],
@@ -73,7 +73,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
                     {
                       loader: MiniCssExtractPlugin.loader,
                     },
-                    'css-loader',
+                    "css-loader",
                   ],
                 }
               : []
@@ -84,7 +84,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
                   test: /child-compilation\.js$/,
                   loader: path.resolve(
                     __dirname,
-                    './fixtures/emit-asset-in-child-compilation-loader.js'
+                    "./fixtures/emit-asset-in-child-compilation-loader.js"
                   ),
                 }
               : []
@@ -95,7 +95,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
                   test: /simple-emit\.js$/,
                   loader: path.resolve(
                     __dirname,
-                    './fixtures/emitAssetLoader.js'
+                    "./fixtures/emitAssetLoader.js"
                   ),
                 }
               : []
@@ -104,7 +104,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
             options.assetResource
               ? {
                   test: /\.(jpe?g|png|gif|svg)$/i,
-                  type: 'asset/resource',
+                  type: "asset/resource",
                 }
               : []
           )
@@ -112,14 +112,14 @@ function runWebpack(maybeOptions, getCompiler = false) {
             options.assetInline
               ? {
                   test: /\.(jpe?g|png|gif|svg)$/i,
-                  type: 'asset/inline',
+                  type: "asset/inline",
                 }
               : []
           ),
       },
       output: {
-        publicPath: '',
-        filename: 'bundle.js',
+        publicPath: "",
+        filename: "bundle.js",
         path:
           options.output && options.output.path
             ? options.output.path
@@ -162,7 +162,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
 
       imageminPluginsOptions.forEach((imageminPluginOptions) => {
         const ImageMinimizerPluginCreated = new ImageMinimizerPlugin(
-          typeof imageminPluginOptions === 'boolean'
+          typeof imageminPluginOptions === "boolean"
             ? {
                 minimizerOptions: {
                   plugins,
@@ -189,8 +189,8 @@ function runWebpack(maybeOptions, getCompiler = false) {
         new MiniCssExtractPlugin({
           // Options similar to the same options in webpackOptions.output
           // both options are optional
-          filename: '[name].css',
-          chunkFilename: '[id].css',
+          filename: "[name].css",
+          chunkFilename: "[id].css",
         })
       );
     }
@@ -198,7 +198,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
     if (options.copyPlugin) {
       config.plugins = config.plugins.concat(
         new CopyPlugin({
-          patterns: [{ from: 'plugin-test.jpg' }],
+          patterns: [{ from: "plugin-test.jpg" }],
         })
       );
     }
@@ -207,7 +207,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
       config.plugins = config.plugins.concat(
         // eslint-disable-next-line no-use-before-define
         new EmitNewAssetPlugin({
-          name: 'newImg.png',
+          name: "newImg.png",
         })
       );
     }
@@ -278,10 +278,10 @@ function readAsset(asset, compiler, stats) {
   const usedFs = compiler.outputFileSystem;
   const outputPath = stats.compilation.outputOptions.path;
 
-  let data = '';
+  let data = "";
   let targetFile = asset;
 
-  const queryStringIdx = targetFile.indexOf('?');
+  const queryStringIdx = targetFile.indexOf("?");
 
   if (queryStringIdx >= 0) {
     targetFile = targetFile.substr(0, queryStringIdx);
@@ -297,10 +297,10 @@ function readAsset(asset, compiler, stats) {
 }
 
 function normalizePath(string) {
-  const isWin = process.platform === 'win32';
+  const isWin = process.platform === "win32";
 
   if (isWin) {
-    return string.replace(/\\/g, '/');
+    return string.replace(/\\/g, "/");
   }
 
   return string;
@@ -347,7 +347,7 @@ export default class EmitNewAssetPlugin {
         },
         () => {
           const file = fs.readFileSync(
-            path.resolve(__dirname, 'fixtures', 'newImg.png')
+            path.resolve(__dirname, "fixtures", "newImg.png")
           );
 
           // eslint-disable-next-line no-param-reassign

@@ -1,7 +1,7 @@
 module.exports = () => async (buffer) => {
   if (!Buffer.isBuffer(buffer)) {
-    return Promise.reject(new TypeError('Expected a buffer'));
+    return Promise.reject(new TypeError("Expected a buffer"));
   }
 
-  return Promise.resolve(Buffer.from(buffer.toString('base64')));
+  return Promise.resolve(Buffer.from(buffer.toString("base64")));
 };

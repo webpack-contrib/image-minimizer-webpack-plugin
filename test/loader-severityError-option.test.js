@@ -1,11 +1,11 @@
-import path from 'path';
+import path from "path";
 
-import { fixturesPath, isOptimized, plugins, webpack } from './helpers';
+import { fixturesPath, isOptimized, plugins, webpack } from "./helpers";
 
-describe('loader severityError option', () => {
-  it('should throws error on corrupted images using `severityError` option with `true` value', async () => {
+describe("loader severityError option", () => {
+  it("should throws error on corrupted images using `severityError` option with `true` value", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
         severityError: true,
         minimizerOptions: { plugins },
@@ -21,16 +21,16 @@ describe('loader severityError option', () => {
     );
     expect(Object.keys(assets)).toHaveLength(3);
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should throws error on corrupted images using `severityError` option with `error` value', async () => {
+  it("should throws error on corrupted images using `severityError` option with `error` value", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
-        severityError: 'error',
+        severityError: "error",
         minimizerOptions: { plugins },
       },
     });
@@ -44,16 +44,16 @@ describe('loader severityError option', () => {
     );
     expect(Object.keys(assets)).toHaveLength(3);
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should throws error on corrupted images using `severityError` option with `warning` value', async () => {
+  it("should throws error on corrupted images using `severityError` option with `warning` value", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
-        severityError: 'warning',
+        severityError: "warning",
         minimizerOptions: { plugins },
       },
     });
@@ -67,16 +67,16 @@ describe('loader severityError option', () => {
     );
     expect(Object.keys(assets)).toHaveLength(3);
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should throws error on corrupted images using `severityError` option with `off` value', async () => {
+  it("should throws error on corrupted images using `severityError` option with `off` value", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
-        severityError: 'off',
+        severityError: "off",
         minimizerOptions: { plugins },
       },
     });
@@ -88,14 +88,14 @@ describe('loader severityError option', () => {
 
     expect(Object.keys(assets)).toHaveLength(3);
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should throws error on corrupted images using `severityError` option with `false` value', async () => {
+  it("should throws error on corrupted images using `severityError` option with `false` value", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
         severityError: false,
         minimizerOptions: { plugins },
@@ -109,16 +109,16 @@ describe('loader severityError option', () => {
 
     expect(Object.keys(assets)).toHaveLength(3);
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should throws error on corrupted images using `severityError` option with `auto` value', async () => {
+  it("should throws error on corrupted images using `severityError` option with `auto` value", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
-        severityError: 'auto',
+        severityError: "auto",
         minimizerOptions: { plugins },
       },
     });
@@ -132,20 +132,20 @@ describe('loader severityError option', () => {
     );
     expect(Object.keys(assets)).toHaveLength(3);
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should throws error on corrupted images using mode `production` and `severityError` option with `auto` value', async () => {
+  it("should throws error on corrupted images using mode `production` and `severityError` option with `auto` value", async () => {
     const stats = await webpack({
-      mode: 'production',
+      mode: "production",
       optimization: {
         emitOnErrors: true,
       },
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
-        severityError: 'auto',
+        severityError: "auto",
         minimizerOptions: { plugins },
       },
     });
@@ -159,18 +159,18 @@ describe('loader severityError option', () => {
     );
     expect(Object.keys(assets)).toHaveLength(3);
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });
 
-  it('should throws error on corrupted images using mode `production` and `severityError` option not specify value', async () => {
+  it("should throws error on corrupted images using mode `production` and `severityError` option not specify value", async () => {
     const stats = await webpack({
-      mode: 'production',
+      mode: "production",
       optimization: {
         emitOnErrors: true,
       },
-      entry: path.join(fixturesPath, 'loader-corrupted.js'),
+      entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: { minimizerOptions: { plugins } },
     });
     const { compilation } = stats;
@@ -183,7 +183,7 @@ describe('loader severityError option', () => {
     );
     expect(Object.keys(assets)).toHaveLength(3);
 
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
   });

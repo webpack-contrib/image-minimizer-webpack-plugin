@@ -1,4 +1,4 @@
-import path from 'path';
+import path from "path";
 
 import {
   fixturesPath,
@@ -6,20 +6,20 @@ import {
   hasLoader,
   plugins,
   webpack,
-} from './helpers';
+} from "./helpers";
 
-describe('plugin filter option', () => {
-  it('should optimizes all images (loader + plugin) exclude filtered', async () => {
+describe("plugin filter option", () => {
+  it("should optimizes all images (loader + plugin) exclude filtered", async () => {
     const stats = await webpack({
       emitPlugin: true,
       imageminPluginOptions: {
         filter: (source, sourcePath) => {
           expect(source).toBeInstanceOf(Buffer);
-          expect(typeof sourcePath).toBe('string');
+          expect(typeof sourcePath).toBe("string");
 
           if (
-            sourcePath.endsWith('loader-test.jpg') ||
-            sourcePath.endsWith('plugin-test.jpg')
+            sourcePath.endsWith("loader-test.jpg") ||
+            sourcePath.endsWith("plugin-test.jpg")
           ) {
             return false;
           }
@@ -37,36 +37,36 @@ describe('plugin filter option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    expect(hasLoader('loader-test.gif', modules)).toBe(true);
-    expect(hasLoader('loader-test.jpg', modules)).toBe(true);
-    expect(hasLoader('loader-test.gif', modules)).toBe(true);
-    expect(hasLoader('loader-test.svg', modules)).toBe(true);
+    expect(hasLoader("loader-test.gif", modules)).toBe(true);
+    expect(hasLoader("loader-test.jpg", modules)).toBe(true);
+    expect(hasLoader("loader-test.gif", modules)).toBe(true);
+    expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
-    await expect(isOptimized('loader-test.gif', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
       false
     );
-    await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('loader-test.svg', compilation)).resolves.toBe(
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
       true
     );
-    await expect(isOptimized('plugin-test.jpg', compilation)).resolves.toBe(
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
       false
     );
   });
 
-  it('should optimizes all images with filter (multiple plugins)', async () => {
+  it("should optimizes all images with filter (multiple plugins)", async () => {
     let firstFilterCounter = 0;
     let secondFilterCounter = 0;
 
     const stats = await webpack({
-      entry: path.join(fixturesPath, 'multiple-entry.js'),
+      entry: path.join(fixturesPath, "multiple-entry.js"),
       emitPluginOptions: {
-        fileNames: ['multiple-plugin-test-1.svg', 'multiple-plugin-test-2.svg'],
+        fileNames: ["multiple-plugin-test-1.svg", "multiple-plugin-test-2.svg"],
       },
       imageminPluginOptions: [
         {
@@ -108,34 +108,34 @@ describe('plugin filter option', () => {
     expect(firstFilterCounter).toBe(2);
     expect(secondFilterCounter).toBe(2);
 
-    expect(hasLoader('multiple-loader-test-1.svg', modules)).toBe(true);
-    expect(hasLoader('multiple-loader-test-2.svg', modules)).toBe(true);
+    expect(hasLoader("multiple-loader-test-1.svg", modules)).toBe(true);
+    expect(hasLoader("multiple-loader-test-2.svg", modules)).toBe(true);
 
     await expect(
-      isOptimized('multiple-loader-test-1.svg', compilation)
+      isOptimized("multiple-loader-test-1.svg", compilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized('multiple-loader-test-2.svg', compilation)
+      isOptimized("multiple-loader-test-2.svg", compilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized('multiple-plugin-test-1.svg', compilation)
+      isOptimized("multiple-plugin-test-1.svg", compilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized('multiple-plugin-test-2.svg', compilation)
+      isOptimized("multiple-plugin-test-2.svg", compilation)
     ).resolves.toBe(true);
   });
 
-  it('should optimizes all images with filter (multi compiler mode)', async () => {
+  it("should optimizes all images with filter (multi compiler mode)", async () => {
     let firstFilterCounter = 0;
     let secondFilterCounter = 0;
 
     const multiStats = await webpack([
       {
-        entry: path.join(fixturesPath, 'multiple-entry.js'),
+        entry: path.join(fixturesPath, "multiple-entry.js"),
         emitPluginOptions: {
           fileNames: [
-            'multiple-plugin-test-1.svg',
-            'multiple-plugin-test-2.svg',
+            "multiple-plugin-test-1.svg",
+            "multiple-plugin-test-2.svg",
           ],
         },
         imageminPluginOptions: {
@@ -154,11 +154,11 @@ describe('plugin filter option', () => {
         },
       },
       {
-        entry: path.join(fixturesPath, 'multiple-entry-2.js'),
+        entry: path.join(fixturesPath, "multiple-entry-2.js"),
         emitPluginOptions: {
           fileNames: [
-            'multiple-plugin-test-3.svg',
-            'multiple-plugin-test-4.svg',
+            "multiple-plugin-test-3.svg",
+            "multiple-plugin-test-4.svg",
           ],
         },
         imageminPluginOptions: {
@@ -187,20 +187,20 @@ describe('plugin filter option', () => {
 
     expect(firstFilterCounter).toBe(2);
 
-    expect(hasLoader('multiple-loader-test-1.svg', modules)).toBe(true);
-    expect(hasLoader('multiple-loader-test-2.svg', modules)).toBe(true);
+    expect(hasLoader("multiple-loader-test-1.svg", modules)).toBe(true);
+    expect(hasLoader("multiple-loader-test-2.svg", modules)).toBe(true);
 
     await expect(
-      isOptimized('multiple-loader-test-1.svg', firstCompilation)
+      isOptimized("multiple-loader-test-1.svg", firstCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized('multiple-loader-test-2.svg', firstCompilation)
+      isOptimized("multiple-loader-test-2.svg", firstCompilation)
     ).resolves.toBe(false);
     await expect(
-      isOptimized('multiple-plugin-test-1.svg', firstCompilation)
+      isOptimized("multiple-plugin-test-1.svg", firstCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized('multiple-plugin-test-2.svg', firstCompilation)
+      isOptimized("multiple-plugin-test-2.svg", firstCompilation)
     ).resolves.toBe(false);
 
     const [, { compilation: secondCompilation }] = multiStats.stats;
@@ -215,20 +215,20 @@ describe('plugin filter option', () => {
 
     expect(secondFilterCounter).toBe(2);
 
-    expect(hasLoader('multiple-loader-test-3.svg', secondModules)).toBe(true);
-    expect(hasLoader('multiple-loader-test-4.svg', secondModules)).toBe(true);
+    expect(hasLoader("multiple-loader-test-3.svg", secondModules)).toBe(true);
+    expect(hasLoader("multiple-loader-test-4.svg", secondModules)).toBe(true);
 
     await expect(
-      isOptimized('multiple-loader-test-3.svg', secondCompilation)
+      isOptimized("multiple-loader-test-3.svg", secondCompilation)
     ).resolves.toBe(false);
     await expect(
-      isOptimized('multiple-loader-test-4.svg', secondCompilation)
+      isOptimized("multiple-loader-test-4.svg", secondCompilation)
     ).resolves.toBe(true);
     await expect(
-      isOptimized('multiple-plugin-test-3.svg', secondCompilation)
+      isOptimized("multiple-plugin-test-3.svg", secondCompilation)
     ).resolves.toBe(false);
     await expect(
-      isOptimized('multiple-plugin-test-4.svg', secondCompilation)
+      isOptimized("multiple-plugin-test-4.svg", secondCompilation)
     ).resolves.toBe(true);
   });
 });

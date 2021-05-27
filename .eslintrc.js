@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
-  extends: ['@webpack-contrib/eslint-config-webpack', 'prettier'],
+  extends: ["@webpack-contrib/eslint-config-webpack", "prettier"],
   rules: {
-    'import/no-namespace': 0,
+    "import/no-namespace": 0,
   },
 };

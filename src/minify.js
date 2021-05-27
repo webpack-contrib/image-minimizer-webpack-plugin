@@ -1,6 +1,6 @@
 async function minify(options = {}) {
   const minifyFns =
-    typeof options.minify === 'function' ? [options.minify] : options.minify;
+    typeof options.minify === "function" ? [options.minify] : options.minify;
 
   const result = {
     code: options.input,
@@ -10,7 +10,7 @@ async function minify(options = {}) {
   };
 
   if (!result.code) {
-    result.errors.push(new Error('Empty input'));
+    result.errors.push(new Error("Empty input"));
 
     return result;
   }
@@ -42,7 +42,7 @@ async function minify(options = {}) {
     const errors = [];
 
     for (const error of result.errors) {
-      if (error.name === 'ConfigurationError') {
+      if (error.name === "ConfigurationError") {
         errors.push(error);
 
         // eslint-disable-next-line no-continue
@@ -50,17 +50,17 @@ async function minify(options = {}) {
       }
 
       switch (options.severityError) {
-        case 'off':
+        case "off":
         case false:
           break;
-        case 'error':
+        case "error":
         case true:
           errors.push(error);
           break;
-        case 'warning':
+        case "warning":
           result.warnings.push(error);
           break;
-        case 'auto':
+        case "auto":
         default:
           if (options.isProductionMode) {
             errors.push(error);

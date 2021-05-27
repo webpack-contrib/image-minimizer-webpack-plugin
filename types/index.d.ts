@@ -1,7 +1,7 @@
 export default ImageMinimizerPlugin;
-export type WebpackPluginInstance = import('webpack').WebpackPluginInstance;
-export type Compiler = import('webpack').Compiler;
-export type Compilation = import('webpack').Compilation;
+export type WebpackPluginInstance = import("webpack").WebpackPluginInstance;
+export type Compiler = import("webpack").Compiler;
+export type Compilation = import("webpack").Compilation;
 export type Filter = (source: Buffer, sourcePath: string) => boolean;
 export type PluginOptions = {
   /**
@@ -104,11 +104,11 @@ declare class ImageMinimizerPlugin {
   /**
    * @param {import("webpack").Compiler} compiler
    */
-  apply(compiler: import('webpack').Compiler): void;
+  apply(compiler: import("webpack").Compiler): void;
 }
 declare namespace ImageMinimizerPlugin {
   export const loader: string;
-  export const normalizeImageminConfig: typeof import('./utils/imageminMinify').normalizeImageminConfig;
+  export const normalizeImageminConfig: typeof import("./utils/imageminMinify").normalizeImageminConfig;
   export { imageminMinify };
 }
-import imageminMinify from './utils/imageminMinify';
+import imageminMinify from "./utils/imageminMinify";

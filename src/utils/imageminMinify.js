@@ -1,6 +1,6 @@
-import imagemin from 'imagemin';
+import imagemin from "imagemin";
 
-import { klona } from 'klona/full';
+import { klona } from "klona/full";
 
 export default async function imageminMinify(data, minimizerOptions) {
   const [[, input]] = Object.entries(data);
@@ -29,18 +29,18 @@ class InvalidConfigError extends Error {}
 
 function log(error, metaData, type) {
   if (metaData) {
-    if (type === 'error') {
-      if (typeof metaData.errors === 'undefined') {
+    if (type === "error") {
+      if (typeof metaData.errors === "undefined") {
         // eslint-disable-next-line no-param-reassign
         metaData.errors = [];
       }
 
       // eslint-disable-next-line no-param-reassign
-      error.name = 'ConfigurationError';
+      error.name = "ConfigurationError";
 
       metaData.errors.push(error);
     } else {
-      if (typeof metaData.warnings === 'undefined') {
+      if (typeof metaData.warnings === "undefined") {
         // eslint-disable-next-line no-param-reassign
         metaData.warnings = [];
       }
@@ -61,7 +61,7 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
     (minimizerOptions.plugins && minimizerOptions.plugins.length === 0)
   ) {
     log(
-      new Error('No plugins found for `imagemin`. Please read documentation.'),
+      new Error("No plugins found for `imagemin`. Please read documentation."),
       metaData
     );
 
@@ -78,7 +78,7 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
     .map((plugin) => {
       const isPluginArray = Array.isArray(plugin);
 
-      if (typeof plugin === 'string' || isPluginArray) {
+      if (typeof plugin === "string" || isPluginArray) {
         const pluginName = isPluginArray ? plugin[0] : plugin;
         // eslint-disable-next-line no-undefined
         const pluginOptions = isPluginArray ? plugin[1] : undefined;
@@ -96,7 +96,7 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
             // eslint-disable-next-line import/no-dynamic-require, global-require
             requiredPlugin = require(requiredPluginName)(pluginOptions);
           } catch (ignoreError1) {
-            const pluginNameForError = pluginName.startsWith('imagemin')
+            const pluginNameForError = pluginName.startsWith("imagemin")
               ? pluginName
               : `imagemin-${pluginName}`;
 
@@ -112,7 +112,7 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
           // Nothing
         }
 
-        let version = 'unknown';
+        let version = "unknown";
 
         try {
           // eslint-disable-next-line import/no-dynamic-require, global-require
@@ -139,7 +139,7 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
           )}, plugin configuraion should be 'string' or '[string, object]'"`
         ),
         metaData,
-        'error'
+        "error"
       );
 
       return false;
