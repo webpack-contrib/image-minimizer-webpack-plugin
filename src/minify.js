@@ -22,36 +22,60 @@ async function minify(options = {}) {
         ? options.minimizerOptions[i]
         : options.minimizerOptions;
       // eslint-disable-next-line no-await-in-loop
-      result.code = await minifyFn(result.code, minifyOptions, { result });
+      const minifyResult = await minifyFn(
+        { [options.filename]: result.code },
+        minifyOptions
+      );
+
+      result.code = minifyResult.code;
+      result.warnings = result.warnings.concat(minifyResult.warnings || []);
+      result.errors = result.errors.concat(minifyResult.errors || []);
     }
   } catch (error) {
     const errored = error instanceof Error ? error : new Error(error);
 
-    switch (options.severityError) {
-      case 'off':
-      case false:
-        break;
-      case 'error':
-      case true:
-        result.errors.push(errored);
-        break;
-      case 'warning':
-        result.warnings.push(errored);
-        break;
-      case 'auto':
-      default:
-        if (options.isProductionMode) {
-          result.errors.push(errored);
-        } else {
-          result.warnings.push(errored);
-        }
-    }
+    result.errors.push(errored);
     result.code = options.input;
+  }
+
+  if (result.errors.length > 0) {
+    const errors = [];
+
+    for (const error of result.errors) {
+      if (error.name === 'ConfigurationError') {
+        errors.push(error);
+
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      switch (options.severityError) {
+        case 'off':
+        case false:
+          break;
+        case 'error':
+        case true:
+          errors.push(error);
+          break;
+        case 'warning':
+          result.warnings.push(error);
+          break;
+        case 'auto':
+        default:
+          if (options.isProductionMode) {
+            errors.push(error);
+          } else {
+            result.warnings.push(error);
+          }
+      }
+    }
+
+    result.errors = errors;
   }
 
   return {
     filename: result.filename,
-    output: result.code,
+    code: result.code,
     warnings: result.warnings,
     errors: result.errors,
   };

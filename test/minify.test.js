@@ -52,7 +52,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (relative filename)', async () => {
@@ -75,7 +75,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 
   it('should return optimized image even when optimized image large then original', async () => {
@@ -108,7 +108,7 @@ describe('minify', () => {
       plugins: [imageminSvgo(svgoOptions)],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 
   it('should throw error on empty', async () => {
@@ -119,7 +119,7 @@ describe('minify', () => {
     expect(result.errors[0].toString()).toMatch(/Empty input/);
     expect(result.filename).toBeUndefined();
     expect(result.input).toBeUndefined();
-    expect(result.output).toBeUndefined();
+    expect(result.code).toBeUndefined();
   });
 
   it('should throw error on empty `imagemin` options', async () => {
@@ -133,7 +133,7 @@ describe('minify', () => {
     );
     expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
-    expect(result.output.equals(input)).toBe(true);
+    expect(result.code.equals(input)).toBe(true);
   });
 
   it('should throw error on empty `imagemin.plugins` options', async () => {
@@ -152,7 +152,7 @@ describe('minify', () => {
     );
     expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
-    expect(result.output.equals(input)).toBe(true);
+    expect(result.code.equals(input)).toBe(true);
   });
 
   it('should throw error on invalid `imagemin.plugins` options', async () => {
@@ -171,7 +171,7 @@ describe('minify', () => {
     );
     expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
-    expect(result.output.equals(input)).toBe(true);
+    expect(result.code.equals(input)).toBe(true);
   });
 
   it('should return original content and emit a warning on invalid content (`String`)', async () => {
@@ -185,7 +185,7 @@ describe('minify', () => {
 
     expect(result.warnings).toHaveLength(1);
     expect(result.errors).toHaveLength(0);
-    expect(result.output).toBe(input);
+    expect(result.code).toBe(input);
   });
 
   it('should optimize (configuration using `function`)', async () => {
@@ -208,7 +208,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `string`)', async () => {
@@ -231,7 +231,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `array`)', async () => {
@@ -254,7 +254,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg({ quality: 0 })],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `array` without options)', async () => {
@@ -277,7 +277,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `string` with full name)', async () => {
@@ -300,7 +300,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `array` with full name)', async () => {
@@ -323,7 +323,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg({ quality: 0 })],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize (configuration using `array` with full name and without options)', async () => {
@@ -346,7 +346,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 
   it('should throw error on empty `imagemin` options (configuration using `string` and starting with `imagemin`)', async () => {
@@ -367,7 +367,7 @@ describe('minify', () => {
     );
     expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
-    expect(result.output.equals(input)).toBe(true);
+    expect(result.code.equals(input)).toBe(true);
   });
 
   it('should optimize and throw error on unknown plugin (configuration using `string`)', async () => {
@@ -393,7 +393,7 @@ describe('minify', () => {
       plugins: [imageminMozjpeg()],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 
   it('should optimize and throw warning on using `Function` configuration', async () => {
@@ -441,6 +441,6 @@ describe('minify', () => {
       plugins: [imageminSvgo(svgoOptions)],
     });
 
-    expect(result.output.equals(optimizedSource)).toBe(true);
+    expect(result.code.equals(optimizedSource)).toBe(true);
   });
 });

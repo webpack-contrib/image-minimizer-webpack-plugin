@@ -190,7 +190,7 @@ class ImageMinimizerPlugin {
               return;
             }
 
-            output.source = new RawSource(output.output);
+            output.source = new RawSource(output.code);
 
             await cacheItem.storePromise({
               source: output.source,
@@ -306,7 +306,7 @@ class ImageMinimizerPlugin {
 
 ImageMinimizerPlugin.loader = require.resolve('./loader');
 
-ImageMinimizerPlugin.normalizeConfig = require('./utils/normalize-config').default;
+ImageMinimizerPlugin.normalizeImageminConfig = require('./utils/imageminMinify').normalizeImageminConfig;
 
 ImageMinimizerPlugin.imageminMinify = imageminMinify;
 

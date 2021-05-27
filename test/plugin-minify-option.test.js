@@ -28,18 +28,21 @@ describe('plugin minify option', () => {
   });
 
   it('should work when minify is custom function', async () => {
-    expect.assertions(6);
+    expect.assertions(5);
 
     const stats = await webpack({
       entry: path.join(fixturesPath, './empty-entry.js'),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: (input, minifiOptions, metaData) => {
-          expect(input).toBeDefined();
-          expect(minifiOptions).toBeDefined();
-          expect(metaData).toBeDefined();
+        minify: (data, minifiOptions) => {
+          const [[, input]] = Object.entries(data);
 
-          return input;
+          expect(data).toBeDefined();
+          expect(minifiOptions).toBeDefined();
+
+          return {
+            code: input,
+          };
         },
         minimizerOptions: {
           plugins: ['gifsicle', 'mozjpeg', 'pngquant', 'svgo'],
@@ -58,7 +61,7 @@ describe('plugin minify option', () => {
   });
 
   it('should work if minify is array && minimizerOptions is object', async () => {
-    expect.assertions(6);
+    expect.assertions(5);
 
     const stats = await webpack({
       entry: path.join(fixturesPath, './empty-entry.js'),
@@ -66,12 +69,15 @@ describe('plugin minify option', () => {
       imageminPluginOptions: {
         minify: [
           ImageMinimizerPlugin.imageminMinify,
-          (input, minifiOptions, metaData) => {
+          (data, minifiOptions) => {
+            const [[, input]] = Object.entries(data);
+
             expect(input).toBeDefined();
             expect(minifiOptions).toBeDefined();
-            expect(metaData).toBeDefined();
 
-            return input;
+            return {
+              code: input,
+            };
           },
         ],
         minimizerOptions: {
@@ -99,15 +105,23 @@ describe('plugin minify option', () => {
       imageminPluginOptions: {
         minify: [
           ImageMinimizerPlugin.imageminMinify,
-          (input, minifiOptions) => {
+          (data, minifiOptions) => {
+            const [[, input]] = Object.entries(data);
+
             expect('options2' in minifiOptions).toBe(true);
 
-            return input;
+            return {
+              code: input,
+            };
           },
-          (input, minifiOptions) => {
+          (data, minifiOptions) => {
+            const [[, input]] = Object.entries(data);
+
             expect('options3' in minifiOptions).toBe(true);
 
-            return input;
+            return {
+              code: input,
+            };
           },
         ],
         minimizerOptions: [

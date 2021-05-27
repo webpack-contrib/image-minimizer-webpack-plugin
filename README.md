@@ -324,11 +324,6 @@ Allows to override default minify function.
 By default plugin uses [imagemin](https://github.com/imagemin/imagemin) package.
 Useful for using and testing unpublished versions or forks.
 
-Possible options:
-
-- ImageMinimizerPlugin.imageminMinify
-- async (input, minimizerOptions, metadata) => {return `<Buffer>`}
-
 ##### `Function`
 
 **webpack.config.js**
@@ -339,9 +334,14 @@ const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
 module.exports = {
   plugins: [
     new ImageMinimizerPlugin({
-      minify: async (input, minimizerOptions, metaData) => {
+      minify: async (data, minimizerOptions) => {
+        const [[, input]] = Object.entries(data);
         // To do something
-        return `<Buffer>`;
+        return {
+          code: `<Buffer>`,
+          warnings: [],
+          errors: [],
+        };
       },
       minimizerOptions: {},
     }),
@@ -365,8 +365,14 @@ module.exports = {
     new ImageMinimizerPlugin({
       minify: [
         ImageMinimizerPlugin.imageminMinify,
-        (input, minimizerOptions, metaData) => {
-          return `<Buffer>`;
+        (data, minimizerOptions) => {
+          const [[, input]] = Object.entries(data);
+          // To do something
+          return {
+            code: `<Buffer>`,
+            warnings: [],
+            errors: [],
+          };
         },
       ],
       minimizerOptions: [
