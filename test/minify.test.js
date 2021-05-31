@@ -6,6 +6,9 @@ import imageminMozjpeg from "imagemin-mozjpeg";
 import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { extendDefaultPlugins } from "svgo";
+
 import minify from "../src/minify";
 
 import imageminMinify from "../src/utils/imageminMinify";
@@ -80,13 +83,14 @@ describe("minify", () => {
 
   it("should return optimized image even when optimized image large then original", async () => {
     const svgoOptions = {
-      plugins: [
+      plugins: extendDefaultPlugins([
         {
-          addAttributesToSVGElement: {
+          name: "addAttributesToSVGElement",
+          params: {
             attributes: [{ xmlns: "http://www.w3.org/2000/svg" }],
           },
         },
-      ],
+      ]),
     };
 
     const filename = path.resolve(
@@ -416,13 +420,14 @@ describe("minify", () => {
 
   it("should support svgo options", async () => {
     const svgoOptions = {
-      plugins: [
+      plugins: extendDefaultPlugins([
         {
-          cleanupIDs: {
+          name: "cleanupIDs",
+          params: {
             prefix: "qwerty",
           },
         },
-      ],
+      ]),
     };
 
     const filename = path.resolve(__dirname, "./fixtures/svg-with-id.svg");
