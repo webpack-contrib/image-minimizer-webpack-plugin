@@ -131,7 +131,7 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
 export default async function imageminMinify(data, minimizerOptions) {
   const [[, input]] = Object.entries(data);
   const result = {
-    code: input,
+    data: input,
     warnings: [],
     errors: [],
   };
@@ -143,7 +143,7 @@ export default async function imageminMinify(data, minimizerOptions) {
   );
 
   try {
-    result.code = await imagemin.buffer(input, minimizerOptionsNormalized);
+    result.data = await imagemin.buffer(input, minimizerOptionsNormalized);
   } catch (error) {
     result.errors.push(error);
   }

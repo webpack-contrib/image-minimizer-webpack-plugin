@@ -189,7 +189,7 @@ class ImageMinimizerPlugin {
               return;
             }
 
-            output.source = new RawSource(output.code);
+            output.source = new RawSource(output.data);
 
             await cacheItem.storePromise({
               source: output.source,

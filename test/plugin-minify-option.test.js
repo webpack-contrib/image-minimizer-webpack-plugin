@@ -41,7 +41,7 @@ describe("plugin minify option", () => {
           expect(minifiOptions).toBeDefined();
 
           return {
-            code: input,
+            data: input,
           };
         },
         minimizerOptions: {
@@ -76,7 +76,7 @@ describe("plugin minify option", () => {
             expect(minifiOptions).toBeDefined();
 
             return {
-              code: input,
+              data: input,
             };
           },
         ],
@@ -111,7 +111,7 @@ describe("plugin minify option", () => {
             expect("options2" in minifiOptions).toBe(true);
 
             return {
-              code: input,
+              data: input,
             };
           },
           (data, minifiOptions) => {
@@ -120,7 +120,7 @@ describe("plugin minify option", () => {
             expect("options3" in minifiOptions).toBe(true);
 
             return {
-              code: input,
+              data: input,
             };
           },
         ],

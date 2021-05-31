@@ -46,7 +46,7 @@ describe("loader minify option", () => {
           expect(minifiOptions).toBeDefined();
 
           return {
-            code: input,
+            data: input,
           };
         },
         minimizerOptions: {
@@ -89,7 +89,7 @@ describe("loader minify option", () => {
             expect(minifiOptions).toBeDefined();
 
             return {
-              code: input,
+              data: input,
             };
           },
         ],
@@ -132,7 +132,7 @@ describe("loader minify option", () => {
             expect("options2" in minifiOptions).toBe(true);
 
             return {
-              code: input,
+              data: input,
             };
           },
           (data, minifiOptions) => {
@@ -141,7 +141,7 @@ describe("loader minify option", () => {
             expect("options3" in minifiOptions).toBe(true);
 
             return {
-              code: input,
+              data: input,
             };
           },
         ],

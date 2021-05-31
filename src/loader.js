@@ -41,7 +41,7 @@ module.exports = async function loader(content) {
     return;
   }
 
-  output.source = output.code;
+  output.source = output.data;
 
   if (output.warnings && output.warnings.length > 0) {
     output.warnings.forEach((warning) => {

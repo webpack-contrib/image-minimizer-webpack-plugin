@@ -354,10 +354,10 @@ module.exports = {
           result = await minifyAndReturnBuffer(input);
         } catch (error) {
           // Return original input if there was an error
-          return { code: input, errors: [error] };
+          return { data: input, errors: [error] };
         }
 
-        return { code: result, warnings: [], errors: [] };
+        return { data: result, warnings: [], errors: [] };
       },
       minimizerOptions: {},
     }),
@@ -390,10 +390,10 @@ module.exports = {
             result = minifyAndReturnBuffer(input);
           } catch (error) {
             // Return original input if there was an error
-            return { code: input, errors: [error] };
+            return { data: input, errors: [error] };
           }
 
-          return { code: result, warnings: [], errors: [] };
+          return { data: result, warnings: [], errors: [] };
         },
       ],
       minimizerOptions: [
@@ -481,10 +481,10 @@ module.exports = {
             result = await minifyAndReturnBuffer(input);
           } catch (error) {
             // Return original input if there was an error
-            return { code: input, errors: [error] };
+            return { data: input, errors: [error] };
           }
 
-          return { code: result, warnings: [], errors: [] };
+          return { data: result, warnings: [], errors: [] };
         },
       ],
       minimizerOptions: [
@@ -767,10 +767,10 @@ module.exports = {
                   result = await minifyAndReturnBuffer(input);
                 } catch (error) {
                   // Return original input if there was an error
-                  return { code: input, errors: [error] };
+                  return { data: input, errors: [error] };
                 }
 
-                return { code: result, warnings: [], errors: [] };
+                return { data: result, warnings: [], errors: [] };
               },
               minimizerOptions: {},
             },
@@ -817,10 +817,10 @@ module.exports = {
                     result = await minifyAndReturnBuffer(input);
                   } catch (error) {
                     // Return original input if there was an error
-                    return { code: input, errors: [error] };
+                    return { data: input, errors: [error] };
                   }
 
-                  return { code: result, warnings: [], errors: [] };
+                  return { data: result, warnings: [], errors: [] };
                 },
               ],
               minimizerOptions: [
@@ -917,10 +917,10 @@ module.exports = {
                     result = await minifyAndReturnBuffer(input);
                   } catch (error) {
                     // Return original input if there was an error
-                    return { code: input, errors: [error] };
+                    return { data: input, errors: [error] };
                   }
 
-                  return { code: result, warnings: [], errors: [] };
+                  return { data: result, warnings: [], errors: [] };
                 },
               ],
               minimizerOptions: [
