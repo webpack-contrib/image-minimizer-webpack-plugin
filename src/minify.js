@@ -3,13 +3,13 @@ async function minify(options = {}) {
     typeof options.minify === "function" ? [options.minify] : options.minify;
 
   const result = {
-    code: options.input,
+    data: options.input,
     filename: options.filename,
     warnings: [],
     errors: [],
   };
 
-  if (!result.code) {
+  if (!result.data) {
     result.errors.push(new Error("Empty input"));
 
     return result;
@@ -23,11 +23,11 @@ async function minify(options = {}) {
         : options.minimizerOptions;
       // eslint-disable-next-line no-await-in-loop
       const minifyResult = await minifyFn(
-        { [options.filename]: result.code },
+        { [options.filename]: result.data },
         minifyOptions
       );
 
-      result.code = minifyResult.code;
+      result.data = minifyResult.data;
       result.warnings = [...result.warnings, ...(minifyResult.warnings || [])];
       result.errors = [...result.errors, ...(minifyResult.errors || [])];
     }
@@ -35,7 +35,7 @@ async function minify(options = {}) {
     const errored = error instanceof Error ? error : new Error(error);
 
     result.errors.push(errored);
-    result.code = options.input;
+    result.data = options.input;
   }
 
   if (result.errors.length > 0) {
