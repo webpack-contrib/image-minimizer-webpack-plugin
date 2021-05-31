@@ -448,4 +448,22 @@ describe("minify", () => {
 
     expect(result.code.equals(optimizedSource)).toBe(true);
   });
+
+  it("should throw two warnings", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await minify({
+      minify: [
+        () => ({ errors: [new Error("fail")] }),
+        () => ({ errors: [new Error("fail")] }),
+      ],
+      input,
+      filename,
+    });
+
+    expect(result.warnings).toHaveLength(2);
+    expect(result.warnings[0].toString()).toMatch(/Error: fail/);
+    expect(result.warnings[1].toString()).toMatch(/Error: fail/);
+    expect(result.filename).toBe(filename);
+  });
 });

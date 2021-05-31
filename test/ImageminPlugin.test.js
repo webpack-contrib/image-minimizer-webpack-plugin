@@ -344,7 +344,6 @@ describe("imagemin plugin", () => {
       const match = assetName.match(/^.+?\.(.+?)\..+$/);
 
       if (!match) {
-        // eslint-disable-next-line no-continue
         continue;
       }
 
@@ -447,7 +446,6 @@ describe("imagemin plugin", () => {
       const match = assetName.match(/^.+?\.(.+?)\..+$/);
 
       if (!match) {
-        // eslint-disable-next-line no-continue
         continue;
       }
 
@@ -669,10 +667,8 @@ describe("imagemin plugin - persistent cache", () => {
       path.resolve(outputDir, "loader-test.json")
     );
 
-    // eslint-disable-next-line no-undefined
-    expect(extPluginJson).toBe(undefined);
-    // eslint-disable-next-line no-undefined
-    expect(extLoaderJson).toBe(undefined);
+    expect(extPluginJson).toBeUndefined();
+    expect(extLoaderJson).toBeUndefined();
     expect(/image\/webp/i.test(extPluginWebp.mime)).toBe(true);
     expect(/image\/webp/i.test(extLoaderWebp.mime)).toBe(true);
 

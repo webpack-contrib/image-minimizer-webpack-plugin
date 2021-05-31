@@ -23,7 +23,10 @@ const fixturesPath = path.join(__dirname, "./fixtures");
 function compile(compiler) {
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
-      if (err) return reject(err);
+      if (err) {
+        return reject(err);
+      }
+
       return resolve(stats);
     });
   });
@@ -47,10 +50,10 @@ function runWebpack(maybeOptions, getCompiler = false) {
       optimization: options.optimization,
       cache: options.cache,
       module: {
-        rules: []
-          .concat(
-            !options.fileLoaderOff
-              ? {
+        rules: [
+          ...(!options.fileLoaderOff
+            ? [
+                {
                   test: options.test ? options.test : /\.(jpe?g|png|gif|svg)$/i,
                   use: [
                     {
@@ -62,12 +65,12 @@ function runWebpack(maybeOptions, getCompiler = false) {
                       },
                     },
                   ],
-                }
-              : []
-          )
-          .concat(
-            options.MCEP
-              ? {
+                },
+              ]
+            : []),
+          ...(options.MCEP
+            ? [
+                {
                   test: /\.css$/,
                   use: [
                     {
@@ -75,47 +78,48 @@ function runWebpack(maybeOptions, getCompiler = false) {
                     },
                     "css-loader",
                   ],
-                }
-              : []
-          )
-          .concat(
-            options.childPlugin
-              ? {
+                },
+              ]
+            : []),
+          ...(options.childPlugin
+            ? [
+                {
                   test: /child-compilation\.js$/,
                   loader: path.resolve(
                     __dirname,
                     "./fixtures/emit-asset-in-child-compilation-loader.js"
                   ),
-                }
-              : []
-          )
-          .concat(
-            options.emitAssetPlugin
-              ? {
+                },
+              ]
+            : []),
+          ...(options.emitAssetPlugin
+            ? [
+                {
                   test: /simple-emit\.js$/,
                   loader: path.resolve(
                     __dirname,
                     "./fixtures/emitAssetLoader.js"
                   ),
-                }
-              : []
-          )
-          .concat(
-            options.assetResource
-              ? {
+                },
+              ]
+            : []),
+          ...(options.assetResource
+            ? [
+                {
                   test: /\.(jpe?g|png|gif|svg)$/i,
                   type: "asset/resource",
-                }
-              : []
-          )
-          .concat(
-            options.assetInline
-              ? {
+                },
+              ]
+            : []),
+          ...(options.assetInline
+            ? [
+                {
                   test: /\.(jpe?g|png|gif|svg)$/i,
                   type: "asset/inline",
-                }
-              : []
-          ),
+                },
+              ]
+            : []),
+        ],
       },
       output: {
         publicPath: "",
@@ -137,20 +141,24 @@ function runWebpack(maybeOptions, getCompiler = false) {
     }
 
     if (options.imageminLoader || options.imageminLoaderOptions) {
-      config.module.rules[0].use = config.module.rules[0].use.concat({
-        loader: ImageMinimizerPlugin.loader,
-        options: options.imageminLoaderOptions
-          ? options.imageminLoaderOptions
-          : {
-              minimizerOptions: { plugins },
-            },
-      });
+      config.module.rules[0].use = [
+        ...config.module.rules[0].use,
+        {
+          loader: ImageMinimizerPlugin.loader,
+          options: options.imageminLoaderOptions
+            ? options.imageminLoaderOptions
+            : {
+                minimizerOptions: { plugins },
+              },
+        },
+      ];
     }
 
     if (options.emitPlugin || options.emitPluginOptions) {
-      config.plugins = config.plugins.concat(
-        new EmitPlugin(options.emitPluginOptions)
-      );
+      config.plugins = [
+        ...config.plugins,
+        new EmitPlugin(options.emitPluginOptions),
+      ];
     }
 
     if (options.imageminPlugin || options.imageminPluginOptions) {
@@ -179,37 +187,40 @@ function runWebpack(maybeOptions, getCompiler = false) {
           config.optimization.minimize = true;
           config.optimization.minimizer = [ImageMinimizerPluginCreated];
         } else {
-          config.plugins = config.plugins.concat(ImageMinimizerPluginCreated);
+          config.plugins = [...config.plugins, ImageMinimizerPluginCreated];
         }
       });
     }
 
     if (options.MCEP) {
-      config.plugins = config.plugins.concat(
+      config.plugins = [
+        ...config.plugins,
         new MiniCssExtractPlugin({
           // Options similar to the same options in webpackOptions.output
           // both options are optional
           filename: "[name].css",
           chunkFilename: "[id].css",
-        })
-      );
+        }),
+      ];
     }
 
     if (options.copyPlugin) {
-      config.plugins = config.plugins.concat(
+      config.plugins = [
+        ...config.plugins,
         new CopyPlugin({
           patterns: [{ from: "plugin-test.jpg" }],
-        })
-      );
+        }),
+      ];
     }
 
     if (options.EmitNewAssetPlugin) {
-      config.plugins = config.plugins.concat(
+      config.plugins = [
+        ...config.plugins,
         // eslint-disable-next-line no-use-before-define
         new EmitNewAssetPlugin({
           name: "newImg.png",
-        })
-      );
+        }),
+      ];
     }
 
     configs.push(config);
@@ -284,10 +295,11 @@ function readAsset(asset, compiler, stats) {
   const queryStringIdx = targetFile.indexOf("?");
 
   if (queryStringIdx >= 0) {
-    targetFile = targetFile.substr(0, queryStringIdx);
+    targetFile = targetFile.slice(0, Math.max(0, queryStringIdx));
   }
 
   try {
+    // eslint-disable-next-line node/no-sync
     data = usedFs.readFileSync(path.join(outputPath, targetFile));
   } catch (error) {
     data = error.toString();
@@ -310,15 +322,19 @@ function clearDirectory(dirPath) {
   let files;
 
   try {
+    // eslint-disable-next-line node/no-sync
     files = fs.readdirSync(dirPath);
-  } catch (e) {
+  } catch {
     return;
   }
+
   if (files.length > 0) {
     for (let i = 0; i < files.length; i++) {
       const filePath = `${dirPath}/${files[i]}`;
 
+      // eslint-disable-next-line node/no-sync
       if (fs.statSync(filePath).isFile()) {
+        // eslint-disable-next-line node/no-sync
         fs.unlinkSync(filePath);
       } else {
         clearDirectory(filePath);
@@ -326,6 +342,7 @@ function clearDirectory(dirPath) {
     }
   }
 
+  // eslint-disable-next-line node/no-sync
   fs.rmdirSync(dirPath);
 }
 
@@ -346,11 +363,11 @@ export default class EmitNewAssetPlugin {
           stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT,
         },
         () => {
+          // eslint-disable-next-line node/no-sync
           const file = fs.readFileSync(
             path.resolve(__dirname, "fixtures", "newImg.png")
           );
 
-          // eslint-disable-next-line no-param-reassign
           compilation.emitAsset(this.options.name, new RawSource(file));
         }
       );
