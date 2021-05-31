@@ -102,7 +102,6 @@ class ImageMinimizerPlugin {
 
           if (
             !compiler.webpack.ModuleFilenameHelpers.matchObject.bind(
-              // eslint-disable-next-line no-undefined
               undefined,
               this.options
             )(name)

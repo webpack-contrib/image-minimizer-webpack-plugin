@@ -347,12 +347,17 @@ module.exports = {
     new ImageMinimizerPlugin({
       minify: async (data, minimizerOptions) => {
         const [[, input]] = Object.entries(data);
-        // To do something
-        return {
-          code: `<Buffer>`,
-          warnings: [],
-          errors: [],
-        };
+
+        let result;
+
+        try {
+          result = await minifyAndReturnBuffer(input);
+        } catch (error) {
+          // Return original input if there was an error
+          return { code: input, errors: [error] };
+        }
+
+        return { code: result, warnings: [], errors: [] };
       },
       minimizerOptions: {},
     }),
@@ -378,12 +383,17 @@ module.exports = {
         ImageMinimizerPlugin.imageminMinify,
         (data, minimizerOptions) => {
           const [[, input]] = Object.entries(data);
-          // To do something
-          return {
-            code: `<Buffer>`,
-            warnings: [],
-            errors: [],
-          };
+
+          let result;
+
+          try {
+            result = minifyAndReturnBuffer(input);
+          } catch (error) {
+            // Return original input if there was an error
+            return { code: input, errors: [error] };
+          }
+
+          return { code: result, warnings: [], errors: [] };
         },
       ],
       minimizerOptions: [
@@ -464,12 +474,17 @@ module.exports = {
         ImageMinimizerPlugin.imageminMinify,
         async (data, minimizerOptions) => {
           const [[, input]] = Object.entries(data);
-          // To do something
-          return {
-            code: `<Buffer>`,
-            warnings: [],
-            errors: [],
-          };
+
+          let result;
+
+          try {
+            result = await minifyAndReturnBuffer(input);
+          } catch (error) {
+            // Return original input if there was an error
+            return { code: input, errors: [error] };
+          }
+
+          return { code: result, warnings: [], errors: [] };
         },
       ],
       minimizerOptions: [
@@ -745,12 +760,17 @@ module.exports = {
             options: {
               minify: async (data, minimizerOptions) => {
                 const [[, input]] = Object.entries(data);
-                // To do something
-                return {
-                  code: `<Buffer>`,
-                  warnings: [],
-                  errors: [],
-                };
+
+                let result;
+
+                try {
+                  result = await minifyAndReturnBuffer(input);
+                } catch (error) {
+                  // Return original input if there was an error
+                  return { code: input, errors: [error] };
+                }
+
+                return { code: result, warnings: [], errors: [] };
               },
               minimizerOptions: {},
             },
@@ -790,12 +810,17 @@ module.exports = {
                 ImageMinimizerPlugin.imageminMinify,
                 async (data, minimizerOptions) => {
                   const [[, input]] = Object.entries(data);
-                  // To do something
-                  return {
-                    code: `<Buffer>`,
-                    warnings: [],
-                    errors: [],
-                  };
+
+                  let result;
+
+                  try {
+                    result = await minifyAndReturnBuffer(input);
+                  } catch (error) {
+                    // Return original input if there was an error
+                    return { code: input, errors: [error] };
+                  }
+
+                  return { code: result, warnings: [], errors: [] };
                 },
               ],
               minimizerOptions: [
@@ -885,12 +910,17 @@ module.exports = {
                 ImageMinimizerPlugin.imageminMinify,
                 async (data, minimizerOptions) => {
                   const [[, input]] = Object.entries(data);
-                  // To do something
-                  return {
-                    code: `<Buffer>`,
-                    warnings: [],
-                    errors: [],
-                  };
+
+                  let result;
+
+                  try {
+                    result = await minifyAndReturnBuffer(input);
+                  } catch (error) {
+                    // Return original input if there was an error
+                    return { code: input, errors: [error] };
+                  }
+
+                  return { code: result, warnings: [], errors: [] };
                 },
               ],
               minimizerOptions: [

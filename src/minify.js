@@ -28,8 +28,8 @@ async function minify(options = {}) {
       );
 
       result.code = minifyResult.code;
-      result.warnings = result.warnings.concat(minifyResult.warnings || []);
-      result.errors = result.errors.concat(minifyResult.errors || []);
+      result.warnings = [...result.warnings, ...(minifyResult.warnings || [])];
+      result.errors = [...result.errors, ...(minifyResult.errors || [])];
     }
   } catch (error) {
     const errored = error instanceof Error ? error : new Error(error);
@@ -45,7 +45,6 @@ async function minify(options = {}) {
       if (error.name === "ConfigurationError") {
         errors.push(error);
 
-        // eslint-disable-next-line no-continue
         continue;
       }
 

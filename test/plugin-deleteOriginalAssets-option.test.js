@@ -160,7 +160,7 @@ describe('plugin "deleteOriginalAssets" option', () => {
       "./nested/deep/plugin-test.png",
       "./nested/deep/plugin-test.webp",
     ].forEach((asset) => {
-      expect(assetsKeys.includes(asset)).toBe(true);
+      expect(assetsKeys).toContain(asset);
     });
 
     expect(warnings).toHaveLength(0);

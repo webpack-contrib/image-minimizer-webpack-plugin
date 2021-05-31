@@ -2,46 +2,18 @@ import imagemin from "imagemin";
 
 import { klona } from "klona/full";
 
-export default async function imageminMinify(data, minimizerOptions) {
-  const [[, input]] = Object.entries(data);
-  const result = {
-    code: input,
-    warnings: [],
-    errors: [],
-  };
-
-  // Implement autosearch config on root directory of project in future
-  const minimizerOptionsNormalized = normalizeImageminConfig(
-    minimizerOptions,
-    result
-  );
-
-  try {
-    result.code = await imagemin.buffer(input, minimizerOptionsNormalized);
-  } catch (error) {
-    result.errors.push(error);
-  }
-
-  return result;
-}
-
-class InvalidConfigError extends Error {}
-
 function log(error, metaData, type) {
   if (metaData) {
     if (type === "error") {
       if (typeof metaData.errors === "undefined") {
-        // eslint-disable-next-line no-param-reassign
         metaData.errors = [];
       }
 
-      // eslint-disable-next-line no-param-reassign
       error.name = "ConfigurationError";
 
       metaData.errors.push(error);
     } else {
       if (typeof metaData.warnings === "undefined") {
-        // eslint-disable-next-line no-param-reassign
         metaData.warnings = [];
       }
 
@@ -52,6 +24,14 @@ function log(error, metaData, type) {
   }
 
   throw error;
+}
+
+class InvalidConfigError extends Error {
+  constructor(message) {
+    super(message);
+
+    this.name = "InvalidConfigError";
+  }
 }
 
 export function normalizeImageminConfig(minimizerOptions, metaData) {
@@ -80,22 +60,21 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
 
       if (typeof plugin === "string" || isPluginArray) {
         const pluginName = isPluginArray ? plugin[0] : plugin;
-        // eslint-disable-next-line no-undefined
         const pluginOptions = isPluginArray ? plugin[1] : undefined;
 
         let requiredPlugin = null;
         let requiredPluginName = `imagemin-${pluginName}`;
 
         try {
-          // eslint-disable-next-line import/no-dynamic-require, global-require
+          // eslint-disable-next-line import/no-dynamic-require
           requiredPlugin = require(requiredPluginName)(pluginOptions);
-        } catch (ignoreError) {
+        } catch {
           requiredPluginName = pluginName;
 
           try {
-            // eslint-disable-next-line import/no-dynamic-require, global-require
+            // eslint-disable-next-line import/no-dynamic-require
             requiredPlugin = require(requiredPluginName)(pluginOptions);
-          } catch (ignoreError1) {
+          } catch {
             const pluginNameForError = pluginName.startsWith("imagemin")
               ? pluginName
               : `imagemin-${pluginName}`;
@@ -115,9 +94,9 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
         let version = "unknown";
 
         try {
-          // eslint-disable-next-line import/no-dynamic-require, global-require
+          // eslint-disable-next-line import/no-dynamic-require
           ({ version } = require(`${requiredPluginName}/package.json`));
-        } catch (ignoreVersion) {
+        } catch {
           // Nothing
         }
 
@@ -147,4 +126,27 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
     .filter(Boolean);
 
   return imageminConfig;
+}
+
+export default async function imageminMinify(data, minimizerOptions) {
+  const [[, input]] = Object.entries(data);
+  const result = {
+    code: input,
+    warnings: [],
+    errors: [],
+  };
+
+  // Implement autosearch config on root directory of project in future
+  const minimizerOptionsNormalized = normalizeImageminConfig(
+    minimizerOptions,
+    result
+  );
+
+  try {
+    result.code = await imagemin.buffer(input, minimizerOptionsNormalized);
+  } catch (error) {
+    result.errors.push(error);
+  }
+
+  return result;
 }

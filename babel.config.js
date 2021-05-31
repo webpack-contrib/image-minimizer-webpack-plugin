@@ -1,3 +1,5 @@
+"use strict";
+
 const MIN_BABEL_VERSION = 7;
 
 module.exports = (api) => {
