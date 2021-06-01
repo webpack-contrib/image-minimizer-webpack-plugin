@@ -1,7 +1,6 @@
 import path from "path";
 
 import minify from "./minify";
-import interpolateName from "./utils/interpolate-name";
 import schema from "./loader-options.json";
 import imageminMinify from "./utils/imageminMinify";
 
@@ -50,10 +49,13 @@ module.exports = async function loader(content) {
   }
 
   const { source } = output;
-  const newName = interpolateName(
-    name,
-    options.filename || "[path][name][ext]"
+  const { path: newName } = this._compilation.getPathWithInfo(
+    options.filename || "[path][name][ext]",
+    {
+      filename: name,
+    }
   );
+
   const isNewAsset = name !== newName;
 
   if (isNewAsset) {

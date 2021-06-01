@@ -7,7 +7,6 @@ import { validate } from "schema-utils";
 import serialize from "serialize-javascript";
 
 import minifyFn from "./minify";
-import interpolateName from "./utils/interpolate-name";
 import schema from "./plugin-options.json";
 import imageminMinify from "./utils/imageminMinify";
 
@@ -205,7 +204,12 @@ class ImageMinimizerPlugin {
             });
           }
 
-          const newName = interpolateName(name, this.options.filename);
+          const { path: newName } = compilation.getPathWithInfo(
+            this.options.filename,
+            {
+              filename: name,
+            }
+          );
 
           const isNewAsset = name !== newName;
 
