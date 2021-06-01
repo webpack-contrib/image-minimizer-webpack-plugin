@@ -50,22 +50,13 @@ async function minify(options = {}) {
 
       switch (options.severityError) {
         case "off":
-        case false:
-          break;
-        case "error":
-        case true:
-          errors.push(error);
           break;
         case "warning":
           result.warnings.push(error);
           break;
-        case "auto":
+        case "error":
         default:
-          if (options.isProductionMode) {
-            errors.push(error);
-          } else {
-            result.warnings.push(error);
-          }
+          errors.push(error);
       }
     }
 

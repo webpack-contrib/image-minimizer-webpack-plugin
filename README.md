@@ -194,7 +194,7 @@ module.exports = {
 |       **`include`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `include`                                                                                |
 |       **`exclude`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `exclude`                                                                                |
 |        **`filter`**        |               `{Function}`                |                        `() => true`                         | Allows filtering of images for optimization                                                       |
-|    **`severityError`**     |            `{Boolean\|String}`            |                          `'auto'`                           | Allows to choose how errors are displayed                                                         |
+|    **`severityError`**     |                `{String}`                 |                          `'error'`                          | Allows to choose how errors are displayed                                                         |
 |        **`minify`**        |      `{Function \| Array<Function>}`      |            `ImageMinimizerPlugin.imageminMinify`            | Allows to override default minify function                                                        |
 |   **`minimizerOptions`**   |         `{Object\|Array<Object>}`         |                      `{ plugins: [] }`                      | Options for `imagemin`                                                                            |
 |        **`loader`**        |                `{Boolean}`                |                           `true`                            | Automatically adding `imagemin-loader`                                                            |
@@ -300,17 +300,16 @@ module.exports = {
 
 #### `severityError`
 
-Type: `Boolean|String`
-Default: `'auto'`
+Type: `String`
+Default: `'error'`
 
 Allows to choose how errors are displayed.
 
 Сan have the following values:
 
-- `'auto'` - emit warnings in `development` mode and emit errors in `production` mode (default behavior)
-- `false` or `'off'` - suppresses errors and warnings
+- `'off'` - suppresses errors and warnings
 - `'warning'` - emit warnings instead errors
-- `true` or `'error'` - emit errors
+- `'error'` - emit errors
 
 **webpack.config.js**
 
@@ -630,7 +629,7 @@ module.exports = {
 |            Name            |              Type               |                Default                | Description                                                                                       |
 | :------------------------: | :-----------------------------: | :-----------------------------------: | :------------------------------------------------------------------------------------------------ |
 |        **`filter`**        |          `{Function}`           |              `undefined`              | Allows filtering of images for optimization                                                       |
-|    **`severityError`**     |       `{Boolean\|String}`       |               `'auto'`                | Allows to choose how errors are displayed                                                         |
+|    **`severityError`**     |           `{String}`            |               `'error'`               | Allows to choose how errors are displayed                                                         |
 |        **`minify`**        | `{Function \| Array<Function>}` | `ImageMinimizerPlugin.imageminMinify` | Allows to override default minify function                                                        |
 |   **`minimizerOptions`**   |    `{Object\|Array<Object>}`    |           `{ plugins: [] }`           | Options for `imagemin`                                                                            |
 |       **`filename`**       |           `{string}`            |         `'[path][name][ext]'`         | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
@@ -687,17 +686,16 @@ module.exports = {
 
 #### `severityError`
 
-Type: `Boolean|String`
-Default: `'auto'`
+Type: `String`
+Default: `'error'`
 
 Allows to choose how errors are displayed.
 
 Сan have the following values:
 
-- `'auto'` - emit warnings in `development` mode and emit errors in `production` mode (default behavior)
-- `false` or `'off'` - suppresses errors and warnings
+- `'off'` - suppresses errors and warnings
 - `'warning'` - emit warnings instead errors
-- `true` or `'error'` - emit errors
+- `'error'` - emit errors
 
 **webpack.config.js**
 

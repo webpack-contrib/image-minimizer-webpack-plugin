@@ -27,7 +27,7 @@ import imageminMinify from "./utils/imageminMinify";
  * @property {string|RegExp|Array<string|RegExp>} [test=/\.(jpe?g|png|gif|tif|webp|svg|avif)$/i] Test to match files against.
  * @property {string|RegExp|Array<string|RegExp>} [include] Files to include.
  * @property {string|RegExp|Array<string|RegExp>} [exclude] Files to exclude.
- * @property {boolean|string} [severityError='auto'] Allows to choose how errors are displayed.
+ * @property {boolean|string} [severityError='error'] Allows to choose how errors are displayed.
  * @property {Object} [minimizerOptions={plugins: []}] Options for `imagemin`.
  * @property {boolean} [loader=true] Automatically adding `imagemin-loader`.
  * @property {number} [maxConcurrency=Math.max(1, os.cpus().length - 1)] Maximum number of concurrency optimization processes in one time.

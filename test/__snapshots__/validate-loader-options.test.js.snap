@@ -170,32 +170,32 @@ exports[`validate loader options should throw an error on the "minimizerOptions"
 
 exports[`validate loader options should throw an error on the "severityError" option with "() => {}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.severityError should be one of these:
-   boolean | string
-   -> Allows to choose how errors are displayed.
-   Details:
-    * options.severityError should be a boolean.
-    * options.severityError should be a string."
+ - options.severityError should be a string.
+   -> Allows to choose how errors are displayed."
 `;
 
 exports[`validate loader options should throw an error on the "severityError" option with "[]" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.severityError should be one of these:
-   boolean | string
-   -> Allows to choose how errors are displayed.
-   Details:
-    * options.severityError should be a boolean.
-    * options.severityError should be a string."
+ - options.severityError should be a string.
+   -> Allows to choose how errors are displayed."
 `;
 
 exports[`validate loader options should throw an error on the "severityError" option with "{}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.severityError should be one of these:
-   boolean | string
-   -> Allows to choose how errors are displayed.
-   Details:
-    * options.severityError should be a boolean.
-    * options.severityError should be a string."
+ - options.severityError should be a string.
+   -> Allows to choose how errors are displayed."
+`;
+
+exports[`validate loader options should throw an error on the "severityError" option with "false" value 1`] = `
+"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
+ - options.severityError should be a string.
+   -> Allows to choose how errors are displayed."
+`;
+
+exports[`validate loader options should throw an error on the "severityError" option with "true" value 1`] = `
+"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
+ - options.severityError should be a string.
+   -> Allows to choose how errors are displayed."
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "/test/" value 1`] = `

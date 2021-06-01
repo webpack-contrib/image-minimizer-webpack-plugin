@@ -84,14 +84,7 @@
     },
     "severityError": {
       "description": "Allows to choose how errors are displayed.",
-      "anyOf": [
-        {
-          "type": "boolean"
-        },
-        {
-          "type": "string"
-        }
-      ]
+      "type": "string"
     },
     "loader": {
       "description": "Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other).",

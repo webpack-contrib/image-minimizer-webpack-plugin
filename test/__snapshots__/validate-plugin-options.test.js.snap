@@ -114,20 +114,28 @@ exports[`validate plugin options should work 10`] = `
 
 exports[`validate plugin options should work 11`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.severityError should be one of these:
-   boolean | string
-   -> Allows to choose how errors are displayed.
-   Details:
-    * options.severityError should be a boolean.
-    * options.severityError should be a string."
+ - options.severityError should be a string.
+   -> Allows to choose how errors are displayed."
 `;
 
 exports[`validate plugin options should work 12`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.deleteOriginalAssets should be a boolean."
+ - options.severityError should be a string.
+   -> Allows to choose how errors are displayed."
 `;
 
 exports[`validate plugin options should work 13`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.severityError should be a string.
+   -> Allows to choose how errors are displayed."
+`;
+
+exports[`validate plugin options should work 14`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.deleteOriginalAssets should be a boolean."
+`;
+
+exports[`validate plugin options should work 15`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.minimizerOptions should be one of these:
    object { … } | [object { … }, ...] (should not have fewer than 1 item)
@@ -139,25 +147,25 @@ exports[`validate plugin options should work 13`] = `
       [object { … }, ...] (should not have fewer than 1 item)"
 `;
 
-exports[`validate plugin options should work 14`] = `
-"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.maxConcurrency should be a number.
-   -> Maximum number of concurrency optimization processes in one time."
-`;
-
-exports[`validate plugin options should work 15`] = `
-"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.maxConcurrency should be a number.
-   -> Maximum number of concurrency optimization processes in one time."
-`;
-
 exports[`validate plugin options should work 16`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.maxConcurrency should be a number.
+   -> Maximum number of concurrency optimization processes in one time."
+`;
+
+exports[`validate plugin options should work 17`] = `
+"Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
+ - options.maxConcurrency should be a number.
+   -> Maximum number of concurrency optimization processes in one time."
+`;
+
+exports[`validate plugin options should work 18`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.loader should be a boolean.
    -> Automatically adding \`imagemin-loader\` (require for minification images using in \`url-loader\`, \`svg-url-loader\` or other)."
 `;
 
-exports[`validate plugin options should work 17`] = `
+exports[`validate plugin options should work 19`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.minify should be one of these:
    function | [function, ...] (should not have fewer than 1 item)
