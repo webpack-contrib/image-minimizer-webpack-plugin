@@ -548,6 +548,7 @@ Type: `String`
 Default: `'[path][name][ext]'`
 
 Allows to set the filename for the generated asset. Useful for converting to a `webp`.
+Supported values see in [`webpack template strings`](https://webpack.js.org/configuration/output/#template-strings), `File-level` section.
 
 **webpack.config.js**
 
@@ -948,6 +949,7 @@ Type: `String`
 Default: `'[path][name][ext]'`
 
 Allows to set the filename for the generated asset. Useful for converting to a `webp`.
+Supported values see in [`webpack template strings`](https://webpack.js.org/configuration/output/#template-strings), `File-level` section.
 
 **webpack.config.js**
 
