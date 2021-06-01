@@ -199,13 +199,14 @@ describe("imagemin plugin", () => {
     );
   });
 
-  it("should optimizes all images (loader + plugin) and interpolate `[name].[ext]` name", async () => {
+  it("should optimizes all images (loader + plugin) and interpolate `[name][ext]` name", async () => {
     const stats = await webpack({
       emitPluginOptions: {
         fileNames: ["plugin-test.png"],
       },
       imageminPluginOptions: {
         minimizerOptions: { plugins },
+        filename: "[name][ext]",
       },
     });
     const { compilation } = stats;
@@ -236,7 +237,7 @@ describe("imagemin plugin", () => {
     );
   });
 
-  it("should optimizes all images (loader + plugin) and interpolate `[path][name].[ext]` name", async () => {
+  it("should optimizes all images (loader + plugin) and interpolate `[path][name][ext]` name", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./nested/deep/loader.js"),
       emitPluginOptions: {
@@ -244,6 +245,7 @@ describe("imagemin plugin", () => {
       },
       imageminPluginOptions: {
         minimizerOptions: { plugins },
+        filename: "[path][name][ext]",
       },
     });
     const { compilation } = stats;
