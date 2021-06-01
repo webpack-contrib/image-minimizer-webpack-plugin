@@ -169,16 +169,19 @@ describe("minify", () => {
       minimizerOptions: { plugins: false },
     });
 
-    expect(result.warnings).toHaveLength(2);
+    expect(result.errors).toHaveLength(1);
+    expect(result.warnings).toHaveLength(1);
     expect(result.warnings[0].toString()).toMatch(
       /No plugins found for `imagemin`/
     );
-    expect(result.errors).toHaveLength(0);
+    expect(result.errors[0].toString()).toMatch(
+      "TypeError: Found non-callable @@iterator"
+    );
     expect(result.filename).toBe(filename);
     expect(result.data.equals(input)).toBe(true);
   });
 
-  it("should return original content and emit a warning on invalid content (`String`)", async () => {
+  it("should return original content and emit a error on invalid content (`String`)", async () => {
     const input = "Foo";
     const result = await minify({
       minify: imageminMinify,
@@ -187,8 +190,8 @@ describe("minify", () => {
       minimizerOptions: { plugins: ["mozjpeg"] },
     });
 
-    expect(result.warnings).toHaveLength(1);
-    expect(result.errors).toHaveLength(0);
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
     expect(result.data).toBe(input);
   });
 
@@ -449,7 +452,7 @@ describe("minify", () => {
     expect(result.data.equals(optimizedSource)).toBe(true);
   });
 
-  it("should throw two warnings", async () => {
+  it("should throw two errors", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await minify({
@@ -461,9 +464,9 @@ describe("minify", () => {
       filename,
     });
 
-    expect(result.warnings).toHaveLength(2);
-    expect(result.warnings[0].toString()).toMatch(/Error: fail/);
-    expect(result.warnings[1].toString()).toMatch(/Error: fail/);
+    expect(result.errors).toHaveLength(2);
+    expect(result.errors[0].toString()).toMatch(/Error: fail/);
+    expect(result.errors[1].toString()).toMatch(/Error: fail/);
     expect(result.filename).toBe(filename);
   });
 });

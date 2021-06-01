@@ -22,8 +22,8 @@ describe("validate loader options", () => {
       failure: [1, true, false, {}, [], null],
     },
     severityError: {
-      success: [true, false, "error"],
-      failure: [{}, [], () => {}],
+      success: ["error"],
+      failure: [true, false, {}, [], () => {}],
     },
     filename: {
       success: ["[name].[ext]"],

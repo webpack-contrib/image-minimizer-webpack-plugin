@@ -30,14 +30,7 @@
     },
     "severityError": {
       "description": "Allows to choose how errors are displayed.",
-      "anyOf": [
-        {
-          "type": "boolean"
-        },
-        {
-          "type": "string"
-        }
-      ]
+      "type": "string"
     },
     "filename": {
       "type": "string"

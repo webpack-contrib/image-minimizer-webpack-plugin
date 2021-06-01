@@ -178,7 +178,7 @@ describe("loader minify option", () => {
     );
   });
 
-  it("should emit warning", async () => {
+  it("should emit errors", async () => {
     const stats = await webpack({
       imageminLoader: true,
       imageminLoaderOptions: {
@@ -190,8 +190,8 @@ describe("loader minify option", () => {
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    expect(warnings).toHaveLength(4);
-    expect(errors).toHaveLength(0);
+    expect(errors).toHaveLength(4);
+    expect(warnings).toHaveLength(0);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
       false

@@ -129,11 +129,11 @@ describe("validate plugin options", () => {
 
     expect(() => {
       new ImageMinimizerPlugin({ severityError: false });
-    }).not.toThrow();
+    }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
       new ImageMinimizerPlugin({ severityError: true });
-    }).not.toThrow();
+    }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
       new ImageMinimizerPlugin({ severityError: "error" });
