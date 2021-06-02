@@ -24,10 +24,12 @@
 
 # image-minimizer-webpack-plugin
 
-This plugin uses [imagemin](https://github.com/imagemin/imagemin) to optimize your images by default.
-Optimization is also available using [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh).
-
 ## Getting Started
+
+This plugin can use 2 tools to compress images:
+
+- [`imagemin`](https://github.com/imagemin/imagemin) - optimize your images by default, since it is stable and works with all types of images
+- [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh) - while working in experimental mode with `.jpg`, `.jpeg`, `.png`, `.webp`, `.avif` file types.
 
 To begin, you'll need to install `image-minimizer-webpack-plugin`:
 

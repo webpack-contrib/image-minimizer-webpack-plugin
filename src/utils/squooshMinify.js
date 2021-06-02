@@ -1,5 +1,7 @@
 import path from "path";
 
+// Todo remove import/no-unresolved comment when "main" section in @squoosh/lib package.json will be fixed
+/* istanbul ignore next */
 async function squooshMinify(data, minifyOptions) {
   const [[filename, input]] = Object.entries(data);
   const result = {
@@ -16,7 +18,7 @@ async function squooshMinify(data, minifyOptions) {
     ".avif": "avif",
     ...minifyOptions.targets,
   };
-  const ext = path.extname(filename);
+  const ext = path.extname(filename).toLowerCase();
 
   if (!targets[ext]) {
     result.warnings.push(
@@ -33,7 +35,8 @@ async function squooshMinify(data, minifyOptions) {
     ...minifyOptions.encodeOptions,
   };
 
-  // eslint-disable-next-line node/no-unpublished-require
+  // Todo remove import/no-unresolved comment when "main" section in @squoosh/lib package.json will be fixed
+  // eslint-disable-next-line node/no-unpublished-require,import/no-unresolved
   const squoosh = require("@squoosh/lib");
   const { ImagePool } = squoosh;
   const imagePool = new ImagePool();
