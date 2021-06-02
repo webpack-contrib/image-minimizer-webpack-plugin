@@ -24,7 +24,8 @@
 
 # image-minimizer-webpack-plugin
 
-This plugin uses [imagemin](https://github.com/imagemin/imagemin) to optimize your images.
+This plugin uses [imagemin](https://github.com/imagemin/imagemin) to optimize your images by default.
+Optimization is also available using [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh).
 
 ## Getting Started
 
@@ -38,6 +39,8 @@ Images can be optimized in two modes:
 
 1.  [Lossless](https://en.wikipedia.org/wiki/Lossless_compression) (without loss of quality).
 2.  [Lossy](https://en.wikipedia.org/wiki/Lossy_compression) (with loss of quality).
+
+### Optimize with [imagemin](https://github.com/imagemin/imagemin)
 
 Note:
 
@@ -109,7 +112,80 @@ module.exports = {
 };
 ```
 
-> ℹ️ Only for `4` version of `webpack`: Make sure that plugin place after any plugins that add images or other assets which you want to optimized.\*\*
+### Optimize with [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh)
+
+```console
+$ npm install @squoosh/lib --save-dev
+```
+
+**Recommended `@squoosh/lib` options for lossy optimization**
+
+For lossy optimization we recommend using the default settings `@squoosh/lib`.
+The default values and supported file types for each option can be found in the `[codecs.js]`(https://github.com/GoogleChromeLabs/squoosh/blob/dev/libsquoosh/src/codecs.js) file under `codecs`.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png)$/i,
+        type: "asset",
+      },
+    ],
+  },
+  plugins: [
+    new ImageMinimizerPlugin({
+      minify: ImageMinimizerPlugin.squooshMinify,
+    }),
+  ],
+};
+```
+
+**Recommended `squoosh` options for lossless optimization**
+
+For lossless optimization we recommend using the options listed below in `minimizerOptions.encodeOptions`.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png)$/i,
+        type: "asset",
+      },
+    ],
+  },
+  plugins: [
+    new ImageMinimizerPlugin({
+      minify: ImageMinimizerPlugin.squooshMinify,
+      minimizerOptions: {
+        encodeOptions: {
+          mozjpeg: {
+            // That setting might be close to lossless, but it’s not guaranteed
+            // https://github.com/GoogleChromeLabs/squoosh/issues/85
+            quality: 100,
+          },
+          webp: {
+            lossless: 1,
+          },
+          avif: {
+            // https://github.com/GoogleChromeLabs/squoosh/blob/dev/codecs/avif/enc/README.md
+            cqLevel: 0,
+          },
+        },
+      },
+    }),
+  ],
+};
+```
 
 > ℹ️ If you want to use `loader` or `plugin` standalone see sections below, but this is not recommended.
 
@@ -333,6 +409,11 @@ Default: `ImageMinimizerPlugin.imageminMinify`
 Allows to override default minify function.
 By default plugin uses [imagemin](https://github.com/imagemin/imagemin) package.
 Useful for using and testing unpublished versions or forks.
+
+Аvailable minifiers:
+
+- ImageMinimizerPlugin.imageminMinify
+- ImageMinimizerPlugin.squooshMinify
 
 ##### `Function`
 
@@ -568,6 +649,40 @@ module.exports = {
 };
 ```
 
+##### Сonverting to `webp` using `ImageMinimizerPlugin.imageminMinify`
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+/*
+const defaultTargets = {
+  ".png": "oxipng",
+  ".jpg": "mozjpeg",
+  ".jpeg": "mozjpeg",
+  ".jxl": "jxl",
+  ".webp": "webp",
+  ".avif": "avif",
+};
+*/
+
+module.exports = {
+  plugins: [
+    // Images are converted to `webp` and the original assets have been kept
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      filename: "[path][name].webp",
+      minify: ImageMinimizerPlugin.squooshMinify,
+      minimizerOptions: {
+        targets: {
+          ".png": "webp",
+        },
+      },
+    }),
+  ],
+};
+```
+
 #### `deleteOriginalAssets`
 
 Type: `Boolean`
@@ -736,6 +851,11 @@ Default: `ImageMinimizerPlugin.imageminMinify`
 Allows to override default minify function.
 By default plugin uses [imagemin](https://github.com/imagemin/imagemin) package.
 Useful for using and testing unpublished versions or forks.
+
+Аvailable minifiers:
+
+- ImageMinimizerPlugin.imageminMinify
+- ImageMinimizerPlugin.squooshMinify
 
 ##### `Function`
 

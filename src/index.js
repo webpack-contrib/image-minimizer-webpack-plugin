@@ -9,6 +9,7 @@ import serialize from "serialize-javascript";
 import minifyFn from "./minify";
 import schema from "./plugin-options.json";
 import imageminMinify from "./utils/imageminMinify";
+import squooshMinify from "./utils/squooshMinify";
 
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
 /** @typedef {import("webpack").Compiler} Compiler */
@@ -313,5 +314,6 @@ ImageMinimizerPlugin.normalizeImageminConfig =
   require("./utils/imageminMinify").normalizeImageminConfig;
 
 ImageMinimizerPlugin.imageminMinify = imageminMinify;
+ImageMinimizerPlugin.squooshMinify = squooshMinify;
 
 export default ImageMinimizerPlugin;

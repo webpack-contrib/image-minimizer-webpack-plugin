@@ -1,6 +1,6 @@
 import ImageMinimizerPlugin from "../src";
 
-import { webpack, isOptimized } from "./helpers";
+import { webpack, isOptimized, fixturesPath } from "./helpers";
 
 describe("loader minify option", () => {
   it('should work with "imagemin" minifier', async () => {
@@ -204,6 +204,28 @@ describe("loader minify option", () => {
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
       false
+    );
+  });
+
+  it('should work with "squooshMinify" minifier', async () => {
+    const stats = await webpack({
+      imageminLoader: true,
+      imageminLoaderOptions: {
+        minify: ImageMinimizerPlugin.squooshMinify,
+        minimizerOptions: {
+          context: fixturesPath,
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(2);
+    expect(errors).toHaveLength(0);
+
+    expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(631);
+    expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
+      71000
     );
   });
 });

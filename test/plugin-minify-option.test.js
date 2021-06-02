@@ -147,4 +147,64 @@ describe("plugin minify option", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
+
+  it('should work with "squooshMinify" minifier', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: ImageMinimizerPlugin.squooshMinify,
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(353);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('should work with "squooshMinify" minifier and minimizerOptions', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: ImageMinimizerPlugin.squooshMinify,
+        minimizerOptions: {
+          targets: {
+            ".jpg": "webp",
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(100);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('should emit warning when file is not supported by "squooshMinify"', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: ImageMinimizerPlugin.squooshMinify,
+        minimizerOptions: {
+          targets: {
+            ".jpg": false,
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].toString()).toMatch(
+      /was not minified by "ImageMinimizerPlugin.squooshMinify"/
+    );
+    expect(errors).toHaveLength(0);
+  });
 });
