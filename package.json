@@ -47,6 +47,11 @@
   "peerDependencies": {
     "webpack": "^5.1.0"
   },
+  "peerDependenciesMeta": {
+    "@squoosh/lib": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "imagemin": "^7.0.1",
     "klona": "^2.0.4",
@@ -60,6 +65,7 @@
     "@babel/preset-env": "^7.14.4",
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
+    "@squoosh/lib": "^0.2.3",
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^27.0.2",
