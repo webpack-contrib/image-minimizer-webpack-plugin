@@ -2,6 +2,22 @@ import imagemin from "imagemin";
 
 import { klona } from "klona/full";
 
+/** @typedef {import("imagemin").Options} ImageminOptions */
+/** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
+/** @typedef {import("../index").ImageminMinimizerOptions} ImageminMinimizerOptions */
+/** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
+
+/**
+ * @typedef {Object} MetaData
+ * @property {Array<Error>} warnings
+ * @property {Array<Error>} errors
+ */
+
+/**
+ * @param {Error} error
+ * @param {MetaData} [metaData]
+ * @param {string} [type]
+ */
 function log(error, metaData, type) {
   if (metaData) {
     if (type === "error") {
@@ -9,6 +25,7 @@ function log(error, metaData, type) {
         metaData.errors = [];
       }
 
+      // Todo remove this name (name already exist and equal "InvalidConfigError")
       error.name = "ConfigurationError";
 
       metaData.errors.push(error);
@@ -27,6 +44,9 @@ function log(error, metaData, type) {
 }
 
 class InvalidConfigError extends Error {
+  /**
+   * @param {string | undefined} message
+   */
   constructor(message) {
     super(message);
 
@@ -34,6 +54,10 @@ class InvalidConfigError extends Error {
   }
 }
 
+/**
+ * @param {ImageminMinimizerOptions} minimizerOptions
+ * @param {MetaData} [metaData]
+ */
 export function normalizeImageminConfig(minimizerOptions, metaData) {
   if (
     !minimizerOptions ||
@@ -59,8 +83,12 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
       const isPluginArray = Array.isArray(plugin);
 
       if (typeof plugin === "string" || isPluginArray) {
-        const pluginName = isPluginArray ? plugin[0] : plugin;
-        const pluginOptions = isPluginArray ? plugin[1] : undefined;
+        const pluginName = isPluginArray
+          ? /** @type {[string, object]} */ (plugin)[0]
+          : /** @type {string} */ (plugin);
+        const pluginOptions = isPluginArray
+          ? /** @type {[string, object]} */ (plugin)[1]
+          : undefined;
 
         let requiredPlugin = null;
         let requiredPluginName = `imagemin-${pluginName}`;
@@ -100,7 +128,8 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
           // Nothing
         }
 
-        imageminConfig.pluginsMeta.push([
+        /** @type {Array<Object>} imageminConfig.pluginsMeta */
+        (imageminConfig.pluginsMeta).push([
           {
             name: requiredPluginName,
             options: pluginOptions || {},
@@ -128,21 +157,26 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
   return imageminConfig;
 }
 
+/**
+ * @param {DataForMinifyFn} data
+ * @param {ImageminMinimizerOptions} minimizerOptions
+ * @returns {Promise<MinifyFnResult>}
+ */
 export default async function imageminMinify(data, minimizerOptions) {
   const [[, input]] = Object.entries(data);
+  /** @type {MinifyFnResult} */
   const result = {
     data: input,
     warnings: [],
     errors: [],
   };
 
-  // Implement autosearch config on root directory of project in future
-  const minimizerOptionsNormalized = normalizeImageminConfig(
-    minimizerOptions,
-    result
-  );
-
   try {
+    // Implement autosearch config on root directory of project in future
+    const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
+      normalizeImageminConfig(minimizerOptions, result)
+    );
+
     result.data = await imagemin.buffer(input, minimizerOptionsNormalized);
   } catch (error) {
     result.errors.push(error);

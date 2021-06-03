@@ -4,8 +4,31 @@ import minify from "./minify";
 import schema from "./loader-options.json";
 import imageminMinify from "./utils/imageminMinify";
 
+/**
+ * @typedef {Object} LoaderOptions
+ * @property {FilterFn} [filter] Allows filtering of images for optimization.
+ * @property {string} [severityError] Allows to choose how errors are displayed.
+ * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
+ * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
+ * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+ * @property {MinifyFunctions} [minify]
+ */
+
+/** @typedef {import("./index").FilterFn} FilterFn */
+/** @typedef {import("./index").Rules} Rules */
+/** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
+/** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
+/** @typedef {import("./index").InternalMinifyOptions} InternalMinifyOptions */
+/** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
+/** @typedef {import("webpack").LoaderContext<LoaderOptions>} LoaderContext */
+/** @typedef {import("webpack").Compilation} Compilation */
+
+/**
+ * @this {LoaderContext}
+ * @param {Buffer} content
+ */
 module.exports = async function loader(content) {
-  const options = this.getOptions(schema);
+  const options = this.getOptions(/** @type {Schema} */ (schema));
   const callback = this.async();
   const name = path.relative(this.rootContext, this.resourcePath);
 
@@ -19,14 +42,14 @@ module.exports = async function loader(content) {
 
   const { severityError, minimizerOptions } = options;
 
-  const minifyOptions = {
+  const minifyOptions = /** @type {InternalMinifyOptions} */ ({
     minify: options.minify || imageminMinify,
     input,
     filename: name,
     severityError,
     minimizerOptions,
     isProductionMode: this.mode === "production" || !this.mode,
-  };
+  });
 
   const output = await minify(minifyOptions);
 
@@ -40,26 +63,23 @@ module.exports = async function loader(content) {
     return;
   }
 
-  output.source = output.data;
-
   if (output.warnings && output.warnings.length > 0) {
     output.warnings.forEach((warning) => {
       this.emitWarning(warning);
     });
   }
 
-  const { source } = output;
-  const { path: newName } = this._compilation.getPathWithInfo(
-    options.filename || "[path][name][ext]",
-    {
-      filename: name,
-    }
-  );
+  const source = output.data;
+  const { path: newName } = /** @type {Compilation} */ (
+    this._compilation
+  ).getPathWithInfo(options.filename || "[path][name][ext]", {
+    filename: name,
+  });
 
   const isNewAsset = name !== newName;
 
   if (isNewAsset) {
-    this.emitFile(newName, source, null, {
+    this.emitFile(newName, source.toString(), "", {
       minimized: true,
     });
 

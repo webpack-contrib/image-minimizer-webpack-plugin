@@ -11,29 +11,108 @@ import schema from "./plugin-options.json";
 import imageminMinify from "./utils/imageminMinify";
 import squooshMinify from "./utils/squooshMinify";
 
+/** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
 /** @typedef {import("webpack").Compiler} Compiler */
 /** @typedef {import("webpack").Compilation} Compilation */
+/** @typedef {import("webpack").WebpackError} WebpackError */
+/** @typedef {import("webpack").Asset} Asset */
+/** @typedef {import("imagemin").Options} ImageminOptions */
+/** @typedef {import("./loader").LoaderOptions} LoaderOptions */
+/** @typedef {import("./utils/imageminMinify").default} ImageminMinifyFunction */
+/** @typedef {import("./utils/squooshMinify").default} SquooshMinifyFunction */
+
+/** @typedef {RegExp | string} Rule */
+
+/** @typedef {Rule[] | Rule} Rules */
 
 /**
- * @callback Filter
+ * @callback FilterFn
  * @param {Buffer} source `Buffer` of source file.
  * @param {string} sourcePath Absolute path to source.
  * @returns {boolean}
  */
 
 /**
+ * @typedef {Record.<string, Buffer>} DataForMinifyFn
+ */
+
+/**
+ * @typedef {Object} ImageminMinimizerOptions
+ * @property {ImageminOptions["plugins"] | [string, Record<string, any>]} plugins
+ * @property {Array<Record<string, any>>} [pluginsMeta]
+ */
+
+/**
+ * @typedef {Record<string, any>} SquooshMinimizerOptions
+ */
+
+/**
+ * @typedef {Record<string, any>} CustomFnMinimizerOptions
+ */
+
+/**
+ * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
+ */
+
+/**
+ * @typedef {Object} InternalMinifyOptions
+ * @property {string} filename
+ * @property {Buffer} input
+ * @property {string} [severityError]
+ * @property {MinimizerOptions} [minimizerOptions]
+ * @property {MinifyFunctions} minify
+ */
+
+/**
+ * @typedef {Object} InternalMinifyResult
+ * @property {Buffer} data
+ * @property {string} filename
+ * @property {Array<Error>} warnings
+ * @property {Array<Error>} errors
+ */
+
+/**
+ * @callback CustomMinifyFunction
+ * @param {DataForMinifyFn} data
+ * @param {CustomFnMinimizerOptions} minifyOptions
+ * @returns {InternalMinifyResult}
+ */
+
+/**
+ * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
+ */
+
+/**
+ * @typedef {Object} MinifyFnResult
+ * @property {Buffer} data
+ * @property {Array<Error>} warnings
+ * @property {Array<Error>} errors
+ */
+
+/**
+ * @typedef {Object} InternalLoaderOptions
+ * @property {Rules} [test] Test to match files against.
+ * @property {Rules} [include] Files to include.
+ * @property {Rules} [exclude] Files to exclude.
+ * @property {string} [severityError] Allows to choose how errors are displayed.
+ * @property {string} [loader]
+ * @property {LoaderOptions} [loaderOptions]
+ */
+
+/**
  * @typedef {Object} PluginOptions
- * @property {Filter} [filter=() => true] Allows filtering of images for optimization.
- * @property {string|RegExp|Array<string|RegExp>} [test=/\.(jpe?g|png|gif|tif|webp|svg|avif)$/i] Test to match files against.
- * @property {string|RegExp|Array<string|RegExp>} [include] Files to include.
- * @property {string|RegExp|Array<string|RegExp>} [exclude] Files to exclude.
- * @property {boolean|string} [severityError='error'] Allows to choose how errors are displayed.
- * @property {Object} [minimizerOptions={plugins: []}] Options for `imagemin`.
- * @property {boolean} [loader=true] Automatically adding `imagemin-loader`.
- * @property {number} [maxConcurrency=Math.max(1, os.cpus().length - 1)] Maximum number of concurrency optimization processes in one time.
- * @property {string} [filename='[path][name][ext]'] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
- * @property {boolean} [deleteOriginalAssets=false] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+ * @property {FilterFn} [filter] Allows filtering of images for optimization.
+ * @property {Rules} [test] Test to match files against.
+ * @property {Rules} [include] Files to include.
+ * @property {Rules} [exclude] Files to exclude.
+ * @property {string} [severityError] Allows to choose how errors are displayed.
+ * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
+ * @property {boolean} [loader] Automatically adding `imagemin-loader`.
+ * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
+ * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
+ * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+ * @property {MinifyFunctions} [minify]
  */
 
 /**
@@ -44,7 +123,7 @@ class ImageMinimizerPlugin {
    * @param {PluginOptions} [options={}] Plugin options.
    */
   constructor(options = {}) {
-    validate(schema, options, {
+    validate(/** @type {Schema} */ (schema), options, {
       name: "Image Minimizer Plugin",
       baseDataPath: "options",
     });
@@ -84,8 +163,8 @@ class ImageMinimizerPlugin {
    * @private
    * @param {Compiler} compiler
    * @param {Compilation} compilation
-   * @param assets
-   * @param moduleAssets
+   * @param {Record<string, import("webpack").sources.Source>} assets
+   * @param {Set<string>} moduleAssets
    * @returns {Promise<void>}
    */
   async optimize(compiler, compilation, assets, moduleAssets) {
@@ -93,7 +172,9 @@ class ImageMinimizerPlugin {
     const assetsForMinify = await Promise.all(
       Object.keys(assets)
         .filter((name) => {
-          const { info, source } = compilation.getAsset(name);
+          const { info, source } = /** @type {Asset} */ (
+            compilation.getAsset(name)
+          );
 
           // Skip double minimize assets from child compilation
           if (info.minimized) {
@@ -116,14 +197,19 @@ class ImageMinimizerPlugin {
 
           const input = source.source();
 
-          if (this.options.filter && !this.options.filter(input, name)) {
+          if (
+            this.options.filter &&
+            !this.options.filter(/** @type {Buffer} */ (input), name)
+          ) {
             return false;
           }
 
           return true;
         })
         .map(async (name) => {
-          const { info, source } = compilation.getAsset(name);
+          const { info, source } = /** @type {Asset} */ (
+            compilation.getAsset(name)
+          );
 
           const cacheName = serialize({
             name,
@@ -163,26 +249,21 @@ class ImageMinimizerPlugin {
               input = Buffer.from(input);
             }
 
-            const {
-              severityError,
-              isProductionMode,
-              minimizerOptions,
-              minify,
-            } = this.options;
+            const { severityError, minimizerOptions, minify } = this.options;
 
-            const minifyOptions = {
+            const minifyOptions = /** @type {InternalMinifyOptions} */ ({
               filename: name,
               input,
               severityError,
-              isProductionMode,
               minimizerOptions,
               minify,
-            };
+            });
 
             output = await minifyFn(minifyOptions);
 
             if (output.errors.length > 0) {
-              output.errors.forEach((error) => {
+              /** @type {[WebpackError]} */
+              (output.errors).forEach((error) => {
                 compilation.errors.push(error);
               });
 
@@ -200,7 +281,8 @@ class ImageMinimizerPlugin {
           const { source, warnings } = output;
 
           if (warnings && warnings.length > 0) {
-            warnings.forEach((warning) => {
+            /** @type {[WebpackError]} */
+            (warnings).forEach((warning) => {
               compilation.warnings.push(warning);
             });
           }
@@ -243,9 +325,6 @@ class ImageMinimizerPlugin {
    * @param {import("webpack").Compiler} compiler
    */
   apply(compiler) {
-    this.options.isProductionMode =
-      compiler.options.mode === "production" || !compiler.options.mode;
-
     const pluginName = this.constructor.name;
 
     const moduleAssets = new Set();
@@ -274,7 +353,7 @@ class ImageMinimizerPlugin {
           minimizerOptions,
         } = this.options;
 
-        const loader = {
+        const loader = /** @type{InternalLoaderOptions} */ ({
           test,
           include,
           exclude,
@@ -288,7 +367,7 @@ class ImageMinimizerPlugin {
             filter,
             minimizerOptions,
           },
-        };
+        });
 
         compiler.options.module.rules.push(loader);
       });
