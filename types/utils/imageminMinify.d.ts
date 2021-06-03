@@ -15,7 +15,6 @@ export default function imageminMinify(
   data: DataForMinifyFn,
   minimizerOptions: ImageminMinimizerOptions
 ): Promise<MinifyFnResult>;
-export type ImageminOptions = import("imagemin").Options;
 export type DataForMinifyFn = import("../index").DataForMinifyFn;
 export type ImageminMinimizerOptions =
   import("../index").ImageminMinimizerOptions;

@@ -62,10 +62,6 @@ export type InternalLoaderOptions = {
    * Files to exclude.
    */
   exclude?: Rules | undefined;
-  /**
-   * Allows to choose how errors are displayed.
-   */
-  severityError?: string | undefined;
   loader?: string | undefined;
   loaderOptions?: import("./loader").LoaderOptions | undefined;
 };
@@ -182,7 +178,6 @@ export type PluginOptions = {
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
- * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {string} [loader]
  * @property {LoaderOptions} [loaderOptions]
  */
@@ -237,9 +232,10 @@ declare class ImageMinimizerPlugin {
 }
 declare namespace ImageMinimizerPlugin {
   export const loader: string;
-  export const normalizeImageminConfig: typeof import("./utils/imageminMinify").normalizeImageminConfig;
+  export { normalizeImageminConfig };
   export { imageminMinify };
   export { squooshMinify };
 }
 import imageminMinify from "./utils/imageminMinify";
 import squooshMinify from "./utils/squooshMinify";
+import { normalizeImageminConfig } from "./utils/imageminMinify";

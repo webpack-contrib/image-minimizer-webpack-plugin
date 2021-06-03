@@ -1,8 +1,5 @@
-import imagemin from "imagemin";
-
 import { klona } from "klona/full";
 
-/** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
 /** @typedef {import("../index").ImageminMinimizerOptions} ImageminMinimizerOptions */
 /** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
@@ -172,6 +169,12 @@ export default async function imageminMinify(data, minimizerOptions) {
   };
 
   try {
+    // @ts-ignore
+    // eslint-disable-next-line import/dynamic-import-chunkname,node/no-unsupported-features/es-syntax
+    const imagemin = await import("imagemin");
+
+    /** @typedef {import("imagemin").Options} ImageminOptions */
+
     // Implement autosearch config on root directory of project in future
     const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
       normalizeImageminConfig(minimizerOptions, result)

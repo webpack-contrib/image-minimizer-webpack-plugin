@@ -8,7 +8,9 @@ import serialize from "serialize-javascript";
 
 import minifyFn from "./minify";
 import schema from "./plugin-options.json";
-import imageminMinify from "./utils/imageminMinify";
+import imageminMinify, {
+  normalizeImageminConfig,
+} from "./utils/imageminMinify";
 import squooshMinify from "./utils/squooshMinify";
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
@@ -95,7 +97,6 @@ import squooshMinify from "./utils/squooshMinify";
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
- * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {string} [loader]
  * @property {LoaderOptions} [loaderOptions]
  */
@@ -353,12 +354,12 @@ class ImageMinimizerPlugin {
           minimizerOptions,
         } = this.options;
 
-        const loader = /** @type{InternalLoaderOptions} */ ({
+        const loader = /** @type {InternalLoaderOptions} */ ({
           test,
           include,
           exclude,
           enforce: "pre",
-          loader: path.join(__dirname, "loader.js"),
+          loader: require.resolve(path.join(__dirname, "loader.js")),
           options: {
             minify,
             filename,
@@ -389,9 +390,7 @@ class ImageMinimizerPlugin {
 
 ImageMinimizerPlugin.loader = require.resolve("./loader");
 
-ImageMinimizerPlugin.normalizeImageminConfig =
-  require("./utils/imageminMinify").normalizeImageminConfig;
-
+ImageMinimizerPlugin.normalizeImageminConfig = normalizeImageminConfig;
 ImageMinimizerPlugin.imageminMinify = imageminMinify;
 ImageMinimizerPlugin.squooshMinify = squooshMinify;
 
