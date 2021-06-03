@@ -651,7 +651,7 @@ module.exports = {
 };
 ```
 
-##### Converting to `webp` using `ImageMinimizerPlugin.imageminMinify`
+##### Converting to `webp` using `ImageMinimizerPlugin.squooshMinify`
 
 **webpack.config.js**
 
