@@ -17,7 +17,18 @@ export type ImageminMinimizerOptions = {
   plugins: ImageminOptions["plugins"] | [string, Record<string, any>];
   pluginsMeta?: Record<string, any>[] | undefined;
 };
-export type SquooshMinimizerOptions = Record<string, any>;
+export type SquooshMinimizerOptions = {
+  targets?:
+    | {
+        [x: string]: string;
+      }
+    | undefined;
+  encodeOptions?:
+    | {
+        [x: string]: object;
+      }
+    | undefined;
+};
 export type CustomFnMinimizerOptions = Record<string, any>;
 export type MinimizerOptions =
   | ImageminMinimizerOptions
@@ -135,7 +146,9 @@ export type PluginOptions = {
  * @property {Array<Record<string, any>>} [pluginsMeta]
  */
 /**
- * @typedef {Record<string, any>} SquooshMinimizerOptions
+ * @typedef {Object} SquooshMinimizerOptions
+ * @property {Object.<string, string>} [targets]
+ * @property {Object.<string, object>} [encodeOptions]
  */
 /**
  * @typedef {Record<string, any>} CustomFnMinimizerOptions

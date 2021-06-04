@@ -20,6 +20,10 @@ async function squooshMinify(data, minifyOptions) {
     warnings: [],
     errors: [],
   };
+
+  /**
+   * @type {Record<string, string>}
+   */
   const targets = {
     ".png": "oxipng",
     ".jpg": "mozjpeg",

@@ -46,7 +46,9 @@ import squooshMinify from "./utils/squooshMinify";
  */
 
 /**
- * @typedef {Record<string, any>} SquooshMinimizerOptions
+ * @typedef {Object} SquooshMinimizerOptions
+ * @property {Object.<string, string>} [targets]
+ * @property {Object.<string, object>} [encodeOptions]
  */
 
 /**
