@@ -1,7 +1,18 @@
-async function minify(options = {}) {
-  const minifyFns =
-    typeof options.minify === "function" ? [options.minify] : options.minify;
+/** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
+/** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
+/** @typedef {import("./index").InternalMinifyResult} InternalMinifyResult */
+/** @typedef {import("./index").InternalMinifyOptions} InternalMinifyOptions */
 
+/**
+ * @param {InternalMinifyOptions} options
+ * @returns {Promise<InternalMinifyResult>}
+ */
+async function minify(options) {
+  const minifyFns = /** @type {[MinifyFunctions]} */ (
+    typeof options.minify === "function" ? [options.minify] : options.minify
+  );
+
+  /** @type {InternalMinifyResult} */
   const result = {
     data: options.input,
     filename: options.filename,

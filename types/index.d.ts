@@ -1,33 +1,106 @@
 export default ImageMinimizerPlugin;
+export type Schema = import("schema-utils/declarations/validate").Schema;
 export type WebpackPluginInstance = import("webpack").WebpackPluginInstance;
 export type Compiler = import("webpack").Compiler;
 export type Compilation = import("webpack").Compilation;
-export type Filter = (source: Buffer, sourcePath: string) => boolean;
+export type WebpackError = import("webpack").WebpackError;
+export type Asset = import("webpack").Asset;
+export type ImageminOptions = import("imagemin").Options;
+export type LoaderOptions = import("./loader").LoaderOptions;
+export type ImageminMinifyFunction = typeof imageminMinify;
+export type SquooshMinifyFunction = typeof squooshMinify;
+export type Rule = RegExp | string;
+export type Rules = Rule[] | Rule;
+export type FilterFn = (source: Buffer, sourcePath: string) => boolean;
+export type DataForMinifyFn = Record<string, Buffer>;
+export type ImageminMinimizerOptions = {
+  plugins: ImageminOptions["plugins"] | [string, Record<string, any>];
+  pluginsMeta?: Record<string, any>[] | undefined;
+};
+export type SquooshMinimizerOptions = {
+  targets?:
+    | {
+        [x: string]: string;
+      }
+    | undefined;
+  encodeOptions?:
+    | {
+        [x: string]: object;
+      }
+    | undefined;
+};
+export type CustomFnMinimizerOptions = Record<string, any>;
+export type MinimizerOptions =
+  | ImageminMinimizerOptions
+  | SquooshMinimizerOptions
+  | CustomFnMinimizerOptions;
+export type InternalMinifyOptions = {
+  filename: string;
+  input: Buffer;
+  severityError?: string | undefined;
+  minimizerOptions?: MinimizerOptions | undefined;
+  minify: MinifyFunctions;
+};
+export type InternalMinifyResult = {
+  data: Buffer;
+  filename: string;
+  warnings: Array<Error>;
+  errors: Array<Error>;
+};
+export type CustomMinifyFunction = (
+  data: DataForMinifyFn,
+  minifyOptions: CustomFnMinimizerOptions
+) => InternalMinifyResult;
+export type MinifyFunctions =
+  | ImageminMinifyFunction
+  | SquooshMinifyFunction
+  | CustomMinifyFunction;
+export type MinifyFnResult = {
+  data: Buffer;
+  warnings: Array<Error>;
+  errors: Array<Error>;
+};
+export type InternalLoaderOptions = {
+  /**
+   * Test to match files against.
+   */
+  test?: Rules | undefined;
+  /**
+   * Files to include.
+   */
+  include?: Rules | undefined;
+  /**
+   * Files to exclude.
+   */
+  exclude?: Rules | undefined;
+  loader?: string | undefined;
+  loaderOptions?: import("./loader").LoaderOptions | undefined;
+};
 export type PluginOptions = {
   /**
    * Allows filtering of images for optimization.
    */
-  filter?: Filter | undefined;
+  filter?: FilterFn | undefined;
   /**
    * Test to match files against.
    */
-  test?: string | RegExp | (string | RegExp)[] | undefined;
+  test?: Rules | undefined;
   /**
    * Files to include.
    */
-  include?: string | RegExp | (string | RegExp)[] | undefined;
+  include?: Rules | undefined;
   /**
    * Files to exclude.
    */
-  exclude?: string | RegExp | (string | RegExp)[] | undefined;
+  exclude?: Rules | undefined;
   /**
    * Allows to choose how errors are displayed.
    */
-  severityError?: string | boolean | undefined;
+  severityError?: string | undefined;
   /**
    * Options for `imagemin`.
    */
-  minimizerOptions?: Object | undefined;
+  minimizerOptions?: MinimizerOptions | undefined;
   /**
    * Automatically adding `imagemin-loader`.
    */
@@ -44,28 +117,96 @@ export type PluginOptions = {
    * Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
    */
   deleteOriginalAssets?: boolean | undefined;
+  minify?: MinifyFunctions | undefined;
 };
+/** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
 /** @typedef {import("webpack").Compiler} Compiler */
 /** @typedef {import("webpack").Compilation} Compilation */
+/** @typedef {import("webpack").WebpackError} WebpackError */
+/** @typedef {import("webpack").Asset} Asset */
+/** @typedef {import("imagemin").Options} ImageminOptions */
+/** @typedef {import("./loader").LoaderOptions} LoaderOptions */
+/** @typedef {import("./utils/imageminMinify").default} ImageminMinifyFunction */
+/** @typedef {import("./utils/squooshMinify").default} SquooshMinifyFunction */
+/** @typedef {RegExp | string} Rule */
+/** @typedef {Rule[] | Rule} Rules */
 /**
- * @callback Filter
+ * @callback FilterFn
  * @param {Buffer} source `Buffer` of source file.
  * @param {string} sourcePath Absolute path to source.
  * @returns {boolean}
  */
 /**
+ * @typedef {Record.<string, Buffer>} DataForMinifyFn
+ */
+/**
+ * @typedef {Object} ImageminMinimizerOptions
+ * @property {ImageminOptions["plugins"] | [string, Record<string, any>]} plugins
+ * @property {Array<Record<string, any>>} [pluginsMeta]
+ */
+/**
+ * @typedef {Object} SquooshMinimizerOptions
+ * @property {Object.<string, string>} [targets]
+ * @property {Object.<string, object>} [encodeOptions]
+ */
+/**
+ * @typedef {Record<string, any>} CustomFnMinimizerOptions
+ */
+/**
+ * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
+ */
+/**
+ * @typedef {Object} InternalMinifyOptions
+ * @property {string} filename
+ * @property {Buffer} input
+ * @property {string} [severityError]
+ * @property {MinimizerOptions} [minimizerOptions]
+ * @property {MinifyFunctions} minify
+ */
+/**
+ * @typedef {Object} InternalMinifyResult
+ * @property {Buffer} data
+ * @property {string} filename
+ * @property {Array<Error>} warnings
+ * @property {Array<Error>} errors
+ */
+/**
+ * @callback CustomMinifyFunction
+ * @param {DataForMinifyFn} data
+ * @param {CustomFnMinimizerOptions} minifyOptions
+ * @returns {InternalMinifyResult}
+ */
+/**
+ * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
+ */
+/**
+ * @typedef {Object} MinifyFnResult
+ * @property {Buffer} data
+ * @property {Array<Error>} warnings
+ * @property {Array<Error>} errors
+ */
+/**
+ * @typedef {Object} InternalLoaderOptions
+ * @property {Rules} [test] Test to match files against.
+ * @property {Rules} [include] Files to include.
+ * @property {Rules} [exclude] Files to exclude.
+ * @property {string} [loader]
+ * @property {LoaderOptions} [loaderOptions]
+ */
+/**
  * @typedef {Object} PluginOptions
- * @property {Filter} [filter=() => true] Allows filtering of images for optimization.
- * @property {string|RegExp|Array<string|RegExp>} [test=/\.(jpe?g|png|gif|tif|webp|svg|avif)$/i] Test to match files against.
- * @property {string|RegExp|Array<string|RegExp>} [include] Files to include.
- * @property {string|RegExp|Array<string|RegExp>} [exclude] Files to exclude.
- * @property {boolean|string} [severityError='auto'] Allows to choose how errors are displayed.
- * @property {Object} [minimizerOptions={plugins: []}] Options for `imagemin`.
- * @property {boolean} [loader=true] Automatically adding `imagemin-loader`.
- * @property {number} [maxConcurrency=Math.max(1, os.cpus().length - 1)] Maximum number of concurrency optimization processes in one time.
- * @property {string} [filename='[path][name][ext]'] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
- * @property {boolean} [deleteOriginalAssets=false] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+ * @property {FilterFn} [filter] Allows filtering of images for optimization.
+ * @property {Rules} [test] Test to match files against.
+ * @property {Rules} [include] Files to include.
+ * @property {Rules} [exclude] Files to exclude.
+ * @property {string} [severityError] Allows to choose how errors are displayed.
+ * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
+ * @property {boolean} [loader] Automatically adding `imagemin-loader`.
+ * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
+ * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
+ * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+ * @property {MinifyFunctions} [minify]
  */
 /**
  * @extends {WebpackPluginInstance}
@@ -76,19 +217,15 @@ declare class ImageMinimizerPlugin {
    */
   constructor(options?: PluginOptions | undefined);
   options: {
-    minify: any;
-    severityError: string | boolean | undefined;
-    filter: Filter;
-    exclude: string | RegExp | (string | RegExp)[] | undefined;
-    minimizerOptions:
-      | Object
-      | {
-          plugins: never[];
-        };
-    include: string | RegExp | (string | RegExp)[] | undefined;
+    minify: MinifyFunctions;
+    severityError: string | undefined;
+    filter: FilterFn;
+    exclude: Rules | undefined;
+    minimizerOptions: MinimizerOptions;
+    include: Rules | undefined;
     loader: boolean;
     maxConcurrency: number | undefined;
-    test: string | RegExp | (string | RegExp)[];
+    test: Rules;
     filename: string;
     deleteOriginalAssets: boolean;
   };
@@ -96,8 +233,8 @@ declare class ImageMinimizerPlugin {
    * @private
    * @param {Compiler} compiler
    * @param {Compilation} compilation
-   * @param assets
-   * @param moduleAssets
+   * @param {Record<string, import("webpack").sources.Source>} assets
+   * @param {Set<string>} moduleAssets
    * @returns {Promise<void>}
    */
   private optimize;
@@ -108,7 +245,10 @@ declare class ImageMinimizerPlugin {
 }
 declare namespace ImageMinimizerPlugin {
   export const loader: string;
-  export const normalizeImageminConfig: typeof import("./utils/imageminMinify").normalizeImageminConfig;
+  export { normalizeImageminConfig };
   export { imageminMinify };
+  export { squooshMinify };
 }
 import imageminMinify from "./utils/imageminMinify";
+import squooshMinify from "./utils/squooshMinify";
+import { normalizeImageminConfig } from "./utils/imageminMinify";

@@ -3,11 +3,12 @@
     "target": "esnext",
     "moduleResolution": "node",
     "allowJs": true,
-    // "checkJs": true,
+    "checkJs": true,
     "strict": true,
     "types": ["node"],
     "resolveJsonModule": true,
-    "newLine": "LF"
+    "newLine": "LF",
+    "allowSyntheticDefaultImports": true
   },
   "include": ["./src/**/*"]
 }

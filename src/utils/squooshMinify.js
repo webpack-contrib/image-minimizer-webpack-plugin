@@ -1,14 +1,29 @@
 import path from "path";
 
+/** @typedef {import("webpack").WebpackError} WebpackError */
+/** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
+/** @typedef {import("../index").SquooshMinimizerOptions} SquooshMinimizerOptions */
+/** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
+
+/**
+ * @param {DataForMinifyFn} data
+ * @param {SquooshMinimizerOptions} minifyOptions
+ * @returns {Promise<MinifyFnResult>}
+ */
 // Todo remove import/no-unresolved comment when "main" section in @squoosh/lib package.json will be fixed
 /* istanbul ignore next */
 async function squooshMinify(data, minifyOptions) {
   const [[filename, input]] = Object.entries(data);
+  /** @type {MinifyFnResult} */
   const result = {
     data: input,
     warnings: [],
     errors: [],
   };
+
+  /**
+   * @type {Record<string, string>}
+   */
   const targets = {
     ".png": "oxipng",
     ".jpg": "mozjpeg",
@@ -19,8 +34,9 @@ async function squooshMinify(data, minifyOptions) {
     ...minifyOptions.targets,
   };
   const ext = path.extname(filename).toLowerCase();
+  const targetCodec = targets[ext];
 
-  if (!targets[ext]) {
+  if (!targetCodec) {
     result.warnings.push(
       new Error(
         `The "${filename}" was not minified by "ImageMinimizerPlugin.squooshMinify". ${ext} extension is not supported".`
@@ -31,11 +47,12 @@ async function squooshMinify(data, minifyOptions) {
   }
 
   const encodeOptions = {
-    [targets[ext]]: {},
+    [targetCodec]: {},
     ...minifyOptions.encodeOptions,
   };
 
   // Todo remove import/no-unresolved comment when "main" section in @squoosh/lib package.json will be fixed
+  // @ts-ignore
   // eslint-disable-next-line node/no-unpublished-require,import/no-unresolved
   const squoosh = require("@squoosh/lib");
   const { ImagePool } = squoosh;
@@ -54,7 +71,7 @@ async function squooshMinify(data, minifyOptions) {
 
   await imagePool.close();
 
-  const encodedImage = await image.encodedWith[targets[ext]];
+  const encodedImage = await image.encodedWith[targetCodec];
 
   result.data = Buffer.from(encodedImage.binary);
 
