@@ -665,7 +665,13 @@ module.exports = {
     // Images are converted to `webp` and the original assets have been kept
     new ImageMinimizerPlugin({
       test: /\.(png)$/i,
-      filename: (pathData, assetInfo) => "[path][name].webp",
+      filename: (pathData, assetInfo) => {
+        if (/imageLg/i.test(pathData.filename)) {
+          return "./bigImages/[path][name].webp";
+        }
+
+        return "[path][name].webp";
+      },
       minimizerOptions: {
         plugins: ["imagemin-webp"],
       },
@@ -1147,7 +1153,13 @@ module.exports = {
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
-              filename: (pathData, assetInfo) => "[path][name].webp",
+              filename: (pathData, assetInfo) => {
+                if (/imageLg/i.test(pathData.filename)) {
+                  return "./bigImages/[path][name].webp";
+                }
+
+                return "[path][name].webp";
+              },
               minimizerOptions: {
                 plugins: ["imagemin-webp"],
               },
