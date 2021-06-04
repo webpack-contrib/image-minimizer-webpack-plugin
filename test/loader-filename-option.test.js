@@ -97,4 +97,34 @@ describe('loader "filename" option', () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
+
+  it("should emit new transformed to webp asset with filename when filename is function", async () => {
+    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-3");
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./loader-single.js"),
+      output: {
+        path: outputDir,
+      },
+      imageminPluginOptions: {
+        filename: () => "other/[name].webp",
+        minimizerOptions: {
+          plugins: ["imagemin-webp"],
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const transformedAsset = path.resolve(
+      __dirname,
+      outputDir,
+      "other/loader-test.webp"
+    );
+
+    const transformedExt = await fileType.fromFile(transformedAsset);
+
+    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
 });

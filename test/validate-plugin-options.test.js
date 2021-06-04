@@ -120,6 +120,10 @@ describe("validate plugin options", () => {
     }).not.toThrow();
 
     expect(() => {
+      new ImageMinimizerPlugin({ filename: () => "[name].[ext]" });
+    }).not.toThrow();
+
+    expect(() => {
       new ImageMinimizerPlugin({ filename: true });
     }).toThrowErrorMatchingSnapshot();
 
