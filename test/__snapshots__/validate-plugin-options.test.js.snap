@@ -104,12 +104,20 @@ exports[`validate plugin options should work 8`] = `
 
 exports[`validate plugin options should work 9`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.filename should be a string."
+ - options.filename should be one of these:
+   string | function
+   Details:
+    * options.filename should be a string.
+    * options.filename should be an instance of function."
 `;
 
 exports[`validate plugin options should work 10`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.filename should be a string."
+ - options.filename should be one of these:
+   string | function
+   Details:
+    * options.filename should be a string.
+    * options.filename should be an instance of function."
 `;
 
 exports[`validate plugin options should work 11`] = `

@@ -15,24 +15,31 @@ exports[`validate loader options should throw an error on the "deleteOriginalAss
  - options.deleteOriginalAssets should be a boolean."
 `;
 
-exports[`validate loader options should throw an error on the "filename" option with "() => {}" value 1`] = `
-"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.filename should be a string."
-`;
-
 exports[`validate loader options should throw an error on the "filename" option with "[]" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.filename should be a string."
+ - options.filename should be one of these:
+   string | function
+   Details:
+    * options.filename should be a string.
+    * options.filename should be an instance of function."
 `;
 
 exports[`validate loader options should throw an error on the "filename" option with "{}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.filename should be a string."
+ - options.filename should be one of these:
+   string | function
+   Details:
+    * options.filename should be a string.
+    * options.filename should be an instance of function."
 `;
 
 exports[`validate loader options should throw an error on the "filename" option with "true" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.filename should be a string."
+ - options.filename should be one of these:
+   string | function
+   Details:
+    * options.filename should be a string.
+    * options.filename should be an instance of function."
 `;
 
 exports[`validate loader options should throw an error on the "filter" option with "[]" value 1`] = `

@@ -33,7 +33,14 @@
       "type": "string"
     },
     "filename": {
-      "type": "string"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "instanceof": "Function"
+        }
+      ]
     },
     "deleteOriginalAssets": {
       "type": "boolean"

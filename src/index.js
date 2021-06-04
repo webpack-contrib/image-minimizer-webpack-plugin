@@ -19,6 +19,7 @@ import squooshMinify from "./utils/squooshMinify";
 /** @typedef {import("webpack").Compilation} Compilation */
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
+/** @typedef {import("webpack").AssetInfo} AssetInfo */
 /** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("./loader").LoaderOptions} LoaderOptions */
 /** @typedef {import("./utils/imageminMinify").default} ImageminMinifyFunction */
@@ -104,6 +105,18 @@ import squooshMinify from "./utils/squooshMinify";
  */
 
 /**
+ * @typedef {Object} PathData
+ * @property {string} [filename]
+ */
+
+/**
+ * @callback FilenameFn
+ * @param {PathData} pathData
+ * @param {AssetInfo} [assetInfo]
+ * @returns {string}
+ */
+
+/**
  * @typedef {Object} PluginOptions
  * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {Rules} [test] Test to match files against.
@@ -113,7 +126,7 @@ import squooshMinify from "./utils/squooshMinify";
  * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
- * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
+ * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  * @property {MinifyFunctions} [minify]
  */

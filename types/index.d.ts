@@ -5,6 +5,7 @@ export type Compiler = import("webpack").Compiler;
 export type Compilation = import("webpack").Compilation;
 export type WebpackError = import("webpack").WebpackError;
 export type Asset = import("webpack").Asset;
+export type AssetInfo = import("webpack").AssetInfo;
 export type ImageminOptions = import("imagemin").Options;
 export type LoaderOptions = import("./loader").LoaderOptions;
 export type ImageminMinifyFunction = typeof imageminMinify;
@@ -76,6 +77,13 @@ export type InternalLoaderOptions = {
   loader?: string | undefined;
   loaderOptions?: import("./loader").LoaderOptions | undefined;
 };
+export type PathData = {
+  filename?: string | undefined;
+};
+export type FilenameFn = (
+  pathData: PathData,
+  assetInfo?: import("webpack").AssetInfo | undefined
+) => string;
 export type PluginOptions = {
   /**
    * Allows filtering of images for optimization.
@@ -112,7 +120,7 @@ export type PluginOptions = {
   /**
    * Allows to set the filename for the generated asset. Useful for converting to a `webp`.
    */
-  filename?: string | undefined;
+  filename?: string | FilenameFn | undefined;
   /**
    * Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
    */
@@ -125,6 +133,7 @@ export type PluginOptions = {
 /** @typedef {import("webpack").Compilation} Compilation */
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
+/** @typedef {import("webpack").AssetInfo} AssetInfo */
 /** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("./loader").LoaderOptions} LoaderOptions */
 /** @typedef {import("./utils/imageminMinify").default} ImageminMinifyFunction */
@@ -195,6 +204,16 @@ export type PluginOptions = {
  * @property {LoaderOptions} [loaderOptions]
  */
 /**
+ * @typedef {Object} PathData
+ * @property {string} [filename]
+ */
+/**
+ * @callback FilenameFn
+ * @param {PathData} pathData
+ * @param {AssetInfo} [assetInfo]
+ * @returns {string}
+ */
+/**
  * @typedef {Object} PluginOptions
  * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {Rules} [test] Test to match files against.
@@ -204,7 +223,7 @@ export type PluginOptions = {
  * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
- * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
+ * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  * @property {MinifyFunctions} [minify]
  */
@@ -226,7 +245,7 @@ declare class ImageMinimizerPlugin {
     loader: boolean;
     maxConcurrency: number | undefined;
     test: Rules;
-    filename: string;
+    filename: string | FilenameFn;
     deleteOriginalAssets: boolean;
   };
   /**
