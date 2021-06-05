@@ -267,14 +267,14 @@ module.exports = {
 <!--lint disable no-html-->
 
 |            Name            |                   Type                    |                           Default                           | Description                                                                                       |
-| :------------------------: | :---------------------------------------: | :---------------------------------------------------------: | :------------------------------------------------------------------------------------------------ |
+| :------------------------: | :---------------------------------------: | :---------------------------------------------------------: | :------------------------------------------------------------------------------------------------ | ---------------------- |
 |         **`test`**         | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|tif\|webp\|svg\|avif)\$/i</code> | Test to match files against                                                                       |
 |       **`include`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `include`                                                                                |
 |       **`exclude`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `exclude`                                                                                |
 |        **`filter`**        |               `{Function}`                |                        `() => true`                         | Allows filtering of images for optimization                                                       |
 |    **`severityError`**     |                `{String}`                 |                          `'error'`                          | Allows to choose how errors are displayed                                                         |
 |        **`minify`**        |      `{Function \| Array<Function>}`      |            `ImageMinimizerPlugin.imageminMinify`            | Allows to override default minify function                                                        |
-|   **`minimizerOptions`**   |         `{Object\|Array<Object>}`         |                      `{ plugins: [] }`                      | Options for `imagemin`                                                                            |
+|   **`minimizerOptions`**   |     `{Object\|Function\|Array<Object      |                         Function>}`                         | `{ plugins: [] }`                                                                                 | Options for `imagemin` |
 |        **`loader`**        |                `{Boolean}`                |                           `true`                            | Automatically adding `imagemin-loader`                                                            |
 |    **`maxConcurrency`**    |                `{Number}`                 |             `Math.max(1, os.cpus().length - 1)`             | Maximum number of concurrency optimization processes in one time                                  |
 |       **`filename`**       |           `{string\|Function}`            |                    `'[path][name][ext]'`                    | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
@@ -493,7 +493,7 @@ module.exports = {
 
 #### `minimizerOptions`
 
-Type: `Object|Array<Object>`
+Type: `Object|Function|Array<Object|Function>`
 Default: `{ plugins: [] }`
 
 Options for `minify` functions. [`imagemin`](https://github.com/imagemin/imagemin) is default minify function.
@@ -539,6 +539,54 @@ module.exports = {
 };
 ```
 
+##### `Function`
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  plugins: [
+    new ImageMinimizerPlugin({
+      minimizerOptions: (data) => {
+        let qualityJpg = 90;
+        const [[filename, input]] = Object.entries(data);
+
+        if (/bigImage/i.test(filename)) {
+          qualityJpg = 70;
+        }
+
+        return {
+          plugins: [
+            // Name
+            "gifsicle",
+            // Name with options
+            ["mozjpeg", { quality: qualityJpg }],
+            // Full package name
+            [
+              "imagemin-svgo",
+              {
+                plugins: [
+                  {
+                    removeViewBox: false,
+                  },
+                ],
+              },
+            ],
+            [
+              // Custom package name
+              "nonstandard-imagemin-package-name",
+              { myOptions: true },
+            ],
+          ],
+        };
+      },
+    }),
+  ],
+};
+```
+
 ##### `Array`
 
 The function index in the `minify` array corresponds to the options object with the same index in the `minimizerOptions` array.
@@ -575,7 +623,7 @@ module.exports = {
           plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
         },
         // Options for the second function
-        {},
+        () => ({}),
       ],
     }),
   ],
@@ -772,14 +820,14 @@ module.exports = {
 
 ### Loader Options
 
-|            Name            |              Type               |                Default                | Description                                                                                       |
-| :------------------------: | :-----------------------------: | :-----------------------------------: | :------------------------------------------------------------------------------------------------ |
-|        **`filter`**        |          `{Function}`           |              `undefined`              | Allows filtering of images for optimization                                                       |
-|    **`severityError`**     |           `{String}`            |               `'error'`               | Allows to choose how errors are displayed                                                         |
-|        **`minify`**        | `{Function \| Array<Function>}` | `ImageMinimizerPlugin.imageminMinify` | Allows to override default minify function                                                        |
-|   **`minimizerOptions`**   |    `{Object\|Array<Object>}`    |           `{ plugins: [] }`           | Options for `imagemin`                                                                            |
-|       **`filename`**       |      `{string\|Function}`       |         `'[path][name][ext]'`         | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
-| **`deleteOriginalAssets`** |           `{Boolean}`           |                `false`                | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
+|            Name            |                      Type                       |                Default                | Description                                                                                       |
+| :------------------------: | :---------------------------------------------: | :-----------------------------------: | :------------------------------------------------------------------------------------------------ |
+|        **`filter`**        |                  `{Function}`                   |              `undefined`              | Allows filtering of images for optimization                                                       |
+|    **`severityError`**     |                   `{String}`                    |               `'error'`               | Allows to choose how errors are displayed                                                         |
+|        **`minify`**        |         `{Function \| Array<Function>}`         | `ImageMinimizerPlugin.imageminMinify` | Allows to override default minify function                                                        |
+|   **`minimizerOptions`**   | `{Object\|Function\|Array<Object \| Function>}` |           `{ plugins: [] }`           | Options for `imagemin`                                                                            |
+|       **`filename`**       |              `{string\|Function}`               |         `'[path][name][ext]'`         | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
+| **`deleteOriginalAssets`** |                   `{Boolean}`                   |                `false`                | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
 
 #### `filter`
 
@@ -992,7 +1040,7 @@ module.exports = {
 
 #### `minimizerOptions`
 
-Type: `Object|Array<Object>`
+Type: `Object|Function|Array<Object|Function>`
 Default: `{ plugins: [] }`
 
 Options for `minify` functions. [`imagemin`](https://github.com/imagemin/imagemin) is default minify function.
@@ -1023,6 +1071,68 @@ module.exports = {
                 plugins: [
                   ["gifsicle", { interlaced: true, optimizationLevel: 3 }],
                 ],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```
+
+##### `Function`
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        type: "asset",
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          {
+            loader: ImageMinimizerPlugin.loader,
+            options: {
+              minimizerOptions: (data) => {
+                let qualityJpg = 90;
+                const [[filename, input]] = Object.entries(data);
+
+                if (/bigImage/i.test(filename)) {
+                  qualityJpg = 70;
+                }
+
+                return {
+                  plugins: [
+                    // Name
+                    "gifsicle",
+                    // Name with options
+                    ["mozjpeg", { quality: qualityJpg }],
+                    // Full package name
+                    [
+                      "imagemin-svgo",
+                      {
+                        plugins: [
+                          {
+                            removeViewBox: false,
+                          },
+                        ],
+                      },
+                    ],
+                    [
+                      // Custom package name
+                      "nonstandard-imagemin-package-name",
+                      { myOptions: true },
+                    ],
+                  ],
+                };
               },
             },
           },

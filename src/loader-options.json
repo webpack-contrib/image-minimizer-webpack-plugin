@@ -1,8 +1,15 @@
 {
   "definitions": {
     "MinimizerOptions": {
-      "additionalProperties": true,
-      "type": "object"
+      "anyOf": [
+        {
+          "instanceof": "Function"
+        },
+        {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      ]
     }
   },
   "title": "Image Minimizer Plugin Loader options",

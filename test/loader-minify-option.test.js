@@ -178,6 +178,110 @@ describe("loader minify option", () => {
     );
   });
 
+  it("should work if minify is array && minimizerOptions is function", async () => {
+    expect.assertions(14);
+
+    const stats = await webpack({
+      imageminLoader: true,
+      imageminLoaderOptions: {
+        minify: [
+          ImageMinimizerPlugin.imageminMinify,
+          (data, minifiOptions) => {
+            const [[, input]] = Object.entries(data);
+
+            expect(input).toBeDefined();
+            expect(minifiOptions).toBeDefined();
+
+            return {
+              data: input,
+            };
+          },
+        ],
+        minimizerOptions: () => ({
+          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+        }),
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+  });
+
+  it("should work if minify is array && minimizerOptions is [functions", async () => {
+    expect.assertions(14);
+
+    const stats = await webpack({
+      imageminLoader: true,
+      imageminLoaderOptions: {
+        minify: [
+          ImageMinimizerPlugin.imageminMinify,
+          (data, minifiOptions) => {
+            const [[, input]] = Object.entries(data);
+
+            expect("options2" in minifiOptions).toBe(true);
+
+            return {
+              data: input,
+            };
+          },
+          (data, minifiOptions) => {
+            const [[, input]] = Object.entries(data);
+
+            expect("options3" in minifiOptions).toBe(true);
+
+            return {
+              data: input,
+            };
+          },
+        ],
+        minimizerOptions: [
+          () => ({
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+          }),
+          () => ({
+            options2: "passed",
+          }),
+          () => ({
+            options3: "passed",
+          }),
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+  });
+
   it("should emit errors", async () => {
     const stats = await webpack({
       imageminLoader: true,

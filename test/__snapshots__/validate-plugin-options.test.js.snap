@@ -146,13 +146,17 @@ exports[`validate plugin options should work 14`] = `
 exports[`validate plugin options should work 15`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.minimizerOptions should be one of these:
-   object { … } | [object { … }, ...] (should not have fewer than 1 item)
+   function | object { … } | [function | object { … }, ...] (should not have fewer than 1 item)
    -> Options for \`imageMinimizerOptions\`.
    Details:
-    * options.minimizerOptions should be an object:
-      object { … }
+    * options.minimizerOptions should be one of these:
+      function | object { … }
+      Details:
+       * options.minimizerOptions should be an instance of function.
+       * options.minimizerOptions should be an object:
+         object { … }
     * options.minimizerOptions should be an array:
-      [object { … }, ...] (should not have fewer than 1 item)"
+      [function | object { … }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate plugin options should work 16`] = `

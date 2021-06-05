@@ -57,7 +57,17 @@ import squooshMinify from "./utils/squooshMinify";
  */
 
 /**
- * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
+ * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptionsObject
+ */
+
+/**
+ * @callback MinimizerOptionsFn
+ * @param {DataForMinifyFn} data
+ * @returns {MinimizerOptions}
+ */
+
+/**
+ * @typedef {MinimizerOptionsObject | MinimizerOptionsFn | [MinimizerOptionsObject | MinimizerOptionsFn]} MinimizerOptions
  */
 
 /**

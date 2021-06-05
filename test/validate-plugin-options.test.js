@@ -164,6 +164,10 @@ describe("validate plugin options", () => {
     }).not.toThrow();
 
     expect(() => {
+      new ImageMinimizerPlugin({ minimizerOptions: () => ({}) });
+    }).not.toThrow();
+
+    expect(() => {
       new ImageMinimizerPlugin({ minimizerOptions: null });
     }).toThrowErrorMatchingSnapshot();
 

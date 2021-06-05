@@ -35,7 +35,9 @@ async function minify(options) {
       // eslint-disable-next-line no-await-in-loop
       const minifyResult = await minifyFn(
         { [options.filename]: result.data },
-        minifyOptions
+        typeof minifyOptions === "function"
+          ? minifyOptions({ [options.filename]: result.data })
+          : minifyOptions
       );
 
       result.data = minifyResult.data;

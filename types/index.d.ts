@@ -31,10 +31,15 @@ export type SquooshMinimizerOptions = {
     | undefined;
 };
 export type CustomFnMinimizerOptions = Record<string, any>;
-export type MinimizerOptions =
+export type MinimizerOptionsObject =
   | ImageminMinimizerOptions
   | SquooshMinimizerOptions
   | CustomFnMinimizerOptions;
+export type MinimizerOptionsFn = (data: DataForMinifyFn) => MinimizerOptions;
+export type MinimizerOptions =
+  | MinimizerOptionsObject
+  | MinimizerOptionsFn
+  | [MinimizerOptionsObject | MinimizerOptionsFn];
 export type InternalMinifyOptions = {
   filename: string;
   input: Buffer;
@@ -163,7 +168,15 @@ export type PluginOptions = {
  * @typedef {Record<string, any>} CustomFnMinimizerOptions
  */
 /**
- * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
+ * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptionsObject
+ */
+/**
+ * @callback MinimizerOptionsFn
+ * @param {DataForMinifyFn} data
+ * @returns {MinimizerOptions}
+ */
+/**
+ * @typedef {MinimizerOptionsObject | MinimizerOptionsFn | [MinimizerOptionsObject | MinimizerOptionsFn]} MinimizerOptions
  */
 /**
  * @typedef {Object} InternalMinifyOptions

@@ -148,6 +148,88 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
+  it("should work if minimizerOptions is function", async () => {
+    expect.assertions(5);
+
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minimizerOptions: (data) => {
+          const [[filename, input]] = Object.entries(data);
+
+          expect(filename).toBe("plugin-test.jpg");
+          expect(input).toBeDefined();
+
+          return {
+            plugins: ["mozjpeg"],
+          };
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("should work if minify is array && minimizerOptions is [functions]", async () => {
+    expect.assertions(5);
+
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [
+          ImageMinimizerPlugin.imageminMinify,
+          (data, minifiOptions) => {
+            const [[, input]] = Object.entries(data);
+
+            expect("options2" in minifiOptions).toBe(true);
+
+            return {
+              data: input,
+            };
+          },
+          (data, minifiOptions) => {
+            const [[, input]] = Object.entries(data);
+
+            expect("options3" in minifiOptions).toBe(true);
+
+            return {
+              data: input,
+            };
+          },
+        ],
+        minimizerOptions: [
+          () => ({
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+          }),
+          () => ({
+            options2: "passed",
+          }),
+          () => ({
+            options3: "passed",
+          }),
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
   // Todo enable test when "main" section in @squoosh/lib package.json will be fixed
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip('should work with "squooshMinify" minifier', async () => {
