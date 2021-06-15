@@ -484,7 +484,7 @@ describe("minify", () => {
     expect(result.filename).toBe(filename);
   });
 
-  it("should transform", async () => {
+  it("should transform with ImageMinimizerPlugin.imageminGenerate", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const [, result] = await minify({

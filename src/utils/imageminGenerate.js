@@ -1,5 +1,5 @@
 import path from "path";
-import fileType from "file-type";
+import fileTypeFromBuffer from "./fileTypeFromBuffer";
 import { normalizeImageminConfig } from "./imageminMinify";
 
 /** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
@@ -71,9 +71,7 @@ export default async function imageminGenerate(data, minimizerOptions) {
     }
 
     const extInput = path.extname(resultForPlugin.filename).toLowerCase();
-    const { ext: extOutput } =
-      // eslint-disable-next-line no-await-in-loop
-      (await fileType.fromBuffer(resultForPlugin.data)) || {};
+    const { ext: extOutput } = fileTypeFromBuffer(resultForPlugin.data) || {};
 
     if (extOutput && extInput !== extOutput) {
       resultForPlugin.filename = resultForPlugin.filename.replace(

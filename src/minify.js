@@ -68,7 +68,7 @@ async function minify(options) {
 
         file.errors.push(errored);
 
-        break;
+        continue;
       }
 
       minifyResult = Array.isArray(minifyResult)

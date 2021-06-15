@@ -53,7 +53,6 @@
     }
   },
   "dependencies": {
-    "file-type": "^16.5.0",
     "imagemin": "^7.0.1",
     "klona": "^2.0.4",
     "p-limit": "^3.1.0",
@@ -87,6 +86,7 @@
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-unicorn": "^32.0.1",
     "file-loader": "^6.2.0",
+    "file-type": "^16.5.0",
     "husky": "^6.0.0",
     "imagemin-avif": "^0.1.2",
     "imagemin-gifsicle": "^7.0.0",
