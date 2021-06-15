@@ -4,6 +4,8 @@ import fileType from "file-type";
 
 import { fixturesPath, webpack, clearDirectory } from "./helpers";
 
+import ImageMinimizerPlugin from "../src";
+
 describe('loader "deleteOriginalAssets" option', () => {
   it("should transform asset and keep original asset (default behavior)", async () => {
     const stats = await webpack({
@@ -12,7 +14,7 @@ describe('loader "deleteOriginalAssets" option', () => {
         path: path.resolve(__dirname, "outputs"),
       },
       imageminPluginOptions: {
-        filename: "[path][name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
           plugins: ["imagemin-webp"],
         },
@@ -47,9 +49,9 @@ describe('loader "deleteOriginalAssets" option', () => {
         path: path.resolve(__dirname, "outputs"),
       },
       imageminPluginOptions: {
-        deleteOriginalAssets: false,
-        filename: "[path][name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
+          deleteOriginalAssets: false,
           plugins: ["imagemin-webp"],
         },
       },
@@ -88,9 +90,9 @@ describe('loader "deleteOriginalAssets" option', () => {
         path: outputDir,
       },
       imageminPluginOptions: {
-        deleteOriginalAssets: true,
-        filename: "[path][name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
+          deleteOriginalAssets: true,
           plugins: ["imagemin-webp"],
         },
       },

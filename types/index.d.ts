@@ -10,6 +10,7 @@ export type ImageminOptions = import("imagemin").Options;
 export type LoaderOptions = import("./loader").LoaderOptions;
 export type ImageminMinifyFunction = typeof imageminMinify;
 export type SquooshMinifyFunction = typeof squooshMinify;
+export type squooshTransformerFunction = typeof squooshGenerate;
 export type Rule = RegExp | string;
 export type Rules = Rule[] | Rule;
 export type FilterFn = (source: Buffer, sourcePath: string) => boolean;
@@ -42,12 +43,15 @@ export type InternalMinifyOptions = {
   minimizerOptions?: MinimizerOptions | undefined;
   minify: MinifyFunctions;
 };
-export type InternalMinifyResult = {
+export type InternalMinifyResultEntry = {
   data: Buffer;
   filename: string;
   warnings: Array<Error>;
   errors: Array<Error>;
+  filenameTemplate: string;
+  remove?: boolean | undefined;
 };
+export type InternalMinifyResult = InternalMinifyResultEntry[];
 export type CustomMinifyFunction = (
   data: DataForMinifyFn,
   minifyOptions: CustomFnMinimizerOptions
@@ -56,11 +60,14 @@ export type MinifyFunctions =
   | ImageminMinifyFunction
   | SquooshMinifyFunction
   | CustomMinifyFunction;
-export type MinifyFnResult = {
+export type MinifyFnResultEntry = {
+  filename: string;
   data: Buffer;
   warnings: Array<Error>;
   errors: Array<Error>;
+  filenameTemplate?: string | undefined;
 };
+export type MinifyFnResult = MinifyFnResultEntry | MinifyFnResultEntry[];
 export type InternalLoaderOptions = {
   /**
    * Test to match files against.
@@ -138,6 +145,7 @@ export type PluginOptions = {
 /** @typedef {import("./loader").LoaderOptions} LoaderOptions */
 /** @typedef {import("./utils/imageminMinify").default} ImageminMinifyFunction */
 /** @typedef {import("./utils/squooshMinify").default} SquooshMinifyFunction */
+/** @typedef {import("./utils/squooshGenerate").default} squooshTransformerFunction */
 /** @typedef {RegExp | string} Rule */
 /** @typedef {Rule[] | Rule} Rules */
 /**
@@ -174,11 +182,16 @@ export type PluginOptions = {
  * @property {MinifyFunctions} minify
  */
 /**
- * @typedef {Object} InternalMinifyResult
+ * @typedef {Object} InternalMinifyResultEntry
  * @property {Buffer} data
  * @property {string} filename
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
+ * @property {string} filenameTemplate
+ * @property {boolean | undefined} [remove]
+ */
+/**
+ * @typedef {InternalMinifyResultEntry[]} InternalMinifyResult
  */
 /**
  * @callback CustomMinifyFunction
@@ -190,10 +203,15 @@ export type PluginOptions = {
  * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
  */
 /**
- * @typedef {Object} MinifyFnResult
+ * @typedef {Object} MinifyFnResultEntry
+ * @property {string} filename
  * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
+ * @property {string} [filenameTemplate]
+ */
+/**
+ * @typedef {MinifyFnResultEntry | MinifyFnResultEntry[]} MinifyFnResult
  */
 /**
  * @typedef {Object} InternalLoaderOptions
@@ -249,6 +267,22 @@ declare class ImageMinimizerPlugin {
     deleteOriginalAssets: boolean;
   };
   /**
+   *
+   * @param {(InternalMinifyResultEntry & {source: Buffer} )[]} data
+   * @returns (InternalMinifyResultEntry & {source: Buffer} )[]
+   */
+  createCacheData(
+    data: (InternalMinifyResultEntry & {
+      source: Buffer;
+    })[]
+  ): {
+    source: Buffer;
+    warnings: Error[];
+    filename: string;
+    filenameTemplate: string;
+    remove: boolean | undefined;
+  }[];
+  /**
    * @private
    * @param {Compiler} compiler
    * @param {Compilation} compilation
@@ -267,7 +301,11 @@ declare namespace ImageMinimizerPlugin {
   export { normalizeImageminConfig };
   export { imageminMinify };
   export { squooshMinify };
+  export { imageminGenerate };
+  export { squooshGenerate };
 }
 import imageminMinify from "./utils/imageminMinify";
 import squooshMinify from "./utils/squooshMinify";
+import squooshGenerate from "./utils/squooshGenerate";
 import { normalizeImageminConfig } from "./utils/imageminMinify";
+import imageminGenerate from "./utils/imageminGenerate";

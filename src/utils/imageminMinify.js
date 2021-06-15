@@ -2,6 +2,7 @@ import { klona } from "klona/full";
 
 /** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
 /** @typedef {import("../index").ImageminMinimizerOptions} ImageminMinimizerOptions */
+/** @typedef {import("../index").MinifyFnResultEntry} MinifyFnResultEntry */
 /** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
 
 /**
@@ -160,18 +161,17 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
  * @returns {Promise<MinifyFnResult>}
  */
 export default async function imageminMinify(data, minimizerOptions) {
-  const [[, input]] = Object.entries(data);
-  /** @type {MinifyFnResult} */
+  const [[filename, input]] = Object.entries(data);
+  /** @type {MinifyFnResultEntry} */
   const result = {
+    filename,
     data: input,
     warnings: [],
     errors: [],
   };
 
   try {
-    // @ts-ignore
-    // eslint-disable-next-line import/dynamic-import-chunkname,node/no-unsupported-features/es-syntax
-    const imagemin = await import("imagemin");
+    const imagemin = require("imagemin");
 
     /** @typedef {import("imagemin").Options} ImageminOptions */
 

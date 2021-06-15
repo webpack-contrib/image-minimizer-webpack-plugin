@@ -4,6 +4,8 @@ import fileType from "file-type";
 
 import { fixturesPath, isOptimized, webpack, normalizePath } from "./helpers";
 
+import ImageMinimizerPlugin from "../src";
+
 describe('plugin "deleteOriginalAssets" option', () => {
   it("should transform asset and keep original asset (default behavior)", async () => {
     const stats = await webpack({
@@ -14,7 +16,7 @@ describe('plugin "deleteOriginalAssets" option', () => {
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
-        filename: "[path][name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
           plugins: ["imagemin-webp"],
         },
@@ -58,9 +60,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
-        deleteOriginalAssets: false,
-        filename: "[path][name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
+          deleteOriginalAssets: false,
           plugins: ["imagemin-webp"],
         },
       },
@@ -103,9 +105,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
-        deleteOriginalAssets: true,
-        filename: "[path][name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
+          deleteOriginalAssets: true,
           plugins: ["imagemin-webp"],
         },
       },
@@ -144,7 +146,7 @@ describe('plugin "deleteOriginalAssets" option', () => {
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
-        filename: "[path][name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
           plugins: ["imagemin-webp"],
         },
@@ -177,9 +179,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
         emitPlugin: true,
         emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
         imageminPluginOptions: {
-          deleteOriginalAssets: true,
-          filename: "[path][name].webp",
+          minify: ImageMinimizerPlugin.imageminGenerate,
           minimizerOptions: {
+            deleteOriginalAssets: true,
             plugins: ["imagemin-webp"],
           },
         },

@@ -116,22 +116,6 @@ describe("validate plugin options", () => {
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ filename: "[name].[ext]" });
-    }).not.toThrow();
-
-    expect(() => {
-      new ImageMinimizerPlugin({ filename: () => "[name].[ext]" });
-    }).not.toThrow();
-
-    expect(() => {
-      new ImageMinimizerPlugin({ filename: true });
-    }).toThrowErrorMatchingSnapshot();
-
-    expect(() => {
-      new ImageMinimizerPlugin({ filename: {} });
-    }).toThrowErrorMatchingSnapshot();
-
-    expect(() => {
       new ImageMinimizerPlugin({ severityError: false });
     }).toThrowErrorMatchingSnapshot();
 
@@ -148,18 +132,6 @@ describe("validate plugin options", () => {
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ deleteOriginalAssets: false });
-    }).not.toThrow();
-
-    expect(() => {
-      new ImageMinimizerPlugin({ deleteOriginalAssets: {} });
-    }).toThrowErrorMatchingSnapshot();
-
-    expect(() => {
-      new ImageMinimizerPlugin({ deleteOriginalAssets: true });
-    }).not.toThrow();
-
-    expect(() => {
       new ImageMinimizerPlugin({ minimizerOptions: {} });
     }).not.toThrow();
 
@@ -172,6 +144,38 @@ describe("validate plugin options", () => {
         minimizerOptions: { plugins: [] },
       });
     }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizerOptions: { filename: "[name].[ext]" },
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizerOptions: { filename: () => "[name].[ext]" },
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({ minimizerOptions: { filename: true } });
+    }).toThrowErrorMatchingSnapshot();
+
+    expect(() => {
+      new ImageMinimizerPlugin({ minimizerOptions: { filename: {} } });
+    }).toThrowErrorMatchingSnapshot();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizerOptions: { deleteOriginalAssets: false },
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizerOptions: { deleteOriginalAssets: {} },
+      });
+    }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
       new ImageMinimizerPlugin({ maxConcurrency: 2 });

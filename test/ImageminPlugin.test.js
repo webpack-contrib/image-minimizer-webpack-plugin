@@ -205,8 +205,7 @@ describe("imagemin plugin", () => {
         fileNames: ["plugin-test.png"],
       },
       imageminPluginOptions: {
-        minimizerOptions: { plugins },
-        filename: "[name][ext]",
+        minimizerOptions: { filename: "[name][ext]", plugins },
       },
     });
     const { compilation } = stats;
@@ -244,8 +243,7 @@ describe("imagemin plugin", () => {
         fileNames: ["nested/deep/plugin-test.png"],
       },
       imageminPluginOptions: {
-        minimizerOptions: { plugins },
-        filename: "[path][name][ext]",
+        minimizerOptions: { filename: "[path][name][ext]", plugins },
       },
     });
     const { compilation } = stats;
@@ -619,14 +617,14 @@ describe("imagemin plugin - persistent cache", () => {
         emitAssetPlugin: true,
         imageminPluginOptions: [
           {
-            filename: "[name].webp",
             minimizerOptions: {
+              filename: "[name].webp",
               plugins: ["imagemin-webp"],
             },
           },
           {
-            filename: "[name].json",
             minimizerOptions: {
+              filename: "[name].json",
               plugins: ["../../test/imagemin-base64.js"],
             },
           },

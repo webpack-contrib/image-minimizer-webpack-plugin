@@ -3,7 +3,6 @@ import path from "path";
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
 /** @typedef {import("../index").SquooshMinimizerOptions} SquooshMinimizerOptions */
-/** @typedef {import("../index").MinifyFnResultEntry} MinifyFnResultEntry */
 /** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
 
 /**
@@ -13,45 +12,18 @@ import path from "path";
  */
 // Todo remove import/no-unresolved comment when "main" section in @squoosh/lib package.json will be fixed
 /* istanbul ignore next */
-async function squooshMinify(data, minifyOptions) {
+async function squooshGenerate(data, minifyOptions) {
   const [[filename, input]] = Object.entries(data);
-  /** @type {MinifyFnResultEntry} */
-  const result = {
-    filename,
-    data: input,
-    warnings: [],
-    errors: [],
-  };
+  const { encodeOptions } = minifyOptions;
 
-  /**
-   * @type {Record<string, string>}
-   */
-  const targets = {
-    ".png": "oxipng",
-    ".jpg": "mozjpeg",
-    ".jpeg": "mozjpeg",
-    ".jxl": "jxl",
-    ".webp": "webp",
-    ".avif": "avif",
-    ...minifyOptions.targets,
-  };
-  const ext = path.extname(filename).toLowerCase();
-  const targetCodec = targets[ext];
-
-  if (!targetCodec) {
-    result.warnings.push(
-      new Error(
-        `The "${filename}" was not minified by "ImageMinimizerPlugin.squooshMinify". ${ext} extension is not supported".`
-      )
-    );
-
-    return result;
+  if (typeof encodeOptions === "undefined") {
+    return {
+      filename,
+      data: input,
+      warnings: [],
+      errors: [],
+    };
   }
-
-  const encodeOptions = {
-    [targetCodec]: {},
-    ...minifyOptions.encodeOptions,
-  };
 
   // Todo remove import/no-unresolved comment when "main" section in @squoosh/lib package.json will be fixed
   // @ts-ignore
@@ -66,18 +38,32 @@ async function squooshMinify(data, minifyOptions) {
   } catch (error) {
     await imagePool.close();
 
-    result.errors.push(error);
-
-    return result;
+    return {
+      filename,
+      data: input,
+      warnings: [],
+      errors: [error],
+    };
   }
 
   await imagePool.close();
 
-  const encodedImage = await image.encodedWith[targetCodec];
+  const result = [];
+  const ext = path.extname(filename).toLowerCase();
 
-  result.data = Buffer.from(encodedImage.binary);
+  for (const encodedImage of Object.values(image.encodedWith)) {
+    // eslint-disable-next-line no-await-in-loop
+    const { extension, binary } = await encodedImage;
+
+    result.push({
+      filename: filename.replace(new RegExp(`${ext}$`), `.${extension}`),
+      data: Buffer.from(binary),
+      warnings: [],
+      errors: [],
+    });
+  }
 
   return result;
 }
 
-export default squooshMinify;
+export default squooshGenerate;

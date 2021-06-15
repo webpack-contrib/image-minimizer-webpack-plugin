@@ -266,19 +266,17 @@ module.exports = {
 
 <!--lint disable no-html-->
 
-|            Name            |                   Type                    |                           Default                           | Description                                                                                       |
-| :------------------------: | :---------------------------------------: | :---------------------------------------------------------: | :------------------------------------------------------------------------------------------------ |
-|         **`test`**         | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|tif\|webp\|svg\|avif)\$/i</code> | Test to match files against                                                                       |
-|       **`include`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `include`                                                                                |
-|       **`exclude`**        | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `exclude`                                                                                |
-|        **`filter`**        |               `{Function}`                |                        `() => true`                         | Allows filtering of images for optimization                                                       |
-|    **`severityError`**     |                `{String}`                 |                          `'error'`                          | Allows to choose how errors are displayed                                                         |
-|        **`minify`**        |      `{Function \| Array<Function>}`      |            `ImageMinimizerPlugin.imageminMinify`            | Allows to override default minify function                                                        |
-|   **`minimizerOptions`**   |         `{Object\|Array<Object>}`         |                      `{ plugins: [] }`                      | Options for `imagemin`                                                                            |
-|        **`loader`**        |                `{Boolean}`                |                           `true`                            | Automatically adding `imagemin-loader`                                                            |
-|    **`maxConcurrency`**    |                `{Number}`                 |             `Math.max(1, os.cpus().length - 1)`             | Maximum number of concurrency optimization processes in one time                                  |
-|       **`filename`**       |           `{string\|Function}`            |                    `'[path][name][ext]'`                    | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
-| **`deleteOriginalAssets`** |                `{Boolean}`                |                           `false`                           | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
+|          Name          |                   Type                    |                           Default                           | Description                                                      |
+| :--------------------: | :---------------------------------------: | :---------------------------------------------------------: | :--------------------------------------------------------------- |
+|       **`test`**       | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|tif\|webp\|svg\|avif)\$/i</code> | Test to match files against                                      |
+|     **`include`**      | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `include`                                               |
+|     **`exclude`**      | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `exclude`                                               |
+|      **`filter`**      |               `{Function}`                |                        `() => true`                         | Allows filtering of images for optimization                      |
+|  **`severityError`**   |                `{String}`                 |                          `'error'`                          | Allows to choose how errors are displayed                        |
+|      **`minify`**      |      `{Function \| Array<Function>}`      |            `ImageMinimizerPlugin.imageminMinify`            | Allows to override default minify function                       |
+| **`minimizerOptions`** |         `{Object\|Array<Object>}`         |                      `{ plugins: [] }`                      | Options for `imagemin`                                           |
+|      **`loader`**      |                `{Boolean}`                |                           `true`                            | Automatically adding `imagemin-loader`                           |
+|  **`maxConcurrency`**  |                `{Number}`                 |             `Math.max(1, os.cpus().length - 1)`             | Maximum number of concurrency optimization processes in one time |
 
 <!--lint enable no-html-->
 
@@ -414,8 +412,12 @@ Useful for using and testing unpublished versions or forks.
 
 Аvailable minifiers:
 
-- ImageMinimizerPlugin.imageminMinify
-- ImageMinimizerPlugin.squooshMinify
+- ImageMinimizerPlugin.imageminMinify (to minify images)
+- ImageMinimizerPlugin.imageminGenerate (to generate images in other formats)
+- ImageMinimizerPlugin.squooshMinify (to minify images)
+- ImageMinimizerPlugin.squooshGenerate (to generate images in other formats)
+
+Examples of generating images, see below in the [`Examples`](#examples) section.
 
 ##### `Function`
 
@@ -494,7 +496,14 @@ module.exports = {
 #### `minimizerOptions`
 
 Type: `Object|Array<Object>`
-Default: `{ plugins: [] }`
+Default: `{ plugins: [], filename: [path][name][ext], deleteOriginalAssets: false }`
+
+<!--lint disable no-html-->
+
+|            Name            |         Type         |        Default        | Description                                                                                       |
+| :------------------------: | :------------------: | :-------------------: | :------------------------------------------------------------------------------------------------ |
+|       **`filename`**       | `{string\|Function}` | `'[path][name][ext]'` | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
+| **`deleteOriginalAssets`** |     `{Boolean}`      |        `false`        | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
 
 Options for `minify` functions. [`imagemin`](https://github.com/imagemin/imagemin) is default minify function.
 
@@ -582,6 +591,120 @@ module.exports = {
 };
 ```
 
+##### `filename`
+
+Type: `String|Function`
+Default: `'[path][name][ext]'`
+
+Allows to set the filename for the generated asset.
+Supported values see in [`webpack template strings`](https://webpack.js.org/configuration/output/#template-strings), `File-level` section.
+
+###### `String`
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  plugins: [
+    // Images are converted to `webp` and the original assets have been kept
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      minify: ImageMinimizerPlugin.imageminGenerate,
+      minimizerOptions: {
+        filename: "webp/[path][name][ext]",
+        plugins: ["imagemin-webp"],
+      },
+    }),
+  ],
+};
+```
+
+###### `Function`
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  plugins: [
+    // Images are converted to `webp` and the original assets have been kept
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      minify: ImageMinimizerPlugin.imageminGenerate,
+      minimizerOptions: {
+        filename: (pathData, assetInfo) => {
+          if (/imageLg/i.test(pathData.filename)) {
+            return "./bigImages/[path][name][ext]";
+          }
+
+          return "[path][name][ext]";
+        },
+        plugins: ["imagemin-webp"],
+      },
+    }),
+  ],
+};
+```
+
+##### `deleteOriginalAssets`
+
+Type: `Boolean`
+Default: `false`
+
+Allows to remove original assets. Useful for converting to a `webp` and remove original assets
+
+> i Doesn't make sense if you haven't changed the original value of the `filename` option
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  plugins: [
+    // Images are converted to `webp` and the original assets have been removed
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      minify: ImageMinimizerPlugin.imageminGenerate,
+      minimizerOptions: {
+        deleteOriginalAssets: true,
+        plugins: ["imagemin-webp"],
+      },
+    }),
+  ],
+};
+```
+
+To generate and compress the original assets:
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  plugins: [
+    // And the original assets will be compressed
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      minimizerOptions: {
+        plugins: ["pngquant"],
+      },
+    }),
+    // Images are converted to `webp` and the original assets have been removed
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      minify: ImageMinimizerPlugin.imageminGenerate,
+      minimizerOptions: {
+        deleteOriginalAssets: false,
+        plugins: ["imagemin-webp"],
+      },
+    }),
+  ],
+};
+```
+
 #### `loader`
 
 Type: `Boolean`
@@ -624,162 +747,14 @@ module.exports = {
 };
 ```
 
-#### `filename`
-
-Type: `String|Function`
-Default: `'[path][name][ext]'`
-
-Allows to set the filename for the generated asset. Useful for converting to a `webp`.
-Supported values see in [`webpack template strings`](https://webpack.js.org/configuration/output/#template-strings), `File-level` section.
-
-##### `String`
-
-**webpack.config.js**
-
-```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-
-module.exports = {
-  plugins: [
-    // Images are converted to `webp` and the original assets have been kept
-    new ImageMinimizerPlugin({
-      test: /\.(png)$/i,
-      filename: "[path][name].webp",
-      minimizerOptions: {
-        plugins: ["imagemin-webp"],
-      },
-    }),
-  ],
-};
-```
-
-##### `Function`
-
-**webpack.config.js**
-
-```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-
-module.exports = {
-  plugins: [
-    // Images are converted to `webp` and the original assets have been kept
-    new ImageMinimizerPlugin({
-      test: /\.(png)$/i,
-      filename: (pathData, assetInfo) => {
-        if (/imageLg/i.test(pathData.filename)) {
-          return "./bigImages/[path][name].webp";
-        }
-
-        return "[path][name].webp";
-      },
-      minimizerOptions: {
-        plugins: ["imagemin-webp"],
-      },
-    }),
-  ],
-};
-```
-
-##### Converting to `webp` using `ImageMinimizerPlugin.squooshMinify`
-
-**webpack.config.js**
-
-```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-/*
-const defaultTargets = {
-  ".png": "oxipng",
-  ".jpg": "mozjpeg",
-  ".jpeg": "mozjpeg",
-  ".jxl": "jxl",
-  ".webp": "webp",
-  ".avif": "avif",
-};
-*/
-
-module.exports = {
-  plugins: [
-    // Images are converted to `webp` and the original assets have been kept
-    new ImageMinimizerPlugin({
-      test: /\.(png)$/i,
-      filename: "[path][name].webp",
-      minify: ImageMinimizerPlugin.squooshMinify,
-      minimizerOptions: {
-        targets: {
-          ".png": "webp",
-        },
-      },
-    }),
-  ],
-};
-```
-
-#### `deleteOriginalAssets`
-
-Type: `Boolean`
-Default: `false`
-
-Allows to remove original assets. Useful for converting to a `webp` and remove original assets
-
-> i Doesn't make sense if you haven't changed the original value of the `filename` option
-
-**webpack.config.js**
-
-```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-
-module.exports = {
-  plugins: [
-    // Images are converted to `webp` and the original assets have been removed
-    new ImageMinimizerPlugin({
-      test: /\.(png)$/i,
-      deleteOriginalAssets: true,
-      filename: "[path][name].webp",
-      minimizerOptions: {
-        plugins: ["imagemin-webp"],
-      },
-    }),
-  ],
-};
-```
-
-To generate and compress the original assets:
-
-```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-
-module.exports = {
-  plugins: [
-    // And the original assets will be compressed
-    new ImageMinimizerPlugin({
-      test: /\.(png)$/i,
-      minimizerOptions: {
-        plugins: ["pngquant"],
-      },
-    }),
-    // Images are converted to `webp` and the original assets have been removed
-    new ImageMinimizerPlugin({
-      test: /\.(png)$/i,
-      deleteOriginalAssets: false,
-      filename: "[path][name].webp",
-      minimizerOptions: {
-        plugins: ["imagemin-webp"],
-      },
-    }),
-  ],
-};
-```
-
 ### Loader Options
 
-|            Name            |              Type               |                Default                | Description                                                                                       |
-| :------------------------: | :-----------------------------: | :-----------------------------------: | :------------------------------------------------------------------------------------------------ |
-|        **`filter`**        |          `{Function}`           |              `undefined`              | Allows filtering of images for optimization                                                       |
-|    **`severityError`**     |           `{String}`            |               `'error'`               | Allows to choose how errors are displayed                                                         |
-|        **`minify`**        | `{Function \| Array<Function>}` | `ImageMinimizerPlugin.imageminMinify` | Allows to override default minify function                                                        |
-|   **`minimizerOptions`**   |    `{Object\|Array<Object>}`    |           `{ plugins: [] }`           | Options for `imagemin`                                                                            |
-|       **`filename`**       |      `{string\|Function}`       |         `'[path][name][ext]'`         | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
-| **`deleteOriginalAssets`** |           `{Boolean}`           |                `false`                | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
+|          Name          |              Type               |                Default                | Description                                 |
+| :--------------------: | :-----------------------------: | :-----------------------------------: | :------------------------------------------ |
+|      **`filter`**      |          `{Function}`           |              `undefined`              | Allows filtering of images for optimization |
+|  **`severityError`**   |           `{String}`            |               `'error'`               | Allows to choose how errors are displayed   |
+|      **`minify`**      | `{Function \| Array<Function>}` | `ImageMinimizerPlugin.imageminMinify` | Allows to override default minify function  |
+| **`minimizerOptions`** |    `{Object\|Array<Object>}`    |           `{ plugins: [] }`           | Options for `imagemin`                      |
 
 #### `filter`
 
@@ -887,6 +862,8 @@ Useful for using and testing unpublished versions or forks.
 
 - ImageMinimizerPlugin.imageminMinify
 - ImageMinimizerPlugin.squooshMinify
+- ImageMinimizerPlugin.imageminGenerate,
+- ImageMinimizerPlugin.squooshGenerate
 
 ##### `Function`
 
@@ -993,7 +970,12 @@ module.exports = {
 #### `minimizerOptions`
 
 Type: `Object|Array<Object>`
-Default: `{ plugins: [] }`
+Default: `{ plugins: [], filename: [path][name][ext], deleteOriginalAssets: false }`
+
+|            Name            |         Type         |        Default        | Description                                                                                       |
+| :------------------------: | :------------------: | :-------------------: | :------------------------------------------------------------------------------------------------ |
+|       **`filename`**       | `{string\|Function}` | `'[path][name][ext]'` | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
+| **`deleteOriginalAssets`** |     `{Boolean}`      |        `false`        | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
 
 Options for `minify` functions. [`imagemin`](https://github.com/imagemin/imagemin) is default minify function.
 
@@ -1092,7 +1074,7 @@ module.exports = {
 };
 ```
 
-#### `filename`
+##### `filename`
 
 Type: `String|Function`
 Default: `'[path][name][ext]'`
@@ -1100,7 +1082,7 @@ Default: `'[path][name][ext]'`
 Allows to set the filename for the generated asset. Useful for converting to a `webp`.
 Supported values see in [`webpack template strings`](https://webpack.js.org/configuration/output/#template-strings), `File-level` section.
 
-##### `String`
+###### `String`
 
 **webpack.config.js**
 
@@ -1120,8 +1102,9 @@ module.exports = {
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
-              filename: "[path][name].webp",
+              minify: ImageMinimizerPlugin.imageminGenerate,
               minimizerOptions: {
+                filename: "webp/[path][name][ext]",
                 plugins: ["imagemin-webp"],
               },
             },
@@ -1133,7 +1116,7 @@ module.exports = {
 };
 ```
 
-##### `Function`
+###### `Function`
 
 **webpack.config.js**
 
@@ -1153,14 +1136,15 @@ module.exports = {
           {
             loader: ImageMinimizerPlugin.loader,
             options: {
-              filename: (pathData, assetInfo) => {
-                if (/imageLg/i.test(pathData.filename)) {
-                  return "./bigImages/[path][name].webp";
-                }
-
-                return "[path][name].webp";
-              },
+              minify: ImageMinimizerPlugin.imageminGenerate,
               minimizerOptions: {
+                filename: (pathData, assetInfo) => {
+                  if (/imageLg/i.test(pathData.filename)) {
+                    return "./bigImages/[path][name][ext]";
+                  }
+
+                  return "[path][name][ext]";
+                },
                 plugins: ["imagemin-webp"],
               },
             },
@@ -1172,12 +1156,12 @@ module.exports = {
 };
 ```
 
-#### `deleteOriginalAssets`
+##### `deleteOriginalAssets`
 
 Type: `Boolean`
 Default: `false`
 
-Allows to keep the original asset. Useful for converting to a `webp` and remove original assets.
+Allows to keep the original asset. Useful for converting to other formats and remove original assets.
 
 > i Doesn't make sense if you haven't changed the original value of the `filename` option
 
@@ -1200,9 +1184,10 @@ module.exports = {
             loader: ImageMinimizerPlugin.loader,
             options: {
               // PNG images are converted to WEBP, and the originals will keep
-              deleteOriginalAssets: false,
-              filename: "[path][name].webp",
+              minify: ImageMinimizerPlugin.imageminGenerate,
               minimizerOptions: {
+                deleteOriginalAssets: false,
+                filename: "webp/[path][name][ext]",
                 plugins: ["imagemin-webp"],
               },
             },
@@ -1303,7 +1288,7 @@ module.exports = {
 };
 ```
 
-### Optimize and transform images to `webp`
+### Converting to `webp` and other formats using `ImageMinimizerPlugin.imageminGenerate`
 
 ```js
 const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
@@ -1316,14 +1301,45 @@ module.exports = {
       },
     }),
     new ImageMinimizerPlugin({
-      deleteOriginalAssets: false,
-      filename: "[path][name].webp",
+      minify: ImageMinimizerPlugin.imageminGenerate,
       minimizerOptions: {
-        plugins: ["imagemin-webp"],
+        // (Images will be generated in the specified formats)
+        // "imagemin-webp" and "imagemin-avif" should be installed
+        plugins: ["imagemin-webp", "imagemin-avif"],
       },
     }),
   ],
 };
+
+// Images in `webp` and `avif` format will be generated
+```
+
+### Converting to `webp` and other formats using `ImageMinimizerPlugin.squooshGenerate`
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  plugins: [
+    // Images are converted to `webp` and the original assets have been kept
+    new ImageMinimizerPlugin({
+      test: /\.(png)$/i,
+      minify: ImageMinimizerPlugin.squooshGenerate,
+      minimizerOptions: {
+        // Available codecs "oxipng", "mozjpeg", "jxl", "webp", "wp2", "avif"
+        // (Images will be generated in the specified formats)
+        encodeOptions: {
+          webp: {},
+          avif: {},
+        },
+      },
+    }),
+  ],
+};
+
+// Images in `webp` and `avif` format will be generated
 ```
 
 ## Contributing

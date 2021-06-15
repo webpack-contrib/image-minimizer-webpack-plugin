@@ -1,47 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`validate loader options should throw an error on the "deleteOriginalAssets" option with "() => {}" value 1`] = `
-"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.deleteOriginalAssets should be a boolean."
-`;
-
-exports[`validate loader options should throw an error on the "deleteOriginalAssets" option with "[]" value 1`] = `
-"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.deleteOriginalAssets should be a boolean."
-`;
-
-exports[`validate loader options should throw an error on the "deleteOriginalAssets" option with "{}" value 1`] = `
-"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.deleteOriginalAssets should be a boolean."
-`;
-
-exports[`validate loader options should throw an error on the "filename" option with "[]" value 1`] = `
-"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.filename should be one of these:
-   string | function
-   Details:
-    * options.filename should be a string.
-    * options.filename should be an instance of function."
-`;
-
-exports[`validate loader options should throw an error on the "filename" option with "{}" value 1`] = `
-"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.filename should be one of these:
-   string | function
-   Details:
-    * options.filename should be a string.
-    * options.filename should be an instance of function."
-`;
-
-exports[`validate loader options should throw an error on the "filename" option with "true" value 1`] = `
-"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.filename should be one of these:
-   string | function
-   Details:
-    * options.filename should be a string.
-    * options.filename should be an instance of function."
-`;
-
 exports[`validate loader options should throw an error on the "filter" option with "[]" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.filter should be an instance of function.
@@ -127,52 +85,106 @@ exports[`validate loader options should throw an error on the "minimizerOptions"
  - options.minimizerOptions should be an non-empty array."
 `;
 
+exports[`validate loader options should throw an error on the "minimizerOptions" option with "{"deleteOriginalAssets":[]}" value 1`] = `
+"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
+ - options.minimizerOptions.deleteOriginalAssets should be a boolean."
+`;
+
+exports[`validate loader options should throw an error on the "minimizerOptions" option with "{"deleteOriginalAssets":{}}" value 1`] = `
+"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
+ - options.minimizerOptions.deleteOriginalAssets should be a boolean."
+`;
+
+exports[`validate loader options should throw an error on the "minimizerOptions" option with "{"filename":[]}" value 1`] = `
+"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
+ - options.minimizerOptions should be one of these:
+   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
+   -> Options for \`imageMinimizerOptions\`.
+   Details:
+    * options.minimizerOptions.filename should be one of these:
+      string | function
+      Details:
+       * options.minimizerOptions.filename should be a string.
+       * options.minimizerOptions.filename should be an instance of function."
+`;
+
+exports[`validate loader options should throw an error on the "minimizerOptions" option with "{"filename":{}}" value 1`] = `
+"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
+ - options.minimizerOptions should be one of these:
+   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
+   -> Options for \`imageMinimizerOptions\`.
+   Details:
+    * options.minimizerOptions.filename should be one of these:
+      string | function
+      Details:
+       * options.minimizerOptions.filename should be a string.
+       * options.minimizerOptions.filename should be an instance of function."
+`;
+
+exports[`validate loader options should throw an error on the "minimizerOptions" option with "{"filename":true}" value 1`] = `
+"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
+ - options.minimizerOptions should be one of these:
+   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
+   -> Options for \`imageMinimizerOptions\`.
+   Details:
+    * options.minimizerOptions.filename should be one of these:
+      string | function
+      Details:
+       * options.minimizerOptions.filename should be a string.
+       * options.minimizerOptions.filename should be an instance of function."
+`;
+
+exports[`validate loader options should throw an error on the "minimizerOptions" option with "{}" value 1`] = `
+"Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
+ - options.minimizerOptions.deleteOriginalAssets should be a boolean."
+`;
+
 exports[`validate loader options should throw an error on the "minimizerOptions" option with "1" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.minimizerOptions should be one of these:
-   object { … } | [object { … }, ...] (should not have fewer than 1 item)
+   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
    -> Options for \`imageMinimizerOptions\`.
    Details:
     * options.minimizerOptions should be an object:
-      object { … }
+      object { filename?, deleteOriginalAssets?, … }
     * options.minimizerOptions should be an array:
-      [object { … }, ...] (should not have fewer than 1 item)"
+      [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate loader options should throw an error on the "minimizerOptions" option with "false" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.minimizerOptions should be one of these:
-   object { … } | [object { … }, ...] (should not have fewer than 1 item)
+   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
    -> Options for \`imageMinimizerOptions\`.
    Details:
     * options.minimizerOptions should be an object:
-      object { … }
+      object { filename?, deleteOriginalAssets?, … }
     * options.minimizerOptions should be an array:
-      [object { … }, ...] (should not have fewer than 1 item)"
+      [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate loader options should throw an error on the "minimizerOptions" option with "null" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.minimizerOptions should be one of these:
-   object { … } | [object { … }, ...] (should not have fewer than 1 item)
+   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
    -> Options for \`imageMinimizerOptions\`.
    Details:
     * options.minimizerOptions should be an object:
-      object { … }
+      object { filename?, deleteOriginalAssets?, … }
     * options.minimizerOptions should be an array:
-      [object { … }, ...] (should not have fewer than 1 item)"
+      [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate loader options should throw an error on the "minimizerOptions" option with "true" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.minimizerOptions should be one of these:
-   object { … } | [object { … }, ...] (should not have fewer than 1 item)
+   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
    -> Options for \`imageMinimizerOptions\`.
    Details:
     * options.minimizerOptions should be an object:
-      object { … }
+      object { filename?, deleteOriginalAssets?, … }
     * options.minimizerOptions should be an array:
-      [object { … }, ...] (should not have fewer than 1 item)"
+      [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate loader options should throw an error on the "severityError" option with "() => {}" value 1`] = `
@@ -208,47 +220,47 @@ exports[`validate loader options should throw an error on the "severityError" op
 exports[`validate loader options should throw an error on the "unknown" option with "/test/" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { minimizerOptions?, filter?, severityError?, minify? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "[]" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { minimizerOptions?, filter?, severityError?, minify? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "{"foo":"bar"}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { minimizerOptions?, filter?, severityError?, minify? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "{}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { minimizerOptions?, filter?, severityError?, minify? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "1" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { minimizerOptions?, filter?, severityError?, minify? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "false" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { minimizerOptions?, filter?, severityError?, minify? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "test" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { minimizerOptions?, filter?, severityError?, minify? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "true" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { minimizerOptions?, filter?, severityError?, minify? }"
 `;

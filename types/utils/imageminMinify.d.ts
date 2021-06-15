@@ -18,6 +18,7 @@ export default function imageminMinify(
 export type DataForMinifyFn = import("../index").DataForMinifyFn;
 export type ImageminMinimizerOptions =
   import("../index").ImageminMinimizerOptions;
+export type MinifyFnResultEntry = import("../index").MinifyFnResultEntry;
 export type MinifyFnResult = import("../index").MinifyFnResult;
 export type MetaData = {
   warnings: Array<Error>;

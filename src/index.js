@@ -11,7 +11,9 @@ import schema from "./plugin-options.json";
 import imageminMinify, {
   normalizeImageminConfig,
 } from "./utils/imageminMinify";
+import imageminGenerate from "./utils/imageminGenerate";
 import squooshMinify from "./utils/squooshMinify";
+import squooshGenerate from "./utils/squooshGenerate";
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
@@ -24,6 +26,7 @@ import squooshMinify from "./utils/squooshMinify";
 /** @typedef {import("./loader").LoaderOptions} LoaderOptions */
 /** @typedef {import("./utils/imageminMinify").default} ImageminMinifyFunction */
 /** @typedef {import("./utils/squooshMinify").default} SquooshMinifyFunction */
+/** @typedef {import("./utils/squooshGenerate").default} squooshTransformerFunction */
 
 /** @typedef {RegExp | string} Rule */
 
@@ -70,11 +73,17 @@ import squooshMinify from "./utils/squooshMinify";
  */
 
 /**
- * @typedef {Object} InternalMinifyResult
+ * @typedef {Object} InternalMinifyResultEntry
  * @property {Buffer} data
  * @property {string} filename
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
+ * @property {string} filenameTemplate
+ * @property {boolean | undefined} [remove]
+ */
+
+/**
+ * @typedef {InternalMinifyResultEntry[]} InternalMinifyResult
  */
 
 /**
@@ -89,10 +98,16 @@ import squooshMinify from "./utils/squooshMinify";
  */
 
 /**
- * @typedef {Object} MinifyFnResult
+ * @typedef {Object} MinifyFnResultEntry
+ * @property {string} filename
  * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
+ * @property {string} [filenameTemplate]
+ */
+
+/**
+ * @typedef {MinifyFnResultEntry | MinifyFnResultEntry[]} MinifyFnResult
  */
 
 /**
@@ -173,6 +188,21 @@ class ImageMinimizerPlugin {
       filename,
       deleteOriginalAssets,
     };
+  }
+
+  /**
+   *
+   * @param {(InternalMinifyResultEntry & {source: Buffer} )[]} data
+   * @returns (InternalMinifyResultEntry & {source: Buffer} )[]
+   */
+  createCacheData(data) {
+    return data.map((file) => ({
+      source: file.source,
+      warnings: file.warnings,
+      filename: file.filename,
+      filenameTemplate: file.filenameTemplate,
+      remove: file.remove,
+    }));
   }
 
   /**
@@ -267,68 +297,99 @@ class ImageMinimizerPlugin {
 
             const { severityError, minimizerOptions, minify } = this.options;
 
-            const minifyOptions = /** @type {InternalMinifyOptions} */ ({
+            /** @type {InternalMinifyOptions} */
+            const minifyOptions = {
               filename: name,
               input,
               severityError,
               minimizerOptions,
               minify,
-            });
+            };
 
             output = await minifyFn(minifyOptions);
 
-            if (output.errors.length > 0) {
+            const outputErrors = output.reduce(
+              (
+                /** @type InternalMinifyResultEntry['errors'] */ accumulator,
+                /** @type InternalMinifyResultEntry */ file
+              ) => {
+                // eslint-disable-next-line no-param-reassign
+                accumulator = [...accumulator, ...file.errors];
+
+                return accumulator;
+              },
+              []
+            );
+
+            if (outputErrors.length > 0) {
               /** @type {[WebpackError]} */
-              (output.errors).forEach((error) => {
+              (outputErrors).forEach((error) => {
                 compilation.errors.push(error);
               });
 
               return;
             }
 
-            output.source = new RawSource(output.data);
+            for (let i = 0; i <= output.length - 1; i++) {
+              const file = output[i];
 
-            await cacheItem.storePromise({
-              source: output.source,
-              warnings: output.warnings,
-            });
+              file.source = new RawSource(file.data);
+            }
+
+            await cacheItem.storePromise(this.createCacheData(output));
           }
 
-          const { source, warnings } = output;
+          for (let i = 0; i <= output.length - 1; i++) {
+            const {
+              source,
+              warnings,
+              filename: maybeNewName,
+              remove,
+              filenameTemplate,
+            } = output[i];
 
-          if (warnings && warnings.length > 0) {
-            /** @type {[WebpackError]} */
-            (warnings).forEach((warning) => {
-              compilation.warnings.push(warning);
-            });
-          }
-
-          const { path: newName } = compilation.getPathWithInfo(
-            this.options.filename,
-            {
-              filename: name,
+            if (warnings && warnings.length > 0) {
+              /** @type {[WebpackError]} */
+              (warnings).forEach((warning) => {
+                compilation.warnings.push(warning);
+              });
             }
-          );
 
-          const isNewAsset = name !== newName;
+            const { path: newName } = compilation.getPathWithInfo(
+              filenameTemplate,
+              {
+                filename: maybeNewName,
+              }
+            );
 
-          if (isNewAsset) {
-            const newInfo = {
-              related: { minimized: newName, ...info.related },
-              minimized: true,
-            };
+            const isNewAsset = name !== newName;
 
-            compilation.emitAsset(newName, source, newInfo);
+            if (isNewAsset) {
+              const newInfo = {
+                related: { minimized: newName, ...info.related },
+                minimized: true,
+              };
 
-            if (this.options.deleteOriginalAssets) {
-              compilation.deleteAsset(name);
+              compilation.emitAsset(newName, source, newInfo);
+
+              if (this.options.deleteOriginalAssets) {
+                compilation.deleteAsset(name);
+              }
+            } else {
+              if (remove) {
+                compilation.deleteAsset(name);
+
+                continue;
+              }
+
+              const updatedAssetsInfo = {
+                minimized: true,
+              };
+
+              if (compilation.getAsset(name)) {
+                compilation.updateAsset(name, source, updatedAssetsInfo);
+              }
             }
-          } else {
-            const updatedAssetsInfo = {
-              minimized: true,
-            };
-
-            compilation.updateAsset(name, source, updatedAssetsInfo);
           }
         })
       );
@@ -359,8 +420,6 @@ class ImageMinimizerPlugin {
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
         const {
           minify,
-          filename,
-          deleteOriginalAssets,
           filter,
           test,
           include,
@@ -377,8 +436,6 @@ class ImageMinimizerPlugin {
           loader: require.resolve(path.join(__dirname, "loader.js")),
           options: {
             minify,
-            filename,
-            deleteOriginalAssets,
             severityError,
             filter,
             minimizerOptions,
@@ -408,5 +465,7 @@ ImageMinimizerPlugin.loader = require.resolve("./loader");
 ImageMinimizerPlugin.normalizeImageminConfig = normalizeImageminConfig;
 ImageMinimizerPlugin.imageminMinify = imageminMinify;
 ImageMinimizerPlugin.squooshMinify = squooshMinify;
+ImageMinimizerPlugin.imageminGenerate = imageminGenerate;
+ImageMinimizerPlugin.squooshGenerate = squooshGenerate;
 
 export default ImageMinimizerPlugin;

@@ -2,7 +2,22 @@
   "definitions": {
     "MinimizerOptions": {
       "additionalProperties": true,
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "filename": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "instanceof": "Function"
+            }
+          ]
+        },
+        "deleteOriginalAssets": {
+          "type": "boolean"
+        }
+      }
     }
   },
   "title": "Image Minimizer Plugin Loader options",
@@ -31,19 +46,6 @@
     "severityError": {
       "description": "Allows to choose how errors are displayed.",
       "type": "string"
-    },
-    "filename": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "instanceof": "Function"
-        }
-      ]
-    },
-    "deleteOriginalAssets": {
-      "type": "boolean"
     },
     "minify": {
       "description": "Allows you to override default minify function.",

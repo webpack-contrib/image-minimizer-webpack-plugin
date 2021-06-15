@@ -1,77 +1,132 @@
 /** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
 /** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
+/** @typedef {import("./index").InternalMinifyResultEntry} InternalMinifyResultEntry */
 /** @typedef {import("./index").InternalMinifyResult} InternalMinifyResult */
 /** @typedef {import("./index").InternalMinifyOptions} InternalMinifyOptions */
+/** @typedef {import("./index").MinifyFnResultEntry} MinifyFnResultEntry */
+/** @typedef {import("./index").MinifyFnResult} MinifyFnResult */
 
 /**
  * @param {InternalMinifyOptions} options
  * @returns {Promise<InternalMinifyResult>}
  */
 async function minify(options) {
+  const FILENAME_TEMPLATE = "[path][name][ext]";
   const minifyFns = /** @type {[MinifyFunctions]} */ (
     typeof options.minify === "function" ? [options.minify] : options.minify
   );
 
-  /** @type {InternalMinifyResult} */
-  const result = {
+  /** @type {InternalMinifyResultEntry} */
+  const input = {
     data: options.input,
     filename: options.filename,
+    filenameTemplate: FILENAME_TEMPLATE,
     warnings: [],
     errors: [],
   };
 
-  if (!result.data) {
-    result.errors.push(new Error("Empty input"));
+  if (!input.data) {
+    input.errors.push(new Error("Empty input"));
 
-    return result;
+    return [input];
   }
 
-  try {
-    for (let i = 0; i <= minifyFns.length - 1; i++) {
-      const minifyFn = minifyFns[i];
-      const minifyOptions = Array.isArray(options.minimizerOptions)
-        ? options.minimizerOptions[i]
-        : options.minimizerOptions;
-      // eslint-disable-next-line no-await-in-loop
-      const minifyResult = await minifyFn(
-        { [options.filename]: result.data },
-        minifyOptions
-      );
+  /**
+   * @typedef {Object} processResultEntry
+   * @property {InternalMinifyResultEntry['filename']} minifyFnIndex
+   * @property {InternalMinifyResultEntry} file
+   */
 
-      result.data = minifyResult.data;
-      result.warnings = [...result.warnings, ...(minifyResult.warnings || [])];
-      result.errors = [...result.errors, ...(minifyResult.errors || [])];
-    }
-  } catch (error) {
-    const errored = error instanceof Error ? error : new Error(error);
+  /**
+   * @typedef {processResultEntry[]} processResult
+   */
+  const processResult = {
+    [input.filename]: input,
+  };
 
-    result.errors.push(errored);
-    result.data = options.input;
-  }
+  for (let i = 0; i <= minifyFns.length - 1; i++) {
+    const minifyFn = minifyFns[i];
+    const minifyOptions = Array.isArray(options.minimizerOptions)
+      ? options.minimizerOptions[i]
+      : options.minimizerOptions || {};
+    const {
+      deleteOriginalAssets,
+      filename: filenameTemplate = FILENAME_TEMPLATE,
+    } = minifyOptions;
 
-  if (result.errors.length > 0) {
-    const errors = [];
+    for (const [key, file] of Object.entries(processResult)) {
+      let minifyResult;
 
-    for (const error of result.errors) {
-      if (error.name === "ConfigurationError") {
-        errors.push(error);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        minifyResult = await minifyFn(
+          { [file.filename]: file.data },
+          minifyOptions
+        );
+      } catch (error) {
+        const errored = error instanceof Error ? error : new Error(error);
 
-        continue;
+        file.errors.push(errored);
+
+        break;
       }
 
-      switch (options.severityError) {
-        case "off":
-          break;
-        case "warning":
-          result.warnings.push(error);
-          break;
-        case "error":
-        default:
+      minifyResult = Array.isArray(minifyResult)
+        ? minifyResult
+        : [
+            {
+              filename: minifyResult.filename || file.filename,
+              data: minifyResult.data,
+              warnings: [...file.warnings, ...(minifyResult.warnings || [])],
+              errors: [...file.errors, ...(minifyResult.errors || [])],
+            },
+          ];
+
+      minifyResult.forEach((item) => {
+        processResult[item.filename] = /** @type InternalMinifyResultEntry */ (
+          item
+        );
+
+        if (!item.filenameTemplate) {
+          item.filenameTemplate = filenameTemplate;
+        }
+
+        if (deleteOriginalAssets) {
+          processResult[key].remove = true;
+        }
+      });
+    }
+  }
+
+  const result = [];
+
+  for (const file of Object.values(processResult)) {
+    result.push(file);
+
+    if (file.errors.length > 0) {
+      const errors = [];
+
+      for (const error of file.errors) {
+        if (error.name === "ConfigurationError") {
           errors.push(error);
-      }
-    }
 
-    result.errors = errors;
+          continue;
+        }
+
+        switch (options.severityError) {
+          case "off":
+            break;
+          case "warning":
+            file.warnings.push(error);
+            break;
+          case "error":
+          default:
+            errors.push(error);
+        }
+      }
+
+      file.errors = errors;
+    }
   }
 
   return result;

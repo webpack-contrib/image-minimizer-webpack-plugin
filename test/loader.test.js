@@ -4,6 +4,8 @@ import path from "path";
 import pify from "pify";
 import fileType from "file-type";
 
+import ImageMinimizerPlugin from "../src";
+
 import { fixturesPath, isOptimized, webpack } from "./helpers";
 
 describe("loader", () => {
@@ -79,6 +81,7 @@ describe("loader", () => {
         path: path.resolve(__dirname, "outputs"),
       },
       imageminPluginOptions: {
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
           plugins: ["imagemin-webp"],
         },
@@ -90,7 +93,7 @@ describe("loader", () => {
     const file = path.resolve(
       __dirname,
       "outputs",
-      "./nested/deep/loader-test.jpg"
+      "./nested/deep/loader-test.webp"
     );
     const ext = await fileType.fromFile(file);
 

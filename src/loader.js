@@ -9,8 +9,6 @@ import imageminMinify from "./utils/imageminMinify";
  * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
- * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
- * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  * @property {MinifyFunctions} [minify]
  */
 
@@ -19,6 +17,7 @@ import imageminMinify from "./utils/imageminMinify";
 /** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
 /** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
 /** @typedef {import("./index").InternalMinifyOptions} InternalMinifyOptions */
+/** @typedef {import("./index").InternalMinifyResultEntry} InternalMinifyResultEntry */
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").LoaderContext<LoaderOptions>} LoaderContext */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -51,48 +50,68 @@ module.exports = async function loader(content) {
     isProductionMode: this.mode === "production" || !this.mode,
   });
 
-  const output = await minify(minifyOptions);
+  let output = await minify(minifyOptions);
+  let hasError = false;
 
-  if (output.errors && output.errors.length > 0) {
-    output.errors.forEach((warning) => {
-      this.emitError(warning);
-    });
+  output = output.filter((file) => !file.remove);
 
+  for (let i = 0; i <= output.length - 1; i++) {
+    const file = output[i];
+
+    if (file.errors.length > 0) {
+      file.errors.forEach((error) => {
+        this.emitError(error);
+      });
+
+      hasError = true;
+    }
+  }
+
+  if (hasError) {
     callback(null, content);
 
     return;
   }
 
-  if (output.warnings && output.warnings.length > 0) {
-    output.warnings.forEach((warning) => {
-      this.emitWarning(warning);
-    });
-  }
+  for (let i = 0; i <= output.length - 1; i++) {
+    const file = output[i];
 
-  const source = output.data;
-  const { path: newName } = /** @type {Compilation} */ (
-    this._compilation
-  ).getPathWithInfo(options.filename || "[path][name][ext]", {
-    filename: name,
-  });
-
-  const isNewAsset = name !== newName;
-
-  if (isNewAsset) {
-    this.emitFile(newName, source.toString(), "", {
-      minimized: true,
-    });
-
-    if (options.deleteOriginalAssets) {
-      // TODO remove original asset
+    if (file.warnings && file.warnings.length > 0) {
+      file.warnings.forEach((warning) => {
+        this.emitWarning(warning);
+      });
     }
 
-    callback(null, content);
+    // @ts-ignore
+    file.source = file.data;
 
-    return;
+    const { path: newName } = /** @type {Compilation} */ (
+      this._compilation
+    ).getPathWithInfo(file.filenameTemplate, {
+      filename: file.filename,
+    });
+
+    const isNewAsset = name !== newName;
+
+    if (isNewAsset) {
+      // @ts-ignore
+      this.emitFile(newName, file.source.toString(), "", {
+        minimized: true,
+      });
+
+      if (file.remove) {
+        // TODO remove original asset
+      }
+
+      callback(null, content);
+
+      return;
+    }
   }
 
-  callback(null, source);
+  // Todo add export for multiple assets
+  // @ts-ignore
+  callback(null, output.length === 1 ? output[0].source : content);
 };
 
 module.exports.raw = true;

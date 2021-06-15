@@ -104,20 +104,14 @@ exports[`validate plugin options should work 8`] = `
 
 exports[`validate plugin options should work 9`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.filename should be one of these:
-   string | function
-   Details:
-    * options.filename should be a string.
-    * options.filename should be an instance of function."
+ - options.severityError should be a string.
+   -> Allows to choose how errors are displayed."
 `;
 
 exports[`validate plugin options should work 10`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.filename should be one of these:
-   string | function
-   Details:
-    * options.filename should be a string.
-    * options.filename should be an instance of function."
+ - options.severityError should be a string.
+   -> Allows to choose how errors are displayed."
 `;
 
 exports[`validate plugin options should work 11`] = `
@@ -128,31 +122,45 @@ exports[`validate plugin options should work 11`] = `
 
 exports[`validate plugin options should work 12`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.severityError should be a string.
-   -> Allows to choose how errors are displayed."
+ - options.minimizerOptions should be one of these:
+   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
+   -> Options for \`imageMinimizerOptions\`.
+   Details:
+    * options.minimizerOptions should be an object:
+      object { filename?, deleteOriginalAssets?, … }
+    * options.minimizerOptions should be an array:
+      [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate plugin options should work 13`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.severityError should be a string.
-   -> Allows to choose how errors are displayed."
+ - options.minimizerOptions should be one of these:
+   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
+   -> Options for \`imageMinimizerOptions\`.
+   Details:
+    * options.minimizerOptions.filename should be one of these:
+      string | function
+      Details:
+       * options.minimizerOptions.filename should be a string.
+       * options.minimizerOptions.filename should be an instance of function."
 `;
 
 exports[`validate plugin options should work 14`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.deleteOriginalAssets should be a boolean."
+ - options.minimizerOptions should be one of these:
+   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
+   -> Options for \`imageMinimizerOptions\`.
+   Details:
+    * options.minimizerOptions.filename should be one of these:
+      string | function
+      Details:
+       * options.minimizerOptions.filename should be a string.
+       * options.minimizerOptions.filename should be an instance of function."
 `;
 
 exports[`validate plugin options should work 15`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.minimizerOptions should be one of these:
-   object { … } | [object { … }, ...] (should not have fewer than 1 item)
-   -> Options for \`imageMinimizerOptions\`.
-   Details:
-    * options.minimizerOptions should be an object:
-      object { … }
-    * options.minimizerOptions should be an array:
-      [object { … }, ...] (should not have fewer than 1 item)"
+ - options.minimizerOptions.deleteOriginalAssets should be a boolean."
 `;
 
 exports[`validate plugin options should work 16`] = `

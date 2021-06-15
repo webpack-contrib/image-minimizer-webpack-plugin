@@ -14,8 +14,44 @@ describe("validate loader options", () => {
       failure: [1, true, false, null],
     },
     minimizerOptions: {
-      success: [{ plugins: [] }, {}],
-      failure: [1, true, false, [], null],
+      success: [
+        { plugins: [] },
+        {},
+        {
+          filename: "[name].[ext]",
+        },
+        {
+          filename: () => "[name].[ext]",
+        },
+        {
+          deleteOriginalAssets: true,
+        },
+      ],
+      failure: [
+        1,
+        true,
+        false,
+        [],
+        null,
+        {
+          filename: [],
+        },
+        {
+          filename: {},
+        },
+        {
+          filename: true,
+        },
+        {
+          deleteOriginalAssets: {},
+        },
+        {
+          deleteOriginalAssets: [],
+        },
+        {
+          deleteOriginalAssets: () => {},
+        },
+      ],
     },
     filter: {
       success: [() => false],
@@ -24,14 +60,6 @@ describe("validate loader options", () => {
     severityError: {
       success: ["error"],
       failure: [true, false, {}, [], () => {}],
-    },
-    filename: {
-      success: ["[name].[ext]", () => "[name].[ext]"],
-      failure: [{}, [], true],
-    },
-    deleteOriginalAssets: {
-      success: [true, false],
-      failure: [{}, [], () => {}],
     },
     unknown: {
       success: [],

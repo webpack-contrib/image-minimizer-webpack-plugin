@@ -33,7 +33,22 @@
     },
     "MinimizerOptions": {
       "additionalProperties": true,
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "filename": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "instanceof": "Function"
+            }
+          ]
+        },
+        "deleteOriginalAssets": {
+          "type": "boolean"
+        }
+      }
     }
   },
   "type": "object",
@@ -93,19 +108,6 @@
     "maxConcurrency": {
       "description": "Maximum number of concurrency optimization processes in one time.",
       "type": "number"
-    },
-    "filename": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "instanceof": "Function"
-        }
-      ]
-    },
-    "deleteOriginalAssets": {
-      "type": "boolean"
     },
     "minify": {
       "description": "Allows you to override default minify function.",
