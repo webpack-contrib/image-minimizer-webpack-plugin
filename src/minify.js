@@ -1,4 +1,3 @@
-/** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
 /** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
 /** @typedef {import("./index").InternalMinifyResultEntry} InternalMinifyResultEntry */
 /** @typedef {import("./index").InternalMinifyResult} InternalMinifyResult */
@@ -56,6 +55,15 @@ async function minify(options) {
 
     for (const [key, file] of Object.entries(processResult)) {
       let minifyResult;
+
+      if (
+        // In the plugin and loader for the input asset, the filter has already been run
+        i > 0 &&
+        minifyOptions.filter &&
+        !minifyOptions.filter(file.data, file.filename)
+      ) {
+        continue;
+      }
 
       try {
         // eslint-disable-next-line no-await-in-loop

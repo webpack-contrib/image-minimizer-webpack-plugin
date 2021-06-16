@@ -1,5 +1,7 @@
 import path from "path";
 
+import fileType from "file-type";
+
 import {
   fixturesPath,
   isOptimized,
@@ -7,26 +9,29 @@ import {
   plugins,
   webpack,
 } from "./helpers";
+import ImageMinimizerPlugin from "../src";
+
+jest.setTimeout(10000);
 
 describe("plugin filter option", () => {
   it("should optimizes all images (loader + plugin) exclude filtered", async () => {
     const stats = await webpack({
       emitPlugin: true,
       imageminPluginOptions: {
-        filter: (source, sourcePath) => {
-          expect(source).toBeInstanceOf(Buffer);
-          expect(typeof sourcePath).toBe("string");
-
-          if (
-            sourcePath.endsWith("loader-test.jpg") ||
-            sourcePath.endsWith("plugin-test.jpg")
-          ) {
-            return false;
-          }
-
-          return true;
-        },
         minimizerOptions: {
+          filter: (source, sourcePath) => {
+            expect(source).toBeInstanceOf(Buffer);
+            expect(typeof sourcePath).toBe("string");
+
+            if (
+              sourcePath.endsWith("loader-test.jpg") ||
+              sourcePath.endsWith("plugin-test.jpg")
+            ) {
+              return false;
+            }
+
+            return true;
+          },
           plugins,
         },
       },
@@ -70,30 +75,30 @@ describe("plugin filter option", () => {
       },
       imageminPluginOptions: [
         {
-          filter: (source) => {
-            if (source.byteLength > 500) {
-              firstFilterCounter += 1;
-
-              return true;
-            }
-
-            return false;
-          },
           minimizerOptions: {
+            filter: (source) => {
+              if (source.byteLength > 500) {
+                firstFilterCounter += 1;
+
+                return true;
+              }
+
+              return false;
+            },
             plugins,
           },
         },
         {
-          filter: (source) => {
-            if (source.byteLength < 500) {
-              secondFilterCounter += 1;
-
-              return true;
-            }
-
-            return false;
-          },
           minimizerOptions: {
+            filter: (source) => {
+              if (source.byteLength < 500) {
+                secondFilterCounter += 1;
+
+                return true;
+              }
+
+              return false;
+            },
             plugins,
           },
         },
@@ -139,16 +144,16 @@ describe("plugin filter option", () => {
           ],
         },
         imageminPluginOptions: {
-          filter: (source) => {
-            if (source.byteLength > 500) {
-              firstFilterCounter += 1;
-
-              return true;
-            }
-
-            return false;
-          },
           minimizerOptions: {
+            filter: (source) => {
+              if (source.byteLength > 500) {
+                firstFilterCounter += 1;
+
+                return true;
+              }
+
+              return false;
+            },
             plugins,
           },
         },
@@ -162,16 +167,16 @@ describe("plugin filter option", () => {
           ],
         },
         imageminPluginOptions: {
-          filter: (source) => {
-            if (source.byteLength < 500) {
-              secondFilterCounter += 1;
-
-              return true;
-            }
-
-            return false;
-          },
           minimizerOptions: {
+            filter: (source) => {
+              if (source.byteLength < 500) {
+                secondFilterCounter += 1;
+
+                return true;
+              }
+
+              return false;
+            },
             plugins,
           },
         },
@@ -230,5 +235,54 @@ describe("plugin filter option", () => {
     await expect(
       isOptimized("multiple-plugin-test-4.svg", secondCompilation)
     ).resolves.toBe(true);
+  });
+
+  it("should work if minimizerOptions is array", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      output: {
+        path: path.resolve(__dirname, "outputs"),
+      },
+      emitPlugin: true,
+      emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
+      imageminPluginOptions: {
+        minify: [
+          ImageMinimizerPlugin.imageminGenerate,
+          ImageMinimizerPlugin.imageminGenerate,
+        ],
+        minimizerOptions: [
+          {
+            plugins: ["imagemin-webp"],
+          },
+          {
+            filter: () => false,
+            plugins: ["imagemin-avif"],
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors, assets } = compilation;
+
+    const transformedAssetsToWebp = Object.keys(assets).filter((asset) =>
+      asset.includes("./nested/deep/plugin-test.webp")
+    );
+
+    const transformedAssetsToAvif = Object.keys(assets).filter((asset) =>
+      asset.includes("./nested/deep/plugin-test.avif")
+    );
+
+    const fileWebp = path.resolve(
+      __dirname,
+      "outputs",
+      "./nested/deep/plugin-test.webp"
+    );
+    const extWebp = await fileType.fromFile(fileWebp);
+
+    expect(/image\/webp/i.test(extWebp.mime)).toBe(true);
+    expect(transformedAssetsToWebp).toHaveLength(1);
+    expect(transformedAssetsToAvif).toHaveLength(0);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
   });
 });

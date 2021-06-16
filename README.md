@@ -271,7 +271,6 @@ module.exports = {
 |       **`test`**       | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|tif\|webp\|svg\|avif)\$/i</code> | Test to match files against                                      |
 |     **`include`**      | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `include`                                               |
 |     **`exclude`**      | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to `exclude`                                               |
-|      **`filter`**      |               `{Function}`                |                        `() => true`                         | Allows filtering of images for optimization                      |
 |  **`severityError`**   |                `{String}`                 |                          `'error'`                          | Allows to choose how errors are displayed                        |
 |      **`minify`**      |      `{Function \| Array<Function>}`      |            `ImageMinimizerPlugin.imageminMinify`            | Allows to override default minify function                       |
 | **`minimizerOptions`** |         `{Object\|Array<Object>}`         |                      `{ plugins: [] }`                      | Options for `imagemin`                                           |
@@ -338,37 +337,6 @@ module.exports = {
   plugins: [
     new ImageMinimizerPlugin({
       exclude: /\/excludes/,
-    }),
-  ],
-};
-```
-
-#### `filter`
-
-Type: `Function`
-Default: `() => true`
-
-Allows filtering of images for optimization.
-
-Return `true` to optimize the image, `false` otherwise.
-
-**webpack.config.js**
-
-```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-
-module.exports = {
-  plugins: [
-    new ImageMinimizerPlugin({
-      filter: (source, sourcePath) => {
-        // The `source` argument is a `Buffer` of source file
-        // The `sourcePath` argument is an absolute path to source
-        if (source.byteLength < 8192) {
-          return false;
-        }
-
-        return true;
-      },
     }),
   ],
 };
@@ -502,6 +470,7 @@ Default: `{ plugins: [], filename: [path][name][ext], deleteOriginalAssets: fals
 
 |            Name            |         Type         |        Default        | Description                                                                                       |
 | :------------------------: | :------------------: | :-------------------: | :------------------------------------------------------------------------------------------------ |
+|        **`filter`**        |     `{Function}`     |     `() => true`      | Allows filtering of images for optimization                                                       |
 |       **`filename`**       | `{string\|Function}` | `'[path][name][ext]'` | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
 | **`deleteOriginalAssets`** |     `{Boolean}`      |        `false`        | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
 
@@ -586,6 +555,40 @@ module.exports = {
         // Options for the second function
         {},
       ],
+    }),
+  ],
+};
+```
+
+##### `filter`
+
+Type: `Function`
+Default: `() => true`
+
+Allows filtering of images for optimization.
+
+Return `true` to optimize the image, `false` otherwise.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  plugins: [
+    new ImageMinimizerPlugin({
+      minimizerOptions: {
+        filter: (source, sourcePath) => {
+          // The `source` argument is a `Buffer` of source file
+          // The `sourcePath` argument is an absolute path to source
+          if (source.byteLength < 8192) {
+            return false;
+          }
+
+          return true;
+        },
+        plugins: ["imagemin-webp"],
+      },
     }),
   ],
 };
@@ -749,61 +752,11 @@ module.exports = {
 
 ### Loader Options
 
-|          Name          |              Type               |                Default                | Description                                 |
-| :--------------------: | :-----------------------------: | :-----------------------------------: | :------------------------------------------ |
-|      **`filter`**      |          `{Function}`           |              `undefined`              | Allows filtering of images for optimization |
-|  **`severityError`**   |           `{String}`            |               `'error'`               | Allows to choose how errors are displayed   |
-|      **`minify`**      | `{Function \| Array<Function>}` | `ImageMinimizerPlugin.imageminMinify` | Allows to override default minify function  |
-| **`minimizerOptions`** |    `{Object\|Array<Object>}`    |           `{ plugins: [] }`           | Options for `imagemin`                      |
-
-#### `filter`
-
-Type: `Function`
-Default: `() => true`
-
-Allows filtering of images for optimization.
-
-Return `true` to optimize the image, `false` otherwise.
-
-**webpack.config.js**
-
-```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        type: "asset",
-      },
-      {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        use: [
-          {
-            loader: ImageMinimizerPlugin.loader,
-            options: {
-              cache: true,
-              filter: (source, sourcePath) => {
-                // The `source` argument is a `Buffer` of source file
-                // The `sourcePath` argument is an absolute path to source
-                if (source.byteLength < 8192) {
-                  return false;
-                }
-
-                return true;
-              },
-              minimizerOptions: {
-                plugins: ["gifsicle"],
-              },
-            },
-          },
-        ],
-      },
-    ],
-  },
-};
-```
+|          Name          |              Type               |                Default                | Description                                |
+| :--------------------: | :-----------------------------: | :-----------------------------------: | :----------------------------------------- |
+|  **`severityError`**   |           `{String}`            |               `'error'`               | Allows to choose how errors are displayed  |
+|      **`minify`**      | `{Function \| Array<Function>}` | `ImageMinimizerPlugin.imageminMinify` | Allows to override default minify function |
+| **`minimizerOptions`** |    `{Object\|Array<Object>}`    |           `{ plugins: [] }`           | Options for `imagemin`                     |
 
 #### `severityError`
 
@@ -974,6 +927,7 @@ Default: `{ plugins: [], filename: [path][name][ext], deleteOriginalAssets: fals
 
 |            Name            |         Type         |        Default        | Description                                                                                       |
 | :------------------------: | :------------------: | :-------------------: | :------------------------------------------------------------------------------------------------ |
+|        **`filter`**        |     `{Function}`     |      `undefined`      | Allows filtering of images for optimization                                                       |
 |       **`filename`**       | `{string\|Function}` | `'[path][name][ext]'` | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
 | **`deleteOriginalAssets`** |     `{Boolean}`      |        `false`        | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
 
@@ -1065,6 +1019,55 @@ module.exports = {
                 // Options for the second function
                 {},
               ],
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```
+
+#### `filter`
+
+Type: `Function`
+Default: `() => true`
+
+Allows filtering of images for optimization.
+
+Return `true` to optimize the image, `false` otherwise.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        type: "asset",
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          {
+            loader: ImageMinimizerPlugin.loader,
+            options: {
+              cache: true,
+              minimizerOptions: {
+                filter: (source, sourcePath) => {
+                  // The `source` argument is a `Buffer` of source file
+                  // The `sourcePath` argument is an absolute path to source
+                  if (source.byteLength < 8192) {
+                    return false;
+                  }
+
+                  return true;
+                },
+                plugins: ["gifsicle"],
+              },
             },
           },
         ],

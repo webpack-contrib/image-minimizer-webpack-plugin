@@ -4,17 +4,19 @@ describe("loader filter option", () => {
   it("should optimizes all images exclude filtered", async () => {
     const stats = await webpack({
       imageminLoaderOptions: {
-        filter: (source, filename) => {
-          expect(source).toBeInstanceOf(Buffer);
-          expect(typeof filename).toBe("string");
+        minimizerOptions: {
+          filter: (source, filename) => {
+            expect(source).toBeInstanceOf(Buffer);
+            expect(typeof filename).toBe("string");
 
-          if (source.byteLength === 631) {
-            return false;
-          }
+            if (source.byteLength === 631) {
+              return false;
+            }
 
-          return true;
+            return true;
+          },
+          plugins,
         },
-        minimizerOptions: { plugins },
       },
     });
 

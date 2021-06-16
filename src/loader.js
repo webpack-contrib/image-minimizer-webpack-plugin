@@ -31,7 +31,16 @@ module.exports = async function loader(content) {
   const callback = this.async();
   const name = path.relative(this.rootContext, this.resourcePath);
 
-  if (options.filter && !options.filter(content, name)) {
+  const minimizerOptionsForFirstMinifyFn = Array.isArray(
+    options.minimizerOptions
+  )
+    ? options.minimizerOptions[0]
+    : options.minimizerOptions || {};
+
+  if (
+    minimizerOptionsForFirstMinifyFn.filter &&
+    !minimizerOptionsForFirstMinifyFn.filter(content, name)
+  ) {
     callback(null, content);
 
     return;

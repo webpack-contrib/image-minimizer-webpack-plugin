@@ -26,6 +26,9 @@ describe("validate loader options", () => {
         {
           deleteOriginalAssets: true,
         },
+        {
+          filter: () => false,
+        },
       ],
       failure: [
         1,
@@ -51,11 +54,22 @@ describe("validate loader options", () => {
         {
           deleteOriginalAssets: () => {},
         },
+        {
+          filter: 1,
+        },
+        {
+          filter: true,
+        },
+        {
+          filter: {},
+        },
+        {
+          filter: [],
+        },
+        {
+          filter: null,
+        },
       ],
-    },
-    filter: {
-      success: [() => false],
-      failure: [1, true, false, {}, [], null],
     },
     severityError: {
       success: ["error"],

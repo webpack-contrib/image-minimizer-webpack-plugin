@@ -100,19 +100,19 @@ describe("validate plugin options", () => {
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ filter: () => true });
+      new ImageMinimizerPlugin({ minimizerOptions: { filter: () => true } });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ filter: () => false });
+      new ImageMinimizerPlugin({ minimizerOptions: { filter: () => false } });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ filter: true });
+      new ImageMinimizerPlugin({ minimizerOptions: { filter: true } });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ filter: {} });
+      new ImageMinimizerPlugin({ minimizerOptions: { filter: {} } });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {

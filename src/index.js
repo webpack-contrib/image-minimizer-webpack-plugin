@@ -161,7 +161,6 @@ class ImageMinimizerPlugin {
 
     const {
       minify = imageminMinify,
-      filter = () => true,
       test = /\.(jpe?g|png|gif|tif|webp|svg|avif)$/i,
       include,
       exclude,
@@ -178,7 +177,6 @@ class ImageMinimizerPlugin {
     this.options = {
       minify,
       severityError,
-      filter,
       exclude,
       minimizerOptions,
       include,
@@ -242,10 +240,15 @@ class ImageMinimizerPlugin {
           }
 
           const input = source.source();
+          const minimizerOptionsForFirstMinifyFn = Array.isArray(
+            this.options.minimizerOptions
+          )
+            ? this.options.minimizerOptions[0]
+            : this.options.minimizerOptions || {};
 
           if (
-            this.options.filter &&
-            !this.options.filter(/** @type {Buffer} */ (input), name)
+            minimizerOptionsForFirstMinifyFn.filter &&
+            !minimizerOptionsForFirstMinifyFn.filter(input, name)
           ) {
             return false;
           }
@@ -420,7 +423,6 @@ class ImageMinimizerPlugin {
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
         const {
           minify,
-          filter,
           test,
           include,
           exclude,
@@ -437,7 +439,6 @@ class ImageMinimizerPlugin {
           options: {
             minify,
             severityError,
-            filter,
             minimizerOptions,
           },
         });

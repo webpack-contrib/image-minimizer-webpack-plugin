@@ -92,13 +92,13 @@ exports[`validate plugin options should work 6`] = `
 
 exports[`validate plugin options should work 7`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.filter should be an instance of function.
+ - options.minimizerOptions.filter should be an instance of function.
    -> Allows filtering of images for optimization."
 `;
 
 exports[`validate plugin options should work 8`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.filter should be an instance of function.
+ - options.minimizerOptions.filter should be an instance of function.
    -> Allows filtering of images for optimization."
 `;
 
@@ -123,19 +123,19 @@ exports[`validate plugin options should work 11`] = `
 exports[`validate plugin options should work 12`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.minimizerOptions should be one of these:
-   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
+   object { filename?, deleteOriginalAssets?, filter?, … } | [object { filename?, deleteOriginalAssets?, filter?, … }, ...] (should not have fewer than 1 item)
    -> Options for \`imageMinimizerOptions\`.
    Details:
     * options.minimizerOptions should be an object:
-      object { filename?, deleteOriginalAssets?, … }
+      object { filename?, deleteOriginalAssets?, filter?, … }
     * options.minimizerOptions should be an array:
-      [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)"
+      [object { filename?, deleteOriginalAssets?, filter?, … }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate plugin options should work 13`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.minimizerOptions should be one of these:
-   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
+   object { filename?, deleteOriginalAssets?, filter?, … } | [object { filename?, deleteOriginalAssets?, filter?, … }, ...] (should not have fewer than 1 item)
    -> Options for \`imageMinimizerOptions\`.
    Details:
     * options.minimizerOptions.filename should be one of these:
@@ -148,7 +148,7 @@ exports[`validate plugin options should work 13`] = `
 exports[`validate plugin options should work 14`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.minimizerOptions should be one of these:
-   object { filename?, deleteOriginalAssets?, … } | [object { filename?, deleteOriginalAssets?, … }, ...] (should not have fewer than 1 item)
+   object { filename?, deleteOriginalAssets?, filter?, … } | [object { filename?, deleteOriginalAssets?, filter?, … }, ...] (should not have fewer than 1 item)
    -> Options for \`imageMinimizerOptions\`.
    Details:
     * options.minimizerOptions.filename should be one of these:
