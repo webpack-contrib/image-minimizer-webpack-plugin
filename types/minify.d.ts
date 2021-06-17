@@ -1,5 +1,4 @@
 export = minify;
-/** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
 /** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
 /** @typedef {import("./index").InternalMinifyResultEntry} InternalMinifyResultEntry */
 /** @typedef {import("./index").InternalMinifyResult} InternalMinifyResult */
@@ -15,7 +14,6 @@ declare function minify(
 ): Promise<import("./index").InternalMinifyResult>;
 declare namespace minify {
   export {
-    MinimizerOptions,
     MinifyFunctions,
     InternalMinifyResultEntry,
     InternalMinifyResult,
@@ -25,7 +23,6 @@ declare namespace minify {
   };
 }
 type InternalMinifyOptions = import("./index").InternalMinifyOptions;
-type MinimizerOptions = import("./index").MinimizerOptions;
 type MinifyFunctions = import("./index").MinifyFunctions;
 type InternalMinifyResultEntry = import("./index").InternalMinifyResultEntry;
 type InternalMinifyResult = import("./index").InternalMinifyResult;

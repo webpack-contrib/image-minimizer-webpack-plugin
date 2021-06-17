@@ -60,6 +60,7 @@ async function squooshGenerate(data, minifyOptions) {
       data: Buffer.from(binary),
       warnings: [],
       errors: [],
+      type: "generate",
     });
   }
 

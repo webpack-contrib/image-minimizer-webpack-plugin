@@ -87,21 +87,34 @@ async function minify(options) {
               data: minifyResult.data,
               warnings: [...file.warnings, ...(minifyResult.warnings || [])],
               errors: [...file.errors, ...(minifyResult.errors || [])],
+              type: minifyResult.type,
             },
           ];
 
       minifyResult.forEach((item) => {
+        if (item.type === "generate") {
+          const { path: newName } = options.getPathWithInfoFn(
+            filenameTemplate,
+            {
+              filename: item.filename,
+            }
+          );
+
+          item.filename = newName;
+
+          processResult[item.filename] =
+            /** @type InternalMinifyResultEntry */ (item);
+
+          if (deleteOriginalAssets) {
+            processResult[key].type = "remove";
+          }
+
+          return;
+        }
+
         processResult[item.filename] = /** @type InternalMinifyResultEntry */ (
           item
         );
-
-        if (!item.filenameTemplate) {
-          item.filenameTemplate = filenameTemplate;
-        }
-
-        if (deleteOriginalAssets) {
-          processResult[key].remove = true;
-        }
       });
     }
   }

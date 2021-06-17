@@ -23,6 +23,8 @@ function isPromise(obj) {
   );
 }
 
+const getPathWithInfoFn = ({ filename }) => ({ path: filename });
+
 describe("minify", () => {
   it("minify should be is function", () =>
     expect(typeof minify === "function").toBe(true));
@@ -52,6 +54,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: ["mozjpeg"],
       },
@@ -75,6 +78,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename: path.relative(process.cwd(), filename),
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: ["mozjpeg"],
       },
@@ -112,6 +116,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: { plugins: [["svgo", svgoOptions]] },
     });
 
@@ -143,6 +148,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
     });
 
     expect(result.warnings).toHaveLength(1);
@@ -161,6 +167,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: { plugins: [] },
     });
 
@@ -180,6 +187,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: { plugins: false },
     });
 
@@ -201,6 +209,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename: "foo.jpg",
+      getPathWithInfoFn,
       minimizerOptions: { plugins: ["mozjpeg"] },
     });
 
@@ -216,6 +225,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: ["mozjpeg"],
       },
@@ -239,6 +249,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: ["mozjpeg"],
       },
@@ -262,6 +273,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: [["mozjpeg", { quality: 0 }]],
       },
@@ -285,6 +297,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: [["mozjpeg"]],
       },
@@ -308,6 +321,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: ["imagemin-mozjpeg"],
       },
@@ -331,6 +345,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: [["imagemin-mozjpeg", { quality: 0 }]],
       },
@@ -354,6 +369,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: [["imagemin-mozjpeg"]],
       },
@@ -377,6 +393,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: ["imagemin-unknown"],
       },
@@ -398,6 +415,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: ["imagemin-mozjpeg", "unknown"],
       },
@@ -424,6 +442,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: [imageminMozjpeg()],
       },
@@ -453,6 +472,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminMinify,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: { plugins: [["svgo", svgoOptions]] },
     });
 
@@ -476,6 +496,7 @@ describe("minify", () => {
       ],
       input,
       filename,
+      getPathWithInfoFn,
     });
 
     expect(result.errors).toHaveLength(2);
@@ -491,6 +512,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminGenerate,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: ["imagemin-webp"],
       },
@@ -513,6 +535,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminGenerate,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: ["imagemin-unknown"],
       },
@@ -530,6 +553,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminGenerate,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {},
     });
 
@@ -551,6 +575,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminGenerate,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         deleteOriginalAssets: true,
         plugins: ["imagemin-avif", "imagemin-webp"],
@@ -577,6 +602,7 @@ describe("minify", () => {
       minify: ImageMinimizerPlugin.imageminGenerate,
       input,
       filename,
+      getPathWithInfoFn,
       minimizerOptions: {
         plugins: ["imagemin-avif", "imagemin-webp"],
       },

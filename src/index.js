@@ -70,6 +70,8 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @property {string} [severityError]
  * @property {MinimizerOptions} [minimizerOptions]
  * @property {MinifyFunctions} minify
+ * @property {AssetInfo} [info]
+ * @property {Compilation["getPathWithInfo"]} getPathWithInfoFn
  */
 
 /**
@@ -79,7 +81,7 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
  * @property {string} filenameTemplate
- * @property {boolean | undefined} [remove]
+ * @property {string} [type]
  */
 
 /**
@@ -103,7 +105,7 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
- * @property {string} [filenameTemplate]
+ * @property {string} [type]
  */
 
 /**
@@ -170,8 +172,6 @@ class ImageMinimizerPlugin {
       },
       loader = true,
       maxConcurrency,
-      filename = "[path][name][ext]",
-      deleteOriginalAssets = false,
     } = options;
 
     this.options = {
@@ -183,8 +183,6 @@ class ImageMinimizerPlugin {
       loader,
       maxConcurrency,
       test,
-      filename,
-      deleteOriginalAssets,
     };
   }
 
@@ -196,10 +194,9 @@ class ImageMinimizerPlugin {
   createCacheData(data) {
     return data.map((file) => ({
       source: file.source,
-      warnings: file.warnings,
       filename: file.filename,
-      filenameTemplate: file.filenameTemplate,
-      remove: file.remove,
+      warnings: file.warnings,
+      type: file.type,
     }));
   }
 
@@ -307,6 +304,8 @@ class ImageMinimizerPlugin {
               severityError,
               minimizerOptions,
               minify,
+              info,
+              getPathWithInfoFn: compilation.getPathWithInfo.bind(compilation),
             };
 
             output = await minifyFn(minifyOptions);
@@ -346,9 +345,8 @@ class ImageMinimizerPlugin {
             const {
               source,
               warnings,
+              type,
               filename: maybeNewName,
-              remove,
-              filenameTemplate,
             } = output[i];
 
             if (warnings && warnings.length > 0) {
@@ -358,40 +356,31 @@ class ImageMinimizerPlugin {
               });
             }
 
-            const { path: newName } = compilation.getPathWithInfo(
-              filenameTemplate,
-              {
-                filename: maybeNewName,
-              }
-            );
+            if (type === "remove") {
+              compilation.deleteAsset(maybeNewName);
 
-            const isNewAsset = name !== newName;
+              continue;
+            }
 
-            if (isNewAsset) {
-              const newInfo = {
-                related: { minimized: newName, ...info.related },
-                minimized: true,
-              };
+            if (compilation.getAsset(maybeNewName)) {
+              if (type === "minify") {
+                const updatedAssetsInfo = {
+                  minimized: true,
+                };
 
-              compilation.emitAsset(newName, source, newInfo);
-
-              if (this.options.deleteOriginalAssets) {
-                compilation.deleteAsset(name);
+                compilation.updateAsset(
+                  maybeNewName,
+                  source,
+                  updatedAssetsInfo
+                );
               }
             } else {
-              if (remove) {
-                compilation.deleteAsset(name);
-
-                continue;
-              }
-
-              const updatedAssetsInfo = {
+              const newInfo = {
+                related: { minimized: maybeNewName, ...info.related },
                 minimized: true,
               };
 
-              if (compilation.getAsset(name)) {
-                compilation.updateAsset(name, source, updatedAssetsInfo);
-              }
+              compilation.emitAsset(maybeNewName, source, newInfo);
             }
           }
         })

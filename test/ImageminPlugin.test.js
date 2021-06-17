@@ -15,6 +15,8 @@ import {
   clearDirectory,
 } from "./helpers";
 
+import ImageMinimizerPlugin from "../src";
+
 describe("imagemin plugin", () => {
   it("should optimizes all images (loader + plugin)", async () => {
     const stats = await webpack({ emitPlugin: true, imageminPlugin: true });
@@ -617,12 +619,14 @@ describe("imagemin plugin - persistent cache", () => {
         emitAssetPlugin: true,
         imageminPluginOptions: [
           {
+            minify: ImageMinimizerPlugin.imageminGenerate,
             minimizerOptions: {
-              filename: "[name].webp",
+              filename: "[name][ext]",
               plugins: ["imagemin-webp"],
             },
           },
           {
+            minify: ImageMinimizerPlugin.imageminGenerate,
             minimizerOptions: {
               filename: "[name].json",
               plugins: ["../../test/imagemin-base64.js"],

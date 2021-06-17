@@ -57,12 +57,15 @@ module.exports = async function loader(content) {
     severityError,
     minimizerOptions,
     isProductionMode: this.mode === "production" || !this.mode,
+    getPathWithInfoFn: /** @type Compilation */ (
+      this._compilation
+    ).getPathWithInfo.bind(this._compilation),
   });
 
   let output = await minify(minifyOptions);
   let hasError = false;
 
-  output = output.filter((file) => !file.remove);
+  output = output.filter((file) => file.type !== "remove");
 
   for (let i = 0; i <= output.length - 1; i++) {
     const file = output[i];
@@ -82,6 +85,8 @@ module.exports = async function loader(content) {
     return;
   }
 
+  let emmited = false;
+
   for (let i = 0; i <= output.length - 1; i++) {
     const file = output[i];
 
@@ -94,28 +99,29 @@ module.exports = async function loader(content) {
     // @ts-ignore
     file.source = file.data;
 
-    const { path: newName } = /** @type {Compilation} */ (
-      this._compilation
-    ).getPathWithInfo(file.filenameTemplate, {
-      filename: file.filename,
-    });
-
-    const isNewAsset = name !== newName;
-
-    if (isNewAsset) {
-      // @ts-ignore
-      this.emitFile(newName, file.source.toString(), "", {
-        minimized: true,
-      });
-
-      if (file.remove) {
+    // eslint-disable-next-line default-case
+    switch (file.type) {
+      case "remove":
         // TODO remove original asset
-      }
+        break;
+      case "generate":
+        this.emitFile(
+          // @ts-ignore
+          file.filename,
+          // @ts-ignore
+          file.source.toString(),
+          "",
+          { minimized: true }
+        );
 
-      callback(null, content);
-
-      return;
+        emmited = true;
     }
+  }
+
+  if (emmited) {
+    callback(null, content);
+
+    return;
   }
 
   // Todo add export for multiple assets

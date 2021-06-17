@@ -42,6 +42,8 @@ export type InternalMinifyOptions = {
   severityError?: string | undefined;
   minimizerOptions?: MinimizerOptions | undefined;
   minify: MinifyFunctions;
+  info?: import("webpack").AssetInfo | undefined;
+  getPathWithInfoFn: Compilation["getPathWithInfo"];
 };
 export type InternalMinifyResultEntry = {
   data: Buffer;
@@ -49,7 +51,7 @@ export type InternalMinifyResultEntry = {
   warnings: Array<Error>;
   errors: Array<Error>;
   filenameTemplate: string;
-  remove?: boolean | undefined;
+  type?: string | undefined;
 };
 export type InternalMinifyResult = InternalMinifyResultEntry[];
 export type CustomMinifyFunction = (
@@ -65,7 +67,7 @@ export type MinifyFnResultEntry = {
   data: Buffer;
   warnings: Array<Error>;
   errors: Array<Error>;
-  filenameTemplate?: string | undefined;
+  type?: string | undefined;
 };
 export type MinifyFnResult = MinifyFnResultEntry | MinifyFnResultEntry[];
 export type InternalLoaderOptions = {
@@ -180,6 +182,8 @@ export type PluginOptions = {
  * @property {string} [severityError]
  * @property {MinimizerOptions} [minimizerOptions]
  * @property {MinifyFunctions} minify
+ * @property {AssetInfo} [info]
+ * @property {Compilation["getPathWithInfo"]} getPathWithInfoFn
  */
 /**
  * @typedef {Object} InternalMinifyResultEntry
@@ -188,7 +192,7 @@ export type PluginOptions = {
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
  * @property {string} filenameTemplate
- * @property {boolean | undefined} [remove]
+ * @property {string} [type]
  */
 /**
  * @typedef {InternalMinifyResultEntry[]} InternalMinifyResult
@@ -208,7 +212,7 @@ export type PluginOptions = {
  * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
- * @property {string} [filenameTemplate]
+ * @property {string} [type]
  */
 /**
  * @typedef {MinifyFnResultEntry | MinifyFnResultEntry[]} MinifyFnResult
@@ -256,15 +260,12 @@ declare class ImageMinimizerPlugin {
   options: {
     minify: MinifyFunctions;
     severityError: string | undefined;
-    filter: FilterFn;
     exclude: Rules | undefined;
     minimizerOptions: MinimizerOptions;
     include: Rules | undefined;
     loader: boolean;
     maxConcurrency: number | undefined;
     test: Rules;
-    filename: string | FilenameFn;
-    deleteOriginalAssets: boolean;
   };
   /**
    *
@@ -277,10 +278,9 @@ declare class ImageMinimizerPlugin {
     })[]
   ): {
     source: Buffer;
-    warnings: Error[];
     filename: string;
-    filenameTemplate: string;
-    remove: boolean | undefined;
+    warnings: Error[];
+    type: string | undefined;
   }[];
   /**
    * @private

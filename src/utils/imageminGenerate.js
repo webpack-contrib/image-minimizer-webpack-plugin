@@ -53,6 +53,7 @@ export default async function imageminGenerate(data, minimizerOptions) {
       data: input,
       warnings: [],
       errors: [],
+      type: "generate",
     };
 
     minimizerOptionsNormalized.plugins =
