@@ -76,7 +76,7 @@ async function squooshMinify(data, minifyOptions) {
   const encodedImage = await image.encodedWith[targetCodec];
 
   result.data = Buffer.from(encodedImage.binary);
-  result.type = "minify";
+  result.type = "minimized";
 
   return result;
 }

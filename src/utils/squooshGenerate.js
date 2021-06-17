@@ -48,23 +48,29 @@ async function squooshGenerate(data, minifyOptions) {
 
   await imagePool.close();
 
-  const result = [];
+  const results = [];
   const ext = path.extname(filename).toLowerCase();
+  const tasks = [];
 
   for (const encodedImage of Object.values(image.encodedWith)) {
-    // eslint-disable-next-line no-await-in-loop
-    const { extension, binary } = await encodedImage;
+    tasks.push(encodedImage);
+  }
 
-    result.push({
+  const encodedImages = await Promise.all(tasks);
+
+  for (const encodedImage of encodedImages) {
+    const { extension, binary } = encodedImage;
+
+    results.push({
       filename: filename.replace(new RegExp(`${ext}$`), `.${extension}`),
       data: Buffer.from(binary),
       warnings: [],
       errors: [],
-      type: "generate",
+      type: "generated",
     });
   }
 
-  return result;
+  return results;
 }
 
 export default squooshGenerate;

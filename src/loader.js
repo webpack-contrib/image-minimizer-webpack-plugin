@@ -65,7 +65,7 @@ module.exports = async function loader(content) {
   let output = await minify(minifyOptions);
   let hasError = false;
 
-  output = output.filter((file) => file.type !== "remove");
+  output = output.filter((file) => file.type !== "removed");
 
   for (let i = 0; i <= output.length - 1; i++) {
     const file = output[i];
@@ -101,10 +101,10 @@ module.exports = async function loader(content) {
 
     // eslint-disable-next-line default-case
     switch (file.type) {
-      case "remove":
+      case "removed":
         // TODO remove original asset
         break;
-      case "generate":
+      case "generated":
         this.emitFile(
           // @ts-ignore
           file.filename,

@@ -133,7 +133,7 @@ describe("plugin minify option", () => {
 
             return {
               data: input,
-              type: "minify",
+              type: "minimized",
             };
           },
         ],
@@ -169,7 +169,7 @@ describe("plugin minify option", () => {
 
             return {
               data: input,
-              type: "minify",
+              type: "minimized",
             };
           },
           (data, minifiOptions) => {
@@ -179,7 +179,7 @@ describe("plugin minify option", () => {
 
             return {
               data: input,
-              type: "minify",
+              type: "minimized",
             };
           },
         ],

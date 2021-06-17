@@ -185,7 +185,7 @@ export default async function imageminMinify(data, minimizerOptions) {
     result.errors.push(error);
   }
 
-  result.type = "minify";
+  result.type = "minimized";
 
   return result;
 }

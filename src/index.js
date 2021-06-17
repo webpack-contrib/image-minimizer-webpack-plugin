@@ -356,14 +356,14 @@ class ImageMinimizerPlugin {
               });
             }
 
-            if (type === "remove") {
+            if (type === "removed") {
               compilation.deleteAsset(maybeNewName);
 
               continue;
             }
 
             if (compilation.getAsset(maybeNewName)) {
-              if (type === "minify") {
+              if (type === "minimized") {
                 const updatedAssetsInfo = {
                   minimized: true,
                 };

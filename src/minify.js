@@ -76,7 +76,7 @@ async function minify(options) {
 
         file.errors.push(errored);
 
-        continue;
+        minifyResult = file;
       }
 
       minifyResult = Array.isArray(minifyResult)
@@ -92,7 +92,7 @@ async function minify(options) {
           ];
 
       minifyResult.forEach((item) => {
-        if (item.type === "generate") {
+        if (item.type === "generated") {
           const { path: newName } = options.getPathWithInfoFn(
             filenameTemplate,
             {
@@ -106,7 +106,7 @@ async function minify(options) {
             /** @type InternalMinifyResultEntry */ (item);
 
           if (deleteOriginalAssets) {
-            processResult[key].type = "remove";
+            processResult[key].type = "removed";
           }
 
           return;

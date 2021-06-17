@@ -190,7 +190,7 @@ describe("loader minify option", () => {
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    expect(errors).toHaveLength(4);
+    expect(errors).toHaveLength(8);
     expect(warnings).toHaveLength(0);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
