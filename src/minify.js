@@ -39,9 +39,9 @@ async function minify(options) {
   /**
    * @typedef {processResultEntry[]} processResult
    */
-  const processResult = {
-    [input.filename]: input,
-  };
+  let processResult = [input];
+  let transformedResults = [];
+  let inputIndex = 0;
 
   for (let i = 0; i <= minifyFns.length - 1; i++) {
     const minifyFn = minifyFns[i];
@@ -53,12 +53,14 @@ async function minify(options) {
       filename: filenameTemplate = FILENAME_TEMPLATE,
     } = minifyOptions;
 
-    for (const [key, file] of Object.entries(processResult)) {
+    transformedResults = [];
+    console.log(processResult, inputIndex)
+    for (let k = inputIndex; k <= processResult.length - 1; k++) {
+      const inputAsset = processResult[inputIndex];
+      const file = processResult[k];
       let minifyResult;
 
       if (
-        // In the plugin and loader for the input asset, the filter has already been run
-        i > 0 &&
         minifyOptions.filter &&
         !minifyOptions.filter(file.data, file.filename)
       ) {
@@ -92,6 +94,18 @@ async function minify(options) {
           ];
 
       minifyResult.forEach((item) => {
+        const isSameAsset = inputAsset.filename === item.filename;
+
+        if (isSameAsset) {
+          if (item.data.equals(inputAsset.data)) {
+            item.type = "removed";
+          }
+
+          if (item.type === "minimized") {
+            processResult.splice(0, 1, /** @type InternalMinifyResultEntry */ (item))
+          }
+        }
+
         if (item.type === "generated") {
           const { path: newName } = options.getPathWithInfoFn(
             filenameTemplate,
@@ -102,26 +116,23 @@ async function minify(options) {
 
           item.filename = newName;
 
-          processResult[item.filename] =
-            /** @type InternalMinifyResultEntry */ (item);
+          transformedResults.push(/** @type InternalMinifyResultEntry */ (item));
 
           if (deleteOriginalAssets) {
-            processResult[key].type = "removed";
+            inputAsset.type = "removed";
           }
-
-          return;
         }
-
-        processResult[item.filename] = /** @type InternalMinifyResultEntry */ (
-          item
-        );
       });
     }
+
+    inputIndex += transformedResults.length;
+
+    processResult = [...processResult, ...transformedResults];
   }
 
   const result = [];
 
-  for (const file of Object.values(processResult)) {
+  for (const file of processResult) {
     result.push(file);
 
     if (file.errors.length > 0) {

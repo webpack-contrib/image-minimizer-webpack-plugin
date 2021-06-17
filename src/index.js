@@ -236,20 +236,6 @@ class ImageMinimizerPlugin {
             return false;
           }
 
-          const input = source.source();
-          const minimizerOptionsForFirstMinifyFn = Array.isArray(
-            this.options.minimizerOptions
-          )
-            ? this.options.minimizerOptions[0]
-            : this.options.minimizerOptions || {};
-
-          if (
-            minimizerOptionsForFirstMinifyFn.filter &&
-            !minimizerOptionsForFirstMinifyFn.filter(input, name)
-          ) {
-            return false;
-          }
-
           return true;
         })
         .map(async (name) => {
