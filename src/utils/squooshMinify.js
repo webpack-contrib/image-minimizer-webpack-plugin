@@ -11,10 +11,11 @@ import path from "path";
  * @returns {Promise<MinifyFnResult>}
  */
 
-async function squooshMinify(data, minifyOptions = {}) {
+async function squooshMinify(data, minifyOptions) {
   const [[filename, input]] = Object.entries(data);
   /** @type {MinifyFnResult} */
   const result = {
+    filename,
     data: input,
     warnings: [],
     errors: [],
@@ -50,22 +51,16 @@ async function squooshMinify(data, minifyOptions = {}) {
     ...minifyOptions.encodeOptions,
   };
 
-  const squoosh =
-    // eslint-disable-next-line node/no-unpublished-require
-    require("@squoosh/lib");
-
-  let imagePool;
-  let image;
+  // eslint-disable-next-line node/no-unpublished-require
+  const squoosh = require("@squoosh/lib");
+  const { ImagePool } = squoosh;
+  const imagePool = new ImagePool();
+  const image = imagePool.ingestImage(input);
 
   try {
-    imagePool = new squoosh.ImagePool();
-    image = imagePool.ingestImage(input);
-
     await image.encode(encodeOptions);
   } catch (error) {
-    if (imagePool) {
-      await imagePool.close();
-    }
+    await imagePool.close();
 
     result.errors.push(error);
 
@@ -77,6 +72,7 @@ async function squooshMinify(data, minifyOptions = {}) {
   const encodedImage = await image.encodedWith[targetCodec];
 
   result.data = Buffer.from(encodedImage.binary);
+  result.type = "minimized";
 
   return result;
 }

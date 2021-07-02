@@ -90,9 +90,11 @@ import squooshMinify from "./utils/squooshMinify";
 
 /**
  * @typedef {Object} MinifyFnResult
+ * @property {string} filename
  * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
+ * @property {string} [type]
  */
 
 /**
