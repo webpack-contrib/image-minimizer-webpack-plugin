@@ -56,7 +56,7 @@ class InvalidConfigError extends Error {
  * @param {ImageminMinimizerOptions} minimizerOptions
  * @param {MetaData} [metaData]
  */
-export function normalizeImageminConfig(minimizerOptions, metaData) {
+export function imageminNormalizeConfig(minimizerOptions, metaData) {
   if (
     !minimizerOptions ||
     !minimizerOptions.plugins ||
@@ -175,7 +175,7 @@ export default async function imageminMinify(data, minimizerOptions) {
 
     // Implement autosearch config on root directory of project in future
     const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-      normalizeImageminConfig(minimizerOptions, result)
+      imageminNormalizeConfig(minimizerOptions, result)
     );
 
     result.data = await imagemin.buffer(input, minimizerOptionsNormalized);

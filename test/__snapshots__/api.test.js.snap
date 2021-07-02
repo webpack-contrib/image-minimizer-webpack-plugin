@@ -1,5 +1,108 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`api imageminNormalizeConfig should works 1`] = `"No plugins found for \`imagemin\`. Please read documentation."`;
+
+exports[`api imageminNormalizeConfig should works 2`] = `"No plugins found for \`imagemin\`. Please read documentation."`;
+
+exports[`api imageminNormalizeConfig should works 3`] = `
+"Unknown plugin: imagemin-unknown
+
+Did you forget to install the plugin?
+You can install it with:
+
+$ npm install imagemin-unknown --save-dev
+$ yarn add imagemin-unknown --dev"
+`;
+
+exports[`api imageminNormalizeConfig should works 4`] = `
+"Unknown plugin: imagemin-unknown
+
+Did you forget to install the plugin?
+You can install it with:
+
+$ npm install imagemin-unknown --save-dev
+$ yarn add imagemin-unknown --dev"
+`;
+
+exports[`api imageminNormalizeConfig should works 5`] = `
+Object {
+  "plugins": Array [
+    [Function],
+  ],
+  "pluginsMeta": Array [
+    Array [
+      Object {
+        "name": "imagemin-mozjpeg",
+        "options": Object {},
+        "version": "9.0.0",
+      },
+    ],
+  ],
+}
+`;
+
+exports[`api imageminNormalizeConfig should works 6`] = `
+Object {
+  "plugins": Array [
+    [Function],
+  ],
+  "pluginsMeta": Array [
+    Array [
+      Object {
+        "name": "imagemin-mozjpeg",
+        "options": Object {},
+        "version": "9.0.0",
+      },
+    ],
+  ],
+}
+`;
+
+exports[`api imageminNormalizeConfig should works 7`] = `
+Object {
+  "plugins": Array [
+    [Function],
+  ],
+  "pluginsMeta": Array [
+    Array [
+      Object {
+        "name": "imagemin-mozjpeg",
+        "options": Object {},
+        "version": "9.0.0",
+      },
+    ],
+  ],
+}
+`;
+
+exports[`api imageminNormalizeConfig should works 8`] = `
+Object {
+  "plugins": Array [
+    [Function],
+  ],
+  "pluginsMeta": Array [
+    Array [
+      Object {
+        "name": "imagemin-mozjpeg",
+        "options": Object {
+          "quality": 0,
+        },
+        "version": "9.0.0",
+      },
+    ],
+  ],
+}
+`;
+
+exports[`api imageminNormalizeConfig should works 9`] = `Object {}`;
+
+exports[`api imageminNormalizeConfig should works 10`] = `
+Object {
+  "plugins": Array [],
+  "pluginsMeta": Array [],
+}
+`;
+
 exports[`api normalizeImageminConfig should works 1`] = `"No plugins found for \`imagemin\`. Please read documentation."`;
 
 exports[`api normalizeImageminConfig should works 2`] = `"No plugins found for \`imagemin\`. Please read documentation."`;

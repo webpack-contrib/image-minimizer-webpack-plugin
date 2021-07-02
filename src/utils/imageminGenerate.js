@@ -1,6 +1,6 @@
 import path from "path";
 import fileTypeFromBuffer from "./fileTypeFromBuffer";
-import { normalizeImageminConfig } from "./imageminMinify";
+import { imageminNormalizeConfig } from "./imageminMinify";
 
 /** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
 /** @typedef {import("../index").ImageminMinimizerOptions} ImageminMinimizerOptions */
@@ -25,7 +25,7 @@ export default async function imageminGenerate(data, minimizerOptions) {
 
   /** @type {ImageminOptions} */
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-    normalizeImageminConfig(minimizerOptions, result)
+    imageminNormalizeConfig(minimizerOptions, result)
   );
   const { plugins = [] } = minimizerOptionsNormalized;
 

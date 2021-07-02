@@ -9,7 +9,7 @@ import serialize from "serialize-javascript";
 import minifyFn from "./minify";
 import schema from "./plugin-options.json";
 import imageminMinify, {
-  normalizeImageminConfig,
+  imageminNormalizeConfig,
 } from "./utils/imageminMinify";
 import imageminGenerate from "./utils/imageminGenerate";
 import squooshMinify from "./utils/squooshMinify";
@@ -408,11 +408,10 @@ class ImageMinimizerPlugin {
 }
 
 ImageMinimizerPlugin.loader = require.resolve("./loader");
-
-ImageMinimizerPlugin.normalizeImageminConfig = normalizeImageminConfig;
+ImageMinimizerPlugin.imageminNormalizeConfig = imageminNormalizeConfig;
 ImageMinimizerPlugin.imageminMinify = imageminMinify;
-ImageMinimizerPlugin.squooshMinify = squooshMinify;
 ImageMinimizerPlugin.imageminGenerate = imageminGenerate;
+ImageMinimizerPlugin.squooshMinify = squooshMinify;
 ImageMinimizerPlugin.squooshGenerate = squooshGenerate;
 
 export default ImageMinimizerPlugin;
