@@ -193,7 +193,7 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should emit error when file is not supported by "squooshMinify"', async () => {
+  it('should emit warning when file is not supported by "squooshMinify"', async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
@@ -209,10 +209,10 @@ describe("plugin minify option", () => {
 
     expect(compilation.getAsset("plugin-test.svg")).toBeDefined();
 
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(1);
-    expect(errors[0].toString()).toMatch(
-      "Binary blob has an unsupported format"
+    expect(errors).toHaveLength(0);
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].toString()).toMatch(
+      'Error: "plugin-test.svg" is not minify, because has an unsupported format'
     );
   });
 });

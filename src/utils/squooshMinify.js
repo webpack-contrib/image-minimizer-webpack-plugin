@@ -21,16 +21,34 @@ async function squooshMinify(data, minifyOptions) {
   /**
    * @type {Record<string, string>}
    */
-  const targets = {
-    jpeg: "mozjpeg",
-  };
+  const targets = {};
 
   for (const [codec, { extension }] of Object.entries(encoders)) {
-    targets[extension.toLowerCase()] = codec;
+    const extensionNormalized = extension.toLowerCase();
+
+    if (extensionNormalized === "jpg") {
+      targets.jpeg = codec;
+    }
+
+    targets[extensionNormalized] = codec;
   }
 
   const ext = path.extname(filename).slice(1).toLowerCase();
   const targetCodec = targets[ext];
+
+  if (!targetCodec) {
+    return {
+      filename,
+      data: input,
+      warnings: [
+        new Error(
+          `"${filename}" is not minify, because has an unsupported format`
+        ),
+      ],
+      errors: [],
+    };
+  }
+
   const { encodeOptions = {} } = minifyOptions;
 
   if (!encodeOptions[targetCodec]) {
@@ -41,7 +59,7 @@ async function squooshMinify(data, minifyOptions) {
   const image = imagePool.ingestImage(input);
 
   try {
-    await image.encode(encodeOptions);
+    await image.encode({ [targetCodec]: encodeOptions[targetCodec] });
   } catch (error) {
     await imagePool.close();
 
