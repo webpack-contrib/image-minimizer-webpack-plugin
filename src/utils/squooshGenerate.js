@@ -28,7 +28,7 @@ async function squooshGenerate(data, minifyOptions) {
   const squoosh = require("@squoosh/lib");
   const { ImagePool } = squoosh;
   const imagePool = new ImagePool();
-  const image = imagePool.ingestImage(input);
+  const image = imagePool.ingestImage(new Uint8Array(input));
 
   try {
     await image.encode(encodeOptions);
@@ -63,7 +63,7 @@ async function squooshGenerate(data, minifyOptions) {
       data: Buffer.from(binary),
       warnings: [],
       errors: [],
-      type: "generated",
+      squooshGenerate: true,
     });
   }
 

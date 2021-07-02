@@ -51,7 +51,7 @@ export default async function imageminGenerate(data, minimizerOptions) {
       data: input,
       warnings: [],
       errors: [],
-      type: "generated",
+      imageminGenerate: true,
     };
 
     minimizerOptionsNormalized.plugins =
@@ -69,7 +69,10 @@ export default async function imageminGenerate(data, minimizerOptions) {
       continue;
     }
 
-    const extInput = path.extname(resultForPlugin.filename).toLowerCase();
+    const extInput = path
+      .extname(resultForPlugin.filename)
+      .slice(1)
+      .toLowerCase();
     const { ext: extOutput } = fileTypeFromBuffer(resultForPlugin.data) || {};
 
     if (extOutput && extInput !== extOutput) {

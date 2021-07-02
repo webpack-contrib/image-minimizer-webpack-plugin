@@ -1,4 +1,6 @@
+import path from "path";
 import { klona } from "klona/full";
+import fileTypeFromBuffer from "./fileTypeFromBuffer";
 
 /** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
 /** @typedef {import("../index").ImageminMinimizerOptions} ImageminMinimizerOptions */
@@ -183,7 +185,19 @@ export default async function imageminMinify(data, minimizerOptions) {
     result.errors.push(error);
   }
 
-  result.type = "minimized";
+  const extInput = path.extname(result.filename).slice(1).toLowerCase();
+  const { ext: extOutput } = fileTypeFromBuffer(result.data) || {};
+
+  if (extOutput && extInput !== extOutput) {
+    result.warnings.push(
+      new Error(
+        `"imageminMinify" function do not support generate to "${extOutput}" from "${filename}". Use "imageminGenerate"`
+      )
+    );
+    result.data = input;
+  }
+
+  result.imageminMinify = true;
 
   return result;
 }

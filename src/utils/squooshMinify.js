@@ -56,7 +56,7 @@ async function squooshMinify(data, minifyOptions) {
   }
 
   const imagePool = new ImagePool();
-  const image = imagePool.ingestImage(input);
+  const image = imagePool.ingestImage(new Uint8Array(input));
 
   try {
     await image.encode({ [targetCodec]: encodeOptions[targetCodec] });
@@ -80,7 +80,7 @@ async function squooshMinify(data, minifyOptions) {
     data: Buffer.from(encodedImage.binary),
     warnings: [],
     errors: [],
-    type: "minimized",
+    squooshMinify: true,
   };
 }
 

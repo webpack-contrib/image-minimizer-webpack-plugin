@@ -27,6 +27,27 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
+  it('should emit warning when "imagemin" minifier used for generation', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: ImageMinimizerPlugin.imageminMinify,
+        minimizerOptions: {
+          plugins: ["webp"],
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].toString()).toMatch(
+      'Error: "imageminMinify" function do not support generate to "webp" from "plugin-test.jpg". Use "imageminGenerate"'
+    );
+    expect(errors).toHaveLength(0);
+  });
+
   it("should work when minify is custom function", async () => {
     expect.assertions(5);
 
