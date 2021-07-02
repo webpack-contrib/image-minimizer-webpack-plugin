@@ -1,6 +1,6 @@
 import ImageMinimizerPlugin from "../src";
 
-import { webpack, isOptimized, fixturesPath } from "./helpers";
+import { webpack, isOptimized } from "./helpers";
 
 describe("loader minify option", () => {
   it('should work with "imagemin" minifier', async () => {
@@ -207,22 +207,18 @@ describe("loader minify option", () => {
     );
   });
 
-  // Todo enable test when "main" section in @squoosh/lib package.json will be fixed
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip('should work with "squooshMinify" minifier', async () => {
     const stats = await webpack({
       imageminLoader: true,
       imageminLoaderOptions: {
         minify: ImageMinimizerPlugin.squooshMinify,
-        minimizerOptions: {
-          context: fixturesPath,
-        },
       },
     });
     const { compilation } = stats;
-    const { warnings, errors } = compilation;
+    const { errors } = compilation;
 
-    expect(warnings).toHaveLength(2);
+    // expect(warnings).toHaveLength(2);
     expect(errors).toHaveLength(0);
 
     expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(631);
