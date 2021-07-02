@@ -32,6 +32,7 @@ async function minify(options) {
       const minifyOptions = Array.isArray(options.minimizerOptions)
         ? options.minimizerOptions[i]
         : options.minimizerOptions;
+
       // eslint-disable-next-line no-await-in-loop
       const minifyResult = await minifyFn(
         { [options.filename]: result.data },

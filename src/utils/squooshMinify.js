@@ -10,9 +10,8 @@ import path from "path";
  * @param {SquooshMinimizerOptions} minifyOptions
  * @returns {Promise<MinifyFnResult>}
  */
-// Todo remove import/no-unresolved comment when "main" section in @squoosh/lib package.json will be fixed
-/* istanbul ignore next */
-async function squooshMinify(data, minifyOptions) {
+
+async function squooshMinify(data, minifyOptions = {}) {
   const [[filename, input]] = Object.entries(data);
   /** @type {MinifyFnResult} */
   const result = {
@@ -51,18 +50,22 @@ async function squooshMinify(data, minifyOptions) {
     ...minifyOptions.encodeOptions,
   };
 
-  // Todo remove import/no-unresolved comment when "main" section in @squoosh/lib package.json will be fixed
-  // @ts-ignore
-  // eslint-disable-next-line node/no-unpublished-require,import/no-unresolved
-  const squoosh = require("@squoosh/lib");
-  const { ImagePool } = squoosh;
-  const imagePool = new ImagePool();
-  const image = imagePool.ingestImage(input);
+  const squoosh =
+    // eslint-disable-next-line node/no-unpublished-require
+    require("@squoosh/lib");
+
+  let imagePool;
+  let image;
 
   try {
+    imagePool = new squoosh.ImagePool();
+    image = imagePool.ingestImage(input);
+
     await image.encode(encodeOptions);
   } catch (error) {
-    await imagePool.close();
+    if (imagePool) {
+      await imagePool.close();
+    }
 
     result.errors.push(error);
 

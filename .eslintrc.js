@@ -13,10 +13,10 @@ module.exports = {
     {
       extends: ["plugin:itgalaxy/dirty"],
       files: [
-        "src/**/*.[jt]s?(x)",
-        "**/{tests,test,__tests__}/**/*.[jt]s?(x)",
-        "**/?(*.)+(spec|test).[jt]s?(x)",
-        "**/test-*.[jt]s?(x)",
+        "src/**/*.[j]s?(x)",
+        "**/{tests,test,__tests__}/**/*.[j]s?(x)",
+        "**/?(*.)+(spec|test).[j]s?(x)",
+        "**/test-*.[j]s?(x)",
       ],
     },
   ],
