@@ -193,27 +193,26 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('should emit warning when file is not supported by "squooshMinify"', async () => {
+  it('should emit error when file is not supported by "squooshMinify"', async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
+      emitPluginOptions: {
+        fileNames: ["plugin-test.svg"],
+      },
       imageminPluginOptions: {
         minify: ImageMinimizerPlugin.squooshMinify,
-        minimizerOptions: {
-          encodeOptions: {
-            mozjpeg: "invalidValue",
-          },
-        },
       },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    expect(warnings).toHaveLength(1);
-    expect(warnings[0].toString()).toMatch(
-      /was not minified by "ImageMinimizerPlugin.squooshMinify"/
+    expect(compilation.getAsset("plugin-test.svg")).toBeDefined();
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].toString()).toMatch(
+      "Binary blob has an unsupported format"
     );
-    expect(errors).toHaveLength(0);
   });
 });

@@ -16,21 +16,20 @@ async function squooshMinify(data, minifyOptions) {
 
   // eslint-disable-next-line node/no-unpublished-require
   const squoosh = require("@squoosh/lib");
-  const { ImagePool } = squoosh;
+  const { ImagePool, encoders } = squoosh;
 
   /**
    * @type {Record<string, string>}
    */
   const targets = {
-    ".png": "oxipng",
-    ".jpg": "mozjpeg",
-    ".jpeg": "mozjpeg",
-    ".jxl": "jxl",
-    ".webp": "webp",
-    ".avif": "avif",
+    jpeg: "mozjpeg",
   };
 
-  const ext = path.extname(filename).toLowerCase();
+  for (const [codec, { extension }] of Object.entries(encoders)) {
+    targets[extension.toLowerCase()] = codec;
+  }
+
+  const ext = path.extname(filename).slice(1).toLowerCase();
   const targetCodec = targets[ext];
   const { encodeOptions = {} } = minifyOptions;
 
@@ -57,15 +56,6 @@ async function squooshMinify(data, minifyOptions) {
   await imagePool.close();
 
   const encodedImage = await image.encodedWith[targets[ext]];
-
-  if (!encodedImage) {
-    return {
-      filename,
-      data: input,
-      warnings: [],
-      errors: [],
-    };
-  }
 
   return {
     filename,
