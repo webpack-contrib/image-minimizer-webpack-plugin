@@ -171,8 +171,16 @@ describe("plugin minify option", () => {
       imageminPluginOptions: {
         minify: ImageMinimizerPlugin.squooshMinify,
         minimizerOptions: {
-          targets: {
-            ".jpg": "webp",
+          encodeOptions: {
+            mozjpeg: {
+              quality: 75,
+            },
+            webp: {
+              lossless: 1,
+            },
+            avif: {
+              cqLevel: 0,
+            },
           },
         },
       },
@@ -180,20 +188,21 @@ describe("plugin minify option", () => {
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(100);
+    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(335);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
 
-  it('should emit warning when file is not supported by "squooshMinify"', async () => {
+  // eslint-disable-next-line jest/no-disabled-tests
+  it.skip('should emit warning when file is not supported by "squooshMinify"', async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
         minify: ImageMinimizerPlugin.squooshMinify,
         minimizerOptions: {
-          targets: {
-            ".jpg": false,
+          encodeOptions: {
+            mozjpeg: "invalidValue",
           },
         },
       },

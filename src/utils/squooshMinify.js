@@ -13,13 +13,10 @@ import path from "path";
 
 async function squooshMinify(data, minifyOptions) {
   const [[filename, input]] = Object.entries(data);
-  /** @type {MinifyFnResult} */
-  const result = {
-    filename,
-    data: input,
-    warnings: [],
-    errors: [],
-  };
+
+  // eslint-disable-next-line node/no-unpublished-require
+  const squoosh = require("@squoosh/lib");
+  const { ImagePool } = squoosh;
 
   /**
    * @type {Record<string, string>}
@@ -31,29 +28,16 @@ async function squooshMinify(data, minifyOptions) {
     ".jxl": "jxl",
     ".webp": "webp",
     ".avif": "avif",
-    ...minifyOptions.targets,
   };
+
   const ext = path.extname(filename).toLowerCase();
   const targetCodec = targets[ext];
+  const { encodeOptions = {} } = minifyOptions;
 
-  if (!targetCodec) {
-    result.warnings.push(
-      new Error(
-        `The "${filename}" was not minified by "ImageMinimizerPlugin.squooshMinify". ${ext} extension is not supported".`
-      )
-    );
-
-    return result;
+  if (!encodeOptions[targetCodec]) {
+    encodeOptions[targetCodec] = {};
   }
 
-  const encodeOptions = {
-    [targetCodec]: {},
-    ...minifyOptions.encodeOptions,
-  };
-
-  // eslint-disable-next-line node/no-unpublished-require
-  const squoosh = require("@squoosh/lib");
-  const { ImagePool } = squoosh;
   const imagePool = new ImagePool();
   const image = imagePool.ingestImage(input);
 
@@ -62,19 +46,34 @@ async function squooshMinify(data, minifyOptions) {
   } catch (error) {
     await imagePool.close();
 
-    result.errors.push(error);
-
-    return result;
+    return {
+      filename,
+      data: input,
+      warnings: [],
+      errors: [error],
+    };
   }
 
   await imagePool.close();
 
-  const encodedImage = await image.encodedWith[targetCodec];
+  const encodedImage = await image.encodedWith[targets[ext]];
 
-  result.data = Buffer.from(encodedImage.binary);
-  result.type = "minimized";
+  if (!encodedImage) {
+    return {
+      filename,
+      data: input,
+      warnings: [],
+      errors: [],
+    };
+  }
 
-  return result;
+  return {
+    filename,
+    data: Buffer.from(encodedImage.binary),
+    warnings: [],
+    errors: [],
+    type: "minimized",
+  };
 }
 
 export default squooshMinify;
