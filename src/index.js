@@ -11,7 +11,9 @@ import schema from "./plugin-options.json";
 import imageminMinify, {
   normalizeImageminConfig,
 } from "./utils/imageminMinify";
+import imageminGenerate from "./utils/imageminGenerate";
 import squooshMinify from "./utils/squooshMinify";
+import squooshGenerate from "./utils/squooshGenerate";
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
@@ -410,5 +412,7 @@ ImageMinimizerPlugin.loader = require.resolve("./loader");
 ImageMinimizerPlugin.normalizeImageminConfig = normalizeImageminConfig;
 ImageMinimizerPlugin.imageminMinify = imageminMinify;
 ImageMinimizerPlugin.squooshMinify = squooshMinify;
+ImageMinimizerPlugin.imageminGenerate = imageminGenerate;
+ImageMinimizerPlugin.squooshGenerate = squooshGenerate;
 
 export default ImageMinimizerPlugin;
