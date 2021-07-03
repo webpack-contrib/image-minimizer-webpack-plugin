@@ -41,6 +41,10 @@ async function minify(options) {
     for (let k = 0; k <= results.length - 1; k++) {
       const original = results[k];
 
+      if (minifyOptions.filter && !minifyOptions.filter(original)) {
+        continue;
+      }
+
       try {
         // eslint-disable-next-line no-await-in-loop
         processedResult = await minifyFn(
@@ -77,6 +81,8 @@ async function minify(options) {
       results.push(...processedResult);
     }
   }
+  
+  console.log(results)
 
   return results;
 }

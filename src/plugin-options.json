@@ -82,11 +82,6 @@
         }
       ]
     },
-    "filter": {
-      "description": "Allows filtering of images for optimization.",
-      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filter",
-      "instanceof": "Function"
-    },
     "severityError": {
       "description": "Allows to choose how errors are displayed.",
       "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror",

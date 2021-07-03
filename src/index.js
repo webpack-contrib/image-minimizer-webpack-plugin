@@ -32,30 +32,33 @@ import squooshGenerate from "./utils/squooshGenerate";
 /** @typedef {Rule[] | Rule} Rules */
 
 /**
- * @callback FilterFn
- * @param {Buffer} source `Buffer` of source file.
- * @param {string} sourcePath Absolute path to source.
- * @returns {boolean}
- */
-
-/**
  * @typedef {Record.<string, Buffer>} DataForMinifyFn
  */
 
 /**
+ * @callback FilterFn
+ * @param {MinifyFnResult} input
+ * @returns {boolean}
+ */
+
+/**
  * @typedef {Object} ImageminMinimizerOptions
+ * @property {FilterFn} [filter]
  * @property {ImageminOptions["plugins"] | [string, Record<string, any>]} plugins
  * @property {Array<Record<string, any>>} [pluginsMeta]
  */
 
 /**
  * @typedef {Object} SquooshMinimizerOptions
+ * @property {FilterFn} [filter]
  * @property {Object.<string, string>} [targets]
  * @property {Object.<string, object>} [encodeOptions]
  */
 
+// TODO check it in generated
 /**
  * @typedef {Record<string, any>} CustomFnMinimizerOptions
+ * @property {FilterFn} [filter]
  */
 
 /**
@@ -117,7 +120,6 @@ import squooshGenerate from "./utils/squooshGenerate";
 
 /**
  * @typedef {Object} PluginOptions
- * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
@@ -145,7 +147,6 @@ class ImageMinimizerPlugin {
 
     const {
       minify = imageminMinify,
-      filter = () => true,
       test = /\.(jpe?g|png|gif|tif|webp|svg|avif)$/i,
       include,
       exclude,
@@ -162,7 +163,6 @@ class ImageMinimizerPlugin {
     this.options = {
       minify,
       severityError,
-      filter,
       exclude,
       minimizerOptions,
       include,
@@ -187,9 +187,7 @@ class ImageMinimizerPlugin {
     const assetsForMinify = await Promise.all(
       Object.keys(assets)
         .filter((name) => {
-          const { info, source } = /** @type {Asset} */ (
-            compilation.getAsset(name)
-          );
+          const { info } = /** @type {Asset} */ (compilation.getAsset(name));
 
           // Skip double minimize assets from child compilation
           if (info.minimized) {
@@ -207,15 +205,6 @@ class ImageMinimizerPlugin {
 
           // Exclude already optimized assets from `image-minimizer-webpack-loader`
           if (this.options.loader && moduleAssets.has(name)) {
-            return false;
-          }
-
-          const input = source.source();
-
-          if (
-            this.options.filter &&
-            !this.options.filter(/** @type {Buffer} */ (input), name)
-          ) {
             return false;
           }
 
@@ -360,7 +349,6 @@ class ImageMinimizerPlugin {
           minify,
           filename,
           deleteOriginalAssets,
-          filter,
           test,
           include,
           exclude,
@@ -379,7 +367,6 @@ class ImageMinimizerPlugin {
             filename,
             deleteOriginalAssets,
             severityError,
-            filter,
             minimizerOptions,
           },
         });
