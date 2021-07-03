@@ -81,8 +81,6 @@ async function minify(options) {
       results.push(...processedResult);
     }
   }
-  
-  console.log(results)
 
   return results;
 }
