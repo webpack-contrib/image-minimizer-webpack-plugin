@@ -12,29 +12,33 @@ export type ImageminMinifyFunction = typeof imageminMinify;
 export type SquooshMinifyFunction = typeof squooshMinify;
 export type Rule = RegExp | string;
 export type Rules = Rule[] | Rule;
-export type FilterFn = (source: Buffer, sourcePath: string) => boolean;
 export type DataForMinifyFn = Record<string, Buffer>;
+export type FilterFn = (input: MinifyFnResult) => boolean;
+export type KnownMinimizerOptions = {
+  filter?: FilterFn | undefined;
+  /**
+   * Allows to remove original assets.
+   */
+  deleteOriginal?: boolean | undefined;
+};
 export type ImageminMinimizerOptions = {
   plugins: ImageminOptions["plugins"] | [string, Record<string, any>];
   pluginsMeta?: Record<string, any>[] | undefined;
 };
 export type SquooshMinimizerOptions = {
-  targets?:
-    | {
-        [x: string]: string;
-      }
-    | undefined;
   encodeOptions?:
     | {
         [x: string]: object;
       }
     | undefined;
 };
-export type CustomFnMinimizerOptions = Record<string, any>;
+export type CustomFnMinimizerOptions = {
+  [x: string]: any;
+};
 export type MinimizerOptions =
-  | ImageminMinimizerOptions
-  | SquooshMinimizerOptions
-  | CustomFnMinimizerOptions;
+  | (KnownMinimizerOptions & ImageminMinimizerOptions)
+  | (KnownMinimizerOptions & SquooshMinimizerOptions)
+  | (KnownMinimizerOptions & CustomFnMinimizerOptions);
 export type InternalMinifyOptions = {
   filename: string;
   input: Buffer;
@@ -85,10 +89,6 @@ export type FilenameFn = (
 ) => string;
 export type PluginOptions = {
   /**
-   * Allows filtering of images for optimization.
-   */
-  filter?: FilterFn | undefined;
-  /**
    * Test to match files against.
    */
   test?: Rules | undefined;
@@ -120,10 +120,6 @@ export type PluginOptions = {
    * Allows to set the filename for the generated asset. Useful for converting to a `webp`.
    */
   filename?: string | FilenameFn | undefined;
-  /**
-   * Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
-   */
-  deleteOriginalAssets?: boolean | undefined;
   minify?: MinifyFunctions | undefined;
 };
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
@@ -140,13 +136,17 @@ export type PluginOptions = {
 /** @typedef {RegExp | string} Rule */
 /** @typedef {Rule[] | Rule} Rules */
 /**
+ * @typedef {Record.<string, Buffer>} DataForMinifyFn
+ */
+/**
  * @callback FilterFn
- * @param {Buffer} source `Buffer` of source file.
- * @param {string} sourcePath Absolute path to source.
+ * @param {MinifyFnResult} input
  * @returns {boolean}
  */
 /**
- * @typedef {Record.<string, Buffer>} DataForMinifyFn
+ * @typedef {Object} KnownMinimizerOptions
+ * @property {FilterFn} [filter]
+ * @property {boolean} [deleteOriginal] Allows to remove original assets.
  */
 /**
  * @typedef {Object} ImageminMinimizerOptions
@@ -155,14 +155,13 @@ export type PluginOptions = {
  */
 /**
  * @typedef {Object} SquooshMinimizerOptions
- * @property {Object.<string, string>} [targets]
  * @property {Object.<string, object>} [encodeOptions]
  */
 /**
- * @typedef {Record<string, any>} CustomFnMinimizerOptions
+ * @typedef {Object.<string, any>} CustomFnMinimizerOptions
  */
 /**
- * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
+ * @typedef {KnownMinimizerOptions & ImageminMinimizerOptions | KnownMinimizerOptions & SquooshMinimizerOptions | KnownMinimizerOptions & CustomFnMinimizerOptions} MinimizerOptions
  */
 /**
  * @typedef {Object} InternalMinifyOptions
@@ -212,7 +211,6 @@ export type PluginOptions = {
  */
 /**
  * @typedef {Object} PluginOptions
- * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
@@ -221,7 +219,6 @@ export type PluginOptions = {
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
- * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  * @property {MinifyFunctions} [minify]
  */
 /**
@@ -235,7 +232,6 @@ declare class ImageMinimizerPlugin {
   options: {
     minify: MinifyFunctions;
     severityError: string | undefined;
-    filter: FilterFn;
     exclude: Rules | undefined;
     minimizerOptions: MinimizerOptions;
     include: Rules | undefined;
@@ -243,7 +239,6 @@ declare class ImageMinimizerPlugin {
     maxConcurrency: number | undefined;
     test: Rules;
     filename: string | FilenameFn;
-    deleteOriginalAssets: boolean;
   };
   /**
    * @private

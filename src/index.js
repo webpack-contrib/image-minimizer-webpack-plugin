@@ -42,27 +42,28 @@ import squooshGenerate from "./utils/squooshGenerate";
  */
 
 /**
- * @typedef {Object} ImageminMinimizerOptions
+ * @typedef {Object} KnownMinimizerOptions
  * @property {FilterFn} [filter]
+ * @property {boolean} [deleteOriginal] Allows to remove original assets.
+ */
+
+/**
+ * @typedef {Object} ImageminMinimizerOptions
  * @property {ImageminOptions["plugins"] | [string, Record<string, any>]} plugins
  * @property {Array<Record<string, any>>} [pluginsMeta]
  */
 
 /**
  * @typedef {Object} SquooshMinimizerOptions
- * @property {FilterFn} [filter]
- * @property {Object.<string, string>} [targets]
  * @property {Object.<string, object>} [encodeOptions]
  */
 
-// TODO check it in generated
 /**
- * @typedef {Record<string, any>} CustomFnMinimizerOptions
- * @property {FilterFn} [filter]
+ * @typedef {Object.<string, any>} CustomFnMinimizerOptions
  */
 
 /**
- * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
+ * @typedef {KnownMinimizerOptions & ImageminMinimizerOptions | KnownMinimizerOptions & SquooshMinimizerOptions | KnownMinimizerOptions & CustomFnMinimizerOptions} MinimizerOptions
  */
 
 /**
@@ -128,7 +129,6 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
- * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  * @property {MinifyFunctions} [minify]
  */
 
@@ -157,7 +157,6 @@ class ImageMinimizerPlugin {
       loader = true,
       maxConcurrency,
       filename = "[path][name][ext]",
-      deleteOriginalAssets = false,
     } = options;
 
     this.options = {
@@ -170,7 +169,6 @@ class ImageMinimizerPlugin {
       maxConcurrency,
       test,
       filename,
-      deleteOriginalAssets,
     };
   }
 
@@ -307,10 +305,6 @@ class ImageMinimizerPlugin {
             };
 
             compilation.emitAsset(newName, source, newInfo);
-
-            if (this.options.deleteOriginalAssets) {
-              compilation.deleteAsset(name);
-            }
           } else {
             const updatedAssetsInfo = {
               minimized: true,
@@ -348,7 +342,6 @@ class ImageMinimizerPlugin {
         const {
           minify,
           filename,
-          deleteOriginalAssets,
           test,
           include,
           exclude,
@@ -365,7 +358,6 @@ class ImageMinimizerPlugin {
           options: {
             minify,
             filename,
-            deleteOriginalAssets,
             severityError,
             minimizerOptions,
           },

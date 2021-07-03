@@ -9,7 +9,6 @@ import imageminMinify from "./utils/imageminMinify";
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
  * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
- * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  * @property {MinifyFunctions} [minify]
  */
 
@@ -42,7 +41,7 @@ module.exports = async function loader(content) {
     isProductionMode: this.mode === "production" || !this.mode,
   });
 
-  const output = await minify(minifyOptions);
+  const [output] = (await minify(minifyOptions));
 
   if (output.errors && output.errors.length > 0) {
     output.errors.forEach((warning) => {
@@ -73,10 +72,6 @@ module.exports = async function loader(content) {
     this.emitFile(newName, source.toString(), "", {
       minimized: true,
     });
-
-    if (options.deleteOriginalAssets) {
-      // TODO remove original asset
-    }
 
     callback(null, content);
 
