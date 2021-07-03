@@ -80,7 +80,7 @@ async function imageminGenerate(data, minimizerOptions) {
     if (extOutput && extInput !== extOutput) {
       resultForPlugin.filename = resultForPlugin.filename.replace(
         new RegExp(`${extInput}$`),
-        `.${extOutput}`
+        `${extOutput}`
       );
     }
 

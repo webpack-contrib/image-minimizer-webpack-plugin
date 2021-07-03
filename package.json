@@ -88,6 +88,7 @@
     "file-loader": "^6.2.0",
     "file-type": "^16.5.3",
     "husky": "^7.0.1",
+    "imagemin-avif": "^0.1.2",
     "imagemin-gifsicle": "^7.0.0",
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-pngquant": "^9.0.1",
