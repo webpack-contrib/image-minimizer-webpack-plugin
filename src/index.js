@@ -128,7 +128,6 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
- * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {MinifyFunctions} [minify]
  */
 
@@ -156,7 +155,6 @@ class ImageMinimizerPlugin {
       },
       loader = true,
       maxConcurrency,
-      filename = "[path][name][ext]",
     } = options;
 
     this.options = {
@@ -168,7 +166,6 @@ class ImageMinimizerPlugin {
       loader,
       maxConcurrency,
       test,
-      filename,
     };
   }
 
@@ -256,9 +253,10 @@ class ImageMinimizerPlugin {
             const minifyOptions = /** @type {InternalMinifyOptions} */ ({
               filename: name,
               input,
-              severityError,
-              minimizerOptions,
               minify,
+              minimizerOptions,
+              severityError,
+              generateFilename: compilation.getAssetPath.bind(compilation),
             });
 
             output = await minifyFn(minifyOptions);
@@ -289,22 +287,15 @@ class ImageMinimizerPlugin {
             });
           }
 
-          const { path: newName } = compilation.getPathWithInfo(
-            this.options.filename,
-            {
-              filename: name,
-            }
-          );
-
-          const isNewAsset = name !== newName;
+          const isNewAsset = true;
 
           if (isNewAsset) {
             const newInfo = {
-              related: { minimized: newName, ...info.related },
+              related: { minimized: true, ...info.related },
               minimized: true,
             };
 
-            compilation.emitAsset(newName, source, newInfo);
+            compilation.emitAsset("test.jpg", source, newInfo);
           } else {
             const updatedAssetsInfo = {
               minimized: true,
@@ -341,7 +332,6 @@ class ImageMinimizerPlugin {
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
         const {
           minify,
-          filename,
           test,
           include,
           exclude,
@@ -357,7 +347,6 @@ class ImageMinimizerPlugin {
           loader: require.resolve(path.join(__dirname, "loader.js")),
           options: {
             minify,
-            filename,
             severityError,
             minimizerOptions,
           },

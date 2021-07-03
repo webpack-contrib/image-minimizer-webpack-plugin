@@ -66,6 +66,22 @@
         }
       ]
     },
+    "minify": {
+      "description": "Allows you to override default minify function.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#minify",
+      "anyOf": [
+        {
+          "instanceof": "Function"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "instanceof": "Function"
+          }
+        }
+      ]
+    },
     "minimizerOptions": {
       "description": "Options for `imageMinimizerOptions`.",
       "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#minimizeroptions",
@@ -82,11 +98,6 @@
         }
       ]
     },
-    "severityError": {
-      "description": "Allows to choose how errors are displayed.",
-      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror",
-      "type": "string"
-    },
     "loader": {
       "description": "Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other).",
       "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#loader",
@@ -97,33 +108,10 @@
       "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#maxconcurrency",
       "type": "number"
     },
-    "filename": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "instanceof": "Function"
-        }
-      ],
-      "description": "Allows to set the filename for the generated asset.",
-      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filename"
-    },
-    "minify": {
-      "description": "Allows you to override default minify function.",
-      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#minify",
-      "anyOf": [
-        {
-          "instanceof": "Function"
-        },
-        {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "instanceof": "Function"
-          }
-        }
-      ]
+    "severityError": {
+      "description": "Allows to choose how errors are displayed.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror",
+      "type": "string"
     }
   }
 }

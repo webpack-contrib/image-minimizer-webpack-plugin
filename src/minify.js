@@ -17,8 +17,8 @@ async function minify(options) {
 
   /** @type {MinifyFnResult} */
   const input = {
-    data: options.input,
     filename: options.filename,
+    data: options.input,
     warnings: [],
     errors: [],
   };
@@ -82,6 +82,16 @@ async function minify(options) {
       }
 
       if (Array.isArray(processedResult)) {
+        if (minifyOptions.filename) {
+          processedResult = processedResult.map((item) => {
+            item.filename = options.generateFilename(minifyOptions.filename, {
+              filename: item.filename,
+            });
+
+            return item;
+          });
+        }
+
         if (
           typeof minifyOptions.deleteOriginal !== "undefined" &&
           minifyOptions.deleteOriginal
@@ -91,6 +101,15 @@ async function minify(options) {
           results.push(...processedResult);
         }
       } else if (!Array.isArray(processedResult)) {
+        if (minifyOptions.filename) {
+          processedResult.filename = options.generateFilename(
+            minifyOptions.filename,
+            {
+              filename: processedResult.filename,
+            }
+          );
+        }
+
         if (
           typeof minifyOptions.deleteOriginal !== "undefined" &&
           !minifyOptions.deleteOriginal
