@@ -32,6 +32,7 @@ module.exports = async function loader(content) {
 
   const { severityError, minimizerOptions } = options;
 
+  const compilation = /** @type {Compilation} */ (this._compilation);
   const minifyOptions = /** @type {InternalMinifyOptions} */ ({
     minify: options.minify || imageminMinify,
     input,
@@ -39,9 +40,10 @@ module.exports = async function loader(content) {
     severityError,
     minimizerOptions,
     isProductionMode: this.mode === "production" || !this.mode,
+    generateFilename: compilation.getAssetPath.bind(compilation),
   });
 
-  const [output] = (await minify(minifyOptions));
+  const [output] = await minify(minifyOptions);
 
   if (output.errors && output.errors.length > 0) {
     output.errors.forEach((warning) => {

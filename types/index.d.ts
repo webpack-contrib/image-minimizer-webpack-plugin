@@ -14,8 +14,15 @@ export type Rule = RegExp | string;
 export type Rules = Rule[] | Rule;
 export type DataForMinifyFn = Record<string, Buffer>;
 export type FilterFn = (input: MinifyFnResult) => boolean;
+export type PathData = {
+  filename?: string | undefined;
+};
 export type KnownMinimizerOptions = {
   filter?: FilterFn | undefined;
+  filename?:
+    | string
+    | ((arg0: PathData, arg1?: AssetInfo | undefined) => string)
+    | undefined;
   /**
    * Allows to remove original assets.
    */
@@ -42,9 +49,10 @@ export type MinimizerOptions =
 export type InternalMinifyOptions = {
   filename: string;
   input: Buffer;
-  severityError?: string | undefined;
-  minimizerOptions?: MinimizerOptions | undefined;
   minify: MinifyFunctions;
+  minimizerOptions?: MinimizerOptions | undefined;
+  severityError?: string | undefined;
+  generateFilename: Compilation["getAssetPath"];
 };
 export type MinifyFnResult = {
   filename: string;
@@ -80,13 +88,6 @@ export type InternalLoaderOptions = {
   loader?: string | undefined;
   loaderOptions?: import("./loader").LoaderOptions | undefined;
 };
-export type PathData = {
-  filename?: string | undefined;
-};
-export type FilenameFn = (
-  pathData: PathData,
-  assetInfo?: import("webpack").AssetInfo | undefined
-) => string;
 export type PluginOptions = {
   /**
    * Test to match files against.
@@ -116,10 +117,6 @@ export type PluginOptions = {
    * Maximum number of concurrency optimization processes in one time.
    */
   maxConcurrency?: number | undefined;
-  /**
-   * Allows to set the filename for the generated asset. Useful for converting to a `webp`.
-   */
-  filename?: string | FilenameFn | undefined;
   minify?: MinifyFunctions | undefined;
 };
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
@@ -144,8 +141,13 @@ export type PluginOptions = {
  * @returns {boolean}
  */
 /**
+ * @typedef {Object} PathData
+ * @property {string} [filename]
+ */
+/**
  * @typedef {Object} KnownMinimizerOptions
  * @property {FilterFn} [filter]
+ * @property {string | function(PathData, AssetInfo=): string} [filename]
  * @property {boolean} [deleteOriginal] Allows to remove original assets.
  */
 /**
@@ -167,9 +169,10 @@ export type PluginOptions = {
  * @typedef {Object} InternalMinifyOptions
  * @property {string} filename
  * @property {Buffer} input
- * @property {string} [severityError]
- * @property {MinimizerOptions} [minimizerOptions]
  * @property {MinifyFunctions} minify
+ * @property {MinimizerOptions} [minimizerOptions]
+ * @property {string} [severityError]
+ * @property {Compilation["getAssetPath"]} generateFilename
  */
 /**
  * @typedef {Object} MinifyFnResult
@@ -200,16 +203,6 @@ export type PluginOptions = {
  * @property {LoaderOptions} [loaderOptions]
  */
 /**
- * @typedef {Object} PathData
- * @property {string} [filename]
- */
-/**
- * @callback FilenameFn
- * @param {PathData} pathData
- * @param {AssetInfo} [assetInfo]
- * @returns {string}
- */
-/**
  * @typedef {Object} PluginOptions
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
@@ -218,7 +211,6 @@ export type PluginOptions = {
  * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
- * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {MinifyFunctions} [minify]
  */
 /**
@@ -238,7 +230,6 @@ declare class ImageMinimizerPlugin {
     loader: boolean;
     maxConcurrency: number | undefined;
     test: Rules;
-    filename: string | FilenameFn;
   };
   /**
    * @private

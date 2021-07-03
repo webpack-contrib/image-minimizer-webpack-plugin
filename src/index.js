@@ -42,8 +42,14 @@ import squooshGenerate from "./utils/squooshGenerate";
  */
 
 /**
+ * @typedef {Object} PathData
+ * @property {string} [filename]
+ */
+
+/**
  * @typedef {Object} KnownMinimizerOptions
  * @property {FilterFn} [filter]
+ * @property {string | function(PathData, AssetInfo=): string} [filename]
  * @property {boolean} [deleteOriginal] Allows to remove original assets.
  */
 
@@ -70,9 +76,10 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @typedef {Object} InternalMinifyOptions
  * @property {string} filename
  * @property {Buffer} input
- * @property {string} [severityError]
- * @property {MinimizerOptions} [minimizerOptions]
  * @property {MinifyFunctions} minify
+ * @property {MinimizerOptions} [minimizerOptions]
+ * @property {string} [severityError]
+ * @property {Compilation["getAssetPath"]} generateFilename
  */
 
 /**
@@ -105,18 +112,6 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @property {Rules} [exclude] Files to exclude.
  * @property {string} [loader]
  * @property {LoaderOptions} [loaderOptions]
- */
-
-/**
- * @typedef {Object} PathData
- * @property {string} [filename]
- */
-
-/**
- * @callback FilenameFn
- * @param {PathData} pathData
- * @param {AssetInfo} [assetInfo]
- * @returns {string}
  */
 
 /**
@@ -291,7 +286,7 @@ class ImageMinimizerPlugin {
 
           if (isNewAsset) {
             const newInfo = {
-              related: { minimized: true, ...info.related },
+              related: { minimized: "test", ...info.related },
               minimized: true,
             };
 
