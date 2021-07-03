@@ -42,25 +42,24 @@ export type InternalMinifyOptions = {
   minimizerOptions?: MinimizerOptions | undefined;
   minify: MinifyFunctions;
 };
-export type InternalMinifyResult = {
-  data: Buffer;
+export type MinifyFnResult = {
   filename: string;
+  data: Buffer;
   warnings: Array<Error>;
   errors: Array<Error>;
+  squooshMinify?: boolean | undefined;
+  squooshGenerate?: boolean | undefined;
+  imageminMinify?: boolean | undefined;
+  imageminGenerate?: boolean | undefined;
 };
 export type CustomMinifyFunction = (
   data: DataForMinifyFn,
   minifyOptions: CustomFnMinimizerOptions
-) => InternalMinifyResult;
+) => MinifyFnResult | MinifyFnResult[];
 export type MinifyFunctions =
   | ImageminMinifyFunction
   | SquooshMinifyFunction
   | CustomMinifyFunction;
-export type MinifyFnResult = {
-  data: Buffer;
-  warnings: Array<Error>;
-  errors: Array<Error>;
-};
 export type InternalLoaderOptions = {
   /**
    * Test to match files against.
@@ -174,26 +173,24 @@ export type PluginOptions = {
  * @property {MinifyFunctions} minify
  */
 /**
- * @typedef {Object} InternalMinifyResult
- * @property {Buffer} data
+ * @typedef {Object} MinifyFnResult
  * @property {string} filename
+ * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
+ * @property {boolean} [squooshMinify]
+ * @property {boolean} [squooshGenerate]
+ * @property {boolean} [imageminMinify]
+ * @property {boolean} [imageminGenerate]
  */
 /**
  * @callback CustomMinifyFunction
  * @param {DataForMinifyFn} data
  * @param {CustomFnMinimizerOptions} minifyOptions
- * @returns {InternalMinifyResult}
+ * @returns {MinifyFnResult | MinifyFnResult[]}
  */
 /**
  * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
- */
-/**
- * @typedef {Object} MinifyFnResult
- * @property {Buffer} data
- * @property {Array<Error>} warnings
- * @property {Array<Error>} errors
  */
 /**
  * @typedef {Object} InternalLoaderOptions
@@ -264,10 +261,14 @@ declare class ImageMinimizerPlugin {
 }
 declare namespace ImageMinimizerPlugin {
   export const loader: string;
-  export { normalizeImageminConfig };
+  export { imageminNormalizeConfig };
   export { imageminMinify };
+  export { imageminGenerate };
   export { squooshMinify };
+  export { squooshGenerate };
 }
 import imageminMinify from "./utils/imageminMinify";
 import squooshMinify from "./utils/squooshMinify";
-import { normalizeImageminConfig } from "./utils/imageminMinify";
+import { imageminNormalizeConfig } from "./utils/imageminMinify";
+import imageminGenerate from "./utils/imageminGenerate";
+import squooshGenerate from "./utils/squooshGenerate";

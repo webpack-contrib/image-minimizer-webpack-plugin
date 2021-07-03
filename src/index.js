@@ -72,31 +72,26 @@ import squooshGenerate from "./utils/squooshGenerate";
  */
 
 /**
- * @typedef {Object} InternalMinifyResult
- * @property {Buffer} data
+ * @typedef {Object} MinifyFnResult
  * @property {string} filename
+ * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
+ * @property {boolean} [squooshMinify]
+ * @property {boolean} [squooshGenerate]
+ * @property {boolean} [imageminMinify]
+ * @property {boolean} [imageminGenerate]
  */
 
 /**
  * @callback CustomMinifyFunction
  * @param {DataForMinifyFn} data
  * @param {CustomFnMinimizerOptions} minifyOptions
- * @returns {InternalMinifyResult}
+ * @returns {MinifyFnResult | MinifyFnResult[]}
  */
 
 /**
  * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
- */
-
-/**
- * @typedef {Object} MinifyFnResult
- * @property {string} filename
- * @property {Buffer} data
- * @property {Array<Error>} warnings
- * @property {Array<Error>} errors
- * @property {string} [type]
  */
 
 /**

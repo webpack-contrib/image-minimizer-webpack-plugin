@@ -4,6 +4,8 @@ import ImageMinimizerPlugin from "../src";
 
 import { fixturesPath, webpack, isOptimized } from "./helpers";
 
+jest.setTimeout(30000);
+
 describe("plugin minify option", () => {
   it('should work with "imagemin" minifier', async () => {
     const stats = await webpack({

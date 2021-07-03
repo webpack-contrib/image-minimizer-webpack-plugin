@@ -58,7 +58,7 @@ class InvalidConfigError extends Error {
  * @param {ImageminMinimizerOptions} minimizerOptions
  * @param {MetaData} [metaData]
  */
-export function imageminNormalizeConfig(minimizerOptions, metaData) {
+function imageminNormalizeConfig(minimizerOptions, metaData) {
   if (
     !minimizerOptions ||
     !minimizerOptions.plugins ||
@@ -203,3 +203,4 @@ async function imageminMinify(data, minimizerOptions) {
 }
 
 export default imageminMinify;
+export { imageminNormalizeConfig };
