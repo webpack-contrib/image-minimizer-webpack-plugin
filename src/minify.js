@@ -2,6 +2,9 @@
 /** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
 /** @typedef {import("./index").InternalMinifyOptions} InternalMinifyOptions */
 /** @typedef {import("./index").MinifyFnResult} MinifyFnResult */
+/** @typedef {import("./index").ImageminMinimizerOptions} ImageminMinimizerOptions */
+/** @typedef {import("./index").SquooshMinimizerOptions} SquooshMinimizerOptions */
+/** @typedef {import("./index").CustomFnMinimizerOptions} CustomFnMinimizerOptions */
 
 /**
  * @param {InternalMinifyOptions} options
@@ -26,19 +29,23 @@ async function minify(options) {
     return [input];
   }
 
+  /** @type {MinifyFnResult[]} */
   const results = [input];
 
   for (let i = 0; i <= minifyFns.length - 1; i++) {
+    /** @type {MinifyFunctions} */
     const minifyFn = minifyFns[i];
+    /** @type {MinimizerOptions} */
     const minifyOptions = Array.isArray(options.minimizerOptions)
       ? options.minimizerOptions[i] || {}
       : options.minimizerOptions || {};
 
     /** @type {MinifyFnResult | MinifyFnResult[] | undefined} */
     let processedResult;
+    const length = results.length - 1;
 
     // TODO maybe promise?
-    for (let k = 0; k <= results.length - 1; k++) {
+    for (let k = 0; k <= length; k++) {
       const original = results[k];
 
       if (minifyOptions.filter && !minifyOptions.filter(original)) {
@@ -49,7 +56,9 @@ async function minify(options) {
         // eslint-disable-next-line no-await-in-loop
         processedResult = await minifyFn(
           { [original.filename]: original.data },
-          minifyOptions
+          /** @type {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} */ (
+            minifyOptions
+          )
         );
       } catch (error) {
         processedResult = original;
@@ -72,13 +81,25 @@ async function minify(options) {
         }
       }
 
-      if (!Array.isArray(processedResult)) {
-        results.splice(k, 1, processedResult);
+      if (Array.isArray(processedResult)) {
+        if (
+          typeof minifyOptions.deleteOriginal !== "undefined" &&
+          minifyOptions.deleteOriginal
+        ) {
+          results.splice(k, processedResult.length, ...processedResult);
+        } else {
+          results.push(...processedResult);
+        }
+      } else if (!Array.isArray(processedResult)) {
+        if (
+          typeof minifyOptions.deleteOriginal !== "undefined" &&
+          !minifyOptions.deleteOriginal
+        ) {
+          results.push(processedResult);
+        } else {
+          results.splice(k, 1, processedResult);
+        }
       }
-    }
-
-    if (Array.isArray(processedResult)) {
-      results.push(...processedResult);
     }
   }
 
