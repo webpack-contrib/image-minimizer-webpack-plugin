@@ -162,7 +162,7 @@ export function imageminNormalizeConfig(minimizerOptions, metaData) {
  * @param {ImageminMinimizerOptions} minimizerOptions
  * @returns {Promise<MinifyFnResult>}
  */
-export default async function imageminMinify(data, minimizerOptions) {
+async function imageminMinify(data, minimizerOptions) {
   const [[filename, input]] = Object.entries(data);
   /** @type {MinifyFnResult} */
   const result = {
@@ -201,3 +201,5 @@ export default async function imageminMinify(data, minimizerOptions) {
 
   return result;
 }
+
+export default imageminMinify;

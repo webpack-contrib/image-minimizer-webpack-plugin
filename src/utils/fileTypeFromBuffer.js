@@ -2,7 +2,7 @@
 
 /**
  * @callback Uint8ArrayUtf8ByteString
- * @param {string | any[] | Uint8Array} array
+ * @param {number[] | Uint8Array} array
  * @param {number} start
  * @param {number} end
  * @returns {string}
@@ -24,6 +24,7 @@ const stringToBytes = (string) =>
 
 /**
  * @param {ArrayBuffer | ArrayLike<number>} input
+ * @returns {{ext: string, mime: string} | undefined}
  */
 function fileTypeFromBuffer(input) {
   if (
@@ -44,10 +45,12 @@ function fileTypeFromBuffer(input) {
     return;
   }
 
-  const check = (
-    /** @type {string | any[]} */ header,
-    /** @type {{ offset: number, mask?: any } | undefined} */ options
-  ) => {
+  /**
+   * @param {number[]} header
+   * @param {{offset: number, mask?: number[]}} [options]
+   * @returns {boolean}
+   */
+  const check = (header, options) => {
     // eslint-disable-next-line no-param-reassign
     options = {
       offset: 0,
@@ -68,10 +71,13 @@ function fileTypeFromBuffer(input) {
     return true;
   };
 
-  const checkString = (
-    /** @type {string} */ header,
-    /** @type {{ offset: any; mask?: any; } | undefined} */ options
-  ) => check(stringToBytes(header), options);
+  /**
+   * @param {string} header
+   * @param {{offset: number, mask?: number[]}} [options]
+   * @returns {boolean}
+   */
+  const checkString = (header, options) =>
+    check(stringToBytes(header), options);
 
   if (check([0xff, 0xd8, 0xff])) {
     return {

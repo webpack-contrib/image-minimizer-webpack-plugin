@@ -11,7 +11,7 @@ import { imageminNormalizeConfig } from "./imageminMinify";
  * @param {ImageminMinimizerOptions} minimizerOptions
  * @returns {Promise<MinifyFnResult | MinifyFnResult[]>}
  */
-export default async function imageminGenerate(data, minimizerOptions) {
+async function imageminGenerate(data, minimizerOptions) {
   const [[filename, input]] = Object.entries(data);
   /** @type {MinifyFnResult} */
   const result = {
@@ -43,9 +43,11 @@ export default async function imageminGenerate(data, minimizerOptions) {
     return result;
   }
 
+  /** @type {MinifyFnResult[]} */
   const results = [result];
 
   for (const plugin of plugins) {
+    /** @type {MinifyFnResult} */
     const resultForPlugin = {
       filename,
       data: input,
@@ -87,3 +89,5 @@ export default async function imageminGenerate(data, minimizerOptions) {
 
   return results;
 }
+
+export default imageminGenerate;

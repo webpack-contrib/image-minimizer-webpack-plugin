@@ -45,6 +45,7 @@ async function squooshGenerate(data, minifyOptions) {
 
   await imagePool.close();
 
+  /** @type {MinifyFnResult[]} */
   const results = [];
   const ext = path.extname(filename).toLowerCase();
   const tasks = [];
