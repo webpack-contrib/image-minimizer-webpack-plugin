@@ -10,7 +10,7 @@ describe("plugin filename option", () => {
   beforeAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
   afterAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
 
-  it.only("should transform image to webp", async () => {
+  it("should transform image to webp", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "filename-1");
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
