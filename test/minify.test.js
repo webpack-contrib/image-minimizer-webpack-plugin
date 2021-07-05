@@ -23,6 +23,8 @@ function isPromise(obj) {
   );
 }
 
+jest.setTimeout(30000);
+
 describe("minify", () => {
   it("minify should be is function", () =>
     expect(typeof minify === "function").toBe(true));
@@ -490,128 +492,132 @@ describe("minify", () => {
         ],
       ],
     },
-    // {
-    //   targetsResults: ["jpg", "webp", "png"],
-    //   data: [
-    //     [ImageMinimizerPlugin.squooshGenerate, squooshGenerateOptions],
-    //     [ImageMinimizerPlugin.squooshMinify, {}],
-    //   ],
-    // },
-    // {
-    //   targetsResults: ["jpg", "webp", "png"],
-    //   data: [
-    //     [ImageMinimizerPlugin.squooshMinify, {}],
-    //     [ImageMinimizerPlugin.squooshGenerate, squooshGenerateOptions],
-    //   ],
-    // },
-    // {
-    //   targetsResults: ["jpg"],
-    //   data: [
-    //     [ImageMinimizerPlugin.squooshMinify, {}],
-    //     [ImageMinimizerPlugin.squooshMinify, {}],
-    //   ],
-    // },
-    // // Todo check this case
-    // // {
-    // //   targetsResults: ["jpg", "webp", "png"],
-    // //   data: [
-    // //     [
-    // //       ImageMinimizerPlugin.squooshGenerate,
-    // //       { encodeOptions: { oxipng: {} } },
-    // //     ],
-    // //     [ImageMinimizerPlugin.squooshGenerate, { encodeOptions: { webp: {} } }],
-    // //   ],
-    // // },
-    // {
-    //   targetsResults: ["jpg", "jpg", "webp", "avif"],
-    //   data: [
-    //     [
-    //       ImageMinimizerPlugin.imageminGenerate,
-    //       {
-    //         plugins: ["imagemin-webp", "imagemin-avif"],
-    //       },
-    //     ],
-    //     [
-    //       ImageMinimizerPlugin.imageminMinify,
-    //       {
-    //         plugins: ["imagemin-mozjpeg"],
-    //       },
-    //     ],
-    //   ],
-    // },
-    // {
-    //   targetsResults: ["jpg", "jpg", "webp", "avif"],
-    //   data: [
-    //     [
-    //       ImageMinimizerPlugin.imageminMinify,
-    //       {
-    //         plugins: ["imagemin-mozjpeg"],
-    //       },
-    //     ],
-    //     [
-    //       ImageMinimizerPlugin.imageminGenerate,
-    //       {
-    //         plugins: ["imagemin-webp", "imagemin-avif"],
-    //       },
-    //     ],
-    //   ],
-    // },
-    // // Todo check this case
-    // // {
-    // //   targetsResults: ["jpg", "webp", "avif"],
-    // //   data: [
-    // //     [ImageMinimizerPlugin.imageminGenerate, {
-    // //       plugins: ["imagemin-webp"]
-    // //     }],
-    // //     [ImageMinimizerPlugin.imageminGenerate, {
-    // //       plugins: ["imagemin-avif"]
-    // //     }],
-    // //   ],
-    // // },
-    // {
-    //   targetsResults: ["jpg"],
-    //   data: [
-    //     [
-    //       ImageMinimizerPlugin.imageminMinify,
-    //       {
-    //         plugins: ["imagemin-mozjpeg"],
-    //       },
-    //     ],
-    //     [
-    //       ImageMinimizerPlugin.imageminMinify,
-    //       {
-    //         plugins: ["imagemin-mozjpeg"],
-    //       },
-    //     ],
-    //   ],
-    // },
-    // {
-    //   targetsResults: ["jpg", "png"],
-    //   data: [
-    //     [
-    //       ImageMinimizerPlugin.squooshGenerate,
-    //       { encodeOptions: { oxipng: {} } },
-    //     ],
-    //     [
-    //       ImageMinimizerPlugin.imageminMinify,
-    //       {
-    //         plugins: ["imagemin-mozjpeg", "imagemin-pngquant"],
-    //       },
-    //     ],
-    //   ],
-    // },
-    // {
-    //   targetsResults: ["jpg", "jpg", "webp"],
-    //   data: [
-    //     [
-    //       ImageMinimizerPlugin.imageminGenerate,
-    //       {
-    //         plugins: ["imagemin-webp"],
-    //       },
-    //     ],
-    //     [ImageMinimizerPlugin.squooshMinify, {}],
-    //   ],
-    // },
+    {
+      targetsResults: ["jpg", "webp", "png"],
+      data: [
+        [ImageMinimizerPlugin.squooshGenerate, squooshGenerateOptions],
+        [ImageMinimizerPlugin.squooshMinify, {}],
+      ],
+    },
+    {
+      targetsResults: ["jpg", "webp", "png"],
+      data: [
+        [ImageMinimizerPlugin.squooshMinify, {}],
+        [ImageMinimizerPlugin.squooshGenerate, squooshGenerateOptions],
+      ],
+    },
+    {
+      targetsResults: ["jpg"],
+      data: [
+        [ImageMinimizerPlugin.squooshMinify, {}],
+        [ImageMinimizerPlugin.squooshMinify, {}],
+      ],
+    },
+    {
+      targetsResults: ["jpg", "webp", "png"],
+      data: [
+        [
+          ImageMinimizerPlugin.squooshGenerate,
+          { encodeOptions: { oxipng: {} } },
+        ],
+        [ImageMinimizerPlugin.squooshGenerate, { encodeOptions: { webp: {} } }],
+      ],
+    },
+    {
+      targetsResults: ["jpg", "webp", "avif"],
+      data: [
+        [
+          ImageMinimizerPlugin.imageminGenerate,
+          {
+            plugins: ["imagemin-webp", "imagemin-avif"],
+          },
+        ],
+        [
+          ImageMinimizerPlugin.imageminMinify,
+          {
+            plugins: ["imagemin-mozjpeg"],
+          },
+        ],
+      ],
+    },
+    {
+      targetsResults: ["jpg", "webp", "avif"],
+      data: [
+        [
+          ImageMinimizerPlugin.imageminMinify,
+          {
+            plugins: ["imagemin-mozjpeg"],
+          },
+        ],
+        [
+          ImageMinimizerPlugin.imageminGenerate,
+          {
+            plugins: ["imagemin-webp", "imagemin-avif"],
+          },
+        ],
+      ],
+    },
+    {
+      targetsResults: ["jpg", "webp", "avif"],
+      data: [
+        [
+          ImageMinimizerPlugin.imageminGenerate,
+          {
+            plugins: ["imagemin-webp"],
+          },
+        ],
+        [
+          ImageMinimizerPlugin.imageminGenerate,
+          {
+            plugins: ["imagemin-avif"],
+          },
+        ],
+      ],
+    },
+    {
+      targetsResults: ["jpg"],
+      data: [
+        [
+          ImageMinimizerPlugin.imageminMinify,
+          {
+            plugins: ["imagemin-mozjpeg"],
+          },
+        ],
+        [
+          ImageMinimizerPlugin.imageminMinify,
+          {
+            plugins: ["imagemin-mozjpeg"],
+          },
+        ],
+      ],
+    },
+    {
+      targetsResults: ["jpg", "png"],
+      data: [
+        [
+          ImageMinimizerPlugin.squooshGenerate,
+          { encodeOptions: { oxipng: {} } },
+        ],
+        [
+          ImageMinimizerPlugin.imageminMinify,
+          {
+            plugins: ["imagemin-mozjpeg", "imagemin-pngquant"],
+          },
+        ],
+      ],
+    },
+    {
+      targetsResults: ["jpg", "webp"],
+      data: [
+        [
+          ImageMinimizerPlugin.imageminGenerate,
+          {
+            plugins: ["imagemin-webp"],
+          },
+        ],
+        [ImageMinimizerPlugin.squooshMinify, {}],
+      ],
+    },
   ].forEach((testCase) => {
     const { targetsResults, data } = testCase;
     const [[firstFn, firstOptions], [secondtFn, secondtOptions]] = data;
@@ -635,8 +641,6 @@ describe("minify", () => {
         tasks.push(
           (async () => {
             const { ext } = await fileType.fromBuffer(result.data);
-
-            expect(targets).toContain(ext);
 
             targets.splice(targets.indexOf(ext), 1);
 
