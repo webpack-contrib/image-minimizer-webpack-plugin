@@ -9,7 +9,7 @@ import { imageminNormalizeConfig } from "./imageminMinify";
 /**
  * @param {MinifyFnResult} original
  * @param {ImageminMinimizerOptions} minimizerOptions
- * @returns {Promise<MinifyFnResult | MinifyFnResult[]>}
+ * @returns {Promise<MinifyFnResult[]>}
  */
 async function imageminGenerate(original, minimizerOptions) {
   /** @typedef {import("imagemin").Options} ImageminOptions */
@@ -21,7 +21,7 @@ async function imageminGenerate(original, minimizerOptions) {
   const { plugins = [] } = minimizerOptionsNormalized;
 
   if (plugins.length === 0) {
-    return original;
+    return [];
   }
 
   let imagemin;
@@ -31,7 +31,7 @@ async function imageminGenerate(original, minimizerOptions) {
   } catch (error) {
     original.errors.push(error);
 
-    return original;
+    return [original];
   }
 
   const extInput = path.extname(original.filename).slice(1).toLowerCase();

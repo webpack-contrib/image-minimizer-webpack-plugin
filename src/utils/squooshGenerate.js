@@ -8,14 +8,14 @@ import path from "path";
 /**
  * @param {MinifyFnResult} original
  * @param {SquooshMinimizerOptions} minifyOptions
- * @returns {Promise<MinifyFnResult | MinifyFnResult[]>}
+ * @returns {Promise<MinifyFnResult[]>}
  */
 
 async function squooshGenerate(original, minifyOptions) {
   const { encodeOptions } = minifyOptions;
 
   if (typeof encodeOptions === "undefined") {
-    return original;
+    return [];
   }
 
   let squoosh;
@@ -26,7 +26,7 @@ async function squooshGenerate(original, minifyOptions) {
   } catch (error) {
     original.errors.push(error);
 
-    return original;
+    return [original];
   }
 
   const imagePool = new squoosh.ImagePool();
@@ -39,7 +39,7 @@ async function squooshGenerate(original, minifyOptions) {
 
     original.errors.push(error);
 
-    return original;
+    return [original];
   }
 
   await imagePool.close();

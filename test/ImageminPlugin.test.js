@@ -497,9 +497,7 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
-});
 
-describe("imagemin plugin - persistent cache", () => {
   it("should work and use the persistent cache by default (loader + plugin)", async () => {
     const compiler = await webpack(
       {
@@ -715,6 +713,7 @@ describe("imagemin plugin - persistent cache", () => {
 
     expect(info.copied).toBe(true);
     expect(info.minimized).toBe(true);
+    expect(info.minimizedBy).toEqual(["imagemin"]);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });

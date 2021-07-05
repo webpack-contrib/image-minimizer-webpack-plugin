@@ -22,6 +22,7 @@ import squooshGenerate from "./utils/squooshGenerate";
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
+/** @typedef {import("webpack").sources.RawSource} RawSource */
 /** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("./loader").LoaderOptions} LoaderOptions */
 /** @typedef {import("./utils/imageminMinify").default} ImageminMinifyFunction */
@@ -80,6 +81,19 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @property {MinimizerOptions} [minimizerOptions]
  * @property {string} [severityError]
  * @property {Compilation["getAssetPath"]} generateFilename
+ */
+
+/**
+ * @typedef {Object} InternalMinifyFnResult
+ * @property {string} filename
+ * @property {RawSource} data
+ * @property {Array<Error>} warnings
+ * @property {Array<Error>} errors
+ * @property {AssetInfo} [info]
+ * @property {boolean} [squooshMinify]
+ * @property {boolean} [squooshGenerate]
+ * @property {boolean} [imageminMinify]
+ * @property {boolean} [imageminGenerate]
  */
 
 /**
@@ -208,6 +222,7 @@ class ImageMinimizerPlugin {
 
           const cacheName = serialize({
             name,
+            minify: this.options.minify,
             minimizerOptions: this.options.minimizerOptions,
           });
 
@@ -231,9 +246,8 @@ class ImageMinimizerPlugin {
     for (const asset of assetsForMinify) {
       scheduledTasks.push(
         limit(async () => {
-          const { name, inputSource, cacheItem, info } = asset;
-
-          let { output } = assets;
+          const { name, inputSource, cacheItem } = asset;
+          let { output } = asset;
           let input;
 
           const sourceFromInputSource = inputSource.source();
@@ -256,23 +270,23 @@ class ImageMinimizerPlugin {
               generateFilename: compilation.getAssetPath.bind(compilation),
             });
 
-            /** @type {MinifyFnResult[]} */
             output = await minifyFn(minifyOptions);
 
-            output.forEach((item) => {
+            output = /** @type {MinifyFnResult[]} */ (output).map((item) => {
+              // TODO fix me
+              // @ts-ignore
               item.data = new RawSource(item.data);
+
+              return item;
             });
 
-            // TODO
-            // await cacheItem.storePromise({
-            //   source: output.source,
-            //   warnings: output.warnings,
-            // });
+            await cacheItem.storePromise(output);
           }
 
           let hasOriginal = false;
 
-          output.forEach((item) => {
+          /** @type {InternalMinifyFnResult[]} */
+          (output).forEach((item) => {
             if (name === item.filename) {
               hasOriginal = true;
             }
@@ -291,6 +305,7 @@ class ImageMinimizerPlugin {
               );
             }
 
+            // TODO need to merge with before `info`?
             // TODO check `related` usage
             if (compilation.getAsset(item.filename)) {
               compilation.updateAsset(item.filename, item.data, item.info);
