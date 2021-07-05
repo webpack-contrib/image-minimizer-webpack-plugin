@@ -4,6 +4,7 @@ import path from "path";
 import imagemin from "imagemin";
 import imageminMozjpeg from "imagemin-mozjpeg";
 import imageminSvgo from "imagemin-svgo";
+import imageminWebp from "imagemin-webp";
 import pify from "pify";
 import fileType from "file-type";
 
@@ -472,136 +473,159 @@ describe("minify", () => {
     },
   };
 
-  const matrixFns = [
+  [
     {
       targetsResults: ["jpg", "webp", "png"],
       data: [
         [ImageMinimizerPlugin.squooshGenerate, squooshGenerateOptions],
-        [ImageMinimizerPlugin.squooshMinify, {}],
+        [
+          (data) => {
+            const [[filename, input]] = Object.entries(data);
+
+            expect(filename.endsWith("png")).toBe(true);
+
+            return {
+              filename,
+              data: input,
+              warnings: [],
+              errors: [],
+            };
+          },
+          {
+            filter: (entry) => entry.filename.endsWith("png"),
+          },
+        ],
       ],
     },
-    {
-      targetsResults: ["jpg", "webp", "png"],
-      data: [
-        [ImageMinimizerPlugin.squooshMinify, {}],
-        [ImageMinimizerPlugin.squooshGenerate, squooshGenerateOptions],
-      ],
-    },
-    {
-      targetsResults: ["jpg"],
-      data: [
-        [ImageMinimizerPlugin.squooshMinify, {}],
-        [ImageMinimizerPlugin.squooshMinify, {}],
-      ],
-    },
-    // Todo check this case
     // {
     //   targetsResults: ["jpg", "webp", "png"],
+    //   data: [
+    //     [ImageMinimizerPlugin.squooshGenerate, squooshGenerateOptions],
+    //     [ImageMinimizerPlugin.squooshMinify, {}],
+    //   ],
+    // },
+    // {
+    //   targetsResults: ["jpg", "webp", "png"],
+    //   data: [
+    //     [ImageMinimizerPlugin.squooshMinify, {}],
+    //     [ImageMinimizerPlugin.squooshGenerate, squooshGenerateOptions],
+    //   ],
+    // },
+    // {
+    //   targetsResults: ["jpg"],
+    //   data: [
+    //     [ImageMinimizerPlugin.squooshMinify, {}],
+    //     [ImageMinimizerPlugin.squooshMinify, {}],
+    //   ],
+    // },
+    // // Todo check this case
+    // // {
+    // //   targetsResults: ["jpg", "webp", "png"],
+    // //   data: [
+    // //     [
+    // //       ImageMinimizerPlugin.squooshGenerate,
+    // //       { encodeOptions: { oxipng: {} } },
+    // //     ],
+    // //     [ImageMinimizerPlugin.squooshGenerate, { encodeOptions: { webp: {} } }],
+    // //   ],
+    // // },
+    // {
+    //   targetsResults: ["jpg", "jpg", "webp", "avif"],
+    //   data: [
+    //     [
+    //       ImageMinimizerPlugin.imageminGenerate,
+    //       {
+    //         plugins: ["imagemin-webp", "imagemin-avif"],
+    //       },
+    //     ],
+    //     [
+    //       ImageMinimizerPlugin.imageminMinify,
+    //       {
+    //         plugins: ["imagemin-mozjpeg"],
+    //       },
+    //     ],
+    //   ],
+    // },
+    // {
+    //   targetsResults: ["jpg", "jpg", "webp", "avif"],
+    //   data: [
+    //     [
+    //       ImageMinimizerPlugin.imageminMinify,
+    //       {
+    //         plugins: ["imagemin-mozjpeg"],
+    //       },
+    //     ],
+    //     [
+    //       ImageMinimizerPlugin.imageminGenerate,
+    //       {
+    //         plugins: ["imagemin-webp", "imagemin-avif"],
+    //       },
+    //     ],
+    //   ],
+    // },
+    // // Todo check this case
+    // // {
+    // //   targetsResults: ["jpg", "webp", "avif"],
+    // //   data: [
+    // //     [ImageMinimizerPlugin.imageminGenerate, {
+    // //       plugins: ["imagemin-webp"]
+    // //     }],
+    // //     [ImageMinimizerPlugin.imageminGenerate, {
+    // //       plugins: ["imagemin-avif"]
+    // //     }],
+    // //   ],
+    // // },
+    // {
+    //   targetsResults: ["jpg"],
+    //   data: [
+    //     [
+    //       ImageMinimizerPlugin.imageminMinify,
+    //       {
+    //         plugins: ["imagemin-mozjpeg"],
+    //       },
+    //     ],
+    //     [
+    //       ImageMinimizerPlugin.imageminMinify,
+    //       {
+    //         plugins: ["imagemin-mozjpeg"],
+    //       },
+    //     ],
+    //   ],
+    // },
+    // {
+    //   targetsResults: ["jpg", "png"],
     //   data: [
     //     [
     //       ImageMinimizerPlugin.squooshGenerate,
     //       { encodeOptions: { oxipng: {} } },
     //     ],
-    //     [ImageMinimizerPlugin.squooshGenerate, { encodeOptions: { webp: {} } }],
+    //     [
+    //       ImageMinimizerPlugin.imageminMinify,
+    //       {
+    //         plugins: ["imagemin-mozjpeg", "imagemin-pngquant"],
+    //       },
+    //     ],
     //   ],
     // },
-    {
-      targetsResults: ["jpg", "jpg", "webp", "avif"],
-      data: [
-        [
-          ImageMinimizerPlugin.imageminGenerate,
-          {
-            plugins: ["imagemin-webp", "imagemin-avif"],
-          },
-        ],
-        [
-          ImageMinimizerPlugin.imageminMinify,
-          {
-            plugins: ["imagemin-mozjpeg"],
-          },
-        ],
-      ],
-    },
-    {
-      targetsResults: ["jpg", "jpg", "webp", "avif"],
-      data: [
-        [
-          ImageMinimizerPlugin.imageminMinify,
-          {
-            plugins: ["imagemin-mozjpeg"],
-          },
-        ],
-        [
-          ImageMinimizerPlugin.imageminGenerate,
-          {
-            plugins: ["imagemin-webp", "imagemin-avif"],
-          },
-        ],
-      ],
-    },
-    // Todo check this case
     // {
-    //   targetsResults: ["jpg", "webp", "avif"],
+    //   targetsResults: ["jpg", "jpg", "webp"],
     //   data: [
-    //     [ImageMinimizerPlugin.imageminGenerate, {
-    //       plugins: ["imagemin-webp"]
-    //     }],
-    //     [ImageMinimizerPlugin.imageminGenerate, {
-    //       plugins: ["imagemin-avif"]
-    //     }],
+    //     [
+    //       ImageMinimizerPlugin.imageminGenerate,
+    //       {
+    //         plugins: ["imagemin-webp"],
+    //       },
+    //     ],
+    //     [ImageMinimizerPlugin.squooshMinify, {}],
     //   ],
     // },
-    {
-      targetsResults: ["jpg"],
-      data: [
-        [
-          ImageMinimizerPlugin.imageminMinify,
-          {
-            plugins: ["imagemin-mozjpeg"],
-          },
-        ],
-        [
-          ImageMinimizerPlugin.imageminMinify,
-          {
-            plugins: ["imagemin-mozjpeg"],
-          },
-        ],
-      ],
-    },
-    {
-      targetsResults: ["jpg", "png"],
-      data: [
-        [
-          ImageMinimizerPlugin.squooshGenerate,
-          { encodeOptions: { oxipng: {} } },
-        ],
-        [
-          ImageMinimizerPlugin.imageminMinify,
-          {
-            plugins: ["imagemin-mozjpeg", "imagemin-pngquant"],
-          },
-        ],
-      ],
-    },
-    {
-      targetsResults: ["jpg", "jpg", "webp"],
-      data: [
-        [
-          ImageMinimizerPlugin.imageminGenerate,
-          {
-            plugins: ["imagemin-webp"],
-          },
-        ],
-        [ImageMinimizerPlugin.squooshMinify, {}],
-      ],
-    },
-  ];
-
-  matrixFns.forEach((testCase) => {
+  ].forEach((testCase) => {
     const { targetsResults, data } = testCase;
     const [[firstFn, firstOptions], [secondtFn, secondtOptions]] = data;
 
-    it(`should work with ${firstFn.name} + ${secondtFn.name}`, async () => {
+    it(`should work with ${firstFn.name}/${JSON.stringify(firstOptions)} + ${
+      secondtFn.name
+    }/${JSON.stringify(secondtOptions)}`, async () => {
       const filename = path.resolve(__dirname, "./fixtures/plugin-test.jpg");
       const input = await pify(fs.readFile)(filename);
       const results = await minify({
@@ -609,6 +633,86 @@ describe("minify", () => {
         filename,
         minify: [firstFn, secondtFn],
         minimizerOptions: [firstOptions, secondtOptions],
+      });
+
+      const targets = [...targetsResults];
+      const tasks = [];
+
+      results.forEach((result) => {
+        tasks.push(
+          (async () => {
+            const { ext } = await fileType.fromBuffer(result.data);
+
+            expect(targets).toContain(ext);
+
+            targets.splice(targets.indexOf(ext), 1);
+
+            expect(result.filename.endsWith(ext)).toBe(true);
+            expect(result.warnings).toHaveLength(0);
+            expect(result.errors).toHaveLength(0);
+          })()
+        );
+      });
+
+      await Promise.all(tasks);
+
+      expect(targets).toHaveLength(0);
+    });
+  });
+
+  [
+    {
+      targetsResults: ["jpg"],
+      data: [
+        ImageMinimizerPlugin.squooshMinify,
+        {
+          encodeOptions: {},
+        },
+      ],
+    },
+    {
+      targetsResults: ["jpg", "webp", "png"],
+      data: [
+        ImageMinimizerPlugin.squooshGenerate,
+        {
+          encodeOptions: { oxipng: {}, webp: {} },
+        },
+      ],
+    },
+    {
+      targetsResults: ["webp", "png"],
+      data: [
+        ImageMinimizerPlugin.squooshGenerate,
+        {
+          deleteOriginal: true,
+          encodeOptions: { oxipng: {}, webp: {} },
+        },
+      ],
+    },
+    {
+      targetsResults: ["jpg"],
+      data: [
+        ImageMinimizerPlugin.squooshGenerate,
+        {
+          filter: () => false,
+          encodeOptions: { oxipng: {}, webp: {} },
+        },
+      ],
+    },
+  ].forEach((testCase) => {
+    const { targetsResults, data } = testCase;
+    const [minifyFn, minifyOptions] = data;
+
+    it(`should work with ${minifyFn.name} + ${JSON.stringify(
+      minifyOptions
+    )}`, async () => {
+      const filename = path.resolve(__dirname, "./fixtures/plugin-test.jpg");
+      const input = await pify(fs.readFile)(filename);
+      const results = await minify({
+        input,
+        filename,
+        minify: minifyFn,
+        minimizerOptions: minifyOptions,
       });
 
       const targets = [...targetsResults];
@@ -652,5 +756,185 @@ describe("minify", () => {
     expect(result.errors[0].toString()).toMatch(/Error: fail/);
     expect(result.errors[1].toString()).toMatch(/Error: fail/);
     expect(result.filename).toBe(filename);
+  });
+
+  it.skip("should emit error when imagemin.buffer has error", async () => {
+    const imageminBufferSpy = jest
+      .spyOn(imagemin, "buffer")
+      .mockImplementation(() => {
+        throw new Error("test error");
+      });
+
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const [result] = await minify({
+      minify: ImageMinimizerPlugin.imageminGenerate,
+      input,
+      filename,
+      minimizerOptions: {
+        deleteOriginalAssets: true,
+        plugins: ["imagemin-avif", "imagemin-webp"],
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(2);
+    expect(result.errors[0].toString()).toMatch(/Error: test error/);
+
+    imageminBufferSpy.mockRestore();
+  });
+
+  it.skip("should transform to webp and emit one error when imagemin.buffer has error", async () => {
+    const imageminSpy = jest
+      .spyOn(imagemin, "buffer")
+      .mockImplementationOnce(() => {
+        throw new Error("test error");
+      });
+
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const results = await minify({
+      minify: ImageMinimizerPlugin.imageminGenerate,
+      input,
+      filename,
+      minimizerOptions: {
+        plugins: ["imagemin-avif", "imagemin-webp"],
+      },
+    });
+
+    const inputAsset = results.shift();
+    const resultWebp = results.pop();
+
+    const ext = await fileType.fromBuffer(resultWebp.data);
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(inputAsset.warnings).toHaveLength(0);
+    expect(inputAsset.errors).toHaveLength(1);
+    expect(inputAsset.errors[0].toString()).toMatch(/Error: test error/);
+
+    imageminSpy.mockRestore();
+  });
+
+  it("should transform", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const [, , result] = await minify({
+      minify: ImageMinimizerPlugin.imageminGenerate,
+      input,
+      filename,
+      minimizerOptions: {
+        plugins: ["imagemin-webp"],
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminWebp()],
+    });
+
+    expect(result.data.equals(optimizedSource)).toBe(true);
+  });
+
+  it("should emit warning on imagemin unknown plugin", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const [result] = await minify({
+      minify: ImageMinimizerPlugin.imageminGenerate,
+      input,
+      filename,
+      minimizerOptions: {
+        plugins: ["imagemin-unknown"],
+      },
+    });
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(/Error: Unknown plugin/);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it("should emit warning on imagemin when no plugins", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const [result] = await minify({
+      minify: ImageMinimizerPlugin.imageminGenerate,
+      input,
+      filename,
+      minimizerOptions: {},
+    });
+
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0].toString()).toMatch(/Error: No plugins found/);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it("should transform with 'ImageMinimizerPlugin.squooshMinify'", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const [result] = await minify({
+      minify: ImageMinimizerPlugin.squooshMinify,
+      input,
+      filename,
+      minimizerOptions: {},
+    });
+
+    expect(result.data.length).toBeLessThan(335);
+    expect(result.squooshMinify).toBe(true);
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it("should transform with 'ImageMinimizerPlugin.squooshMinify' 2", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const [result] = await minify({
+      minify: ImageMinimizerPlugin.squooshMinify,
+      input,
+      filename,
+      minimizerOptions: {
+        encodeOptions: {
+          mozjpeg: {
+            progressive: false,
+            // eslint-disable-next-line camelcase
+            color_space: 1,
+          },
+        },
+      },
+    });
+
+    expect(result.data.length).toBeLessThan(160);
+    expect(result.squooshMinify).toBe(true);
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it("should transform with 'ImageMinimizerPlugin.squooshGenerate'", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const results = await minify({
+      minify: ImageMinimizerPlugin.squooshGenerate,
+      input,
+      filename,
+      minimizerOptions: {
+        encodeOptions: {
+          mozjpeg: {},
+          oxipng: {},
+          webp: {},
+        },
+      },
+    });
+
+    const [, jpg, png, webp] = results;
+
+    results.forEach((result) => {
+      expect(result.warnings).toHaveLength(0);
+      expect(result.errors).toHaveLength(0);
+      expect(png.squooshGenerate).toBe(true);
+    });
+
+    expect(jpg.data.length).toBeLessThan(335);
+    expect(png.data.length).toBeLessThan(70);
+    expect(webp.data.length).toBeLessThan(50);
   });
 });
