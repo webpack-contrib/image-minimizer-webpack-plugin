@@ -6,16 +6,23 @@ import path from "path";
 /** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
 
 /**
- * @param {DataForMinifyFn} data
+ * @param {MinifyFnResult} original
  * @param {SquooshMinimizerOptions} minifyOptions
  * @returns {Promise<MinifyFnResult>}
  */
 
-async function squooshMinify(data, minifyOptions) {
-  const [[filename, input]] = Object.entries(data);
+async function squooshMinify(original, minifyOptions) {
+  let squoosh;
 
-  // eslint-disable-next-line node/no-unpublished-require
-  const squoosh = require("@squoosh/lib");
+  try {
+    // eslint-disable-next-line node/no-unpublished-require
+    squoosh = require("@squoosh/lib");
+  } catch (error) {
+    original.errors.push(error);
+
+    return original;
+  }
+
   const { ImagePool, encoders } = squoosh;
 
   /**
@@ -33,20 +40,17 @@ async function squooshMinify(data, minifyOptions) {
     targets[extensionNormalized] = codec;
   }
 
-  const ext = path.extname(filename).slice(1).toLowerCase();
+  const ext = path.extname(original.filename).slice(1).toLowerCase();
   const targetCodec = targets[ext];
 
   if (!targetCodec) {
-    return {
-      filename,
-      data: input,
-      warnings: [
-        new Error(
-          `"${filename}" is not minify, because has an unsupported format`
-        ),
-      ],
-      errors: [],
-    };
+    original.warnings.push(
+      new Error(
+        `"${original.filename}" is not minimized, because has an unsupported format`
+      )
+    );
+
+    return original;
   }
 
   const { encodeOptions = {} } = minifyOptions;
@@ -56,19 +60,16 @@ async function squooshMinify(data, minifyOptions) {
   }
 
   const imagePool = new ImagePool();
-  const image = imagePool.ingestImage(new Uint8Array(input));
+  const image = imagePool.ingestImage(new Uint8Array(original.data));
 
   try {
     await image.encode({ [targetCodec]: encodeOptions[targetCodec] });
   } catch (error) {
     await imagePool.close();
 
-    return {
-      filename,
-      data: input,
-      warnings: [],
-      errors: [error],
-    };
+    original.errors.push(error);
+
+    return original;
   }
 
   await imagePool.close();
@@ -76,11 +77,18 @@ async function squooshMinify(data, minifyOptions) {
   const encodedImage = await image.encodedWith[targets[ext]];
 
   return {
-    filename,
+    filename: original.filename,
     data: Buffer.from(encodedImage.binary),
-    warnings: [],
-    errors: [],
-    squooshMinify: true,
+    warnings: [...original.warnings],
+    errors: [...original.errors],
+    info: {
+      ...original.info,
+      minimized: true,
+      minimizedBy:
+        original.info && original.info.minimizedBy
+          ? ["squoosh", ...original.info.minimizedBy]
+          : ["squoosh"],
+    },
   };
 }
 

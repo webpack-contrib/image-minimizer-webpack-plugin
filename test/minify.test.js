@@ -740,13 +740,21 @@ describe("minify", () => {
     });
   });
 
-  it.skip("should throw two errors", async () => {
+  it("should throw two errors", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const [result] = await minify({
       minify: [
-        () => ({ errors: [new Error("fail")] }),
-        () => ({ errors: [new Error("fail")] }),
+        (original) => {
+          original.errors.push(new Error("fail"));
+
+          return original;
+        },
+        (original) => {
+          original.errors.push(new Error("fail"));
+
+          return original;
+        },
       ],
       input,
       filename,
@@ -758,7 +766,7 @@ describe("minify", () => {
     expect(result.filename).toBe(filename);
   });
 
-  it.skip("should emit error when imagemin.buffer has error", async () => {
+  it("should emit error when imagemin.buffer has error", async () => {
     const imageminBufferSpy = jest
       .spyOn(imagemin, "buffer")
       .mockImplementation(() => {
@@ -784,7 +792,7 @@ describe("minify", () => {
     imageminBufferSpy.mockRestore();
   });
 
-  it.skip("should transform to webp and emit one error when imagemin.buffer has error", async () => {
+  it("should transform to webp and emit one error when imagemin.buffer has error", async () => {
     const imageminSpy = jest
       .spyOn(imagemin, "buffer")
       .mockImplementationOnce(() => {

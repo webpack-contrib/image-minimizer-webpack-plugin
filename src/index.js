@@ -88,6 +88,7 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
+ * @property {AssetInfo} [info]
  * @property {boolean} [squooshMinify]
  * @property {boolean} [squooshGenerate]
  * @property {boolean} [imageminMinify]
@@ -96,7 +97,7 @@ import squooshGenerate from "./utils/squooshGenerate";
 
 /**
  * @callback CustomMinifyFunction
- * @param {DataForMinifyFn} data
+ * @param {MinifyFnResult} original
  * @param {CustomFnMinimizerOptions} minifyOptions
  * @returns {MinifyFnResult | MinifyFnResult[]}
  */
@@ -231,7 +232,8 @@ class ImageMinimizerPlugin {
       scheduledTasks.push(
         limit(async () => {
           const { name, inputSource, cacheItem, info } = asset;
-          let { output } = asset;
+
+          let { output } = assets;
           let input;
 
           const sourceFromInputSource = inputSource.source();
@@ -254,49 +256,51 @@ class ImageMinimizerPlugin {
               generateFilename: compilation.getAssetPath.bind(compilation),
             });
 
+            /** @type {MinifyFnResult[]} */
             output = await minifyFn(minifyOptions);
 
-            if (output.errors.length > 0) {
-              /** @type {[WebpackError]} */
-              (output.errors).forEach((error) => {
-                compilation.errors.push(error);
-              });
+            output.forEach((item) => {
+              item.data = new RawSource(item.data);
+            });
 
-              return;
+            // TODO
+            // await cacheItem.storePromise({
+            //   source: output.source,
+            //   warnings: output.warnings,
+            // });
+          }
+
+          let hasOriginal = false;
+
+          output.forEach((item) => {
+            if (name === item.filename) {
+              hasOriginal = true;
             }
 
-            output.source = new RawSource(output.data);
+            if (item.errors && item.errors.length > 0) {
+              /** @type {[WebpackError]} */ (item.errors).forEach((error) => {
+                compilation.errors.push(error);
+              });
+            }
 
-            await cacheItem.storePromise({
-              source: output.source,
-              warnings: output.warnings,
-            });
-          }
+            if (item.warnings && item.warnings.length > 0) {
+              /** @type {[WebpackError]} */ (item.warnings).forEach(
+                (warning) => {
+                  compilation.warnings.push(warning);
+                }
+              );
+            }
 
-          const { source, warnings } = output;
+            // TODO check `related` usage
+            if (compilation.getAsset(item.filename)) {
+              compilation.updateAsset(item.filename, item.data, item.info);
+            } else {
+              compilation.emitAsset(item.filename, item.data, item.info);
+            }
+          });
 
-          if (warnings && warnings.length > 0) {
-            /** @type {[WebpackError]} */
-            (warnings).forEach((warning) => {
-              compilation.warnings.push(warning);
-            });
-          }
-
-          const isNewAsset = true;
-
-          if (isNewAsset) {
-            const newInfo = {
-              related: { minimized: "test", ...info.related },
-              minimized: true,
-            };
-
-            compilation.emitAsset("test.jpg", source, newInfo);
-          } else {
-            const updatedAssetsInfo = {
-              minimized: true,
-            };
-
-            compilation.updateAsset(name, source, updatedAssetsInfo);
+          if (!hasOriginal) {
+            compilation.deleteAsset(name);
           }
         })
       );

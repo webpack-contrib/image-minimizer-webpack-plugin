@@ -158,48 +158,63 @@ function imageminNormalizeConfig(minimizerOptions, metaData) {
 }
 
 /**
- * @param {DataForMinifyFn} data
+ * @param {MinifyFnResult} original
  * @param {ImageminMinimizerOptions} minimizerOptions
  * @returns {Promise<MinifyFnResult>}
  */
-async function imageminMinify(data, minimizerOptions) {
-  const [[filename, input]] = Object.entries(data);
-  /** @type {MinifyFnResult} */
-  const result = {
-    filename,
-    data: input,
-    warnings: [],
-    errors: [],
-  };
+async function imageminMinify(original, minimizerOptions) {
+  let imagemin;
 
   try {
-    const imagemin = require("imagemin");
-
-    // Implement autosearch config on root directory of project in future
-    const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-      imageminNormalizeConfig(minimizerOptions, result)
-    );
-
-    result.data = await imagemin.buffer(input, minimizerOptionsNormalized);
+    imagemin = require("imagemin");
   } catch (error) {
-    result.errors.push(error);
+    original.errors.push(error);
+
+    return original;
   }
 
-  const extInput = path.extname(result.filename).slice(1).toLowerCase();
-  const { ext: extOutput } = fileTypeFromBuffer(result.data) || {};
+  // Implement autosearch config on root directory of project in future
+  const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
+    imageminNormalizeConfig(minimizerOptions, original)
+  );
+
+  let result;
+
+  try {
+    result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
+  } catch (error) {
+    original.errors.push(error);
+
+    return original;
+  }
+
+  const extInput = path.extname(original.filename).slice(1).toLowerCase();
+  const { ext: extOutput } = fileTypeFromBuffer(result) || {};
 
   if (extOutput && extInput !== extOutput) {
-    result.warnings.push(
+    original.warnings.push(
       new Error(
-        `"imageminMinify" function do not support generate to "${extOutput}" from "${filename}". Use "imageminGenerate"`
+        `"imageminMinify" function do not support generate to "${extOutput}" from "${original.filename}". Use "imageminGenerate"`
       )
     );
-    result.data = input;
+
+    return original;
   }
 
-  result.imageminMinify = true;
-
-  return result;
+  return {
+    filename: original.filename,
+    data: result,
+    warnings: [],
+    errors: [],
+    info: {
+      ...original.info,
+      minimized: true,
+      minimizedBy:
+        original.info && original.info.minimizedBy
+          ? ["imagemin", ...original.info.minimizedBy]
+          : ["imagemin"],
+    },
+  };
 }
 
 export default imageminMinify;

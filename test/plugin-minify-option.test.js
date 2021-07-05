@@ -51,21 +51,18 @@ describe("plugin minify option", () => {
   });
 
   it("should work when minify is custom function", async () => {
-    expect.assertions(5);
+    expect.assertions(6);
 
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: (data, minifiOptions) => {
-          const [[, input]] = Object.entries(data);
-
-          expect(data).toBeDefined();
+        minify: (original, minifiOptions) => {
+          expect(original.data).toBeDefined();
+          expect(original.filename).toBeDefined();
           expect(minifiOptions).toBeDefined();
 
-          return {
-            data: input,
-          };
+          return original;
         },
         minimizerOptions: {
           plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
@@ -84,7 +81,7 @@ describe("plugin minify option", () => {
   });
 
   it("should work if minify is array && minimizerOptions is object", async () => {
-    expect.assertions(5);
+    expect.assertions(6);
 
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
@@ -92,15 +89,12 @@ describe("plugin minify option", () => {
       imageminPluginOptions: {
         minify: [
           ImageMinimizerPlugin.imageminMinify,
-          (data, minifiOptions) => {
-            const [[, input]] = Object.entries(data);
-
-            expect(input).toBeDefined();
+          (original, minifiOptions) => {
+            expect(original.filename).toBeDefined();
+            expect(original.data).toBeDefined();
             expect(minifiOptions).toBeDefined();
 
-            return {
-              data: input,
-            };
+            return original;
           },
         ],
         minimizerOptions: {
@@ -129,22 +123,14 @@ describe("plugin minify option", () => {
         minify: [
           ImageMinimizerPlugin.imageminMinify,
           (data, minifiOptions) => {
-            const [[, input]] = Object.entries(data);
-
             expect("options2" in minifiOptions).toBe(true);
 
-            return {
-              data: input,
-            };
+            return data;
           },
           (data, minifiOptions) => {
-            const [[, input]] = Object.entries(data);
-
             expect("options3" in minifiOptions).toBe(true);
 
-            return {
-              data: input,
-            };
+            return data;
           },
         ],
         minimizerOptions: [
@@ -231,11 +217,58 @@ describe("plugin minify option", () => {
     const { warnings, errors } = compilation;
 
     expect(compilation.getAsset("plugin-test.svg")).toBeDefined();
-
     expect(errors).toHaveLength(0);
     expect(warnings).toHaveLength(1);
     expect(warnings[0].toString()).toMatch(
-      'Error: "plugin-test.svg" is not minify, because has an unsupported format'
+      'Error: "plugin-test.svg" is not minimized, because has an unsupported format'
     );
+  });
+
+  it('should work with "squooshGenerate" and "squooshMinify"', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [
+          ImageMinimizerPlugin.squooshGenerate,
+          ImageMinimizerPlugin.squooshMinify,
+        ],
+        minimizerOptions: [
+          {
+            encodeOptions: {
+              webp: {},
+            },
+          },
+          {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 75,
+              },
+              webp: {
+                quality: 75,
+              },
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const jpgAsset = compilation.getAsset("plugin-test.jpg");
+    const webpAsset = compilation.getAsset("plugin-test.webp");
+
+    expect(jpgAsset.info.size).toBeLessThan(353);
+    expect(jpgAsset.info.minimized).toBe(true);
+    expect(jpgAsset.info.minimizedBy).toEqual(["squoosh"]);
+
+    expect(webpAsset.info.size).toBeLessThan(45);
+    expect(webpAsset.info.generated).toBe(true);
+    expect(webpAsset.info.generatedBy).toEqual(["squoosh"]);
+    expect(webpAsset.info.minimized).toBe(true);
+    expect(webpAsset.info.minimizedBy).toEqual(["squoosh"]);
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
   });
 });

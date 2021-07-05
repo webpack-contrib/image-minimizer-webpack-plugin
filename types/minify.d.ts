@@ -13,22 +13,9 @@ export = minify;
  * @param {InternalMinifyOptions} options
  * @returns {Promise<MinifyFnResult[]>}
  */
-declare function minify(
-  options: InternalMinifyOptions
-): Promise<MinifyFnResult[]>;
+declare function minify(options: InternalMinifyOptions): Promise<MinifyFnResult[]>;
 declare namespace minify {
-  export {
-    MinimizerOptions,
-    MinifyFunctions,
-    InternalMinifyOptions,
-    MinifyFnResult,
-    ImageminMinifyFunction,
-    ImageminMinimizerOptions,
-    SquooshMinifyFunction,
-    SquooshMinimizerOptions,
-    CustomMinifyFunction,
-    CustomFnMinimizerOptions,
-  };
+    export { MinimizerOptions, MinifyFunctions, InternalMinifyOptions, MinifyFnResult, ImageminMinifyFunction, ImageminMinimizerOptions, SquooshMinifyFunction, SquooshMinimizerOptions, CustomMinifyFunction, CustomFnMinimizerOptions };
 }
 type InternalMinifyOptions = import("./index").InternalMinifyOptions;
 type MinifyFnResult = import("./index").MinifyFnResult;

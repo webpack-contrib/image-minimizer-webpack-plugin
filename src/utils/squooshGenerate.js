@@ -6,48 +6,47 @@ import path from "path";
 /** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
 
 /**
- * @param {DataForMinifyFn} data
+ * @param {MinifyFnResult} original
  * @param {SquooshMinimizerOptions} minifyOptions
  * @returns {Promise<MinifyFnResult | MinifyFnResult[]>}
  */
 
-async function squooshGenerate(data, minifyOptions) {
-  const [[filename, input]] = Object.entries(data);
+async function squooshGenerate(original, minifyOptions) {
   const { encodeOptions } = minifyOptions;
 
   if (typeof encodeOptions === "undefined") {
-    return {
-      filename,
-      data: input,
-      warnings: [],
-      errors: [],
-    };
+    return original;
   }
 
-  // eslint-disable-next-line node/no-unpublished-require
-  const squoosh = require("@squoosh/lib");
-  const { ImagePool } = squoosh;
-  const imagePool = new ImagePool();
-  const image = imagePool.ingestImage(new Uint8Array(input));
+  let squoosh;
+
+  try {
+    // eslint-disable-next-line node/no-unpublished-require
+    squoosh = require("@squoosh/lib");
+  } catch (error) {
+    original.errors.push(error);
+
+    return original;
+  }
+
+  const imagePool = new squoosh.ImagePool();
+  const image = imagePool.ingestImage(new Uint8Array(original.data));
 
   try {
     await image.encode(encodeOptions);
   } catch (error) {
     await imagePool.close();
 
-    return {
-      filename,
-      data: input,
-      warnings: [],
-      errors: [error],
-    };
+    original.errors.push(error);
+
+    return original;
   }
 
   await imagePool.close();
 
   /** @type {MinifyFnResult[]} */
   const results = [];
-  const ext = path.extname(filename).toLowerCase();
+  const ext = path.extname(original.filename).toLowerCase();
   const tasks = [];
 
   for (const encodedImage of Object.values(image.encodedWith)) {
@@ -58,13 +57,21 @@ async function squooshGenerate(data, minifyOptions) {
 
   for (const encodedImage of encodedImages) {
     const { extension, binary } = encodedImage;
+    const newFilename = original.filename.replace(
+      new RegExp(`${ext}$`),
+      `.${extension}`
+    );
 
     results.push({
-      filename: filename.replace(new RegExp(`${ext}$`), `.${extension}`),
+      filename: newFilename,
       data: Buffer.from(binary),
       warnings: [],
       errors: [],
-      squooshGenerate: true,
+      info: {
+        generated: true,
+        generatedBy: ["squoosh"],
+        related: { generated: newFilename },
+      },
     });
   }
 

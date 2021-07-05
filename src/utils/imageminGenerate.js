@@ -7,30 +7,21 @@ import { imageminNormalizeConfig } from "./imageminMinify";
 /** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
 
 /**
- * @param {DataForMinifyFn} data
+ * @param {MinifyFnResult} original
  * @param {ImageminMinimizerOptions} minimizerOptions
  * @returns {Promise<MinifyFnResult | MinifyFnResult[]>}
  */
-async function imageminGenerate(data, minimizerOptions) {
-  const [[filename, input]] = Object.entries(data);
-  /** @type {MinifyFnResult} */
-  const result = {
-    filename,
-    data: input,
-    warnings: [],
-    errors: [],
-  };
-
+async function imageminGenerate(original, minimizerOptions) {
   /** @typedef {import("imagemin").Options} ImageminOptions */
 
   /** @type {ImageminOptions} */
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-    imageminNormalizeConfig(minimizerOptions, result)
+    imageminNormalizeConfig(minimizerOptions, original)
   );
   const { plugins = [] } = minimizerOptionsNormalized;
 
   if (plugins.length === 0) {
-    return result;
+    return original;
   }
 
   let imagemin;
@@ -38,22 +29,22 @@ async function imageminGenerate(data, minimizerOptions) {
   try {
     imagemin = require("imagemin");
   } catch (error) {
-    result.errors.push(error);
+    original.errors.push(error);
 
-    return result;
+    return original;
   }
 
   /** @type {MinifyFnResult[]} */
-  const results = [result];
+  const results = [original];
 
   for (const plugin of plugins) {
     /** @type {MinifyFnResult} */
-    const resultForPlugin = {
-      filename,
-      data: input,
+    const result = {
+      filename: original.filename,
+      data: original.data,
       warnings: [],
       errors: [],
-      imageminGenerate: true,
+      info: { generated: true, generatedBy: ["imagemin"] },
     };
 
     minimizerOptionsNormalized.plugins =
@@ -61,8 +52,8 @@ async function imageminGenerate(data, minimizerOptions) {
 
     try {
       // eslint-disable-next-line no-await-in-loop
-      resultForPlugin.data = await imagemin.buffer(
-        input,
+      result.data = await imagemin.buffer(
+        original.data,
         minimizerOptionsNormalized
       );
     } catch (error) {
@@ -71,20 +62,17 @@ async function imageminGenerate(data, minimizerOptions) {
       continue;
     }
 
-    const extInput = path
-      .extname(resultForPlugin.filename)
-      .slice(1)
-      .toLowerCase();
-    const { ext: extOutput } = fileTypeFromBuffer(resultForPlugin.data) || {};
+    const extInput = path.extname(result.filename).slice(1).toLowerCase();
+    const { ext: extOutput } = fileTypeFromBuffer(result.data) || {};
 
     if (extOutput && extInput !== extOutput) {
-      resultForPlugin.filename = resultForPlugin.filename.replace(
+      result.filename = result.filename.replace(
         new RegExp(`${extInput}$`),
         `${extOutput}`
       );
     }
 
-    results.push(resultForPlugin);
+    result.info.related = { generated: result.filename };
   }
 
   return results;
