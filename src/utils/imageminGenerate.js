@@ -74,7 +74,9 @@ async function imageminGenerate(original, minimizerOptions) {
       );
     }
 
-    result.info.related = { generated: result.filename };
+    if (result.info) {
+      result.info.related = { generated: result.filename };
+    }
 
     results.push(result);
   }
