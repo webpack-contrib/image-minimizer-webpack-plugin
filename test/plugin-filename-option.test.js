@@ -4,11 +4,13 @@ import fileType from "file-type";
 
 import { fixturesPath, webpack, clearDirectory } from "./helpers";
 
+import ImageMinimizerPlugin from "../src";
+
 describe("plugin filename option", () => {
   beforeAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
   afterAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
 
-  it("should transform image to webp", async () => {
+  it.only("should transform image to webp", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "filename-1");
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
@@ -18,8 +20,10 @@ describe("plugin filename option", () => {
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
-        filename: "[path][name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
+          filename: "[path][name]-1[ext]",
+          deleteOriginal: true,
           plugins: ["imagemin-webp"],
         },
       },
@@ -28,12 +32,12 @@ describe("plugin filename option", () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.webp")
+      asset.includes("./nested/deep/plugin-test-1.webp")
     );
     const file = path.resolve(
       __dirname,
       outputDir,
-      "./nested/deep/plugin-test.webp"
+      "./nested/deep/plugin-test-1.webp"
     );
     const ext = await fileType.fromFile(file);
 
@@ -53,8 +57,10 @@ describe("plugin filename option", () => {
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
-        filename: "[name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
+          filename: "[name][ext]",
+          deleteOriginal: true,
           plugins: ["imagemin-webp"],
         },
       },
@@ -84,8 +90,10 @@ describe("plugin filename option", () => {
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["plugin-test.png"] },
       imageminPluginOptions: {
-        filename: "./nested/deep/[name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
+          filename: "./nested/deep/[name][ext]",
+          deleteOriginal: true,
           plugins: ["imagemin-webp"],
         },
       },
@@ -119,8 +127,10 @@ describe("plugin filename option", () => {
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
-        filename: "./other/[name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
+          filename: "./other/[name][ext]",
+          deleteOriginal: true,
           plugins: ["imagemin-webp"],
         },
       },
@@ -150,8 +160,10 @@ describe("plugin filename option", () => {
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
-        filename: () => "./other/[name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
+          filename: () => "./other/[name][ext]",
+          deleteOriginal: true,
           plugins: ["imagemin-webp"],
         },
       },

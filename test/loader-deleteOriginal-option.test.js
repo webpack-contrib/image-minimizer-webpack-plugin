@@ -4,7 +4,9 @@ import fileType from "file-type";
 
 import { fixturesPath, webpack, clearDirectory } from "./helpers";
 
-describe('loader "deleteOriginalAssets" option', () => {
+import ImageMinimizerPlugin from "../src";
+
+describe('loader "deleteOriginal" option', () => {
   it("should transform asset and keep original asset (default behavior)", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
@@ -12,7 +14,7 @@ describe('loader "deleteOriginalAssets" option', () => {
         path: path.resolve(__dirname, "outputs"),
       },
       imageminPluginOptions: {
-        filename: "[path][name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
           plugins: ["imagemin-webp"],
         },
@@ -40,16 +42,16 @@ describe('loader "deleteOriginalAssets" option', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should transform asset and keep original asset when the "deleteOriginalAssets" option is "false"', async () => {
+  it('should transform asset and keep original asset when the "deleteOriginal" option is "false"', async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: path.resolve(__dirname, "outputs"),
       },
       imageminPluginOptions: {
-        deleteOriginalAssets: false,
-        filename: "[path][name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
+          deleteOriginal: false,
           plugins: ["imagemin-webp"],
         },
       },
@@ -77,7 +79,7 @@ describe('loader "deleteOriginalAssets" option', () => {
   });
 
   // TODO remove original asset
-  it('should transform asset and remove original asset when the "deleteOriginalAssets" option is "true"', async () => {
+  it('should transform asset and remove original asset when the "deleteOriginal" option is "true"', async () => {
     const outputDir = path.resolve(__dirname, "outputs", "DOA");
 
     clearDirectory(outputDir);
@@ -88,9 +90,9 @@ describe('loader "deleteOriginalAssets" option', () => {
         path: outputDir,
       },
       imageminPluginOptions: {
-        deleteOriginalAssets: true,
-        filename: "[path][name].webp",
+        minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
+          deleteOriginal: true,
           plugins: ["imagemin-webp"],
         },
       },

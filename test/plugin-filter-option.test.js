@@ -13,20 +13,20 @@ describe("plugin filter option", () => {
     const stats = await webpack({
       emitPlugin: true,
       imageminPluginOptions: {
-        filter: (source, sourcePath) => {
-          expect(source).toBeInstanceOf(Buffer);
-          expect(typeof sourcePath).toBe("string");
-
-          if (
-            sourcePath.endsWith("loader-test.jpg") ||
-            sourcePath.endsWith("plugin-test.jpg")
-          ) {
-            return false;
-          }
-
-          return true;
-        },
         minimizerOptions: {
+          filter: (source, sourcePath) => {
+            expect(source).toBeInstanceOf(Buffer);
+            expect(typeof sourcePath).toBe("string");
+
+            if (
+              sourcePath.endsWith("loader-test.jpg") ||
+              sourcePath.endsWith("plugin-test.jpg")
+            ) {
+              return false;
+            }
+
+            return true;
+          },
           plugins,
         },
       },
@@ -70,30 +70,30 @@ describe("plugin filter option", () => {
       },
       imageminPluginOptions: [
         {
-          filter: (source) => {
-            if (source.byteLength > 500) {
-              firstFilterCounter += 1;
-
-              return true;
-            }
-
-            return false;
-          },
           minimizerOptions: {
+            filter: (source) => {
+              if (source.byteLength > 500) {
+                firstFilterCounter += 1;
+
+                return true;
+              }
+
+              return false;
+            },
             plugins,
           },
         },
         {
-          filter: (source) => {
-            if (source.byteLength < 500) {
-              secondFilterCounter += 1;
-
-              return true;
-            }
-
-            return false;
-          },
           minimizerOptions: {
+            filter: (source) => {
+              if (source.byteLength < 500) {
+                secondFilterCounter += 1;
+
+                return true;
+              }
+
+              return false;
+            },
             plugins,
           },
         },
@@ -139,16 +139,16 @@ describe("plugin filter option", () => {
           ],
         },
         imageminPluginOptions: {
-          filter: (source) => {
-            if (source.byteLength > 500) {
-              firstFilterCounter += 1;
-
-              return true;
-            }
-
-            return false;
-          },
           minimizerOptions: {
+            filter: (source) => {
+              if (source.byteLength > 500) {
+                firstFilterCounter += 1;
+
+                return true;
+              }
+
+              return false;
+            },
             plugins,
           },
         },
@@ -162,16 +162,16 @@ describe("plugin filter option", () => {
           ],
         },
         imageminPluginOptions: {
-          filter: (source) => {
-            if (source.byteLength < 500) {
-              secondFilterCounter += 1;
-
-              return true;
-            }
-
-            return false;
-          },
           minimizerOptions: {
+            filter: (source) => {
+              if (source.byteLength < 500) {
+                secondFilterCounter += 1;
+
+                return true;
+              }
+
+              return false;
+            },
             plugins,
           },
         },

@@ -2,7 +2,26 @@
   "definitions": {
     "MinimizerOptions": {
       "additionalProperties": true,
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "filename": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "instanceof": "Function"
+            }
+          ]
+        },
+        "deleteOriginalAssets": {
+          "type": "boolean"
+        },
+        "filter": {
+          "description": "Allows filtering of images for optimization.",
+          "instanceof": "Function"
+        }
+      }
     }
   },
   "title": "Image Minimizer Plugin Loader options",

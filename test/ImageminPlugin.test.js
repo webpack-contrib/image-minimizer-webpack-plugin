@@ -15,6 +15,8 @@ import {
   clearDirectory,
 } from "./helpers";
 
+import ImageMinimizerPlugin from "../src";
+
 describe("imagemin plugin", () => {
   it("should optimizes all images (loader + plugin)", async () => {
     const stats = await webpack({ emitPlugin: true, imageminPlugin: true });
@@ -205,8 +207,7 @@ describe("imagemin plugin", () => {
         fileNames: ["plugin-test.png"],
       },
       imageminPluginOptions: {
-        minimizerOptions: { plugins },
-        filename: "[name][ext]",
+        minimizerOptions: { filename: "[name][ext]", plugins },
       },
     });
     const { compilation } = stats;
@@ -244,8 +245,7 @@ describe("imagemin plugin", () => {
         fileNames: ["nested/deep/plugin-test.png"],
       },
       imageminPluginOptions: {
-        minimizerOptions: { plugins },
-        filename: "[path][name][ext]",
+        minimizerOptions: { filename: "[path][name][ext]", plugins },
       },
     });
     const { compilation } = stats;
@@ -619,14 +619,15 @@ describe("imagemin plugin - persistent cache", () => {
         emitAssetPlugin: true,
         imageminPluginOptions: [
           {
-            filename: "[name].webp",
+            minify: ImageMinimizerPlugin.imageminGenerate,
             minimizerOptions: {
+              filename: "[name].webp",
               plugins: ["imagemin-webp"],
             },
           },
           {
-            filename: "[name].json",
             minimizerOptions: {
+              filename: "[name].json",
               plugins: ["../../test/imagemin-base64.js"],
             },
           },
