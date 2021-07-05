@@ -479,17 +479,10 @@ describe("minify", () => {
       data: [
         [ImageMinimizerPlugin.squooshGenerate, squooshGenerateOptions],
         [
-          (data) => {
-            const [[filename, input]] = Object.entries(data);
+          (original) => {
+            expect(original.filename.endsWith("png")).toBe(true);
 
-            expect(filename.endsWith("png")).toBe(true);
-
-            return {
-              filename,
-              data: input,
-              warnings: [],
-              errors: [],
-            };
+            return original;
           },
           {
             filter: (entry) => entry.filename.endsWith("png"),
@@ -775,7 +768,7 @@ describe("minify", () => {
 
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const [result] = await minify({
+    const [, avif, webp] = await minify({
       minify: ImageMinimizerPlugin.imageminGenerate,
       input,
       filename,
@@ -785,9 +778,13 @@ describe("minify", () => {
       },
     });
 
-    expect(result.warnings).toHaveLength(0);
-    expect(result.errors).toHaveLength(2);
-    expect(result.errors[0].toString()).toMatch(/Error: test error/);
+    expect(avif.warnings).toHaveLength(0);
+    expect(avif.errors).toHaveLength(1);
+    expect(avif.errors[0].toString()).toMatch(/Error: test error/);
+
+    expect(webp.warnings).toHaveLength(0);
+    expect(webp.errors).toHaveLength(1);
+    expect(webp.errors[0].toString()).toMatch(/Error: test error/);
 
     imageminBufferSpy.mockRestore();
   });
@@ -801,7 +798,7 @@ describe("minify", () => {
 
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const results = await minify({
+    const [, avif, webp] = await minify({
       minify: ImageMinimizerPlugin.imageminGenerate,
       input,
       filename,
@@ -810,23 +807,20 @@ describe("minify", () => {
       },
     });
 
-    const inputAsset = results.shift();
-    const resultWebp = results.pop();
-
-    const ext = await fileType.fromBuffer(resultWebp.data);
+    const ext = await fileType.fromBuffer(webp.data);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
-    expect(inputAsset.warnings).toHaveLength(0);
-    expect(inputAsset.errors).toHaveLength(1);
-    expect(inputAsset.errors[0].toString()).toMatch(/Error: test error/);
+    expect(avif.warnings).toHaveLength(0);
+    expect(avif.errors).toHaveLength(1);
+    expect(avif.errors[0].toString()).toMatch(/Error: test error/);
 
     imageminSpy.mockRestore();
   });
 
-  it("should transform", async () => {
+  it("should generate 'webp' using 'imagemin-webp'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const [, , result] = await minify({
+    const [, result] = await minify({
       minify: ImageMinimizerPlugin.imageminGenerate,
       input,
       filename,
@@ -837,6 +831,9 @@ describe("minify", () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
+    expect(result.filename.endsWith(".webp")).toBe(true);
+    expect(result.info.generated).toBe(true);
+    expect(result.info.generatedBy).toEqual(["imagemin"]);
 
     const optimizedSource = await imagemin.buffer(input, {
       plugins: [imageminWebp()],
@@ -888,7 +885,8 @@ describe("minify", () => {
     });
 
     expect(result.data.length).toBeLessThan(335);
-    expect(result.squooshMinify).toBe(true);
+    expect(result.info.minimized).toBe(true);
+    expect(result.info.minimizedBy).toEqual(["squoosh"]);
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
   });
@@ -912,7 +910,8 @@ describe("minify", () => {
     });
 
     expect(result.data.length).toBeLessThan(160);
-    expect(result.squooshMinify).toBe(true);
+    expect(result.info.minimized).toBe(true);
+    expect(result.info.minimizedBy).toEqual(["squoosh"]);
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
   });
@@ -935,14 +934,20 @@ describe("minify", () => {
 
     const [, jpg, png, webp] = results;
 
-    results.forEach((result) => {
-      expect(result.warnings).toHaveLength(0);
-      expect(result.errors).toHaveLength(0);
-      expect(png.squooshGenerate).toBe(true);
-    });
-
     expect(jpg.data.length).toBeLessThan(335);
+    expect(jpg.info.generated).toBe(true);
+    expect(jpg.info.generatedBy).toEqual(["squoosh"]);
+    expect(jpg.warnings).toHaveLength(0);
+    expect(jpg.errors).toHaveLength(0);
     expect(png.data.length).toBeLessThan(70);
+    expect(png.info.generated).toBe(true);
+    expect(png.info.generatedBy).toEqual(["squoosh"]);
+    expect(png.warnings).toHaveLength(0);
+    expect(png.errors).toHaveLength(0);
     expect(webp.data.length).toBeLessThan(50);
+    expect(webp.info.generated).toBe(true);
+    expect(webp.info.generatedBy).toEqual(["squoosh"]);
+    expect(webp.warnings).toHaveLength(0);
+    expect(webp.errors).toHaveLength(0);
   });
 });

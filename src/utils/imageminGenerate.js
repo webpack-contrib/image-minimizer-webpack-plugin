@@ -34,8 +34,10 @@ async function imageminGenerate(original, minimizerOptions) {
     return original;
   }
 
+  const extInput = path.extname(original.filename).slice(1).toLowerCase();
+
   /** @type {MinifyFnResult[]} */
-  const results = [original];
+  const results = [];
 
   for (const plugin of plugins) {
     /** @type {MinifyFnResult} */
@@ -58,11 +60,11 @@ async function imageminGenerate(original, minimizerOptions) {
       );
     } catch (error) {
       result.errors.push(error);
+      results.push(result);
 
       continue;
     }
 
-    const extInput = path.extname(result.filename).slice(1).toLowerCase();
     const { ext: extOutput } = fileTypeFromBuffer(result.data) || {};
 
     if (extOutput && extInput !== extOutput) {
@@ -73,6 +75,8 @@ async function imageminGenerate(original, minimizerOptions) {
     }
 
     result.info.related = { generated: result.filename };
+
+    results.push(result);
   }
 
   return results;

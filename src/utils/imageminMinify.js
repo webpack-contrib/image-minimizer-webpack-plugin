@@ -204,8 +204,8 @@ async function imageminMinify(original, minimizerOptions) {
   return {
     filename: original.filename,
     data: result,
-    warnings: [],
-    errors: [],
+    warnings: [...original.warnings],
+    errors: [...original.errors],
     info: {
       ...original.info,
       minimized: true,
