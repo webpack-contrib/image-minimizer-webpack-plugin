@@ -84,7 +84,7 @@
     "eslint-plugin-markdown": "^2.2.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
-    "eslint-plugin-unicorn": "^32.0.1",
+    "eslint-plugin-unicorn": "^34.0.1",
     "file-loader": "^6.2.0",
     "file-type": "^16.5.3",
     "husky": "^7.0.1",
