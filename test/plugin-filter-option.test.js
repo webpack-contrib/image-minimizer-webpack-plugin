@@ -14,13 +14,15 @@ describe("plugin filter option", () => {
       emitPlugin: true,
       imageminPluginOptions: {
         minimizerOptions: {
-          filter: (source, sourcePath) => {
-            expect(source).toBeInstanceOf(Buffer);
-            expect(typeof sourcePath).toBe("string");
+          filter: (item) => {
+            expect(item.filename).toBeDefined();
+            expect(item.data).toBeDefined();
+            expect(item.warnings).toBeDefined();
+            expect(item.errors).toBeDefined();
 
             if (
-              sourcePath.endsWith("loader-test.jpg") ||
-              sourcePath.endsWith("plugin-test.jpg")
+              item.filename.endsWith("loader-test.jpg") ||
+              item.filename.endsWith("plugin-test.jpg")
             ) {
               return false;
             }
@@ -71,8 +73,8 @@ describe("plugin filter option", () => {
       imageminPluginOptions: [
         {
           minimizerOptions: {
-            filter: (source) => {
-              if (source.byteLength > 500) {
+            filter: (item) => {
+              if (item.data.byteLength > 500) {
                 firstFilterCounter += 1;
 
                 return true;
@@ -85,8 +87,8 @@ describe("plugin filter option", () => {
         },
         {
           minimizerOptions: {
-            filter: (source) => {
-              if (source.byteLength < 500) {
+            filter: (item) => {
+              if (item.data.byteLength < 500) {
                 secondFilterCounter += 1;
 
                 return true;
@@ -140,8 +142,8 @@ describe("plugin filter option", () => {
         },
         imageminPluginOptions: {
           minimizerOptions: {
-            filter: (source) => {
-              if (source.byteLength > 500) {
+            filter: (item) => {
+              if (item.data.byteLength > 500) {
                 firstFilterCounter += 1;
 
                 return true;
@@ -163,8 +165,8 @@ describe("plugin filter option", () => {
         },
         imageminPluginOptions: {
           minimizerOptions: {
-            filter: (source) => {
-              if (source.byteLength < 500) {
+            filter: (item) => {
+              if (item.data.byteLength < 500) {
                 secondFilterCounter += 1;
 
                 return true;
