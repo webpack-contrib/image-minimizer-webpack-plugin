@@ -291,18 +291,24 @@ class ImageMinimizerPlugin {
               hasOriginal = true;
             }
 
-            if (item.errors && item.errors.length > 0) {
-              /** @type {[WebpackError]} */ (item.errors).forEach((error) => {
-                compilation.errors.push(error);
-              });
-            }
+            if (this.options.severityError !== "off") {
+              if (item.errors && item.errors.length > 0) {
+                /** @type {[WebpackError]} */ (item.errors).forEach((error) => {
+                  if (this.options.severityError === "warning") {
+                    compilation.warnings.push(error);
+                  } else {
+                    compilation.errors.push(error);
+                  }
+                });
+              }
 
-            if (item.warnings && item.warnings.length > 0) {
-              /** @type {[WebpackError]} */ (item.warnings).forEach(
-                (warning) => {
-                  compilation.warnings.push(warning);
-                }
-              );
+              if (item.warnings && item.warnings.length > 0) {
+                /** @type {[WebpackError]} */ (item.warnings).forEach(
+                  (warning) => {
+                    compilation.warnings.push(warning);
+                  }
+                );
+              }
             }
 
             // TODO need to merge with before `info`?

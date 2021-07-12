@@ -66,20 +66,7 @@ async function minify(options) {
 
         const errored = error instanceof Error ? error : new Error(error);
 
-        if (errored.name === "ConfigurationError") {
-          processedResult.errors.push(errored);
-        } else {
-          switch (options.severityError) {
-            case "off":
-              break;
-            case "warning":
-              processedResult.warnings.push(errored);
-              break;
-            case "error":
-            default:
-              processedResult.errors.push(errored);
-          }
-        }
+        processedResult.errors.push(errored);
       }
 
       if (Array.isArray(processedResult)) {
