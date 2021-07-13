@@ -71,25 +71,27 @@ async function minify(options) {
       }
 
       if (Array.isArray(processedResult)) {
-        if (filename) {
-          processedResult = processedResult.map((item) => {
-            if (options.severityError === "off") {
-              item.warnings = [];
-              item.errors = [];
-            } else if (options.severityError === "warning") {
-              item.warnings = [...item.warnings, ...item.errors];
-              item.errors = [];
-            }
+        processedResult = processedResult.map((item) => {
+          if (!item.info.sourceFilename) {
+            item.info.sourceFilename = item.filename;
+          }
 
-            if (filename) {
-              item.filename = options.generateFilename(filename, {
-                filename: item.filename,
-              });
-            }
+          if (options.severityError === "off") {
+            item.warnings = [];
+            item.errors = [];
+          } else if (options.severityError === "warning") {
+            item.warnings = [...item.warnings, ...item.errors];
+            item.errors = [];
+          }
 
-            return item;
-          });
-        }
+          if (filename) {
+            item.filename = options.generateFilename(filename, {
+              filename: item.filename,
+            });
+          }
+
+          return item;
+        });
 
         if (typeof deleteOriginal !== "undefined" && deleteOriginal) {
           results.splice(k, processedResult.length, ...processedResult);
@@ -97,6 +99,10 @@ async function minify(options) {
           results.push(...processedResult);
         }
       } else if (!Array.isArray(processedResult)) {
+        if (!processedResult.info.sourceFilename) {
+          processedResult.info.sourceFilename = processedResult.filename;
+        }
+
         if (options.severityError === "off") {
           processedResult.warnings = [];
           processedResult.errors = [];
@@ -108,6 +114,7 @@ async function minify(options) {
           processedResult.errors = [];
         }
 
+        // TODO should we regenerate filename? I think no
         if (filename) {
           processedResult.filename = options.generateFilename(filename, {
             filename: processedResult.filename,
