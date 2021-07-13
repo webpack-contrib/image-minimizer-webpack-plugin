@@ -121,9 +121,9 @@ describe("loader", () => {
     const { warnings, errors } = compilation;
 
     const file = path.resolve(
-        __dirname,
-        "outputs",
-        "./nested/deep/loader-test.webp"
+      __dirname,
+      "outputs",
+      "./nested/deep/loader-test.webp"
     );
     const ext = await fileType.fromFile(file);
 
@@ -150,13 +150,13 @@ describe("loader", () => {
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
-    
+
     // TODO add test on asset name and check `?foo=bar` is included
 
     const file = path.resolve(
-        __dirname,
-        "outputs",
-        "./nested/deep/loader-test.webp"
+      __dirname,
+      "outputs",
+      "./nested/deep/loader-test.webp"
     );
     const ext = await fileType.fromFile(file);
 
@@ -164,4 +164,7 @@ describe("loader", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
+
+  // TODO add test for generate in CSS with multiple
+  // TODO add test for generate in JS with multiple
 });
