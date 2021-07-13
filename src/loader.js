@@ -35,6 +35,7 @@ const loader = async function loader(content) {
   const minifyOptions = /** @type {InternalMinifyOptions} */ ({
     filename: name,
     input: content,
+    info: {},
     minify: options.minify || imageminMinify,
     minimizerOptions: options.minimizerOptions,
     severityError: options.severityError,

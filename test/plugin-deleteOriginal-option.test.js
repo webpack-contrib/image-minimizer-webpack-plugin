@@ -137,9 +137,9 @@ describe('plugin "deleteOriginal" option', () => {
     expect(errors).toHaveLength(0);
   });
 
-  it("should transform assets to webp (plugin + loader)", async () => {
+  it("should transform assets to webp using plugin and loader", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, "./loader-single.js"),
+      entry: path.join(fixturesPath, "./loader-generate-url.js"),
       output: {
         path: path.resolve(__dirname, "outputs"),
       },
@@ -157,8 +157,7 @@ describe('plugin "deleteOriginal" option', () => {
     const assetsKeys = Object.keys(assets).map((asset) => normalizePath(asset));
 
     [
-      "nested/deep/loader-test.webp",
-      "nested/deep/loader-test.jpg",
+      "nested/deep/loader-test.webp?foo=bar",
       "./nested/deep/plugin-test.png",
       "./nested/deep/plugin-test.webp",
     ].forEach((asset) => {

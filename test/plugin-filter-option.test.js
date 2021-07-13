@@ -17,6 +17,7 @@ describe("plugin filter option", () => {
           filter: (item) => {
             expect(item.filename).toBeDefined();
             expect(item.data).toBeDefined();
+            expect(item.info).toBeDefined();
             expect(item.warnings).toBeDefined();
             expect(item.errors).toBeDefined();
 
