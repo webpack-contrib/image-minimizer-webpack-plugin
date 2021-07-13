@@ -85,25 +85,21 @@ import squooshGenerate from "./utils/squooshGenerate";
  */
 
 /**
- * @typedef {Object} InternalMinifyFnResult
- * @property {string} filename
- * @property {RawSource} data
- * @property {Array<Error>} warnings
- * @property {Array<Error>} errors
- * @property {AssetInfo} [info]
- * @property {boolean} [squooshMinify]
- * @property {boolean} [squooshGenerate]
- * @property {boolean} [imageminMinify]
- * @property {boolean} [imageminGenerate]
- */
-
-/**
  * @typedef {Object} MinifyFnResult
  * @property {string} filename
  * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
- * @property {AssetInfo} [info]
+ * @property {AssetInfo} info
+ */
+
+/**
+ * @typedef {Object} MinifyFnSourceResult
+ * @property {string} filename
+ * @property {RawSource} data
+ * @property {Array<Error>} warnings
+ * @property {Array<Error>} errors
+ * @property {AssetInfo} info
  */
 
 /**
@@ -226,6 +222,9 @@ class ImageMinimizerPlugin {
 
           const eTag = cache.getLazyHashedEtag(source);
           const cacheItem = cache.getItemCache(cacheName, eTag);
+          /**
+           * @type {MinifyFnSourceResult[] | undefined}
+           */
           const output = await cacheItem.getPromise();
 
           return { name, info, inputSource: source, output, cacheItem };
@@ -244,11 +243,10 @@ class ImageMinimizerPlugin {
     for (const asset of assetsForMinify) {
       scheduledTasks.push(
         limit(async () => {
-          const { name, inputSource, cacheItem, info } = asset;
           let { output } = asset;
           let input;
 
-          const sourceFromInputSource = inputSource.source();
+          const sourceFromInputSource = asset.inputSource.source();
 
           if (!output) {
             input = sourceFromInputSource;
@@ -260,33 +258,29 @@ class ImageMinimizerPlugin {
             const { severityError, minimizerOptions, minify } = this.options;
 
             const minifyOptions = /** @type {InternalMinifyOptions} */ ({
-              filename: name,
+              filename: asset.name,
               input,
-              info,
+              info: asset.info,
               minify,
               minimizerOptions,
               severityError,
               generateFilename: compilation.getAssetPath.bind(compilation),
             });
 
-            output = await minifyFn(minifyOptions);
+            /** @type {MinifyFnSourceResult[]} */
+            (output) = (await minifyFn(minifyOptions)).map((item) => ({
+              ...item,
+              data: new RawSource(item.data),
+            }));
 
-            output = /** @type {MinifyFnResult[]} */ (output).map((item) => {
-              // TODO fix me
-              // @ts-ignore
-              item.data = new RawSource(item.data);
-
-              return item;
-            });
-
-            await cacheItem.storePromise(output);
+            await asset.cacheItem.storePromise(output);
           }
 
           let hasOriginal = false;
 
-          /** @type {InternalMinifyFnResult[]} */
+          /** @type {MinifyFnSourceResult[]} */
           (output).forEach((item) => {
-            if (name === item.filename) {
+            if (asset.name === item.filename) {
               hasOriginal = true;
             }
 
@@ -315,7 +309,7 @@ class ImageMinimizerPlugin {
           });
 
           if (!hasOriginal) {
-            compilation.deleteAsset(name);
+            compilation.deleteAsset(asset.name);
           }
         })
       );
