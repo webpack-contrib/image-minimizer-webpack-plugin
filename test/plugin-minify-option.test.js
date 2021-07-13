@@ -287,6 +287,7 @@ describe("plugin minify option", () => {
     const webpAsset = compilation.getAsset("plugin-test.webp");
 
     expect(jpgAsset.info.size).toBeLessThan(462);
+    expect(jpgAsset.info.foo).toBe("bar");
     expect(jpgAsset.info.minimized).toBe(true);
     expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
 
@@ -335,6 +336,7 @@ describe("plugin minify option", () => {
     const webpAsset = compilation.getAsset("plugin-test.webp");
 
     expect(jpgAsset.info.size).toBeLessThan(353);
+    expect(jpgAsset.info.foo).toBe("bar");
     expect(jpgAsset.info.minimized).toBe(true);
     expect(jpgAsset.info.minimizedBy).toEqual(["squoosh"]);
 

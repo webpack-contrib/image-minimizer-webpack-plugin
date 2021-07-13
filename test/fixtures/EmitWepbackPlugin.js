@@ -34,7 +34,7 @@ export default class EmitWepbackPlugin {
               mapCache.set(fileName, source);
             }
 
-            compilation.emitAsset(fileName, source);
+            compilation.emitAsset(fileName, source, { foo: "bar" });
           })
         );
       });

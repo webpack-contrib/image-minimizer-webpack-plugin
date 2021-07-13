@@ -302,7 +302,6 @@ class ImageMinimizerPlugin {
               });
             }
 
-            // TODO need to merge with before `info`?
             // TODO check `related` usage
             // TODO add `sourceFilename`
             if (compilation.getAsset(item.filename)) {
