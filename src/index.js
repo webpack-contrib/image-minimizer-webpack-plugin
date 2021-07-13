@@ -309,9 +309,14 @@ class ImageMinimizerPlugin {
             } else {
               compilation.emitAsset(item.filename, item.data, item.info);
 
-              if (hasOriginal) {
+              if (hasOriginal && item.info && item.info.generated) {
+                const relatedName = Array.isArray(item.info.generatedBy)
+                  ? item.info.generatedBy.join(", ")
+                  : "imagemin-minimizer-webpack-plugin";
+
+                // TODO test on generated, i.e. delete original with single generate
                 compilation.updateAsset(asset.name, asset.inputSource, {
-                  related: { "image-generated": item.filename },
+                  related: { [relatedName]: item.filename },
                 });
               }
             }
@@ -379,6 +384,32 @@ class ImageMinimizerPlugin {
         },
         (assets) => this.optimize(compiler, compilation, assets, moduleAssets)
       );
+
+      compilation.hooks.statsPrinter.tap(pluginName, (stats) => {
+        stats.hooks.print
+          .for("asset.info.minimized")
+          .tap(
+            "image-minimizer-webpack-plugin",
+            (minimized, { green, formatFlag }) =>
+              minimized
+                ? /** @type {Function} */ (green)(
+                    /** @type {Function} */ (formatFlag)("minimized")
+                  )
+                : ""
+          );
+
+        stats.hooks.print
+          .for("asset.info.generated")
+          .tap(
+            "image-minimizer-webpack-plugin",
+            (minimized, { green, formatFlag }) =>
+              minimized
+                ? /** @type {Function} */ (green)(
+                    /** @type {Function} */ (formatFlag)("generated")
+                  )
+                : ""
+          );
+      });
     });
   }
 }
