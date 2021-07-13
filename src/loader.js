@@ -45,18 +45,22 @@ const loader = async function loader(content) {
 
   const [output] = await minify(minifyOptions);
 
-  if (output.errors && output.errors.length > 0) {
-    output.errors.forEach((warning) => {
-      this.emitError(warning);
-    });
+  if (options.severityError !== "off") {
+    if (output.errors && output.errors.length > 0) {
+      output.errors.forEach((error) => {
+        if (options.severityError === "warning") {
+          this.emitWarning(error);
+        } else {
+          this.emitError(error);
+        }
+      });
+    }
 
-    return content;
-  }
-
-  if (output.warnings && output.warnings.length > 0) {
-    output.warnings.forEach((warning) => {
-      this.emitWarning(warning);
-    });
+    if (output.warnings && output.warnings.length > 0) {
+      output.warnings.forEach((warning) => {
+        this.emitWarning(warning);
+      });
+    }
   }
 
   return output.data;
