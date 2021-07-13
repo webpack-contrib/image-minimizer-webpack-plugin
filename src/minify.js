@@ -46,6 +46,45 @@ async function minify(options) {
     const { filter, deleteOriginal, filename } =
       /** @type {MinimizerOptions} */ (minifyOptions);
 
+    /**
+     * @param {any} item
+     * @return {MinifyFnResult}
+     */
+    const normalizeProcessedResult = (item) => {
+      if (!item.info) {
+        item.info = {};
+      }
+
+      if (!item.errors) {
+        item.errors = [];
+      }
+
+      if (!item.warnings) {
+        item.warnings = [];
+      }
+
+      if (!item.info.sourceFilename) {
+        item.info.sourceFilename = item.filename;
+      }
+
+      if (options.severityError === "off") {
+        item.warnings = [];
+        item.errors = [];
+      } else if (options.severityError === "warning") {
+        item.warnings = [...item.warnings, ...item.errors];
+        item.errors = [];
+      }
+
+      // TODO should we regenerate filename? I think no
+      if (filename) {
+        item.filename = options.generateFilename(filename, {
+          filename: item.filename,
+        });
+      }
+
+      return item;
+    };
+
     /** @type {MinifyFnResult | MinifyFnResult[] | undefined} */
     let processedResult;
     const length = results.length - 1;
@@ -70,27 +109,9 @@ async function minify(options) {
       }
 
       if (Array.isArray(processedResult)) {
-        processedResult = processedResult.map((item) => {
-          if (!item.info.sourceFilename) {
-            item.info.sourceFilename = item.filename;
-          }
-
-          if (options.severityError === "off") {
-            item.warnings = [];
-            item.errors = [];
-          } else if (options.severityError === "warning") {
-            item.warnings = [...item.warnings, ...item.errors];
-            item.errors = [];
-          }
-
-          if (filename) {
-            item.filename = options.generateFilename(filename, {
-              filename: item.filename,
-            });
-          }
-
-          return item;
-        });
+        processedResult = processedResult.map((item) =>
+          normalizeProcessedResult(item)
+        );
 
         if (typeof deleteOriginal !== "undefined" && deleteOriginal) {
           results.splice(k, processedResult.length, ...processedResult);
@@ -98,27 +119,7 @@ async function minify(options) {
           results.push(...processedResult);
         }
       } else if (!Array.isArray(processedResult)) {
-        if (!processedResult.info.sourceFilename) {
-          processedResult.info.sourceFilename = processedResult.filename;
-        }
-
-        if (options.severityError === "off") {
-          processedResult.warnings = [];
-          processedResult.errors = [];
-        } else if (options.severityError === "warning") {
-          processedResult.warnings = [
-            ...processedResult.warnings,
-            ...processedResult.errors,
-          ];
-          processedResult.errors = [];
-        }
-
-        // TODO should we regenerate filename? I think no
-        if (filename) {
-          processedResult.filename = options.generateFilename(filename, {
-            filename: processedResult.filename,
-          });
-        }
+        processedResult = normalizeProcessedResult(processedResult);
 
         if (typeof deleteOriginal !== "undefined" && !deleteOriginal) {
           results.push(processedResult);

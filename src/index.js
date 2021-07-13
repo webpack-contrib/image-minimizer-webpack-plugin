@@ -293,19 +293,15 @@ class ImageMinimizerPlugin {
 
           /** @type {MinifyFnSourceResult[]} */
           (output).forEach((item) => {
-            if (item.warnings) {
-              /** @type {[WebpackError]} */
-              (item.warnings).forEach((warning) => {
-                compilation.warnings.push(warning);
-              });
-            }
+            /** @type {[WebpackError]} */
+            (item.warnings).forEach((warning) => {
+              compilation.warnings.push(warning);
+            });
 
-            if (item.errors) {
-              /** @type {[WebpackError]} */
-              (item.errors).forEach((error) => {
-                compilation.errors.push(error);
-              });
-            }
+            /** @type {[WebpackError]} */
+            (item.errors).forEach((error) => {
+              compilation.errors.push(error);
+            });
 
             if (compilation.getAsset(item.filename)) {
               compilation.updateAsset(item.filename, item.data, item.info);

@@ -56,17 +56,13 @@ const loader = async function (content) {
     throw new Error("Can't found preset");
   }
 
-  if (item.errors) {
-    item.errors.forEach((error) => {
-      this.emitError(error);
-    });
-  }
+  item.errors.forEach((error) => {
+    this.emitError(error);
+  });
 
-  if (item.warnings) {
-    item.warnings.forEach((warning) => {
-      this.emitWarning(warning);
-    });
-  }
+  item.warnings.forEach((warning) => {
+    this.emitWarning(warning);
+  });
 
   parsedQuery.delete("preset");
 
