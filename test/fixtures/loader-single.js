@@ -1,1 +1,1 @@
-require("./nested/deep/loader-test.jpg");
+module.exports = new URL("./nested/deep/loader-test.jpg?preset=webp&foo=bar", import.meta.url);

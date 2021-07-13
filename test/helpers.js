@@ -54,14 +54,18 @@ function runWebpack(maybeOptions, getCompiler = false) {
           ...(!options.fileLoaderOff
             ? [
                 {
-                  test: options.test ? options.test : /\.(jpe?g|png|gif|svg)$/i,
+                  test: options.test
+                    ? options.test
+                    : /\.(jpe?g|png|gif|svg|webp)$/i,
+                  dependency: { not: ["url"] },
+                  type: "javascript/auto",
                   use: [
                     {
                       loader: "file-loader",
                       options: {
                         name: options.name
                           ? options.name
-                          : "[path][name].[ext]",
+                          : "[path][name].[ext][query]",
                       },
                     },
                   ],
@@ -122,12 +126,13 @@ function runWebpack(maybeOptions, getCompiler = false) {
         ],
       },
       output: {
-        publicPath: "",
+        publicPath: "auto",
         filename: "bundle.js",
         path:
           options.output && options.output.path
             ? options.output.path
             : tempy.directory(),
+        assetModuleFilename: "[path][name][ext][query]",
       },
       plugins: [],
     };

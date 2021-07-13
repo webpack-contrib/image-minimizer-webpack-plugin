@@ -316,6 +316,7 @@ class ImageMinimizerPlugin {
 
             // TODO need to merge with before `info`?
             // TODO check `related` usage
+            // TODO add `sourceFilename`
             if (compilation.getAsset(item.filename)) {
               compilation.updateAsset(item.filename, item.data, item.info);
             } else {

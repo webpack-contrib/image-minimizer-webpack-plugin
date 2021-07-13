@@ -74,9 +74,9 @@ describe("loader", () => {
     );
   });
 
-  it("should transform image source to webp", async () => {
+  it("should transform image to webp using `require`", async () => {
     const stats = await webpack({
-      entry: path.join(fixturesPath, "./loader-single.js"),
+      entry: path.join(fixturesPath, "./loader-generate-require.js"),
       output: {
         path: path.resolve(__dirname, "outputs"),
       },
@@ -94,6 +94,69 @@ describe("loader", () => {
       __dirname,
       "outputs",
       "./nested/deep/loader-test.webp"
+    );
+    const ext = await fileType.fromFile(file);
+
+    // TODO add test on asset name and check `?foo=bar` is included
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("should transform image to webp using `import`", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./loader-generate-import.js"),
+      output: {
+        path: path.resolve(__dirname, "outputs"),
+      },
+      imageminPluginOptions: {
+        minify: ImageMinimizerPlugin.imageminGenerate,
+        minimizerOptions: {
+          plugins: ["imagemin-webp"],
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const file = path.resolve(
+        __dirname,
+        "outputs",
+        "./nested/deep/loader-test.webp"
+    );
+    const ext = await fileType.fromFile(file);
+
+    // TODO add test on asset name and check `?foo=bar` is included
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("should transform image to webp using `new URL(...)`", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./loader-generate-url.js"),
+      output: {
+        path: path.resolve(__dirname, "outputs"),
+      },
+      fileLoaderOff: true,
+      imageminPluginOptions: {
+        minify: ImageMinimizerPlugin.imageminGenerate,
+        minimizerOptions: {
+          plugins: ["imagemin-webp"],
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+    
+    // TODO add test on asset name and check `?foo=bar` is included
+
+    const file = path.resolve(
+        __dirname,
+        "outputs",
+        "./nested/deep/loader-test.webp"
     );
     const ext = await fileType.fromFile(file);
 

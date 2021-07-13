@@ -8,6 +8,7 @@ import imageminMinify from "./utils/imageminMinify";
 /** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
 /** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
 /** @typedef {import("./index").InternalMinifyOptions} InternalMinifyOptions */
+/** @typedef {import("./index").MinifyFnResult} MinifyFnResult */
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
 
@@ -29,25 +30,28 @@ import imageminMinify from "./utils/imageminMinify";
 const loader = async function loader(content) {
   const options = this.getOptions(/** @type {Schema} */ (schema));
   const name = path.relative(this.rootContext, this.resourcePath);
-  const input = content;
-
-  const { severityError, minimizerOptions } = options;
-
+  const parsedQuery = new URLSearchParams(this.resourceQuery);
   const compilation = /** @type {Compilation} */ (this._compilation);
   const minifyOptions = /** @type {InternalMinifyOptions} */ ({
     filename: name,
-    input,
+    input: content,
     minify: options.minify || imageminMinify,
-    minimizerOptions,
-    severityError,
+    minimizerOptions: options.minimizerOptions,
     generateFilename: compilation.getAssetPath.bind(compilation),
   });
+  const preset = parsedQuery.get("preset");
+  const output = await minify(minifyOptions);
 
-  const [output] = await minify(minifyOptions);
+  /**
+   * @type {MinifyFnResult}
+   */
+  const item = preset
+    ? output.find((item) => item.filename.endsWith(preset))
+    : output[0];
 
   if (options.severityError !== "off") {
-    if (output.errors && output.errors.length > 0) {
-      output.errors.forEach((error) => {
+    if (item.errors && item.errors.length > 0) {
+      item.errors.forEach((error) => {
         if (options.severityError === "warning") {
           this.emitWarning(error);
         } else {
@@ -56,14 +60,29 @@ const loader = async function loader(content) {
       });
     }
 
-    if (output.warnings && output.warnings.length > 0) {
-      output.warnings.forEach((warning) => {
+    if (item.warnings && item.warnings.length > 0) {
+      item.warnings.forEach((warning) => {
         this.emitWarning(warning);
       });
     }
   }
 
-  return output.data;
+  parsedQuery.delete("preset");
+
+  const stringifiedParsedQuery = parsedQuery.toString();
+  const query =
+    stringifiedParsedQuery.length > 0 ? `?${stringifiedParsedQuery}` : "";
+
+  // For `file-loader` and other old loaders
+  this.resourcePath = path.join(this.rootContext, item.filename);
+  this.resourceQuery = query;
+
+  // For assets modules
+  if (this._module && !this._module.matchResource) {
+    this._module.matchResource = `${item.filename}${query}`;
+  }
+
+  return item.data;
 };
 
 loader.raw = true;

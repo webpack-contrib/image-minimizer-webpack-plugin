@@ -10,7 +10,7 @@ describe('loader "filename" option', () => {
   beforeAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
   afterAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
 
-  it("should emit new transformed to webp asset with flat filename", async () => {
+  it.only("should emit new transformed to webp asset with flat filename", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "loader-filename-1");
     const stats = await webpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
@@ -21,7 +21,6 @@ describe('loader "filename" option', () => {
         minify: ImageMinimizerPlugin.imageminGenerate,
         minimizerOptions: {
           filename: "[name][ext]",
-          deleteOriginal: true,
           plugins: ["imagemin-webp"],
         },
       },
