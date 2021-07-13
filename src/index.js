@@ -280,7 +280,10 @@ class ImageMinimizerPlugin {
             await asset.cacheItem.storePromise(output);
           }
 
-          const hasOriginal = output.find(
+          /**
+           * @type {Boolean}
+           */
+          const hasOriginal = output.some(
             (item) => item.filename === asset.name
           );
 
@@ -314,7 +317,6 @@ class ImageMinimizerPlugin {
                   ? item.info.generatedBy.join(", ")
                   : "imagemin-minimizer-webpack-plugin";
 
-                // TODO test on generated, i.e. delete original with single generate
                 compilation.updateAsset(asset.name, asset.inputSource, {
                   related: { [relatedName]: item.filename },
                 });

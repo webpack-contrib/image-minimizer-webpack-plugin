@@ -848,7 +848,7 @@ describe("imagemin plugin", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it("should work and show 'minimized' and 'generated' assets in stats", async () => {
+  it("should work and show 'minimized' and 'generated' in stats", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
@@ -899,7 +899,7 @@ describe("imagemin plugin", () => {
     );
   });
 
-  it("should work and show 'minimized' and 'generated' assets in stats wuth the 'filename' option", async () => {
+  it("should work and show 'minimized' and 'generated' in stats with the 'filename' option", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
@@ -951,6 +951,157 @@ describe("imagemin plugin", () => {
     );
     expect(stringStats).toMatch(
       /asset minimized-generated-plugin-test.webp.+\[from: plugin-test.webp\] \[generated\] \[minimized\]/
+    );
+  });
+
+  it("should work and show 'minimized' in stats when only image minification used", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [ImageMinimizerPlugin.imageminMinify],
+        minimizerOptions: [
+          {
+            deleteOriginal: true,
+            filename: "minimized-[name][ext]",
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+    const jpgAsset = compilation.getAsset("minimized-plugin-test.jpg");
+
+    expect(jpgAsset.info.size).toBeLessThan(462);
+    expect(jpgAsset.info.foo).toBe("bar");
+    expect(jpgAsset.info.sourceFilename).toBe("plugin-test.jpg");
+    expect(jpgAsset.info.minimized).toBe(true);
+    expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const stringStats = stats.toString({ relatedAssets: true });
+
+    expect(stringStats).toMatch(
+      /asset minimized-plugin-test.jpg.+\[from: plugin-test.jpg\] \[minimized\]/
+    );
+  });
+
+  it("should work and show 'generated' in stats when only image generation used", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [ImageMinimizerPlugin.imageminGenerate],
+        minimizerOptions: [
+          {
+            deleteOriginal: true,
+            filename: "generated-[name][ext]",
+            plugins: ["webp"],
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+    const webpAsset = compilation.getAsset("generated-plugin-test.webp");
+
+    expect(webpAsset.info.size).toBeLessThan(45);
+    expect(webpAsset.info.sourceFilename).toBe("plugin-test.webp");
+    expect(webpAsset.info.generated).toBe(true);
+    expect(webpAsset.info.generatedBy).toEqual(["imagemin"]);
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const stringStats = stats.toString({ relatedAssets: true });
+
+    expect(stringStats).toMatch(
+      /asset generated-plugin-test.webp.+\[from: plugin-test.webp\] \[generated\]/
+    );
+  });
+
+  it("should not have an error when custom minify function add an error and used only image generation with the 'deleteOriginal' option", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [
+          (original) => {
+            original.errors.push(new Error("Error"));
+
+            return original;
+          },
+          ImageMinimizerPlugin.imageminGenerate,
+        ],
+        minimizerOptions: [
+          {},
+          {
+            deleteOriginal: true,
+            plugins: ["webp"],
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const webpAsset = compilation.getAsset("plugin-test.webp");
+
+    expect(webpAsset.info.size).toBeLessThan(45);
+    expect(webpAsset.info.sourceFilename).toBe("plugin-test.webp");
+    expect(webpAsset.info.generated).toBe(true);
+    expect(webpAsset.info.generatedBy).toEqual(["imagemin"]);
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const stringStats = stats.toString({ relatedAssets: true });
+
+    expect(stringStats).toMatch(
+      /asset plugin-test.webp.+\[from: plugin-test.webp\] \[generated\]/
+    );
+  });
+
+  it("should not throw an error when custom minify function add an error and used only image generation with the 'deleteOriginal' option", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [
+          () => {
+            throw new Error("Error");
+          },
+          ImageMinimizerPlugin.imageminGenerate,
+        ],
+        minimizerOptions: [
+          {},
+          {
+            deleteOriginal: true,
+            plugins: ["webp"],
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const webpAsset = compilation.getAsset("plugin-test.webp");
+
+    expect(webpAsset.info.size).toBeLessThan(45);
+    expect(webpAsset.info.sourceFilename).toBe("plugin-test.webp");
+    expect(webpAsset.info.generated).toBe(true);
+    expect(webpAsset.info.generatedBy).toEqual(["imagemin"]);
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const stringStats = stats.toString({ relatedAssets: true });
+
+    expect(stringStats).toMatch(
+      /asset plugin-test.webp.+\[from: plugin-test.webp\] \[generated\]/
     );
   });
 });

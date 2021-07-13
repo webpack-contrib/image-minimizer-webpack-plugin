@@ -62,7 +62,6 @@ async function minify(options) {
         // eslint-disable-next-line no-await-in-loop
         processedResult = await minifyFn(original, minifyOptions);
       } catch (error) {
-        // TODO original asset can be removed and no errors will be
         processedResult = original;
 
         const errored = error instanceof Error ? error : new Error(error);
