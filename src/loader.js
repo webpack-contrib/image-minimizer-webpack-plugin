@@ -20,15 +20,16 @@ import imageminMinify from "./utils/imageminMinify";
  * @property {MinifyFunctions} [minify]
  */
 
-/** @typedef {import("webpack").LoaderContext<LoaderOptions>} LoaderContext */
-/** @typedef {import("webpack").RawLoaderDefinition<LoaderOptions>} RawLoaderDefinition */
+/** @typedef {import("webpack").RawLoaderDefinition<LoaderOptions>} ImageMinimizerRawLoaderDefinition */
 
 /**
- * @type {RawLoaderDefinition}
+ * @type {ImageMinimizerRawLoaderDefinition}
  */
+// @ts-ignore Due workaround for renaming modules
 // eslint-disable-next-line func-style
-const loader = async function loader(content) {
+const loader = async function (content) {
   const options = this.getOptions(/** @type {Schema} */ (schema));
+
   const name = path.relative(this.rootContext, this.resourcePath);
   const parsedQuery = new URLSearchParams(this.resourceQuery);
   const compilation = /** @type {Compilation} */ (this._compilation);
@@ -45,11 +46,15 @@ const loader = async function loader(content) {
   const output = await minify(minifyOptions);
 
   /**
-   * @type {MinifyFnResult}
+   * @type {MinifyFnResult | undefined}
    */
   const item = preset
-    ? output.find((item) => item.filename.endsWith(preset))
+    ? output.find((possibleItem) => possibleItem.filename.endsWith(preset))
     : output[0];
+
+  if (!item) {
+    throw new Error("Can't found preset");
+  }
 
   if (item.errors) {
     item.errors.forEach((error) => {
@@ -69,6 +74,8 @@ const loader = async function loader(content) {
   const query =
     stringifiedParsedQuery.length > 0 ? `?${stringifiedParsedQuery}` : "";
 
+  // TODO check watch/resolver
+  // TODO change `resource` too
   // For `file-loader` and other old loaders
   this.resourcePath = path.join(this.rootContext, item.filename);
   this.resourceQuery = query;

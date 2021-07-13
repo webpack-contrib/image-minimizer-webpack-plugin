@@ -101,8 +101,8 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @typedef {Object} MinifyFnResult
  * @property {string} filename
  * @property {Buffer} data
- * @property {Array<Error>} [warnings]
- * @property {Array<Error>} [errors]
+ * @property {Array<Error>} warnings
+ * @property {Array<Error>} errors
  * @property {AssetInfo} [info]
  */
 

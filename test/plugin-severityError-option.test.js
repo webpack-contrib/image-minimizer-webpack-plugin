@@ -49,11 +49,11 @@ describe("plugin severityError option", () => {
     expect(warnings).toHaveLength(1);
     expect(errors).toHaveLength(0);
     expect(warnings[0].message).toMatch(
-        /(Corrupt JPEG data|Command failed with EPIPE)/
+      /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
     await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
-        true
+      true
     );
   });
 

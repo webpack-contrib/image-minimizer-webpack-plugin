@@ -113,13 +113,11 @@ describe("loader severityError option", () => {
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toMatch(
-        /Error/
-    );
+    expect(errors[0].message).toMatch(/Error/);
     expect(Object.keys(assets)).toHaveLength(3);
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-        false
+      false
     );
   });
 
@@ -140,16 +138,12 @@ describe("loader severityError option", () => {
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(2);
-    expect(errors[0].message).toMatch(
-        /Error/
-    );
-    expect(errors[1].message).toMatch(
-        /Error/
-    );
+    expect(errors[0].message).toMatch(/Error/);
+    expect(errors[1].message).toMatch(/Error/);
     expect(Object.keys(assets)).toHaveLength(3);
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-        false
+      false
     );
   });
 
@@ -169,17 +163,13 @@ describe("loader severityError option", () => {
     const { assets, warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(2);
-    expect(warnings[0].message).toMatch(
-        /Error/
-    );
-    expect(warnings[1].message).toMatch(
-        /Error/
-    );
+    expect(warnings[0].message).toMatch(/Error/);
+    expect(warnings[1].message).toMatch(/Error/);
     expect(Object.keys(assets)).toHaveLength(3);
     expect(errors).toHaveLength(0);
 
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-        false
+      false
     );
   });
 });

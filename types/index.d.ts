@@ -50,6 +50,7 @@ export type MinimizerOptions =
 export type InternalMinifyOptions = {
   filename: string;
   input: Buffer;
+  info: AssetInfo;
   minify: MinifyFunctions;
   minimizerOptions?: MinimizerOptions | undefined;
   severityError?: string | undefined;
@@ -72,10 +73,6 @@ export type MinifyFnResult = {
   warnings: Array<Error>;
   errors: Array<Error>;
   info?: import("webpack").AssetInfo | undefined;
-  squooshMinify?: boolean | undefined;
-  squooshGenerate?: boolean | undefined;
-  imageminMinify?: boolean | undefined;
-  imageminGenerate?: boolean | undefined;
 };
 export type CustomMinifyFunction = (
   original: MinifyFnResult,
@@ -183,6 +180,7 @@ export type PluginOptions = {
  * @typedef {Object} InternalMinifyOptions
  * @property {string} filename
  * @property {Buffer} input
+ * @property {AssetInfo} info
  * @property {MinifyFunctions} minify
  * @property {MinimizerOptions} [minimizerOptions]
  * @property {string} [severityError]
@@ -207,10 +205,6 @@ export type PluginOptions = {
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
  * @property {AssetInfo} [info]
- * @property {boolean} [squooshMinify]
- * @property {boolean} [squooshGenerate]
- * @property {boolean} [imageminMinify]
- * @property {boolean} [imageminGenerate]
  */
 /**
  * @callback CustomMinifyFunction
