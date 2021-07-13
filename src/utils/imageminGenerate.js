@@ -44,6 +44,7 @@ async function imageminGenerate(original, minimizerOptions) {
     const result = {
       filename: original.filename,
       data: original.data,
+      // TODO test on collect
       warnings: [],
       errors: [],
       info: { generated: true, generatedBy: ["imagemin"] },
@@ -72,10 +73,6 @@ async function imageminGenerate(original, minimizerOptions) {
         new RegExp(`${extInput}$`),
         `${extOutput}`
       );
-    }
-
-    if (result.info) {
-      result.info.related = { generated: result.filename };
     }
 
     results.push(result);

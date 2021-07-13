@@ -67,11 +67,7 @@ async function squooshGenerate(original, minifyOptions) {
       data: Buffer.from(binary),
       warnings: [],
       errors: [],
-      info: {
-        generated: true,
-        generatedBy: ["squoosh"],
-        related: { generated: newFilename },
-      },
+      info: { generated: true, generatedBy: ["squoosh"] },
     });
   }
 

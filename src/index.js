@@ -280,14 +280,16 @@ class ImageMinimizerPlugin {
             await asset.cacheItem.storePromise(output);
           }
 
-          let hasOriginal = false;
+          const hasOriginal = output.find(
+            (item) => item.filename === asset.name
+          );
+
+          if (!hasOriginal) {
+            compilation.deleteAsset(asset.name);
+          }
 
           /** @type {MinifyFnSourceResult[]} */
           (output).forEach((item) => {
-            if (asset.name === item.filename) {
-              hasOriginal = true;
-            }
-
             if (item.warnings) {
               /** @type {[WebpackError]} */
               (item.warnings).forEach((warning) => {
@@ -302,17 +304,18 @@ class ImageMinimizerPlugin {
               });
             }
 
-            // TODO check `related` usage
             if (compilation.getAsset(item.filename)) {
               compilation.updateAsset(item.filename, item.data, item.info);
             } else {
               compilation.emitAsset(item.filename, item.data, item.info);
+
+              if (hasOriginal) {
+                compilation.updateAsset(asset.name, asset.inputSource, {
+                  related: { "image-generated": item.filename },
+                });
+              }
             }
           });
-
-          if (!hasOriginal) {
-            compilation.deleteAsset(asset.name);
-          }
         })
       );
     }

@@ -99,7 +99,7 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it("should work if minify is array && minimizerOptions is object", async () => {
+  it("should work when the 'minify' option is array and the 'minimizerOptions' option is object", async () => {
     expect.assertions(9);
 
     const stats = await webpack({
@@ -135,7 +135,7 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it("should work if minify is array && minimizerOptions is array", async () => {
+  it("should work when the 'minify' option && he 'minimizerOptions' option is array", async () => {
     expect.assertions(17);
 
     const stats = await webpack({
@@ -191,7 +191,7 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should work with "imageminMinify" minifier and minimizerOptions', async () => {
+  it("should work with 'imageminMinify' minifier and 'minimizerOptions'", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
@@ -210,7 +210,7 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should work with "squooshMinify" minifier and minimizerOptions', async () => {
+  it("should work with 'squooshMinify' minifier and 'minimizerOptions'", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
@@ -261,48 +261,6 @@ describe("plugin minify option", () => {
     );
   });
 
-  it('should work and always have the "sourceFilename" property', async () => {
-    const stats = await webpack({
-      entry: path.join(fixturesPath, "./empty-entry.js"),
-      emitPlugin: true,
-      imageminPluginOptions: {
-        minify: [
-          ImageMinimizerPlugin.imageminGenerate,
-          ImageMinimizerPlugin.imageminMinify,
-        ],
-        minimizerOptions: [
-          {
-            plugins: ["webp"],
-          },
-          {
-            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
-          },
-        ],
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
-
-    const jpgAsset = compilation.getAsset("plugin-test.jpg");
-    const webpAsset = compilation.getAsset("plugin-test.webp");
-
-    expect(jpgAsset.info.size).toBeLessThan(462);
-    expect(jpgAsset.info.foo).toBe("bar");
-    expect(jpgAsset.info.sourceFilename).toBe("plugin-test.jpg");
-    expect(jpgAsset.info.minimized).toBe(true);
-    expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
-
-    expect(webpAsset.info.size).toBeLessThan(45);
-    expect(webpAsset.info.sourceFilename).toBe("plugin-test.webp");
-    expect(webpAsset.info.generated).toBe(true);
-    expect(webpAsset.info.generatedBy).toEqual(["imagemin"]);
-    expect(webpAsset.info.minimized).toBe(true);
-    expect(webpAsset.info.minimizedBy).toEqual(["imagemin"]);
-
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-  });
-
   it('should work with "imageminGenerate" and "imageminMinify"', async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
@@ -332,54 +290,12 @@ describe("plugin minify option", () => {
     expect(jpgAsset.info.foo).toBe("bar");
     expect(jpgAsset.info.minimized).toBe(true);
     expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
-
-    expect(webpAsset.info.size).toBeLessThan(45);
-    expect(webpAsset.info.generated).toBe(true);
-    expect(webpAsset.info.generatedBy).toEqual(["imagemin"]);
-    expect(webpAsset.info.minimized).toBe(true);
-    expect(webpAsset.info.minimizedBy).toEqual(["imagemin"]);
-
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-  });
-
-  it('should work with "imageminGenerate" and "imageminMinify" and the "filename" option', async () => {
-    const stats = await webpack({
-      entry: path.join(fixturesPath, "./empty-entry.js"),
-      emitPlugin: true,
-      imageminPluginOptions: {
-        minify: [
-          ImageMinimizerPlugin.imageminGenerate,
-          ImageMinimizerPlugin.imageminMinify,
-        ],
-        minimizerOptions: [
-          {
-            filename: "generated-[name][ext]",
-            plugins: ["webp"],
-          },
-          {
-            filename: "minified-[name][ext]",
-            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
-          },
-        ],
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
-
-    const jpgAsset = compilation.getAsset("minified-plugin-test.jpg");
-    const webpAsset = compilation.getAsset(
-      "minified-generated-plugin-test.webp"
+    expect(jpgAsset.info.related.foo).toEqual("bar");
+    expect(jpgAsset.info.related["image-generated"]).toEqual(
+      "plugin-test.webp"
     );
 
-    expect(jpgAsset.info.size).toBeLessThan(462);
-    expect(jpgAsset.info.foo).toBe("bar");
-    expect(jpgAsset.info.sourceFilename).toBe("plugin-test.jpg");
-    expect(jpgAsset.info.minimized).toBe(true);
-    expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
-
     expect(webpAsset.info.size).toBeLessThan(45);
-    expect(webpAsset.info.sourceFilename).toBe("plugin-test.webp");
     expect(webpAsset.info.generated).toBe(true);
     expect(webpAsset.info.generatedBy).toEqual(["imagemin"]);
     expect(webpAsset.info.minimized).toBe(true);
@@ -423,10 +339,14 @@ describe("plugin minify option", () => {
     const jpgAsset = compilation.getAsset("plugin-test.jpg");
     const webpAsset = compilation.getAsset("plugin-test.webp");
 
-    expect(jpgAsset.info.size).toBeLessThan(353);
+    expect(jpgAsset.info.size).toBeLessThan(354);
     expect(jpgAsset.info.foo).toBe("bar");
     expect(jpgAsset.info.minimized).toBe(true);
     expect(jpgAsset.info.minimizedBy).toEqual(["squoosh"]);
+    expect(jpgAsset.info.related.foo).toEqual("bar");
+    expect(jpgAsset.info.related["image-generated"]).toEqual(
+      "plugin-test.webp"
+    );
 
     expect(webpAsset.info.size).toBeLessThan(45);
     expect(webpAsset.info.generated).toBe(true);
