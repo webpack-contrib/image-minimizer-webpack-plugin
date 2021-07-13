@@ -202,6 +202,7 @@ class ImageMinimizerPlugin {
             return false;
           }
 
+          // TODO improve check
           // Exclude already optimized assets from `image-minimizer-webpack-loader`
           if (this.options.loader && moduleAssets.has(name)) {
             return false;
