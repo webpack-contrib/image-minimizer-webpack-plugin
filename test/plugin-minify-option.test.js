@@ -305,6 +305,108 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
+  it('should work with "imageminGenerate" and "imageminMinify" and respect warnings from previously custom function', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [
+          (original) => {
+            original.warnings.push(new Error("Warning"));
+
+            return original;
+          },
+          ImageMinimizerPlugin.imageminGenerate,
+          ImageMinimizerPlugin.imageminMinify,
+        ],
+        minimizerOptions: [
+          {},
+          {
+            plugins: ["webp"],
+          },
+          {
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const jpgAsset = compilation.getAsset("plugin-test.jpg");
+    const webpAsset = compilation.getAsset("plugin-test.webp");
+
+    expect(jpgAsset.info.size).toBeLessThan(462);
+    expect(jpgAsset.info.foo).toBe("bar");
+    expect(jpgAsset.info.minimized).toBe(true);
+    expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
+    expect(jpgAsset.info.related.foo).toEqual("bar");
+    expect(jpgAsset.info.related["image-generated"]).toEqual(
+      "plugin-test.webp"
+    );
+
+    expect(webpAsset.info.size).toBeLessThan(45);
+    expect(webpAsset.info.generated).toBe(true);
+    expect(webpAsset.info.generatedBy).toEqual(["imagemin"]);
+    expect(webpAsset.info.minimized).toBe(true);
+    expect(webpAsset.info.minimizedBy).toEqual(["imagemin"]);
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].message).toMatch(/Warning/);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('should work with "imageminGenerate" and "imageminMinify" and respect errors from previously custom function', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [
+          (original) => {
+            original.errors.push(new Error("Error"));
+
+            return original;
+          },
+          ImageMinimizerPlugin.imageminGenerate,
+          ImageMinimizerPlugin.imageminMinify,
+        ],
+        minimizerOptions: [
+          {},
+          {
+            plugins: ["webp"],
+          },
+          {
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const jpgAsset = compilation.getAsset("plugin-test.jpg");
+    const webpAsset = compilation.getAsset("plugin-test.webp");
+
+    expect(jpgAsset.info.size).toBeLessThan(462);
+    expect(jpgAsset.info.foo).toBe("bar");
+    expect(jpgAsset.info.minimized).toBe(true);
+    expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
+    expect(jpgAsset.info.related.foo).toEqual("bar");
+    expect(jpgAsset.info.related["image-generated"]).toEqual(
+      "plugin-test.webp"
+    );
+
+    expect(webpAsset.info.size).toBeLessThan(45);
+    expect(webpAsset.info.generated).toBe(true);
+    expect(webpAsset.info.generatedBy).toEqual(["imagemin"]);
+    expect(webpAsset.info.minimized).toBe(true);
+    expect(webpAsset.info.minimizedBy).toEqual(["imagemin"]);
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toMatch(/Error/);
+  });
+
   it('should work with "squooshGenerate" and "squooshMinify"', async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
@@ -356,5 +458,125 @@ describe("plugin minify option", () => {
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
+  });
+
+  it('should work with "squooshGenerate" and "squooshMinify" and respect warnings from previously custom function', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [
+          (original) => {
+            original.warnings.push(new Error("Warning"));
+
+            return original;
+          },
+          ImageMinimizerPlugin.squooshGenerate,
+          ImageMinimizerPlugin.squooshMinify,
+        ],
+        minimizerOptions: [
+          {},
+          {
+            encodeOptions: {
+              webp: {},
+            },
+          },
+          {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 75,
+              },
+              webp: {
+                quality: 75,
+              },
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const jpgAsset = compilation.getAsset("plugin-test.jpg");
+    const webpAsset = compilation.getAsset("plugin-test.webp");
+
+    expect(jpgAsset.info.size).toBeLessThan(462);
+    expect(jpgAsset.info.foo).toBe("bar");
+    expect(jpgAsset.info.minimized).toBe(true);
+    expect(jpgAsset.info.minimizedBy).toEqual(["squoosh"]);
+    expect(jpgAsset.info.related.foo).toEqual("bar");
+    expect(jpgAsset.info.related["image-generated"]).toEqual(
+      "plugin-test.webp"
+    );
+
+    expect(webpAsset.info.size).toBeLessThan(45);
+    expect(webpAsset.info.generated).toBe(true);
+    expect(webpAsset.info.generatedBy).toEqual(["squoosh"]);
+    expect(webpAsset.info.minimized).toBe(true);
+    expect(webpAsset.info.minimizedBy).toEqual(["squoosh"]);
+
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0].message).toMatch(/Warning/);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('should work with "squooshGenerate" and "squooshMinify" and respect errors from previously custom function', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [
+          (original) => {
+            original.errors.push(new Error("Error"));
+
+            return original;
+          },
+          ImageMinimizerPlugin.squooshGenerate,
+          ImageMinimizerPlugin.squooshMinify,
+        ],
+        minimizerOptions: [
+          {},
+          {
+            encodeOptions: {
+              webp: {},
+            },
+          },
+          {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 75,
+              },
+              webp: {
+                quality: 75,
+              },
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const jpgAsset = compilation.getAsset("plugin-test.jpg");
+    const webpAsset = compilation.getAsset("plugin-test.webp");
+
+    expect(jpgAsset.info.size).toBeLessThan(462);
+    expect(jpgAsset.info.foo).toBe("bar");
+    expect(jpgAsset.info.minimized).toBe(true);
+    expect(jpgAsset.info.minimizedBy).toEqual(["squoosh"]);
+    expect(jpgAsset.info.related.foo).toEqual("bar");
+    expect(jpgAsset.info.related["image-generated"]).toEqual(
+      "plugin-test.webp"
+    );
+
+    expect(webpAsset.info.size).toBeLessThan(45);
+    expect(webpAsset.info.generated).toBe(true);
+    expect(webpAsset.info.generatedBy).toEqual(["squoosh"]);
+    expect(webpAsset.info.minimized).toBe(true);
+    expect(webpAsset.info.minimizedBy).toEqual(["squoosh"]);
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toMatch(/Error/);
   });
 });
