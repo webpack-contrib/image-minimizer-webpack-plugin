@@ -73,9 +73,19 @@ async function minify(options) {
       if (Array.isArray(processedResult)) {
         if (filename) {
           processedResult = processedResult.map((item) => {
-            item.filename = options.generateFilename(filename, {
-              filename: item.filename,
-            });
+            if (options.severityError === "off") {
+              item.warnings = [];
+              item.errors = [];
+            } else if (options.severityError === "warning") {
+              item.warnings = [...item.warnings, ...item.errors];
+              item.errors = [];
+            }
+
+            if (filename) {
+              item.filename = options.generateFilename(filename, {
+                filename: item.filename,
+              });
+            }
 
             return item;
           });
@@ -87,6 +97,17 @@ async function minify(options) {
           results.push(...processedResult);
         }
       } else if (!Array.isArray(processedResult)) {
+        if (options.severityError === "off") {
+          processedResult.warnings = [];
+          processedResult.errors = [];
+        } else if (options.severityError === "warning") {
+          processedResult.warnings = [
+            ...processedResult.warnings,
+            ...processedResult.errors,
+          ];
+          processedResult.errors = [];
+        }
+
         if (filename) {
           processedResult.filename = options.generateFilename(filename, {
             filename: processedResult.filename,

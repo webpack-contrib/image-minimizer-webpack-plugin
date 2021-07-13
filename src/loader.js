@@ -37,6 +37,7 @@ const loader = async function loader(content) {
     input: content,
     minify: options.minify || imageminMinify,
     minimizerOptions: options.minimizerOptions,
+    severityError: options.severityError,
     generateFilename: compilation.getAssetPath.bind(compilation),
   });
   const preset = parsedQuery.get("preset");
@@ -49,22 +50,16 @@ const loader = async function loader(content) {
     ? output.find((item) => item.filename.endsWith(preset))
     : output[0];
 
-  if (options.severityError !== "off") {
-    if (item.errors && item.errors.length > 0) {
-      item.errors.forEach((error) => {
-        if (options.severityError === "warning") {
-          this.emitWarning(error);
-        } else {
-          this.emitError(error);
-        }
-      });
-    }
+  if (item.errors) {
+    item.errors.forEach((error) => {
+      this.emitError(error);
+    });
+  }
 
-    if (item.warnings && item.warnings.length > 0) {
-      item.warnings.forEach((warning) => {
-        this.emitWarning(warning);
-      });
-    }
+  if (item.warnings) {
+    item.warnings.forEach((warning) => {
+      this.emitWarning(warning);
+    });
   }
 
   parsedQuery.delete("preset");

@@ -101,13 +101,9 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @typedef {Object} MinifyFnResult
  * @property {string} filename
  * @property {Buffer} data
- * @property {Array<Error>} warnings
- * @property {Array<Error>} errors
+ * @property {Array<Error>} [warnings]
+ * @property {Array<Error>} [errors]
  * @property {AssetInfo} [info]
- * @property {boolean} [squooshMinify]
- * @property {boolean} [squooshGenerate]
- * @property {boolean} [imageminMinify]
- * @property {boolean} [imageminGenerate]
  */
 
 /**
@@ -294,24 +290,18 @@ class ImageMinimizerPlugin {
               hasOriginal = true;
             }
 
-            if (this.options.severityError !== "off") {
-              if (item.errors && item.errors.length > 0) {
-                /** @type {[WebpackError]} */ (item.errors).forEach((error) => {
-                  if (this.options.severityError === "warning") {
-                    compilation.warnings.push(error);
-                  } else {
-                    compilation.errors.push(error);
-                  }
-                });
-              }
+            if (item.warnings) {
+              /** @type {[WebpackError]} */
+              (item.warnings).forEach((warning) => {
+                compilation.warnings.push(warning);
+              });
+            }
 
-              if (item.warnings && item.warnings.length > 0) {
-                /** @type {[WebpackError]} */ (item.warnings).forEach(
-                  (warning) => {
-                    compilation.warnings.push(warning);
-                  }
-                );
-              }
+            if (item.errors) {
+              /** @type {[WebpackError]} */
+              (item.errors).forEach((error) => {
+                compilation.errors.push(error);
+              });
             }
 
             // TODO need to merge with before `info`?
