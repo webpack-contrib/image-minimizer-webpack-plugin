@@ -35,12 +35,11 @@ const loader = async function loader(content) {
 
   const compilation = /** @type {Compilation} */ (this._compilation);
   const minifyOptions = /** @type {InternalMinifyOptions} */ ({
-    minify: options.minify || imageminMinify,
-    input,
     filename: name,
-    severityError,
+    input,
+    minify: options.minify || imageminMinify,
     minimizerOptions,
-    isProductionMode: this.mode === "production" || !this.mode,
+    severityError,
     generateFilename: compilation.getAssetPath.bind(compilation),
   });
 
@@ -60,24 +59,7 @@ const loader = async function loader(content) {
     });
   }
 
-  const source = output.data;
-  const { path: newName } = /** @type {Compilation} */ (
-    this._compilation
-  ).getPathWithInfo(options.filename || "[path][name][ext]", {
-    filename: name,
-  });
-
-  const isNewAsset = name !== newName;
-
-  if (isNewAsset) {
-    this.emitFile(newName, source.toString(), "", {
-      minimized: true,
-    });
-
-    return content;
-  }
-
-  return source;
+  return output.data;
 };
 
 loader.raw = true;
