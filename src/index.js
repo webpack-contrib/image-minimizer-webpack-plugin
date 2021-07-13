@@ -270,8 +270,11 @@ class ImageMinimizerPlugin {
 
             /** @type {MinifyFnSourceResult[]} */
             (output) = (await minifyFn(minifyOptions)).map((item) => ({
-              ...item,
+              filename: item.filename,
               data: new RawSource(item.data),
+              info: item.info,
+              errors: item.errors,
+              warnings: item.warnings,
             }));
 
             await asset.cacheItem.storePromise(output);
