@@ -14,7 +14,7 @@
             }
           ]
         },
-        "deleteOriginalAssets": {
+        "deleteOriginal": {
           "type": "boolean"
         },
         "filter": {

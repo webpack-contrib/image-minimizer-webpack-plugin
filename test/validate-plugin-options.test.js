@@ -167,13 +167,13 @@ describe("validate plugin options", () => {
 
     expect(() => {
       new ImageMinimizerPlugin({
-        minimizerOptions: { deleteOriginalAssets: false },
+        minimizerOptions: { deleteOriginal: false },
       });
     }).not.toThrow();
 
     expect(() => {
       new ImageMinimizerPlugin({
-        minimizerOptions: { deleteOriginalAssets: {} },
+        minimizerOptions: { deleteOriginal: {} },
       });
     }).toThrowErrorMatchingSnapshot();
 

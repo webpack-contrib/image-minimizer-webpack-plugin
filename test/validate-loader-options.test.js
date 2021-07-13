@@ -24,7 +24,7 @@ describe("validate loader options", () => {
           filename: () => "[name].[ext]",
         },
         {
-          deleteOriginalAssets: true,
+          deleteOriginal: true,
         },
         {
           filter: () => {},
@@ -46,13 +46,13 @@ describe("validate loader options", () => {
           filename: true,
         },
         {
-          deleteOriginalAssets: {},
+          deleteOriginal: {},
         },
         {
-          deleteOriginalAssets: [],
+          deleteOriginal: [],
         },
         {
-          deleteOriginalAssets: () => {},
+          deleteOriginal: () => {},
         },
         {
           filter: 1,
