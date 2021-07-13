@@ -163,20 +163,12 @@ function imageminNormalizeConfig(minimizerOptions, metaData) {
  * @returns {Promise<MinifyFnResult>}
  */
 async function imageminMinify(original, minimizerOptions) {
-  let imagemin;
-
-  try {
-    imagemin = require("imagemin");
-  } catch (error) {
-    original.errors.push(error);
-
-    return original;
-  }
-
   // Implement autosearch config on root directory of project in future
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     imageminNormalizeConfig(minimizerOptions, original)
   );
+
+  const imagemin = require("imagemin");
 
   let result;
 

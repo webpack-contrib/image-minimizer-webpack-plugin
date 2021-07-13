@@ -12,17 +12,8 @@ import path from "path";
  */
 
 async function squooshMinify(original, minifyOptions) {
-  let squoosh;
-
-  try {
-    // eslint-disable-next-line node/no-unpublished-require
-    squoosh = require("@squoosh/lib");
-  } catch (error) {
-    original.errors.push(error);
-
-    return original;
-  }
-
+  // eslint-disable-next-line node/no-unpublished-require
+  const squoosh = require("@squoosh/lib");
   const { ImagePool, encoders } = squoosh;
 
   /**

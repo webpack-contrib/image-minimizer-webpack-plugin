@@ -18,18 +18,10 @@ async function squooshGenerate(original, minifyOptions) {
     return [];
   }
 
-  let squoosh;
-
-  try {
-    // eslint-disable-next-line node/no-unpublished-require
-    squoosh = require("@squoosh/lib");
-  } catch (error) {
-    original.errors.push(error);
-
-    return [original];
-  }
-
-  const imagePool = new squoosh.ImagePool();
+  // eslint-disable-next-line node/no-unpublished-require
+  const squoosh = require("@squoosh/lib");
+  const { ImagePool } = squoosh;
+  const imagePool = new ImagePool();
   const image = imagePool.ingestImage(new Uint8Array(original.data));
 
   try {

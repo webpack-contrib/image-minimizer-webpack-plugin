@@ -24,17 +24,7 @@ async function imageminGenerate(original, minimizerOptions) {
     return [];
   }
 
-  let imagemin;
-
-  try {
-    imagemin = require("imagemin");
-  } catch (error) {
-    original.errors.push(error);
-
-    return [original];
-  }
-
-  const extInput = path.extname(original.filename).slice(1).toLowerCase();
+  const imagemin = require("imagemin");
 
   /** @type {MinifyFnResult[]} */
   const results = [];
@@ -66,6 +56,7 @@ async function imageminGenerate(original, minimizerOptions) {
     }
 
     const { ext: extOutput } = fileTypeFromBuffer(result.data) || {};
+    const extInput = path.extname(original.filename).slice(1).toLowerCase();
 
     if (extOutput && extInput !== extOutput) {
       result.filename = result.filename.replace(
