@@ -4,29 +4,30 @@ import minify from "./minify";
 import schema from "./loader-options.json";
 import imageminMinify from "./utils/imageminMinify";
 
-/**
- * @typedef {Object} LoaderOptions
- * @property {string} [severityError] Allows to choose how errors are displayed.
- * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
- * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
- * @property {MinifyFunctions} [minify]
- */
-
 /** @typedef {import("./index").Rules} Rules */
 /** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
 /** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
 /** @typedef {import("./index").InternalMinifyOptions} InternalMinifyOptions */
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
-/** @typedef {import("webpack").LoaderContext<LoaderOptions>} LoaderContext */
 /** @typedef {import("webpack").Compilation} Compilation */
 
 /**
- * @this {LoaderContext}
- * @param {Buffer} content
+ * @typedef {Object} LoaderOptions
+ * @property {string} [severityError] Allows to choose how errors are displayed.
+ * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`, `squoosh` or custom function.
+ * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
+ * @property {MinifyFunctions} [minify]
  */
-module.exports = async function loader(content) {
+
+/** @typedef {import("webpack").LoaderContext<LoaderOptions>} LoaderContext */
+/** @typedef {import("webpack").RawLoaderDefinition<LoaderOptions>} RawLoaderDefinition */
+
+/**
+ * @type {RawLoaderDefinition}
+ */
+// eslint-disable-next-line func-style
+const loader = async function loader(content) {
   const options = this.getOptions(/** @type {Schema} */ (schema));
-  const callback = this.async();
   const name = path.relative(this.rootContext, this.resourcePath);
   const input = content;
 
@@ -50,9 +51,7 @@ module.exports = async function loader(content) {
       this.emitError(warning);
     });
 
-    callback(null, content);
-
-    return;
+    return content;
   }
 
   if (output.warnings && output.warnings.length > 0) {
@@ -75,12 +74,12 @@ module.exports = async function loader(content) {
       minimized: true,
     });
 
-    callback(null, content);
-
-    return;
+    return content;
   }
 
-  callback(null, source);
+  return source;
 };
 
-module.exports.raw = true;
+loader.raw = true;
+
+module.exports = loader;

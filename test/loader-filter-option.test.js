@@ -5,11 +5,13 @@ describe("loader filter option", () => {
     const stats = await webpack({
       imageminLoaderOptions: {
         minimizerOptions: {
-          filter: (source, filename) => {
-            expect(source).toBeInstanceOf(Buffer);
-            expect(typeof filename).toBe("string");
+          filter: (item) => {
+            expect(item.filename).toBeDefined();
+            expect(item.data).toBeDefined();
+            expect(item.warnings).toBeDefined();
+            expect(item.errors).toBeDefined();
 
-            if (source.byteLength === 631) {
+            if (item.data.byteLength === 631) {
               return false;
             }
 
