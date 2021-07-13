@@ -6,14 +6,14 @@ import { imageminNormalizeConfig } from "./imageminMinify";
 /** @typedef {import("../index").ImageminMinimizerOptions} ImageminMinimizerOptions */
 /** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
 
+/** @typedef {import("imagemin").Options} ImageminOptions */
+
 /**
  * @param {MinifyFnResult} original
  * @param {ImageminMinimizerOptions} minimizerOptions
  * @returns {Promise<MinifyFnResult[]>}
  */
 async function imageminGenerate(original, minimizerOptions) {
-  /** @typedef {import("imagemin").Options} ImageminOptions */
-
   /** @type {ImageminOptions} */
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     imageminNormalizeConfig(minimizerOptions, original)

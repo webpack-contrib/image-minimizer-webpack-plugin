@@ -77,6 +77,7 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @typedef {Object} InternalMinifyOptions
  * @property {string} filename
  * @property {Buffer} input
+ * @property {AssetInfo} info
  * @property {MinifyFunctions} minify
  * @property {MinimizerOptions} [minimizerOptions]
  * @property {string} [severityError]
@@ -195,7 +196,8 @@ class ImageMinimizerPlugin {
           const { info } = /** @type {Asset} */ (compilation.getAsset(name));
 
           // Skip double minimize assets from child compilation
-          if (info.minimized) {
+          // TODO possible bug
+          if (info.minimized || info.generated) {
             return false;
           }
 
@@ -246,7 +248,7 @@ class ImageMinimizerPlugin {
     for (const asset of assetsForMinify) {
       scheduledTasks.push(
         limit(async () => {
-          const { name, inputSource, cacheItem } = asset;
+          const { name, inputSource, cacheItem, info } = asset;
           let { output } = asset;
           let input;
 
@@ -264,6 +266,7 @@ class ImageMinimizerPlugin {
             const minifyOptions = /** @type {InternalMinifyOptions} */ ({
               filename: name,
               input,
+              info,
               minify,
               minimizerOptions,
               severityError,

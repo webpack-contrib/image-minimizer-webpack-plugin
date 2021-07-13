@@ -22,6 +22,7 @@ async function minify(options) {
   const input = {
     filename: options.filename,
     data: options.input,
+    info: options.info,
     warnings: [],
     errors: [],
   };
