@@ -165,6 +165,60 @@ describe("loader", () => {
     expect(errors).toHaveLength(0);
   });
 
+  it("should work with preset option in loader", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "preset.js"),
+      test: /\.(jpe?g|png|gif|svg|css|txt)$/i,
+      imageminLoaderOptions: {
+        minify: ImageMinimizerPlugin.imageminMinify,
+        minimizerOptions: {
+          plugins: ["mozjpeg"],
+        },
+        preset: {
+          webp: {
+            minify: ImageMinimizerPlugin.imageminGenerate,
+            minimizerOptions: {
+              plugins: ["imagemin-webp"],
+            },
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors, assets } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+    expect(Object.keys(assets)).toHaveLength(4);
+  });
+
+  it("should work with preset option in plugin", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "preset.js"),
+      test: /\.(jpe?g|png|gif|svg|css|txt)$/i,
+      imageminPluginOptions: {
+        minify: ImageMinimizerPlugin.imageminMinify,
+        minimizerOptions: {
+          plugins: ["mozjpeg"],
+        },
+        preset: {
+          webp: {
+            minify: ImageMinimizerPlugin.imageminGenerate,
+            minimizerOptions: {
+              plugins: ["imagemin-webp"],
+            },
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors, assets } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+    expect(Object.keys(assets)).toHaveLength(4);
+  });
+
   // TODO add test for generate in CSS with multiple
   // TODO add test for generate in JS with multiple
 });

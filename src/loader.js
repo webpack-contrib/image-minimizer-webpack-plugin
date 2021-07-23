@@ -18,6 +18,7 @@ import imageminMinify from "./utils/imageminMinify";
  * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`, `squoosh` or custom function.
  * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {MinifyFunctions} [minify]
+ * @property {Object} [preset]
  */
 
 /** @typedef {import("webpack").RawLoaderDefinition<LoaderOptions>} ImageMinimizerRawLoaderDefinition */
@@ -42,8 +43,26 @@ const loader = async function (content) {
     severityError: options.severityError,
     generateFilename: compilation.getAssetPath.bind(compilation),
   });
-  const preset = parsedQuery.get("preset");
-  const output = await minify(minifyOptions);
+  const preset = /** @type {string} */ (parsedQuery.get("preset"));
+  let presetOptions;
+  let output;
+
+  // @ts-ignore
+  if (preset && options.preset && options.preset[preset]) {
+    presetOptions = {
+      filename: name,
+      input: content,
+      info: {},
+      severityError: options.severityError,
+      generateFilename: compilation.getAssetPath.bind(compilation),
+      // @ts-ignore
+      ...options.preset[preset],
+    };
+
+    output = await minify(presetOptions);
+  } else {
+    output = await minify(minifyOptions);
+  }
 
   /**
    * @type {MinifyFnResult | undefined}

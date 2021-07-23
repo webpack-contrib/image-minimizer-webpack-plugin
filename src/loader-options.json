@@ -64,6 +64,10 @@
           }
         }
       ]
+    },
+    "preset": {
+      "additionalProperties": true,
+      "type": "object"
     }
   }
 }

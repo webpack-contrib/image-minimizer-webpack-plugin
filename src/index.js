@@ -132,6 +132,7 @@ import squooshGenerate from "./utils/squooshGenerate";
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
  * @property {MinifyFunctions} [minify]
+ * @property {Object} [preset]
  */
 
 /**
@@ -158,6 +159,7 @@ class ImageMinimizerPlugin {
       },
       loader = true,
       maxConcurrency,
+      preset,
     } = options;
 
     this.options = {
@@ -169,6 +171,7 @@ class ImageMinimizerPlugin {
       loader,
       maxConcurrency,
       test,
+      preset,
     };
   }
 
@@ -353,6 +356,7 @@ class ImageMinimizerPlugin {
           exclude,
           severityError,
           minimizerOptions,
+          preset,
         } = this.options;
 
         const loader = /** @type {InternalLoaderOptions} */ ({
@@ -365,6 +369,7 @@ class ImageMinimizerPlugin {
             minify,
             severityError,
             minimizerOptions,
+            preset,
           },
         });
 
