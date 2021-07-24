@@ -15,5 +15,5 @@ export type MinifyFnResult = import("../index").MinifyFnResult;
  */
 declare function squooshMinify(
   data: DataForMinifyFn,
-  minifyOptions: SquooshMinimizerOptions
+  minifyOptions?: SquooshMinimizerOptions
 ): Promise<MinifyFnResult>;
