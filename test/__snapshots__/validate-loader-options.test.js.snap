@@ -124,7 +124,7 @@ exports[`validate loader options should throw an error on the "minify" option wi
 
 exports[`validate loader options should throw an error on the "minimizerOptions" option with "[]" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
- - options.minimizerOptions should be an non-empty array."
+ - options.minimizerOptions should be a non-empty array."
 `;
 
 exports[`validate loader options should throw an error on the "minimizerOptions" option with "1" value 1`] = `
