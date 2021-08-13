@@ -278,7 +278,7 @@ module.exports = {
 |               **[`loader`](#loader)**               |                `{Boolean}`                |                           `true`                            | Automatically adding `imagemin-loader`                                                            |
 |       **[`maxConcurrency`](#maxconcurrency)**       |                `{Number}`                 |             `Math.max(1, os.cpus().length - 1)`             | Maximum number of concurrency optimization processes in one time                                  |
 |             **[`filename`](#filename)**             |           `{string\|Function}`            |                    `'[path][name][ext]'`                    | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
-| **`[deleteOriginalAssets](#deleteoriginalassets)`** |                `{Boolean}`                |                           `false`                           | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
+| **[`deleteOriginalAssets`](#deleteoriginalassets)** |                `{Boolean}`                |                           `false`                           | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
 
 <!--lint enable no-html-->
 
@@ -773,10 +773,10 @@ module.exports = {
 ### Loader Options
 
 |                         Name                          |              Type               |                Default                | Description                                                                                       |
-| :---------------------------------------------------: | :-----------------------------: | :-----------------------------------: | :------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| :---------------------------------------------------: | :-----------------------------: | :-----------------------------------: | :------------------------------------------------------------------------------------------------ |
 |               **[`filter`](#filter-1)**               |          `{Function}`           |              `undefined`              | Allows filtering of images for optimization                                                       |
-|        **[`severityError`](#severityerror-1)**        |                `                |              `{String}`               | `'error'`                                                                                         | Allows to choose how errors are displayed |
-|                   **[`minify-1`]**                    | `{Function \| Array<Function>}` | `ImageMinimizerPlugin.imageminMinify` | Allows to override default minify function                                                        |
+|        **[`severityError`](severityerror-1)**         |           `{String}`            |               `'error'`               | Allows to choose how errors are displayed                                                         |
+|               **[`minify`](#minify-1)**               | `{Function \| Array<Function>}` | `ImageMinimizerPlugin.imageminMinify` | Allows to override default minify function                                                        |
 |     **[`minimizerOptions`](#minimizeroptions-1)**     |    `{Object\|Array<Object>}`    |           `{ plugins: [] }`           | Options for `imagemin`                                                                            |
 |             **[`filename`](#filename-1)**             |      `{string\|Function}`       |         `'[path][name][ext]'`         | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
 | **[`deleteOriginalAssets`](#deleteoriginalassets-1)** |           `{Boolean}`           |                `false`                | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
