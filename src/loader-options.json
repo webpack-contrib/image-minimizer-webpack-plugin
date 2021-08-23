@@ -11,6 +11,7 @@
   "properties": {
     "minimizerOptions": {
       "description": "Options for `imageMinimizerOptions`.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#minimizeroptions-1",
       "anyOf": [
         {
           "$ref": "#/definitions/MinimizerOptions"
@@ -26,10 +27,12 @@
     },
     "filter": {
       "description": "Allows filtering of images for optimization.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filter-1",
       "instanceof": "Function"
     },
     "severityError": {
       "description": "Allows to choose how errors are displayed.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror-1",
       "type": "string"
     },
     "filename": {
@@ -40,13 +43,18 @@
         {
           "instanceof": "Function"
         }
-      ]
+      ],
+      "description": "Allows to set the filename for the generated asset.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filename-1"
     },
     "deleteOriginalAssets": {
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Allows to keep the original asset.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#deleteoriginalassets-1"
     },
     "minify": {
       "description": "Allows you to override default minify function.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#minify-1",
       "anyOf": [
         {
           "instanceof": "Function"
