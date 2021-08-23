@@ -41,6 +41,7 @@
   "properties": {
     "test": {
       "description": "Include all modules that pass test assertion.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#test",
       "oneOf": [
         {
           "$ref": "#/definitions/Rules"
@@ -49,6 +50,7 @@
     },
     "include": {
       "description": "Include all modules matching any of these conditions.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#include",
       "oneOf": [
         {
           "$ref": "#/definitions/Rules"
@@ -57,6 +59,7 @@
     },
     "exclude": {
       "description": "Exclude all modules matching any of these conditions.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#exclude",
       "oneOf": [
         {
           "$ref": "#/definitions/Rules"
@@ -65,6 +68,7 @@
     },
     "minimizerOptions": {
       "description": "Options for `imageMinimizerOptions`.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#minimizeroptions",
       "anyOf": [
         {
           "$ref": "#/definitions/MinimizerOptions"
@@ -80,18 +84,22 @@
     },
     "filter": {
       "description": "Allows filtering of images for optimization.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filter",
       "instanceof": "Function"
     },
     "severityError": {
       "description": "Allows to choose how errors are displayed.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror",
       "type": "string"
     },
     "loader": {
       "description": "Automatically adding `imagemin-loader` (require for minification images using in `url-loader`, `svg-url-loader` or other).",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#loader",
       "type": "boolean"
     },
     "maxConcurrency": {
       "description": "Maximum number of concurrency optimization processes in one time.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#maxconcurrency",
       "type": "number"
     },
     "filename": {
@@ -102,13 +110,18 @@
         {
           "instanceof": "Function"
         }
-      ]
+      ],
+      "description": "Allows to set the filename for the generated asset.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filename"
     },
     "deleteOriginalAssets": {
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Allows to remove original assets.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#deleteoriginalassets"
     },
     "minify": {
       "description": "Allows you to override default minify function.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#minify",
       "anyOf": [
         {
           "instanceof": "Function"
