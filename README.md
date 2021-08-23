@@ -1179,7 +1179,7 @@ Default: `false`
 
 Allows to keep the original asset. Useful for converting to a `webp` and remove original assets.
 
-> i Doesn't make sense if you haven't changed the original value of the `filename` option
+> ℹ️ Doesn't make sense if you haven't changed the original value of the `filename` option
 
 **webpack.config.js**
 
