@@ -5,6 +5,7 @@ exports[`validate plugin options should work 1`] = `
  - options.test should be one of these:
    [RegExp | non-empty string, ...] | RegExp | non-empty string
    -> Filtering rules.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#test
    Details:
     * options.test should be an array:
       [RegExp | non-empty string, ...]
@@ -21,6 +22,7 @@ exports[`validate plugin options should work 2`] = `
  - options.test should be one of these:
    [RegExp | non-empty string, ...] | RegExp | non-empty string
    -> Filtering rules.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#test
    Details:
     * options.test[0] should be one of these:
       RegExp | non-empty string
@@ -35,6 +37,7 @@ exports[`validate plugin options should work 3`] = `
  - options.include should be one of these:
    [RegExp | non-empty string, ...] | RegExp | non-empty string
    -> Filtering rules.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#include
    Details:
     * options.include should be an array:
       [RegExp | non-empty string, ...]
@@ -51,6 +54,7 @@ exports[`validate plugin options should work 4`] = `
  - options.include should be one of these:
    [RegExp | non-empty string, ...] | RegExp | non-empty string
    -> Filtering rules.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#include
    Details:
     * options.include[0] should be one of these:
       RegExp | non-empty string
@@ -65,6 +69,7 @@ exports[`validate plugin options should work 5`] = `
  - options.exclude should be one of these:
    [RegExp | non-empty string, ...] | RegExp | non-empty string
    -> Filtering rules.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#exclude
    Details:
     * options.exclude should be an array:
       [RegExp | non-empty string, ...]
@@ -81,6 +86,7 @@ exports[`validate plugin options should work 6`] = `
  - options.exclude should be one of these:
    [RegExp | non-empty string, ...] | RegExp | non-empty string
    -> Filtering rules.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#exclude
    Details:
     * options.exclude[0] should be one of these:
       RegExp | non-empty string
@@ -93,19 +99,23 @@ exports[`validate plugin options should work 6`] = `
 exports[`validate plugin options should work 7`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.filter should be an instance of function.
-   -> Allows filtering of images for optimization."
+   -> Allows filtering of images for optimization.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filter"
 `;
 
 exports[`validate plugin options should work 8`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.filter should be an instance of function.
-   -> Allows filtering of images for optimization."
+   -> Allows filtering of images for optimization.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filter"
 `;
 
 exports[`validate plugin options should work 9`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.filename should be one of these:
    string | function
+   -> Allows to set the filename for the generated asset.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filename
    Details:
     * options.filename should be a string.
     * options.filename should be an instance of function."
@@ -115,6 +125,8 @@ exports[`validate plugin options should work 10`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.filename should be one of these:
    string | function
+   -> Allows to set the filename for the generated asset.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filename
    Details:
     * options.filename should be a string.
     * options.filename should be an instance of function."
@@ -123,24 +135,29 @@ exports[`validate plugin options should work 10`] = `
 exports[`validate plugin options should work 11`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.severityError should be a string.
-   -> Allows to choose how errors are displayed."
+   -> Allows to choose how errors are displayed.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror"
 `;
 
 exports[`validate plugin options should work 12`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.severityError should be a string.
-   -> Allows to choose how errors are displayed."
+   -> Allows to choose how errors are displayed.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror"
 `;
 
 exports[`validate plugin options should work 13`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.severityError should be a string.
-   -> Allows to choose how errors are displayed."
+   -> Allows to choose how errors are displayed.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror"
 `;
 
 exports[`validate plugin options should work 14`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.deleteOriginalAssets should be a boolean."
+ - options.deleteOriginalAssets should be a boolean.
+   -> Allows to remove original assets.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#deleteoriginalassets"
 `;
 
 exports[`validate plugin options should work 15`] = `
@@ -148,6 +165,7 @@ exports[`validate plugin options should work 15`] = `
  - options.minimizerOptions should be one of these:
    object { … } | [object { … }, ...] (should not have fewer than 1 item)
    -> Options for \`imageMinimizerOptions\`.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#minimizeroptions
    Details:
     * options.minimizerOptions should be an object:
       object { … }
@@ -158,19 +176,22 @@ exports[`validate plugin options should work 15`] = `
 exports[`validate plugin options should work 16`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.maxConcurrency should be a number.
-   -> Maximum number of concurrency optimization processes in one time."
+   -> Maximum number of concurrency optimization processes in one time.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#maxconcurrency"
 `;
 
 exports[`validate plugin options should work 17`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.maxConcurrency should be a number.
-   -> Maximum number of concurrency optimization processes in one time."
+   -> Maximum number of concurrency optimization processes in one time.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#maxconcurrency"
 `;
 
 exports[`validate plugin options should work 18`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.loader should be a boolean.
-   -> Automatically adding \`imagemin-loader\` (require for minification images using in \`url-loader\`, \`svg-url-loader\` or other)."
+   -> Automatically adding \`imagemin-loader\` (require for minification images using in \`url-loader\`, \`svg-url-loader\` or other).
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#loader"
 `;
 
 exports[`validate plugin options should work 19`] = `
@@ -178,6 +199,7 @@ exports[`validate plugin options should work 19`] = `
  - options.minify should be one of these:
    function | [function, ...] (should not have fewer than 1 item)
    -> Allows you to override default minify function.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#minify
    Details:
     * options.minify should be an instance of function.
     * options.minify should be an array:
