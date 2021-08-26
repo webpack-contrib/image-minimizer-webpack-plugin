@@ -18,4 +18,4 @@ about: Would you like something work differently? Have an alternative approach? 
 
 ### Actual Behavior / Situation
 
-### Please paste the results of `npx webpack info` here, and mention other relevant information
+### Please paste the results of `npx webpack-cli info` here, and mention other relevant information

@@ -16,4 +16,4 @@ about: Suggest an idea for this project
 
 ### Feature Use Case
 
-### Please paste the results of `npx webpack info` here, and mention other relevant information
+### Please paste the results of `npx webpack-cli info` here, and mention other relevant information

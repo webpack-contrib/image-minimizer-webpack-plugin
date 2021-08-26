@@ -32,4 +32,4 @@ about: Something went awry and you'd like to tell us about it.
 <!-- https://gist.github.com is a good place for longer code snippets -->
 <!-- If your issue is caused by a plugin or loader, please create an issue on the loader/plugin repository instead -->
 
-### Please paste the results of `npx webpack info` here, and mention other relevant information
+### Please paste the results of `npx webpack-cli info` here, and mention other relevant information
