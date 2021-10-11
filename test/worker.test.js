@@ -6,7 +6,7 @@ import imageminMozjpeg from "imagemin-mozjpeg";
 import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
 
-import minify from "../src/minify";
+import worker from "../src/worker";
 
 import imageminMinify from "../src/utils/imageminMinify";
 
@@ -20,12 +20,12 @@ function isPromise(obj) {
 
 describe("minify", () => {
   it("minify should be is function", () =>
-    expect(typeof minify === "function").toBe(true));
+    expect(typeof worker === "function").toBe(true));
 
   it("should return `Promise`", () =>
     expect(
       isPromise(
-        minify([{ minify: imageminMinify, input: Buffer.from("Foo") }], {
+        worker({
           minify: imageminMinify,
           minimizerOptions: { plugins: ["mozjpeg"] },
         })
@@ -35,7 +35,7 @@ describe("minify", () => {
   it("should optimize", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -58,7 +58,7 @@ describe("minify", () => {
   it("should optimize (relative filename)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename: path.relative(process.cwd(), filename),
@@ -96,7 +96,7 @@ describe("minify", () => {
       "./fixtures/large-after-optimization.svg"
     );
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -114,7 +114,7 @@ describe("minify", () => {
   });
 
   it("should throw error on empty", async () => {
-    const result = await minify([{}]);
+    const result = await worker([{}]);
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(1);
@@ -127,7 +127,7 @@ describe("minify", () => {
   it("should throw error on empty `imagemin` options", async () => {
     const input = Buffer.from("Foo");
     const filename = path.resolve("foo.png");
-    const result = await minify({ minify: imageminMinify, input, filename });
+    const result = await worker({ minify: imageminMinify, input, filename });
 
     expect(result.warnings).toHaveLength(1);
     expect(result.warnings[0].toString()).toMatch(
@@ -141,7 +141,7 @@ describe("minify", () => {
   it("should throw error on empty `imagemin.plugins` options", async () => {
     const input = Buffer.from("Foo");
     const filename = path.resolve("foo.png");
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -160,7 +160,7 @@ describe("minify", () => {
   it("should throw error on invalid `imagemin.plugins` options", async () => {
     const input = Buffer.from("Foo");
     const filename = path.resolve("foo.png");
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -181,7 +181,7 @@ describe("minify", () => {
 
   it("should return original content and emit a error on invalid content (`String`)", async () => {
     const input = "Foo";
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename: "foo.jpg",
@@ -196,7 +196,7 @@ describe("minify", () => {
   it("should optimize (configuration using `function`)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -219,7 +219,7 @@ describe("minify", () => {
   it("should optimize (configuration using `string`)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -242,7 +242,7 @@ describe("minify", () => {
   it("should optimize (configuration using `array`)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -265,7 +265,7 @@ describe("minify", () => {
   it("should optimize (configuration using `array` without options)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -288,7 +288,7 @@ describe("minify", () => {
   it("should optimize (configuration using `string` with full name)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -311,7 +311,7 @@ describe("minify", () => {
   it("should optimize (configuration using `array` with full name)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -334,7 +334,7 @@ describe("minify", () => {
   it("should optimize (configuration using `array` with full name and without options)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -357,7 +357,7 @@ describe("minify", () => {
   it("should throw error on empty `imagemin` options (configuration using `string` and starting with `imagemin`)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -378,7 +378,7 @@ describe("minify", () => {
   it("should optimize and throw error on unknown plugin (configuration using `string`)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -404,7 +404,7 @@ describe("minify", () => {
   it("should optimize and throw warning on using `Function` configuration", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -434,7 +434,7 @@ describe("minify", () => {
 
     const filename = path.resolve(__dirname, "./fixtures/svg-with-id.svg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: imageminMinify,
       input,
       filename,
@@ -456,7 +456,7 @@ describe("minify", () => {
   it.skip("should throw two errors", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
-    const result = await minify({
+    const result = await worker({
       minify: [
         () => ({ errors: [new Error("fail")] }),
         () => ({ errors: [new Error("fail")] }),
