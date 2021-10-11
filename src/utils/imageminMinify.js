@@ -175,7 +175,9 @@ async function imageminMinify(original, minimizerOptions) {
   try {
     result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
   } catch (error) {
-    original.errors.push(error);
+    original.errors.push(
+      error instanceof Error ? error : new Error(/** @type {string} */ (error))
+    );
 
     return original;
   }

@@ -497,6 +497,7 @@ describe("minify", () => {
     },
   };
 
+  // eslint-disable-next-line jest/require-hook
   [
     {
       targetsResults: [
@@ -991,6 +992,7 @@ describe("minify", () => {
     });
   });
 
+  // eslint-disable-next-line jest/require-hook
   [
     {
       targetsResults: ["plugin-test.jpg"],

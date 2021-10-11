@@ -56,23 +56,19 @@ export type InternalMinifyOptions = {
   severityError?: string | undefined;
   generateFilename: Compilation["getAssetPath"];
 };
-export type InternalMinifyFnResult = {
-  filename: string;
-  data: RawSource;
-  warnings: Array<Error>;
-  errors: Array<Error>;
-  info?: import("webpack").AssetInfo | undefined;
-  squooshMinify?: boolean | undefined;
-  squooshGenerate?: boolean | undefined;
-  imageminMinify?: boolean | undefined;
-  imageminGenerate?: boolean | undefined;
-};
 export type MinifyFnResult = {
   filename: string;
   data: Buffer;
   warnings: Array<Error>;
   errors: Array<Error>;
-  info?: import("webpack").AssetInfo | undefined;
+  info: AssetInfo;
+};
+export type MinifyFnSourceResult = {
+  filename: string;
+  data: RawSource;
+  warnings: Array<Error>;
+  errors: Array<Error>;
+  info: AssetInfo;
 };
 export type CustomMinifyFunction = (
   original: MinifyFnResult,
@@ -187,24 +183,20 @@ export type PluginOptions = {
  * @property {Compilation["getAssetPath"]} generateFilename
  */
 /**
- * @typedef {Object} InternalMinifyFnResult
- * @property {string} filename
- * @property {RawSource} data
- * @property {Array<Error>} warnings
- * @property {Array<Error>} errors
- * @property {AssetInfo} [info]
- * @property {boolean} [squooshMinify]
- * @property {boolean} [squooshGenerate]
- * @property {boolean} [imageminMinify]
- * @property {boolean} [imageminGenerate]
- */
-/**
  * @typedef {Object} MinifyFnResult
  * @property {string} filename
  * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
- * @property {AssetInfo} [info]
+ * @property {AssetInfo} info
+ */
+/**
+ * @typedef {Object} MinifyFnSourceResult
+ * @property {string} filename
+ * @property {RawSource} data
+ * @property {Array<Error>} warnings
+ * @property {Array<Error>} errors
+ * @property {AssetInfo} info
  */
 /**
  * @callback CustomMinifyFunction

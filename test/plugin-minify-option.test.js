@@ -290,8 +290,8 @@ describe("plugin minify option", () => {
     expect(jpgAsset.info.foo).toBe("bar");
     expect(jpgAsset.info.minimized).toBe(true);
     expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
-    expect(jpgAsset.info.related.foo).toEqual("bar");
-    expect(jpgAsset.info.related.imagemin).toEqual("plugin-test.webp");
+    expect(jpgAsset.info.related.foo).toBe("bar");
+    expect(jpgAsset.info.related.imagemin).toBe("plugin-test.webp");
 
     expect(webpAsset.info.size).toBeLessThan(45);
     expect(webpAsset.info.generated).toBe(true);
@@ -338,8 +338,8 @@ describe("plugin minify option", () => {
     expect(jpgAsset.info.foo).toBe("bar");
     expect(jpgAsset.info.minimized).toBe(true);
     expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
-    expect(jpgAsset.info.related.foo).toEqual("bar");
-    expect(jpgAsset.info.related.imagemin).toEqual("plugin-test.webp");
+    expect(jpgAsset.info.related.foo).toBe("bar");
+    expect(jpgAsset.info.related.imagemin).toBe("plugin-test.webp");
 
     expect(webpAsset.info.size).toBeLessThan(45);
     expect(webpAsset.info.generated).toBe(true);
@@ -387,8 +387,8 @@ describe("plugin minify option", () => {
     expect(jpgAsset.info.foo).toBe("bar");
     expect(jpgAsset.info.minimized).toBe(true);
     expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
-    expect(jpgAsset.info.related.foo).toEqual("bar");
-    expect(jpgAsset.info.related.imagemin).toEqual("plugin-test.webp");
+    expect(jpgAsset.info.related.foo).toBe("bar");
+    expect(jpgAsset.info.related.imagemin).toBe("plugin-test.webp");
 
     expect(webpAsset.info.size).toBeLessThan(45);
     expect(webpAsset.info.generated).toBe(true);
@@ -439,8 +439,8 @@ describe("plugin minify option", () => {
     expect(jpgAsset.info.foo).toBe("bar");
     expect(jpgAsset.info.minimized).toBe(true);
     expect(jpgAsset.info.minimizedBy).toEqual(["squoosh"]);
-    expect(jpgAsset.info.related.foo).toEqual("bar");
-    expect(jpgAsset.info.related.squoosh).toEqual("plugin-test.webp");
+    expect(jpgAsset.info.related.foo).toBe("bar");
+    expect(jpgAsset.info.related.squoosh).toBe("plugin-test.webp");
 
     expect(webpAsset.info.size).toBeLessThan(45);
     expect(webpAsset.info.generated).toBe(true);
@@ -496,8 +496,8 @@ describe("plugin minify option", () => {
     expect(jpgAsset.info.foo).toBe("bar");
     expect(jpgAsset.info.minimized).toBe(true);
     expect(jpgAsset.info.minimizedBy).toEqual(["squoosh"]);
-    expect(jpgAsset.info.related.foo).toEqual("bar");
-    expect(jpgAsset.info.related.squoosh).toEqual("plugin-test.webp");
+    expect(jpgAsset.info.related.foo).toBe("bar");
+    expect(jpgAsset.info.related.squoosh).toBe("plugin-test.webp");
 
     expect(webpAsset.info.size).toBeLessThan(45);
     expect(webpAsset.info.generated).toBe(true);
@@ -554,8 +554,8 @@ describe("plugin minify option", () => {
     expect(jpgAsset.info.foo).toBe("bar");
     expect(jpgAsset.info.minimized).toBe(true);
     expect(jpgAsset.info.minimizedBy).toEqual(["squoosh"]);
-    expect(jpgAsset.info.related.foo).toEqual("bar");
-    expect(jpgAsset.info.related.squoosh).toEqual("plugin-test.webp");
+    expect(jpgAsset.info.related.foo).toBe("bar");
+    expect(jpgAsset.info.related.squoosh).toBe("plugin-test.webp");
 
     expect(webpAsset.info.size).toBeLessThan(45);
     expect(webpAsset.info.generated).toBe(true);

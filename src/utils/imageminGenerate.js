@@ -49,7 +49,11 @@ async function imageminGenerate(original, minimizerOptions) {
         minimizerOptionsNormalized
       );
     } catch (error) {
-      result.errors.push(error);
+      result.errors.push(
+        error instanceof Error
+          ? error
+          : new Error(/** @type {string} */ (error))
+      );
       results.push(result);
 
       continue;

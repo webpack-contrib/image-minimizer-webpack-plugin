@@ -58,7 +58,9 @@ async function squooshMinify(original, minifyOptions) {
   } catch (error) {
     await imagePool.close();
 
-    original.errors.push(error);
+    original.errors.push(
+      error instanceof Error ? error : new Error(/** @type {string} */ (error))
+    );
 
     return original;
   }

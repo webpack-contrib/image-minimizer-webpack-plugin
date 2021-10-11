@@ -1,5 +1,3 @@
-/* eslint-disable consistent-return */
-
 /**
  * @callback Uint8ArrayUtf8ByteString
  * @param {number[] | Uint8Array} array

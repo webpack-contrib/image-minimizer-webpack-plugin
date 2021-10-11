@@ -103,7 +103,10 @@ async function minify(options) {
       } catch (error) {
         processedResult = original;
 
-        const errored = error instanceof Error ? error : new Error(error);
+        const errored =
+          error instanceof Error
+            ? error
+            : new Error(/** @type {string} */ (error));
 
         processedResult.errors.push(errored);
       }
