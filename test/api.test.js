@@ -5,7 +5,7 @@ describe("api", () => {
     it("should exported", () => {
       expect(ImageMinimizerPlugin).toBeInstanceOf(Object);
       expect(typeof ImageMinimizerPlugin.loader).toBe("string");
-      expect(typeof ImageMinimizerPlugin.normalizeImageminConfig).toBe(
+      expect(typeof ImageMinimizerPlugin.imageminNormalizeConfig).toBe(
         "function"
       );
     });
@@ -14,41 +14,41 @@ describe("api", () => {
   describe("normalizeImageminConfig", () => {
     it("should works", () => {
       expect(() =>
-        ImageMinimizerPlugin.normalizeImageminConfig({})
+        ImageMinimizerPlugin.imageminNormalizeConfig({})
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
-        ImageMinimizerPlugin.normalizeImageminConfig({ plugins: [] })
+        ImageMinimizerPlugin.imageminNormalizeConfig({ plugins: [] })
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
-        ImageMinimizerPlugin.normalizeImageminConfig({ plugins: ["unknown"] })
+        ImageMinimizerPlugin.imageminNormalizeConfig({ plugins: ["unknown"] })
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
-        ImageMinimizerPlugin.normalizeImageminConfig({
+        ImageMinimizerPlugin.imageminNormalizeConfig({
           plugins: ["imagemin-unknown"],
         })
       ).toThrowErrorMatchingSnapshot();
 
       expect(
-        ImageMinimizerPlugin.normalizeImageminConfig({ plugins: ["mozjpeg"] })
+        ImageMinimizerPlugin.imageminNormalizeConfig({ plugins: ["mozjpeg"] })
       ).toMatchSnapshot();
       expect(
-        ImageMinimizerPlugin.normalizeImageminConfig({
+        ImageMinimizerPlugin.imageminNormalizeConfig({
           plugins: ["imagemin-mozjpeg"],
         })
       ).toMatchSnapshot();
       expect(
-        ImageMinimizerPlugin.normalizeImageminConfig({ plugins: [["mozjpeg"]] })
+        ImageMinimizerPlugin.imageminNormalizeConfig({ plugins: [["mozjpeg"]] })
       ).toMatchSnapshot();
       expect(
-        ImageMinimizerPlugin.normalizeImageminConfig({
+        ImageMinimizerPlugin.imageminNormalizeConfig({
           plugins: [["mozjpeg", { quality: 0 }]],
         })
       ).toMatchSnapshot();
       expect(
-        ImageMinimizerPlugin.normalizeImageminConfig({}, {})
+        ImageMinimizerPlugin.imageminNormalizeConfig({}, {})
       ).toMatchSnapshot();
       expect(
-        ImageMinimizerPlugin.normalizeImageminConfig({ plugins: [true] }, {})
+        ImageMinimizerPlugin.imageminNormalizeConfig({ plugins: [true] }, {})
       ).toMatchSnapshot();
     });
   });

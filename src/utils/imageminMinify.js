@@ -1,8 +1,11 @@
+// import path from "path";
 import { klona } from "klona/full";
+// import fileTypeFromBuffer from "./fileTypeFromBuffer";
 
 /** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
 /** @typedef {import("../index").ImageminMinimizerOptions} ImageminMinimizerOptions */
 /** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
+/** @typedef {import("imagemin").Options} ImageminOptions */
 
 /**
  * @typedef {Object} MetaData
@@ -55,7 +58,7 @@ class InvalidConfigError extends Error {
  * @param {ImageminMinimizerOptions} minimizerOptions
  * @param {MetaData} [metaData]
  */
-export function normalizeImageminConfig(minimizerOptions, metaData) {
+function imageminNormalizeConfig(minimizerOptions, metaData) {
   if (
     !minimizerOptions ||
     !minimizerOptions.plugins ||
@@ -155,35 +158,59 @@ export function normalizeImageminConfig(minimizerOptions, metaData) {
 }
 
 /**
- * @param {DataForMinifyFn} data
- * @param {ImageminMinimizerOptions} minimizerOptions
+ * @param {MinifyFnResult} original
+ * @param {ImageminMinimizerOptions} options
  * @returns {Promise<MinifyFnResult>}
  */
-export default async function imageminMinify(data, minimizerOptions) {
-  const [[, input]] = Object.entries(data);
-  /** @type {MinifyFnResult} */
-  const result = {
-    data: input,
-    warnings: [],
-    errors: [],
-  };
+async function imageminMinify(original, options) {
+  // Implement autosearch config on root directory of project in future
+  const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
+    imageminNormalizeConfig(options, original)
+  );
+
+  const imagemin = require("imagemin");
+
+  let result;
 
   try {
-    // @ts-ignore
-    // eslint-disable-next-line import/dynamic-import-chunkname,node/no-unsupported-features/es-syntax
-    const imagemin = await import("imagemin");
-
-    /** @typedef {import("imagemin").Options} ImageminOptions */
-
-    // Implement autosearch config on root directory of project in future
-    const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-      normalizeImageminConfig(minimizerOptions, result)
+    result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
+  } catch (error) {
+    original.errors.push(
+      error instanceof Error ? error : new Error(/** @type {string} */ (error))
     );
 
-    result.data = await imagemin.buffer(input, minimizerOptionsNormalized);
-  } catch (error) {
-    result.errors.push(error);
+    return original;
   }
 
-  return result;
+  // TODO fix me
+  // const extInput = path.extname(original.filename).slice(1).toLowerCase();
+  // const { ext: extOutput } = fileTypeFromBuffer(result) || {};
+
+  // if (extOutput && extInput !== extOutput) {
+  //   original.warnings.push(
+  //     new Error(
+  //       `"imageminMinify" function do not support generate to "${extOutput}" from "${original.filename}". Use "imageminGenerate"`
+  //     )
+  //   );
+  //
+  //   return original;
+  // }
+
+  return {
+    filename: original.filename,
+    data: result,
+    warnings: [...original.warnings],
+    errors: [...original.errors],
+    info: {
+      ...original.info,
+      minimized: true,
+      minimizedBy:
+        original.info && original.info.minimizedBy
+          ? ["imagemin", ...original.info.minimizedBy]
+          : ["imagemin"],
+    },
+  };
 }
+
+export default imageminMinify;
+export { imageminNormalizeConfig };

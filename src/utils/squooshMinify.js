@@ -6,79 +6,83 @@ import path from "path";
 /** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
 
 /**
- * @param {DataForMinifyFn} data
- * @param {SquooshMinimizerOptions} minifyOptions
+ * @param {MinifyFnResult} original
+ * @param {SquooshMinimizerOptions} options
  * @returns {Promise<MinifyFnResult>}
  */
 
-async function squooshMinify(data, minifyOptions = {}) {
-  const [[filename, input]] = Object.entries(data);
-  /** @type {MinifyFnResult} */
-  const result = {
-    data: input,
-    warnings: [],
-    errors: [],
-  };
+async function squooshMinify(original, options) {
+  // eslint-disable-next-line node/no-unpublished-require
+  const squoosh = require("@squoosh/lib");
+  const { ImagePool, encoders } = squoosh;
 
   /**
    * @type {Record<string, string>}
    */
-  const targets = {
-    ".png": "oxipng",
-    ".jpg": "mozjpeg",
-    ".jpeg": "mozjpeg",
-    ".jxl": "jxl",
-    ".webp": "webp",
-    ".avif": "avif",
-    ...minifyOptions.targets,
-  };
-  const ext = path.extname(filename).toLowerCase();
+  const targets = {};
+
+  for (const [codec, { extension }] of Object.entries(encoders)) {
+    const extensionNormalized = extension.toLowerCase();
+
+    if (extensionNormalized === "jpg") {
+      targets.jpeg = codec;
+    }
+
+    targets[extensionNormalized] = codec;
+  }
+
+  const ext = path.extname(original.filename).slice(1).toLowerCase();
   const targetCodec = targets[ext];
 
   if (!targetCodec) {
-    result.warnings.push(
+    original.warnings.push(
       new Error(
-        `The "${filename}" was not minified by "ImageMinimizerPlugin.squooshMinify". ${ext} extension is not supported".`
+        `"${original.filename}" is not minimized, because has an unsupported format`
       )
     );
 
-    return result;
+    return original;
   }
 
-  const encodeOptions = {
-    [targetCodec]: {},
-    ...minifyOptions.encodeOptions,
-  };
+  const { encodeOptions = {} } = options;
 
-  const squoosh =
-    // eslint-disable-next-line node/no-unpublished-require
-    require("@squoosh/lib");
+  if (!encodeOptions[targetCodec]) {
+    encodeOptions[targetCodec] = {};
+  }
 
-  let imagePool;
-  let image;
+  const imagePool = new ImagePool(1);
+  const image = imagePool.ingestImage(new Uint8Array(original.data));
 
   try {
-    imagePool = new squoosh.ImagePool();
-    image = imagePool.ingestImage(input);
-
-    await image.encode(encodeOptions);
+    await image.encode({ [targetCodec]: encodeOptions[targetCodec] });
   } catch (error) {
-    if (imagePool) {
-      await imagePool.close();
-    }
+    await imagePool.close();
 
-    result.errors.push(error);
+    original.errors.push(
+      error instanceof Error ? error : new Error(/** @type {string} */ (error))
+    );
 
-    return result;
+    return original;
   }
 
   await imagePool.close();
 
-  const encodedImage = await image.encodedWith[targetCodec];
+  const encodedImage = await image.encodedWith[targets[ext]];
 
-  result.data = Buffer.from(encodedImage.binary);
-
-  return result;
+  return {
+    filename: original.filename,
+    data: Buffer.from(encodedImage.binary),
+    warnings: [...original.warnings],
+    errors: [...original.errors],
+    info: {
+      ...original.info,
+      minimized: true,
+      minimizedBy:
+        original.info && original.info.minimizedBy
+          ? ["squoosh", ...original.info.minimizedBy]
+          : ["squoosh"],
+    },
+  };
 }
 
 export default squooshMinify;

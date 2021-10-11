@@ -9,11 +9,11 @@ export type MinifyFnResult = import("../index").MinifyFnResult;
 /** @typedef {import("../index").SquooshMinimizerOptions} SquooshMinimizerOptions */
 /** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
 /**
- * @param {DataForMinifyFn} data
- * @param {SquooshMinimizerOptions} minifyOptions
+ * @param {MinifyFnResult} original
+ * @param {SquooshMinimizerOptions} options
  * @returns {Promise<MinifyFnResult>}
  */
 declare function squooshMinify(
-  data: DataForMinifyFn,
-  minifyOptions?: SquooshMinimizerOptions
+  original: MinifyFnResult,
+  options: SquooshMinimizerOptions
 ): Promise<MinifyFnResult>;
