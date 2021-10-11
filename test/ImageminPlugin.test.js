@@ -734,11 +734,8 @@ describe("imagemin plugin", () => {
     const jpgAsset = compilation.getAsset("plugin-test.jpg");
 
     expect(jpgAsset.info.size).toBeLessThan(462);
-    // TODO fix me
-    // expect(jpgAsset.info.sourceFilename).toBe("plugin-test.jpg");
     expect(jpgAsset.info.minimized).toBe(true);
-    // expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
-
+    expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 

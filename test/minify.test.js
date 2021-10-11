@@ -189,7 +189,7 @@ describe("minify", () => {
     });
 
     expect(result.warnings).toHaveLength(0);
-    expect(result.errors).toHaveLength(1);
+    expect(result.errors).toHaveLength(2);
     expect(result.data).toBe(input);
   });
 

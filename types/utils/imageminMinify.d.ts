@@ -2,21 +2,21 @@ export default imageminMinify;
 export type DataForMinifyFn = import("../index").DataForMinifyFn;
 export type ImageminMinimizerOptions =
   import("../index").ImageminMinimizerOptions;
-export type MinifyFnResult = import("../index").MinifyFnResult;
+export type MinifyResult = import("../index").MinifyResult;
 export type ImageminOptions = import("imagemin").Options;
 export type MetaData = {
   warnings: Array<Error>;
   errors: Array<Error>;
 };
 /**
- * @param {MinifyFnResult} original
+ * @param {MinifyResult} original
  * @param {ImageminMinimizerOptions} options
- * @returns {Promise<MinifyFnResult>}
+ * @returns {Promise<MinifyResult>}
  */
 declare function imageminMinify(
-  original: MinifyFnResult,
+  original: MinifyResult,
   options: ImageminMinimizerOptions
-): Promise<MinifyFnResult>;
+): Promise<MinifyResult>;
 /**
  * @param {ImageminMinimizerOptions} minimizerOptions
  * @param {MetaData} [metaData]

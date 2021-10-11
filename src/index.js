@@ -69,18 +69,10 @@ import squooshMinify from "./utils/squooshMinify";
  */
 
 /**
- * @typedef {Object} InternalMinifyResult
- * @property {Buffer} data
- * @property {string} filename
- * @property {Array<Error>} warnings
- * @property {Array<Error>} errors
- */
-
-/**
  * @callback CustomMinifyFunction
- * @param {MinifyFnResult} original
+ * @param {MinifyResult} original
  * @param {CustomFnMinimizerOptions} options
- * @returns {Promise<MinifyFnResult>}
+ * @returns {Promise<MinifyResult>}
  */
 
 /**
@@ -88,7 +80,7 @@ import squooshMinify from "./utils/squooshMinify";
  */
 
 /**
- * @typedef {Object} MinifyFnResult
+ * @typedef {Object} MinifyResult
  * @property {string} filename
  * @property {Buffer} data
  * @property {Array<Error>} warnings
@@ -279,30 +271,30 @@ class ImageMinimizerPlugin {
 
             output = await minifyFn(minifyOptions);
 
-            if (output.errors.length > 0) {
-              /** @type {[WebpackError]} */
-              (output.errors).forEach((error) => {
-                compilation.errors.push(error);
-              });
-
-              return;
-            }
-
             output.source = new RawSource(output.data);
 
             await cacheItem.storePromise({
               source: output.source,
+              info: output.info,
               warnings: output.warnings,
+              errors: output.errors,
             });
           }
 
-          const { source, warnings } = output;
-
-          if (warnings && warnings.length > 0) {
+          if (output.warnings.length > 0) {
             /** @type {[WebpackError]} */
-            (warnings).forEach((warning) => {
+            (output.warnings).forEach((warning) => {
               compilation.warnings.push(warning);
             });
+          }
+
+          if (output.errors.length > 0) {
+            /** @type {[WebpackError]} */
+            (output.errors).forEach((error) => {
+              compilation.errors.push(error);
+            });
+
+            return;
           }
 
           const { path: newName } = compilation.getPathWithInfo(
@@ -316,21 +308,21 @@ class ImageMinimizerPlugin {
 
           if (isNewAsset) {
             const newInfo = {
+              ...output.info,
               related: { minimized: newName, ...info.related },
-              minimized: true,
             };
 
-            compilation.emitAsset(newName, source, newInfo);
+            compilation.emitAsset(newName, output.source, newInfo);
 
             if (this.options.deleteOriginalAssets) {
               compilation.deleteAsset(name);
             }
           } else {
             const updatedAssetsInfo = {
-              minimized: true,
+              ...output.info,
             };
 
-            compilation.updateAsset(name, source, updatedAssetsInfo);
+            compilation.updateAsset(name, output.source, updatedAssetsInfo);
           }
         })
       );

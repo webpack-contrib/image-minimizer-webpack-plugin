@@ -1,15 +1,14 @@
 /** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
 /** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
-/** @typedef {import("./index").InternalMinifyResult} InternalMinifyResult */
 /** @typedef {import("./index").InternalMinifyOptions} InternalMinifyOptions */
-/** @typedef {import("./index").MinifyFnResult} MinifyFnResult */
+/** @typedef {import("./index").MinifyResult} MinifyResult */
 
 /**
  * @param {InternalMinifyOptions} options
- * @returns {Promise<InternalMinifyResult>}
+ * @returns {Promise<MinifyResult>}
  */
 async function minify(options) {
-  /** @type {MinifyFnResult} */
+  /** @type {MinifyResult} */
   const result = {
     data: options.input,
     filename: options.filename,
@@ -28,24 +27,42 @@ async function minify(options) {
     typeof options.minify === "function" ? [options.minify] : options.minify
   );
 
-  try {
-    for (let i = 0; i <= minifyFns.length - 1; i++) {
-      const minifyFn = minifyFns[i];
-      const minifyOptions = Array.isArray(options.minimizerOptions)
-        ? options.minimizerOptions[i]
-        : options.minimizerOptions;
+  for (let i = 0; i <= minifyFns.length - 1; i++) {
+    const minifyFn = minifyFns[i];
+    const minifyOptions = Array.isArray(options.minimizerOptions)
+      ? options.minimizerOptions[i]
+      : options.minimizerOptions;
 
+    /** @type {MinifyResult} */
+    let minifyResult;
+
+    try {
       // eslint-disable-next-line no-await-in-loop
-      const minifyResult = await minifyFn(result, minifyOptions);
+      minifyResult = await minifyFn(result, minifyOptions);
+    } catch (error) {
+      result.errors.push(
+        error instanceof Error
+          ? error
+          : new Error(/** @type {string} */ (error))
+      );
 
-      result.data = minifyResult.data;
+      return result;
     }
-  } catch (error) {
-    const errored =
-      error instanceof Error ? error : new Error(/** @type {string} */ (error));
 
-    result.errors.push(errored);
-    result.data = options.input;
+    if (!minifyResult || !Buffer.isBuffer(minifyResult.data)) {
+      result.errors.push(
+        new Error(
+          "minimizer function doesn't return the 'data' property or result is not a 'Buffer' value"
+        )
+      );
+
+      return result;
+    }
+
+    result.data = minifyResult.data;
+    result.warnings = minifyResult.warnings || [];
+    result.errors = minifyResult.errors || [];
+    result.info = minifyResult.info || {};
   }
 
   if (result.errors.length > 0) {
