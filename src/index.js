@@ -9,7 +9,7 @@ import serialize from "serialize-javascript";
 import minifyFn from "./minify";
 import schema from "./plugin-options.json";
 import imageminMinify, {
-  normalizeImageminConfig,
+  imageminNormalizeConfig,
 } from "./utils/imageminMinify";
 import squooshMinify from "./utils/squooshMinify";
 
@@ -48,7 +48,6 @@ import squooshMinify from "./utils/squooshMinify";
 
 /**
  * @typedef {Object} SquooshMinimizerOptions
- * @property {Object.<string, string>} [targets]
  * @property {Object.<string, object>} [encodeOptions]
  */
 
@@ -79,9 +78,9 @@ import squooshMinify from "./utils/squooshMinify";
 
 /**
  * @callback CustomMinifyFunction
- * @param {DataForMinifyFn} data
- * @param {CustomFnMinimizerOptions} minifyOptions
- * @returns {InternalMinifyResult}
+ * @param {MinifyFnResult} original
+ * @param {CustomFnMinimizerOptions} options
+ * @returns {Promise<MinifyFnResult>}
  */
 
 /**
@@ -90,9 +89,11 @@ import squooshMinify from "./utils/squooshMinify";
 
 /**
  * @typedef {Object} MinifyFnResult
+ * @property {string} filename
  * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
+ * @property {AssetInfo} info
  */
 
 /**
@@ -147,7 +148,7 @@ class ImageMinimizerPlugin {
     const {
       minify = imageminMinify,
       filter = () => true,
-      test = /\.(jpe?g|png|gif|tif|webp|svg|avif)$/i,
+      test = /\.(jpe?g|png|gif|tif|webp|svg|avif|jxl)$/i,
       include,
       exclude,
       severityError,
@@ -404,8 +405,7 @@ class ImageMinimizerPlugin {
 }
 
 ImageMinimizerPlugin.loader = require.resolve("./loader");
-
-ImageMinimizerPlugin.normalizeImageminConfig = normalizeImageminConfig;
+ImageMinimizerPlugin.imageminNormalizeConfig = imageminNormalizeConfig;
 ImageMinimizerPlugin.imageminMinify = imageminMinify;
 ImageMinimizerPlugin.squooshMinify = squooshMinify;
 

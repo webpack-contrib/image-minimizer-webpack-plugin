@@ -2,22 +2,20 @@
 /** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
 /** @typedef {import("./index").InternalMinifyResult} InternalMinifyResult */
 /** @typedef {import("./index").InternalMinifyOptions} InternalMinifyOptions */
+/** @typedef {import("./index").MinifyFnResult} MinifyFnResult */
 
 /**
  * @param {InternalMinifyOptions} options
  * @returns {Promise<InternalMinifyResult>}
  */
 async function minify(options) {
-  const minifyFns = /** @type {[MinifyFunctions]} */ (
-    typeof options.minify === "function" ? [options.minify] : options.minify
-  );
-
-  /** @type {InternalMinifyResult} */
+  /** @type {MinifyFnResult} */
   const result = {
     data: options.input,
     filename: options.filename,
     warnings: [],
     errors: [],
+    info: {}
   };
 
   if (!result.data) {
@@ -25,6 +23,10 @@ async function minify(options) {
 
     return result;
   }
+
+  const minifyFns = /** @type {[MinifyFunctions]} */ (
+    typeof options.minify === "function" ? [options.minify] : options.minify
+  );
 
   try {
     for (let i = 0; i <= minifyFns.length - 1; i++) {
@@ -34,18 +36,14 @@ async function minify(options) {
         : options.minimizerOptions;
 
       // eslint-disable-next-line no-await-in-loop
-      const minifyResult = await minifyFn(
-        { [options.filename]: result.data },
-        minifyOptions
-      );
+      const minifyResult = await minifyFn(result, minifyOptions);
 
       result.data = minifyResult.data;
-      result.warnings = [...result.warnings, ...(minifyResult.warnings || [])];
-      result.errors = [...result.errors, ...(minifyResult.errors || [])];
     }
   } catch (error) {
-    const errored = error instanceof Error ? error : new Error(error);
-
+    const errored =
+      error instanceof Error ? error : new Error(/** @type {string} */ (error));
+    
     result.errors.push(errored);
     result.data = options.input;
   }

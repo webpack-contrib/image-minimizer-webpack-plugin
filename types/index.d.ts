@@ -49,17 +49,19 @@ export type InternalMinifyResult = {
   errors: Array<Error>;
 };
 export type CustomMinifyFunction = (
-  data: DataForMinifyFn,
-  minifyOptions: CustomFnMinimizerOptions
-) => InternalMinifyResult;
+  original: MinifyFnResult,
+  options: CustomFnMinimizerOptions
+) => Promise<MinifyFnResult>;
 export type MinifyFunctions =
   | ImageminMinifyFunction
   | SquooshMinifyFunction
   | CustomMinifyFunction;
 export type MinifyFnResult = {
+  filename: string;
   data: Buffer;
   warnings: Array<Error>;
   errors: Array<Error>;
+  info: AssetInfo;
 };
 export type InternalLoaderOptions = {
   /**
@@ -182,18 +184,20 @@ export type PluginOptions = {
  */
 /**
  * @callback CustomMinifyFunction
- * @param {DataForMinifyFn} data
- * @param {CustomFnMinimizerOptions} minifyOptions
- * @returns {InternalMinifyResult}
+ * @param {MinifyFnResult} original
+ * @param {CustomFnMinimizerOptions} options
+ * @returns {Promise<MinifyFnResult>}
  */
 /**
  * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
  */
 /**
  * @typedef {Object} MinifyFnResult
+ * @property {string} filename
  * @property {Buffer} data
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
+ * @property {AssetInfo} info
  */
 /**
  * @typedef {Object} InternalLoaderOptions
@@ -264,10 +268,10 @@ declare class ImageMinimizerPlugin {
 }
 declare namespace ImageMinimizerPlugin {
   export const loader: string;
-  export { normalizeImageminConfig };
+  export { imageminNormalizeConfig };
   export { imageminMinify };
   export { squooshMinify };
 }
 import imageminMinify from "./utils/imageminMinify";
 import squooshMinify from "./utils/squooshMinify";
-import { normalizeImageminConfig } from "./utils/imageminMinify";
+import { imageminNormalizeConfig } from "./utils/imageminMinify";

@@ -5,7 +5,7 @@ import ImageMinimizerPlugin from "../src";
 import { fixturesPath, webpack, isOptimized } from "./helpers";
 
 describe("plugin minify option", () => {
-  it('should work with "imagemin" minifier', async () => {
+  it('should work with "imageminMinify" minifier', async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
@@ -23,6 +23,22 @@ describe("plugin minify option", () => {
       true
     );
 
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('should work with "squooshMinify" minifier', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: ImageMinimizerPlugin.squooshMinify,
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(353);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
@@ -148,31 +164,42 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should work with "squooshMinify" minifier', async () => {
+  it("should work with 'imageminMinify' minifier and 'minimizerOptions'", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: ImageMinimizerPlugin.squooshMinify,
+        minify: ImageMinimizerPlugin.imageminMinify,
+        minimizerOptions: {
+          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+        },
       },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(353);
+    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(462);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
 
-  it('should work with "squooshMinify" minifier and minimizerOptions', async () => {
+  it("should work with 'squooshMinify' minifier and 'minimizerOptions'", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
         minify: ImageMinimizerPlugin.squooshMinify,
         minimizerOptions: {
-          targets: {
-            ".jpg": "webp",
+          encodeOptions: {
+            mozjpeg: {
+              quality: 75,
+            },
+            webp: {
+              lossless: 1,
+            },
+            avif: {
+              cqLevel: 0,
+            },
           },
         },
       },
@@ -180,7 +207,7 @@ describe("plugin minify option", () => {
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
-    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(100);
+    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(335);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
@@ -189,22 +216,21 @@ describe("plugin minify option", () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
+      emitPluginOptions: {
+        fileNames: ["plugin-test.svg"],
+      },
       imageminPluginOptions: {
         minify: ImageMinimizerPlugin.squooshMinify,
-        minimizerOptions: {
-          targets: {
-            ".jpg": false,
-          },
-        },
       },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
+    expect(compilation.getAsset("plugin-test.svg")).toBeDefined();
+    expect(errors).toHaveLength(0);
     expect(warnings).toHaveLength(1);
     expect(warnings[0].toString()).toMatch(
-      /was not minified by "ImageMinimizerPlugin.squooshMinify"/
+        'Error: "plugin-test.svg" is not minimized, because has an unsupported format'
     );
-    expect(errors).toHaveLength(0);
   });
 });
