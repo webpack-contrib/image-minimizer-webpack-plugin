@@ -744,7 +744,7 @@ describe("minify", () => {
           info: { minimized: true, minimizedBy: ["imagemin"] },
         },
         png: {
-          size: 83,
+          size: 111,
           info: {
             generated: true,
             generatedBy: ["squoosh"],
