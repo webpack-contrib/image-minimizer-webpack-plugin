@@ -6,9 +6,6 @@ import imageminMozjpeg from "imagemin-mozjpeg";
 import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { extendDefaultPlugins } from "svgo";
-
 import minify from "../src/minify";
 
 import imageminMinify from "../src/utils/imageminMinify";
@@ -455,6 +452,7 @@ describe("minify", () => {
   });
 
   // TODO should respect returned errors
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip("should throw two errors", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);

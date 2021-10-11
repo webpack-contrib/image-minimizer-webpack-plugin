@@ -230,7 +230,7 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
     expect(warnings).toHaveLength(1);
     expect(warnings[0].toString()).toMatch(
-        'Error: "plugin-test.svg" is not minimized, because has an unsupported format'
+      'Error: "plugin-test.svg" is not minimized, because has an unsupported format'
     );
   });
 });

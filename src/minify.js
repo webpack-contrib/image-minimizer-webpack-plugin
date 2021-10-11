@@ -15,7 +15,7 @@ async function minify(options) {
     filename: options.filename,
     warnings: [],
     errors: [],
-    info: {}
+    info: {},
   };
 
   if (!result.data) {
@@ -43,7 +43,7 @@ async function minify(options) {
   } catch (error) {
     const errored =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
-    
+
     result.errors.push(errored);
     result.data = options.input;
   }
