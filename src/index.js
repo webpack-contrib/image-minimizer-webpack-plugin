@@ -6,7 +6,7 @@ import pLimit from "p-limit";
 import { validate } from "schema-utils";
 import serialize from "serialize-javascript";
 
-import minifyFn from "./minify";
+import worker from "./worker";
 import schema from "./plugin-options.json";
 import imageminMinify, {
   imageminNormalizeConfig,
@@ -37,10 +37,6 @@ import squooshMinify from "./utils/squooshMinify";
  */
 
 /**
- * @typedef {Record.<string, Buffer>} DataForMinifyFn
- */
-
-/**
  * @typedef {Object} ImageminMinimizerOptions
  * @property {ImageminOptions["plugins"] | [string, Record<string, any>]} plugins
  * @property {Array<Record<string, any>>} [pluginsMeta]
@@ -60,7 +56,7 @@ import squooshMinify from "./utils/squooshMinify";
  */
 
 /**
- * @typedef {Object} InternalMinifyOptions
+ * @typedef {Object} InternalWorkerOptions
  * @property {string} filename
  * @property {Buffer} input
  * @property {string} [severityError]
@@ -70,9 +66,9 @@ import squooshMinify from "./utils/squooshMinify";
 
 /**
  * @callback CustomMinifyFunction
- * @param {MinifyResult} original
+ * @param {WorkerResult} original
  * @param {CustomFnMinimizerOptions} options
- * @returns {Promise<MinifyResult>}
+ * @returns {Promise<WorkerResult>}
  */
 
 /**
@@ -80,7 +76,7 @@ import squooshMinify from "./utils/squooshMinify";
  */
 
 /**
- * @typedef {Object} MinifyResult
+ * @typedef {Object} WorkerResult
  * @property {string} filename
  * @property {Buffer} data
  * @property {Array<Error>} warnings
@@ -261,7 +257,7 @@ class ImageMinimizerPlugin {
 
             const { severityError, minimizerOptions, minify } = this.options;
 
-            const minifyOptions = /** @type {InternalMinifyOptions} */ ({
+            const minifyOptions = /** @type {InternalWorkerOptions} */ ({
               filename: name,
               input,
               severityError,
@@ -269,7 +265,7 @@ class ImageMinimizerPlugin {
               minify,
             });
 
-            output = await minifyFn(minifyOptions);
+            output = await worker(minifyOptions);
 
             output.source = new RawSource(output.data);
 

@@ -1,14 +1,13 @@
 import path from "path";
 
 /** @typedef {import("webpack").WebpackError} WebpackError */
-/** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
 /** @typedef {import("../index").SquooshMinimizerOptions} SquooshMinimizerOptions */
-/** @typedef {import("../index").MinifyResult} MinifyResult */
+/** @typedef {import("../index").WorkerResult} WorkerResult */
 
 /**
- * @param {MinifyResult} original
+ * @param {WorkerResult} original
  * @param {SquooshMinimizerOptions} options
- * @returns {Promise<MinifyResult>}
+ * @returns {Promise<WorkerResult>}
  */
 
 async function squooshMinify(original, options) {

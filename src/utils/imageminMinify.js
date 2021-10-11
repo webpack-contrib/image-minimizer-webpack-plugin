@@ -2,9 +2,8 @@
 import { klona } from "klona/full";
 // import fileTypeFromBuffer from "./fileTypeFromBuffer";
 
-/** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
 /** @typedef {import("../index").ImageminMinimizerOptions} ImageminMinimizerOptions */
-/** @typedef {import("../index").MinifyResult} MinifyResult */
+/** @typedef {import("../index").WorkerResult} WorkerResult */
 /** @typedef {import("imagemin").Options} ImageminOptions */
 
 /**
@@ -158,9 +157,9 @@ function imageminNormalizeConfig(minimizerOptions, metaData) {
 }
 
 /**
- * @param {MinifyResult} original
+ * @param {WorkerResult} original
  * @param {ImageminMinimizerOptions} options
- * @returns {Promise<MinifyResult>}
+ * @returns {Promise<WorkerResult>}
  */
 async function imageminMinify(original, options) {
   // Implement autosearch config on root directory of project in future

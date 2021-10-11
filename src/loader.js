@@ -1,6 +1,6 @@
 import path from "path";
 
-import minify from "./minify";
+import worker from "./worker";
 import schema from "./loader-options.json";
 import imageminMinify from "./utils/imageminMinify";
 
@@ -18,7 +18,7 @@ import imageminMinify from "./utils/imageminMinify";
 /** @typedef {import("./index").Rules} Rules */
 /** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
 /** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
-/** @typedef {import("./index").InternalMinifyOptions} InternalMinifyOptions */
+/** @typedef {import("./index").InternalWorkerOptions} InternalWorkerOptions */
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").LoaderContext<LoaderOptions>} LoaderContext */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -42,7 +42,7 @@ module.exports = async function loader(content) {
 
   const { severityError, minimizerOptions } = options;
 
-  const minifyOptions = /** @type {InternalMinifyOptions} */ ({
+  const minifyOptions = /** @type {InternalWorkerOptions} */ ({
     minify: options.minify || imageminMinify,
     input,
     filename: name,
@@ -51,7 +51,7 @@ module.exports = async function loader(content) {
     isProductionMode: this.mode === "production" || !this.mode,
   });
 
-  const output = await minify(minifyOptions);
+  const output = await worker(minifyOptions);
 
   if (output.errors && output.errors.length > 0) {
     output.errors.forEach((warning) => {

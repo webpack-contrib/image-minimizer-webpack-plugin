@@ -1,14 +1,14 @@
 /** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
 /** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
-/** @typedef {import("./index").InternalMinifyOptions} InternalMinifyOptions */
-/** @typedef {import("./index").MinifyResult} MinifyResult */
+/** @typedef {import("./index").InternalWorkerOptions} InternalWorkerOptions */
+/** @typedef {import("./index").WorkerResult} WorkerResult */
 
 /**
- * @param {InternalMinifyOptions} options
- * @returns {Promise<MinifyResult>}
+ * @param {InternalWorkerOptions} options
+ * @returns {Promise<WorkerResult>}
  */
-async function minify(options) {
-  /** @type {MinifyResult} */
+async function worker(options) {
+  /** @type {WorkerResult} */
   const result = {
     data: options.input,
     filename: options.filename,
@@ -33,7 +33,7 @@ async function minify(options) {
       ? options.minimizerOptions[i]
       : options.minimizerOptions;
 
-    /** @type {MinifyResult} */
+    /** @type {WorkerResult} */
     let minifyResult;
 
     try {
@@ -93,4 +93,4 @@ async function minify(options) {
   return result;
 }
 
-module.exports = minify;
+module.exports = worker;
