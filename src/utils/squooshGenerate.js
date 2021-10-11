@@ -21,7 +21,8 @@ async function squooshGenerate(original, minifyOptions) {
   // eslint-disable-next-line node/no-unpublished-require
   const squoosh = require("@squoosh/lib");
   const { ImagePool } = squoosh;
-  const imagePool = new ImagePool();
+  // TODO https://github.com/GoogleChromeLabs/squoosh/issues/1111
+  const imagePool = new ImagePool(1);
   const image = imagePool.ingestImage(new Uint8Array(original.data));
 
   try {

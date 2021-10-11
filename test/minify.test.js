@@ -8,9 +8,6 @@ import imageminWebp from "imagemin-webp";
 import pify from "pify";
 import fileType from "file-type";
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { extendDefaultPlugins } from "svgo";
-
 import minify from "../src/minify";
 
 import ImageMinimizerPlugin from "../src";
@@ -26,10 +23,11 @@ function isPromise(obj) {
 jest.setTimeout(30000);
 
 describe("minify", () => {
-  it("minify should be is function", () =>
-    expect(typeof minify === "function").toBe(true));
+  it("minify should be is function", () => {
+    expect(typeof minify === "function").toBe(true);
+  });
 
-  it("should return `Promise`", () =>
+  it("should return `Promise`", () => {
     expect(
       isPromise(
         minify(
@@ -45,7 +43,8 @@ describe("minify", () => {
           }
         )
       )
-    ).toBe(true));
+    ).toBe(true);
+  });
 
   it("should optimize", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
@@ -99,14 +98,14 @@ describe("minify", () => {
 
   it("should return optimized image even when optimized image large then original", async () => {
     const svgoOptions = {
-      plugins: extendDefaultPlugins([
-        {
-          name: "addAttributesToSVGElement",
-          params: {
+      name: "preset-default",
+      params: {
+        overrides: {
+          addAttributesToSVGElement: {
             attributes: [{ xmlns: "http://www.w3.org/2000/svg" }],
           },
         },
-      ]),
+      },
     };
 
     const filename = path.resolve(
@@ -459,14 +458,14 @@ describe("minify", () => {
 
   it("should support svgo options", async () => {
     const svgoOptions = {
-      plugins: extendDefaultPlugins([
-        {
-          name: "cleanupIDs",
-          params: {
+      name: "preset-default",
+      params: {
+        overrides: {
+          cleanupIDs: {
             prefix: "qwerty",
           },
         },
-      ]),
+      },
     };
 
     const filename = path.resolve(__dirname, "./fixtures/svg-with-id.svg");

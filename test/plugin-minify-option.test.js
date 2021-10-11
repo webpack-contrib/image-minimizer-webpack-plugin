@@ -29,7 +29,23 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should emit warning when "imageminMinify" minifier used for generation', async () => {
+  it('should work with "squooshMinify" minifier', async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: ImageMinimizerPlugin.squooshMinify,
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(353);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("should emit a warning when minified function used for generation", async () => {
     const stats = await webpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
@@ -47,22 +63,6 @@ describe("plugin minify option", () => {
     expect(warnings[0].toString()).toMatch(
       'Error: "imageminMinify" function do not support generate to "webp" from "plugin-test.jpg". Use "imageminGenerate"'
     );
-    expect(errors).toHaveLength(0);
-  });
-
-  it('should work with "squooshMinify" minifier', async () => {
-    const stats = await webpack({
-      entry: path.join(fixturesPath, "./empty-entry.js"),
-      emitPlugin: true,
-      imageminPluginOptions: {
-        minify: ImageMinimizerPlugin.squooshMinify,
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
-
-    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(353);
-    expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
 

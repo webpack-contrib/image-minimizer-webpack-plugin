@@ -124,6 +124,7 @@ export type PluginOptions = {
    */
   maxConcurrency?: number | undefined;
   minify?: MinifyFunctions | undefined;
+  preset?: Object | undefined;
 };
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
@@ -225,6 +226,7 @@ export type PluginOptions = {
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
  * @property {MinifyFunctions} [minify]
+ * @property {Object} [preset]
  */
 /**
  * @extends {WebpackPluginInstance}
@@ -243,6 +245,7 @@ declare class ImageMinimizerPlugin {
     loader: boolean;
     maxConcurrency: number | undefined;
     test: Rules;
+    preset: Object | undefined;
   };
   /**
    * @private

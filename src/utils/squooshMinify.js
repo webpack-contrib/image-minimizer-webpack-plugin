@@ -50,7 +50,7 @@ async function squooshMinify(original, minifyOptions) {
     encodeOptions[targetCodec] = {};
   }
 
-  const imagePool = new ImagePool();
+  const imagePool = new ImagePool(1);
   const image = imagePool.ingestImage(new Uint8Array(original.data));
 
   try {

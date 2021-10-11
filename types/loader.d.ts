@@ -19,6 +19,7 @@ export type LoaderOptions = {
    */
   filename?: string | undefined;
   minify?: import("./index").MinifyFunctions | undefined;
+  preset?: Object | undefined;
 };
 export type ImageMinimizerRawLoaderDefinition =
   import("webpack").RawLoaderDefinition<LoaderOptions>;
