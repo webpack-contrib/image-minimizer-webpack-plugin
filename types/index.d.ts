@@ -37,21 +37,15 @@ export type InternalMinifyOptions = {
   minimizerOptions?: MinimizerOptions | undefined;
   minify: MinifyFunctions;
 };
-export type InternalMinifyResult = {
-  data: Buffer;
-  filename: string;
-  warnings: Array<Error>;
-  errors: Array<Error>;
-};
 export type CustomMinifyFunction = (
-  original: MinifyFnResult,
+  original: MinifyResult,
   options: CustomFnMinimizerOptions
-) => Promise<MinifyFnResult>;
+) => Promise<MinifyResult>;
 export type MinifyFunctions =
   | ImageminMinifyFunction
   | SquooshMinifyFunction
   | CustomMinifyFunction;
-export type MinifyFnResult = {
+export type MinifyResult = {
   filename: string;
   data: Buffer;
   warnings: Array<Error>;
@@ -170,23 +164,16 @@ export type PluginOptions = {
  * @property {MinifyFunctions} minify
  */
 /**
- * @typedef {Object} InternalMinifyResult
- * @property {Buffer} data
- * @property {string} filename
- * @property {Array<Error>} warnings
- * @property {Array<Error>} errors
- */
-/**
  * @callback CustomMinifyFunction
- * @param {MinifyFnResult} original
+ * @param {MinifyResult} original
  * @param {CustomFnMinimizerOptions} options
- * @returns {Promise<MinifyFnResult>}
+ * @returns {Promise<MinifyResult>}
  */
 /**
  * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
  */
 /**
- * @typedef {Object} MinifyFnResult
+ * @typedef {Object} MinifyResult
  * @property {string} filename
  * @property {Buffer} data
  * @property {Array<Error>} warnings

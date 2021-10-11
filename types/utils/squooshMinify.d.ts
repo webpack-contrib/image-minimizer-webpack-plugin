@@ -3,17 +3,17 @@ export type WebpackError = import("webpack").WebpackError;
 export type DataForMinifyFn = import("../index").DataForMinifyFn;
 export type SquooshMinimizerOptions =
   import("../index").SquooshMinimizerOptions;
-export type MinifyFnResult = import("../index").MinifyFnResult;
+export type MinifyResult = import("../index").MinifyResult;
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
 /** @typedef {import("../index").SquooshMinimizerOptions} SquooshMinimizerOptions */
-/** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
+/** @typedef {import("../index").MinifyResult} MinifyResult */
 /**
- * @param {MinifyFnResult} original
+ * @param {MinifyResult} original
  * @param {SquooshMinimizerOptions} options
- * @returns {Promise<MinifyFnResult>}
+ * @returns {Promise<MinifyResult>}
  */
 declare function squooshMinify(
-  original: MinifyFnResult,
+  original: MinifyResult,
   options: SquooshMinimizerOptions
-): Promise<MinifyFnResult>;
+): Promise<MinifyResult>;

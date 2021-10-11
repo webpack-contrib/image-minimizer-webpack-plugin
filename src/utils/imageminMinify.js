@@ -4,7 +4,7 @@ import { klona } from "klona/full";
 
 /** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
 /** @typedef {import("../index").ImageminMinimizerOptions} ImageminMinimizerOptions */
-/** @typedef {import("../index").MinifyFnResult} MinifyFnResult */
+/** @typedef {import("../index").MinifyResult} MinifyResult */
 /** @typedef {import("imagemin").Options} ImageminOptions */
 
 /**
@@ -144,7 +144,7 @@ function imageminNormalizeConfig(minimizerOptions, metaData) {
         new InvalidConfigError(
           `Invalid plugin configuration "${JSON.stringify(
             plugin
-          )}, plugin configuraion should be 'string' or '[string, object]'"`
+          )}, plugin configuration should be 'string' or '[string, object]'"`
         ),
         metaData,
         "error"
@@ -158,9 +158,9 @@ function imageminNormalizeConfig(minimizerOptions, metaData) {
 }
 
 /**
- * @param {MinifyFnResult} original
+ * @param {MinifyResult} original
  * @param {ImageminMinimizerOptions} options
- * @returns {Promise<MinifyFnResult>}
+ * @returns {Promise<MinifyResult>}
  */
 async function imageminMinify(original, options) {
   // Implement autosearch config on root directory of project in future
