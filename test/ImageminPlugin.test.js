@@ -15,6 +15,8 @@ import {
   clearDirectory,
 } from "./helpers";
 
+import ImageMinimizerPlugin from "../src";
+
 describe("imagemin plugin", () => {
   it("should optimizes all images (loader + plugin)", async () => {
     const stats = await webpack({ emitPlugin: true, imageminPlugin: true });
@@ -497,9 +499,7 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
-});
 
-describe("imagemin plugin - persistent cache", () => {
   it("should work and use the persistent cache by default (loader + plugin)", async () => {
     const compiler = await webpack(
       {
@@ -716,5 +716,72 @@ describe("imagemin plugin - persistent cache", () => {
     expect(info.minimized).toBe(true);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
+  });
+
+  it("should work and show 'minimized' in stats when only image minification used", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [ImageMinimizerPlugin.imageminMinify],
+        minimizerOptions: {
+          plugins: ["mozjpeg"],
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+    const jpgAsset = compilation.getAsset("plugin-test.jpg");
+
+    expect(jpgAsset.info.size).toBeLessThan(462);
+    // TODO fix me
+    // expect(jpgAsset.info.sourceFilename).toBe("plugin-test.jpg");
+    expect(jpgAsset.info.minimized).toBe(true);
+    // expect(jpgAsset.info.minimizedBy).toEqual(["imagemin"]);
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const stringStats = stats.toString({ relatedAssets: true });
+
+    expect(stringStats).toMatch(
+      //  /asset minimized-plugin-test.jpg.+\[from: plugin-test.jpg\] \[minimized\]/
+      /asset plugin-test.jpg.+\[minimized\]/
+    );
+  });
+
+  // eslint-disable-next-line jest/no-disabled-tests
+  it.skip("should work and show 'generated' in stats when only image generation used", async () => {
+    const stats = await webpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minify: [ImageMinimizerPlugin.imageminGenerate],
+        minimizerOptions: [
+          {
+            deleteOriginal: true,
+            filename: "generated-[name][ext]",
+            plugins: ["webp"],
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+    const webpAsset = compilation.getAsset("generated-plugin-test.webp");
+
+    expect(webpAsset.info.size).toBeLessThan(45);
+    expect(webpAsset.info.sourceFilename).toBe("plugin-test.webp");
+    expect(webpAsset.info.generated).toBe(true);
+    expect(webpAsset.info.generatedBy).toEqual(["imagemin"]);
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const stringStats = stats.toString({ relatedAssets: true });
+
+    expect(stringStats).toMatch(
+      /asset generated-plugin-test.webp.+\[from: plugin-test.webp\] \[generated\]/
+    );
   });
 });
