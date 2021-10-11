@@ -230,6 +230,7 @@ class ImageMinimizerPlugin {
 
           const cacheName = serialize({
             name,
+            minify: this.options.minify,
             minimizerOptions: this.options.minimizerOptions,
           });
 
@@ -400,6 +401,32 @@ class ImageMinimizerPlugin {
         },
         (assets) => this.optimize(compiler, compilation, assets, moduleAssets)
       );
+
+      compilation.hooks.statsPrinter.tap(pluginName, (stats) => {
+        stats.hooks.print
+          .for("asset.info.minimized")
+          .tap(
+            "image-minimizer-webpack-plugin",
+            (minimized, { green, formatFlag }) =>
+              minimized
+                ? /** @type {Function} */ (green)(
+                    /** @type {Function} */ (formatFlag)("minimized")
+                  )
+                : ""
+          );
+
+        stats.hooks.print
+          .for("asset.info.generated")
+          .tap(
+            "image-minimizer-webpack-plugin",
+            (generated, { green, formatFlag }) =>
+              generated
+                ? /** @type {Function} */ (green)(
+                    /** @type {Function} */ (formatFlag)("generated")
+                  )
+                : ""
+          );
+      });
     });
   }
 }
