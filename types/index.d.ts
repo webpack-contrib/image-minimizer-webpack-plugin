@@ -19,11 +19,6 @@ export type ImageminMinimizerOptions = {
   pluginsMeta?: Record<string, any>[] | undefined;
 };
 export type SquooshMinimizerOptions = {
-  targets?:
-    | {
-        [x: string]: string;
-      }
-    | undefined;
   encodeOptions?:
     | {
         [x: string]: object;
@@ -158,7 +153,6 @@ export type PluginOptions = {
  */
 /**
  * @typedef {Object} SquooshMinimizerOptions
- * @property {Object.<string, string>} [targets]
  * @property {Object.<string, object>} [encodeOptions]
  */
 /**
