@@ -134,14 +134,13 @@ async function imageminMinify(original, options) {
     return original;
   }
 
-  // TODO fix me
   // const extInput = path.extname(original.filename).slice(1).toLowerCase();
   // const { ext: extOutput } = fileTypeFromBuffer(result) || {};
-
+  //
   // if (extOutput && extInput !== extOutput) {
   //   original.warnings.push(
   //     new Error(
-  //       `"imageminMinify" function do not support generate to "${extOutput}" from "${original.filename}". Use "imageminGenerate"`
+  //       `"imageminMinify" function do not support generate to "${extOutput}" from "${original.filename}". Please use "imageminGenerate" function.`
   //     )
   //   );
   //

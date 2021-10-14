@@ -251,8 +251,10 @@ declare namespace ImageMinimizerPlugin {
   export const loader: string;
   export { imageminNormalizeConfig };
   export { imageminMinify };
+  export { imageminGenerate };
   export { squooshMinify };
 }
 import imageminMinify from "./utils/imageminMinify";
 import squooshMinify from "./utils/squooshMinify";
 import { imageminNormalizeConfig } from "./utils/imageminMinify";
+import imageminGenerate from "./utils/imageminGenerate";
