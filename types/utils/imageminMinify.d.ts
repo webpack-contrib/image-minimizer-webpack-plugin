@@ -1,27 +1,24 @@
 export default imageminMinify;
-export type DataForMinifyFn = import("../index").DataForMinifyFn;
 export type ImageminMinimizerOptions =
   import("../index").ImageminMinimizerOptions;
-export type MinifyResult = import("../index").MinifyResult;
+export type WorkerResult = import("../index").WorkerResult;
 export type ImageminOptions = import("imagemin").Options;
 export type MetaData = {
   warnings: Array<Error>;
   errors: Array<Error>;
 };
 /**
- * @param {MinifyResult} original
+ * @param {WorkerResult} original
  * @param {ImageminMinimizerOptions} options
- * @returns {Promise<MinifyResult>}
+ * @returns {Promise<WorkerResult>}
  */
 declare function imageminMinify(
-  original: MinifyResult,
+  original: WorkerResult,
   options: ImageminMinimizerOptions
-): Promise<MinifyResult>;
+): Promise<WorkerResult>;
 /**
  * @param {ImageminMinimizerOptions} minimizerOptions
- * @param {MetaData} [metaData]
  */
 export function imageminNormalizeConfig(
-  minimizerOptions: ImageminMinimizerOptions,
-  metaData?: MetaData | undefined
+  minimizerOptions: ImageminMinimizerOptions
 ): import("../index").ImageminMinimizerOptions;

@@ -52,6 +52,15 @@ async function worker(options) {
       item.errors = [];
     }
 
+    if (
+      typeof options.newFilename !== "undefined" &&
+      typeof options.generateFilename !== "undefined"
+    ) {
+      item.filename = options.generateFilename(options.newFilename, {
+        filename: item.filename,
+      });
+    }
+
     return item;
   };
 

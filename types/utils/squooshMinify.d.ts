@@ -1,19 +1,17 @@
 export default squooshMinify;
 export type WebpackError = import("webpack").WebpackError;
-export type DataForMinifyFn = import("../index").DataForMinifyFn;
 export type SquooshMinimizerOptions =
   import("../index").SquooshMinimizerOptions;
-export type MinifyResult = import("../index").MinifyResult;
+export type WorkerResult = import("../index").WorkerResult;
 /** @typedef {import("webpack").WebpackError} WebpackError */
-/** @typedef {import("../index").DataForMinifyFn} DataForMinifyFn */
 /** @typedef {import("../index").SquooshMinimizerOptions} SquooshMinimizerOptions */
-/** @typedef {import("../index").MinifyResult} MinifyResult */
+/** @typedef {import("../index").WorkerResult} WorkerResult */
 /**
- * @param {MinifyResult} original
+ * @param {WorkerResult} original
  * @param {SquooshMinimizerOptions} options
- * @returns {Promise<MinifyResult>}
+ * @returns {Promise<WorkerResult>}
  */
 declare function squooshMinify(
-  original: MinifyResult,
+  original: WorkerResult,
   options: SquooshMinimizerOptions
-): Promise<MinifyResult>;
+): Promise<WorkerResult>;

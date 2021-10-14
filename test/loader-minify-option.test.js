@@ -39,15 +39,11 @@ describe("loader minify option", () => {
     const stats = await webpack({
       imageminLoader: true,
       imageminLoaderOptions: {
-        minify: (data, minifiOptions) => {
-          const [[, input]] = Object.entries(data);
-
+        minify: (input, minifiOptions) => {
           expect(input).toBeDefined();
           expect(minifiOptions).toBeDefined();
 
-          return {
-            data: input,
-          };
+          return input;
         },
         minimizerOptions: {
           plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
