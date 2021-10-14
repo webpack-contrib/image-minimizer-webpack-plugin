@@ -8,6 +8,10 @@ describe("api", () => {
       expect(typeof ImageMinimizerPlugin.imageminNormalizeConfig).toBe(
         "function"
       );
+      expect(typeof ImageMinimizerPlugin.imageminMinify).toBe("function");
+      expect(typeof ImageMinimizerPlugin.imageminGenerate).toBe("function");
+      expect(typeof ImageMinimizerPlugin.squooshMinify).toBe("function");
+      expect(typeof ImageMinimizerPlugin.squooshGenerate).toBe("function");
     });
   });
 
