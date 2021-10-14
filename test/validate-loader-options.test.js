@@ -14,7 +14,7 @@ describe("validate loader options", () => {
       failure: [1, true, false, null],
     },
     minimizerOptions: {
-      success: [{ plugins: [] }, {}],
+      success: [{ plugins }],
       failure: [1, true, false, [], null],
     },
     filter: {
@@ -61,7 +61,7 @@ describe("validate loader options", () => {
         },
       };
 
-      if (key === "severityError") {
+      if (key !== "minimizerOptions") {
         options.imageminLoaderOptions.minimizerOptions = { plugins };
       }
 

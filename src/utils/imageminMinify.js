@@ -12,36 +12,6 @@ import { klona } from "klona/full";
  * @property {Array<Error>} errors
  */
 
-/**
- * @param {Error} error
- * @param {MetaData} [metaData]
- * @param {string} [type]
- */
-function log(error, metaData, type) {
-  if (metaData) {
-    if (type === "error") {
-      if (typeof metaData.errors === "undefined") {
-        metaData.errors = [];
-      }
-
-      // Todo remove this name (name already exist and equal "InvalidConfigError")
-      error.name = "ConfigurationError";
-
-      metaData.errors.push(error);
-    } else {
-      if (typeof metaData.warnings === "undefined") {
-        metaData.warnings = [];
-      }
-
-      metaData.warnings.push(error);
-    }
-
-    return;
-  }
-
-  throw error;
-}
-
 class InvalidConfigError extends Error {
   /**
    * @param {string | undefined} message
@@ -55,20 +25,16 @@ class InvalidConfigError extends Error {
 
 /**
  * @param {ImageminMinimizerOptions} minimizerOptions
- * @param {MetaData} [metaData]
  */
-function imageminNormalizeConfig(minimizerOptions, metaData) {
+function imageminNormalizeConfig(minimizerOptions) {
   if (
     !minimizerOptions ||
     !minimizerOptions.plugins ||
     (minimizerOptions.plugins && minimizerOptions.plugins.length === 0)
   ) {
-    log(
-      new Error("No plugins found for `imagemin`. Please read documentation."),
-      metaData
+    throw new Error(
+      "No plugins found for `imagemin`. Please read documentation."
     );
-
-    return minimizerOptions;
   }
 
   const imageminConfig = klona(minimizerOptions);
@@ -77,81 +43,68 @@ function imageminNormalizeConfig(minimizerOptions, metaData) {
     imageminConfig.pluginsMeta = [];
   }
 
-  imageminConfig.plugins = imageminConfig.plugins
-    .map((plugin) => {
-      const isPluginArray = Array.isArray(plugin);
+  imageminConfig.plugins = imageminConfig.plugins.map((plugin) => {
+    const isPluginArray = Array.isArray(plugin);
 
-      if (typeof plugin === "string" || isPluginArray) {
-        const pluginName = isPluginArray
-          ? /** @type {[string, object]} */ (plugin)[0]
-          : /** @type {string} */ (plugin);
-        const pluginOptions = isPluginArray
-          ? /** @type {[string, object]} */ (plugin)[1]
-          : undefined;
+    if (typeof plugin === "string" || isPluginArray) {
+      const pluginName = isPluginArray
+        ? /** @type {[string, object]} */ (plugin)[0]
+        : /** @type {string} */ (plugin);
+      const pluginOptions = isPluginArray
+        ? /** @type {[string, object]} */ (plugin)[1]
+        : undefined;
 
-        let requiredPlugin = null;
-        let requiredPluginName = `imagemin-${pluginName}`;
+      let requiredPlugin = null;
+      let requiredPluginName = `imagemin-${pluginName}`;
+
+      try {
+        // eslint-disable-next-line import/no-dynamic-require
+        requiredPlugin = require(requiredPluginName)(pluginOptions);
+      } catch {
+        requiredPluginName = pluginName;
 
         try {
           // eslint-disable-next-line import/no-dynamic-require
           requiredPlugin = require(requiredPluginName)(pluginOptions);
         } catch {
-          requiredPluginName = pluginName;
+          const pluginNameForError = pluginName.startsWith("imagemin")
+            ? pluginName
+            : `imagemin-${pluginName}`;
 
-          try {
-            // eslint-disable-next-line import/no-dynamic-require
-            requiredPlugin = require(requiredPluginName)(pluginOptions);
-          } catch {
-            const pluginNameForError = pluginName.startsWith("imagemin")
-              ? pluginName
-              : `imagemin-${pluginName}`;
-
-            log(
-              new Error(
-                `Unknown plugin: ${pluginNameForError}\n\nDid you forget to install the plugin?\nYou can install it with:\n\n$ npm install ${pluginNameForError} --save-dev\n$ yarn add ${pluginNameForError} --dev`
-              ),
-              metaData
-            );
-
-            return false;
-          }
-          // Nothing
+          throw new Error(
+            `Unknown plugin: ${pluginNameForError}\n\nDid you forget to install the plugin?\nYou can install it with:\n\n$ npm install ${pluginNameForError} --save-dev\n$ yarn add ${pluginNameForError} --dev`
+          );
         }
-
-        let version = "unknown";
-
-        try {
-          // eslint-disable-next-line import/no-dynamic-require
-          ({ version } = require(`${requiredPluginName}/package.json`));
-        } catch {
-          // Nothing
-        }
-
-        /** @type {Array<Object>} imageminConfig.pluginsMeta */
-        (imageminConfig.pluginsMeta).push([
-          {
-            name: requiredPluginName,
-            options: pluginOptions || {},
-            version,
-          },
-        ]);
-
-        return requiredPlugin;
+        // Nothing
       }
 
-      log(
-        new InvalidConfigError(
-          `Invalid plugin configuration "${JSON.stringify(
-            plugin
-          )}, plugin configuration should be 'string' or '[string, object]'"`
-        ),
-        metaData,
-        "error"
-      );
+      let version = "unknown";
 
-      return false;
-    })
-    .filter(Boolean);
+      try {
+        // eslint-disable-next-line import/no-dynamic-require
+        ({ version } = require(`${requiredPluginName}/package.json`));
+      } catch {
+        // Nothing
+      }
+
+      /** @type {Array<Object>} imageminConfig.pluginsMeta */
+      (imageminConfig.pluginsMeta).push([
+        {
+          name: requiredPluginName,
+          options: pluginOptions || {},
+          version,
+        },
+      ]);
+
+      return requiredPlugin;
+    }
+
+    throw new InvalidConfigError(
+      `Invalid plugin configuration '${JSON.stringify(
+        plugin
+      )}', plugin configuration should be 'string' or '[string, object]'"`
+    );
+  });
 
   return imageminConfig;
 }
@@ -164,7 +117,7 @@ function imageminNormalizeConfig(minimizerOptions, metaData) {
 async function imageminMinify(original, options) {
   // Implement autosearch config on root directory of project in future
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-    imageminNormalizeConfig(options, original)
+    imageminNormalizeConfig(options)
   );
 
   const imagemin = require("imagemin");

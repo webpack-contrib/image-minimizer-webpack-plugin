@@ -85,15 +85,11 @@ describe("plugin minify option", () => {
       imageminPluginOptions: {
         minify: [
           ImageMinimizerPlugin.imageminMinify,
-          (data, minifiOptions) => {
-            const [[, input]] = Object.entries(data);
-
+          (input, minifiOptions) => {
             expect(input).toBeDefined();
             expect(minifiOptions).toBeDefined();
 
-            return {
-              data: input,
-            };
+            return input;
           },
         ],
         minimizerOptions: {
@@ -121,23 +117,15 @@ describe("plugin minify option", () => {
       imageminPluginOptions: {
         minify: [
           ImageMinimizerPlugin.imageminMinify,
-          (data, minifiOptions) => {
-            const [[, input]] = Object.entries(data);
-
+          (input, minifiOptions) => {
             expect("options2" in minifiOptions).toBe(true);
 
-            return {
-              data: input,
-            };
+            return input;
           },
-          (data, minifiOptions) => {
-            const [[, input]] = Object.entries(data);
-
+          (input, minifiOptions) => {
             expect("options3" in minifiOptions).toBe(true);
 
-            return {
-              data: input,
-            };
+            return input;
           },
         ],
         minimizerOptions: [

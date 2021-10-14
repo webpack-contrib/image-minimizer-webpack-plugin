@@ -9,7 +9,7 @@
  */
 async function worker(options) {
   /** @type {WorkerResult} */
-  const result = {
+  let result = {
     data: options.input,
     filename: options.filename,
     warnings: [],
@@ -27,18 +27,46 @@ async function worker(options) {
     typeof options.minify === "function" ? [options.minify] : options.minify
   );
 
+  /**
+   * @param {any} item
+   * @returns {WorkerResult}
+   */
+  const normalizeProcessedResult = (item) => {
+    if (!item.info) {
+      item.info = {};
+    }
+
+    if (!item.errors) {
+      item.errors = [];
+    }
+
+    if (!item.warnings) {
+      item.warnings = [];
+    }
+
+    if (options.severityError === "off") {
+      item.warnings = [];
+      item.errors = [];
+    } else if (options.severityError === "warning") {
+      item.warnings = [...item.warnings, ...item.errors];
+      item.errors = [];
+    }
+
+    return item;
+  };
+
   for (let i = 0; i <= minifyFns.length - 1; i++) {
     const minifyFn = minifyFns[i];
     const minifyOptions = Array.isArray(options.minimizerOptions)
       ? options.minimizerOptions[i]
-      : options.minimizerOptions;
+      : options.minimizerOptions || {};
 
     /** @type {WorkerResult} */
-    let minifyResult;
+    let processedResult;
 
     try {
       // eslint-disable-next-line no-await-in-loop
-      minifyResult = await minifyFn(result, minifyOptions);
+      processedResult = await minifyFn(result, minifyOptions);
     } catch (error) {
       result.errors.push(
         error instanceof Error
@@ -49,7 +77,7 @@ async function worker(options) {
       return result;
     }
 
-    if (!minifyResult || !Buffer.isBuffer(minifyResult.data)) {
+    if (!processedResult || !Buffer.isBuffer(processedResult.data)) {
       result.errors.push(
         new Error(
           "minimizer function doesn't return the 'data' property or result is not a 'Buffer' value"
@@ -59,35 +87,7 @@ async function worker(options) {
       return result;
     }
 
-    result.data = minifyResult.data;
-    result.warnings = minifyResult.warnings || [];
-    result.errors = minifyResult.errors || [];
-    result.info = minifyResult.info || {};
-  }
-
-  if (result.errors.length > 0) {
-    const errors = [];
-
-    for (const error of result.errors) {
-      if (error.name === "ConfigurationError") {
-        errors.push(error);
-
-        continue;
-      }
-
-      switch (options.severityError) {
-        case "off":
-          break;
-        case "warning":
-          result.warnings.push(error);
-          break;
-        case "error":
-        default:
-          errors.push(error);
-      }
-    }
-
-    result.errors = errors;
+    result = normalizeProcessedResult(processedResult);
   }
 
   return result;
