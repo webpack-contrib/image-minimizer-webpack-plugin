@@ -129,11 +129,11 @@ describe("minify", () => {
     const filename = path.resolve("foo.png");
     const result = await worker({ minify: imageminMinify, input, filename });
 
-    expect(result.warnings).toHaveLength(1);
-    expect(result.warnings[0].toString()).toMatch(
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(
       /No plugins found for `imagemin`/
     );
-    expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
     expect(result.data.equals(input)).toBe(true);
   });
@@ -148,11 +148,11 @@ describe("minify", () => {
       minimizerOptions: { plugins: [] },
     });
 
-    expect(result.warnings).toHaveLength(1);
-    expect(result.warnings[0].toString()).toMatch(
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(
       /No plugins found for `imagemin`/
     );
-    expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
     expect(result.data.equals(input)).toBe(true);
   });
@@ -167,13 +167,51 @@ describe("minify", () => {
       minimizerOptions: { plugins: false },
     });
 
+    expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(1);
-    expect(result.warnings).toHaveLength(1);
-    expect(result.warnings[0].toString()).toMatch(
+    expect(result.errors[0].toString()).toMatch(
       /No plugins found for `imagemin`/
     );
+    expect(result.filename).toBe(filename);
+    expect(result.data.equals(input)).toBe(true);
+  });
+
+  it("should throw error on unknown plugin (configuration using `string`)", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      minify: imageminMinify,
+      input,
+      filename,
+      minimizerOptions: {
+        plugins: ["imagemin-mozjpeg", "unknown"],
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
     expect(result.errors[0].toString()).toMatch(
-      "TypeError: Found non-callable @@iterator"
+      /Unknown plugin: imagemin-unknown/
+    );
+    expect(result.filename).toBe(filename);
+  });
+
+  it("should throw error on unknown plugin (starting with `imagemin`)", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      minify: imageminMinify,
+      input,
+      filename,
+      minimizerOptions: {
+        plugins: ["imagemin-unknown"],
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(
+      /Unknown plugin: imagemin-unknown/
     );
     expect(result.filename).toBe(filename);
     expect(result.data.equals(input)).toBe(true);
@@ -344,53 +382,6 @@ describe("minify", () => {
     });
 
     expect(result.warnings).toHaveLength(0);
-    expect(result.errors).toHaveLength(0);
-    expect(result.filename).toBe(filename);
-
-    const optimizedSource = await imagemin.buffer(input, {
-      plugins: [imageminMozjpeg()],
-    });
-
-    expect(result.data.equals(optimizedSource)).toBe(true);
-  });
-
-  it("should throw error on empty `imagemin` options (configuration using `string` and starting with `imagemin`)", async () => {
-    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
-    const result = await worker({
-      minify: imageminMinify,
-      input,
-      filename,
-      minimizerOptions: {
-        plugins: ["imagemin-unknown"],
-      },
-    });
-
-    expect(result.warnings).toHaveLength(1);
-    expect(result.warnings[0].toString()).toMatch(
-      /Unknown plugin: imagemin-unknown/
-    );
-    expect(result.errors).toHaveLength(0);
-    expect(result.filename).toBe(filename);
-    expect(result.data.equals(input)).toBe(true);
-  });
-
-  it("should optimize and throw error on unknown plugin (configuration using `string`)", async () => {
-    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
-    const result = await worker({
-      minify: imageminMinify,
-      input,
-      filename,
-      minimizerOptions: {
-        plugins: ["imagemin-mozjpeg", "unknown"],
-      },
-    });
-
-    expect(result.warnings).toHaveLength(1);
-    expect(result.warnings[0].toString()).toMatch(
-      /Unknown plugin: imagemin-unknown/
-    );
     expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe(filename);
 

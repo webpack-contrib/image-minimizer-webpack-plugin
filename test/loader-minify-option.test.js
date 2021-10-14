@@ -82,15 +82,11 @@ describe("loader minify option", () => {
       imageminLoaderOptions: {
         minify: [
           ImageMinimizerPlugin.imageminMinify,
-          (data, minifiOptions) => {
-            const [[, input]] = Object.entries(data);
-
+          (input, minifiOptions) => {
             expect(input).toBeDefined();
             expect(minifiOptions).toBeDefined();
 
-            return {
-              data: input,
-            };
+            return input;
           },
         ],
         minimizerOptions: {
@@ -126,23 +122,15 @@ describe("loader minify option", () => {
       imageminLoaderOptions: {
         minify: [
           ImageMinimizerPlugin.imageminMinify,
-          (data, minifiOptions) => {
-            const [[, input]] = Object.entries(data);
-
+          (input, minifiOptions) => {
             expect("options2" in minifiOptions).toBe(true);
 
-            return {
-              data: input,
-            };
+            return input;
           },
-          (data, minifiOptions) => {
-            const [[, input]] = Object.entries(data);
-
+          (input, minifiOptions) => {
             expect("options3" in minifiOptions).toBe(true);
 
-            return {
-              data: input,
-            };
+            return input;
           },
         ],
         minimizerOptions: [
@@ -207,8 +195,27 @@ describe("loader minify option", () => {
     );
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('should work with "squooshMinify" minifier', async () => {
+  it('should work with "imageminMinify" minifier', async () => {
+    const stats = await webpack({
+      imageminLoader: true,
+      imageminLoaderOptions: {
+        minify: ImageMinimizerPlugin.imageminMinify,
+        minimizerOptions: {
+          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { errors } = compilation;
+
+    expect(errors).toHaveLength(0);
+    expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(631);
+    expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
+      71000
+    );
+  });
+
+  it('should work with "squooshMinify" minifier', async () => {
     const stats = await webpack({
       imageminLoader: true,
       imageminLoaderOptions: {
@@ -218,9 +225,7 @@ describe("loader minify option", () => {
     const { compilation } = stats;
     const { errors } = compilation;
 
-    // expect(warnings).toHaveLength(2);
     expect(errors).toHaveLength(0);
-
     expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(631);
     expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
       71000

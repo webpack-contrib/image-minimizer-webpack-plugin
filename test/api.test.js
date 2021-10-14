@@ -27,6 +27,12 @@ describe("api", () => {
           plugins: ["imagemin-unknown"],
         })
       ).toThrowErrorMatchingSnapshot();
+      expect(() =>
+        ImageMinimizerPlugin.imageminNormalizeConfig({})
+      ).toThrowErrorMatchingSnapshot();
+      expect(() =>
+        ImageMinimizerPlugin.imageminNormalizeConfig({ plugins: [true] }, {})
+      ).toThrowErrorMatchingSnapshot();
 
       expect(
         ImageMinimizerPlugin.imageminNormalizeConfig({ plugins: ["mozjpeg"] })
@@ -43,12 +49,6 @@ describe("api", () => {
         ImageMinimizerPlugin.imageminNormalizeConfig({
           plugins: [["mozjpeg", { quality: 0 }]],
         })
-      ).toMatchSnapshot();
-      expect(
-        ImageMinimizerPlugin.imageminNormalizeConfig({}, {})
-      ).toMatchSnapshot();
-      expect(
-        ImageMinimizerPlugin.imageminNormalizeConfig({ plugins: [true] }, {})
       ).toMatchSnapshot();
     });
   });
