@@ -13,7 +13,6 @@ export type SquooshMinifyFunction = typeof squooshMinify;
 export type Rule = RegExp | string;
 export type Rules = Rule[] | Rule;
 export type FilterFn = (source: Buffer, sourcePath: string) => boolean;
-export type DataForMinifyFn = Record<string, Buffer>;
 export type ImageminMinimizerOptions = {
   plugins: ImageminOptions["plugins"] | [string, Record<string, any>];
   pluginsMeta?: Record<string, any>[] | undefined;
@@ -30,22 +29,24 @@ export type MinimizerOptions =
   | ImageminMinimizerOptions
   | SquooshMinimizerOptions
   | CustomFnMinimizerOptions;
-export type InternalMinifyOptions = {
+export type InternalWorkerOptions = {
   filename: string;
   input: Buffer;
-  severityError?: string | undefined;
-  minimizerOptions?: MinimizerOptions | undefined;
   minify: MinifyFunctions;
+  minimizerOptions?: MinimizerOptions | undefined;
+  severityError?: string | undefined;
+  newFilename?: string | FilenameFn | undefined;
+  generateFilename?: Function | undefined;
 };
 export type CustomMinifyFunction = (
-  original: MinifyResult,
+  original: WorkerResult,
   options: CustomFnMinimizerOptions
-) => Promise<MinifyResult>;
+) => Promise<WorkerResult>;
 export type MinifyFunctions =
   | ImageminMinifyFunction
   | SquooshMinifyFunction
   | CustomMinifyFunction;
-export type MinifyResult = {
+export type WorkerResult = {
   filename: string;
   data: Buffer;
   warnings: Array<Error>;
@@ -138,9 +139,6 @@ export type PluginOptions = {
  * @returns {boolean}
  */
 /**
- * @typedef {Record.<string, Buffer>} DataForMinifyFn
- */
-/**
  * @typedef {Object} ImageminMinimizerOptions
  * @property {ImageminOptions["plugins"] | [string, Record<string, any>]} plugins
  * @property {Array<Record<string, any>>} [pluginsMeta]
@@ -156,24 +154,26 @@ export type PluginOptions = {
  * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
  */
 /**
- * @typedef {Object} InternalMinifyOptions
+ * @typedef {Object} InternalWorkerOptions
  * @property {string} filename
  * @property {Buffer} input
- * @property {string} [severityError]
- * @property {MinimizerOptions} [minimizerOptions]
  * @property {MinifyFunctions} minify
+ * @property {MinimizerOptions} [minimizerOptions]
+ * @property {string} [severityError]
+ * @property {string | FilenameFn} [newFilename]
+ * @property {Function} [generateFilename]
  */
 /**
  * @callback CustomMinifyFunction
- * @param {MinifyResult} original
+ * @param {WorkerResult} original
  * @param {CustomFnMinimizerOptions} options
- * @returns {Promise<MinifyResult>}
+ * @returns {Promise<WorkerResult>}
  */
 /**
  * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
  */
 /**
- * @typedef {Object} MinifyResult
+ * @typedef {Object} WorkerResult
  * @property {string} filename
  * @property {Buffer} data
  * @property {Array<Error>} warnings

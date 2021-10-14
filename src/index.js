@@ -59,9 +59,11 @@ import squooshMinify from "./utils/squooshMinify";
  * @typedef {Object} InternalWorkerOptions
  * @property {string} filename
  * @property {Buffer} input
- * @property {string} [severityError]
- * @property {MinimizerOptions} [minimizerOptions]
  * @property {MinifyFunctions} minify
+ * @property {MinimizerOptions} [minimizerOptions]
+ * @property {string} [severityError]
+ * @property {string | FilenameFn} [newFilename]
+ * @property {Function} [generateFilename]
  */
 
 /**
@@ -261,8 +263,10 @@ class ImageMinimizerPlugin {
               filename: name,
               input,
               severityError,
-              minimizerOptions,
               minify,
+              minimizerOptions,
+              newFilename: this.options.filename,
+              generateFilename: compilation.getAssetPath.bind(compilation),
             });
 
             output = await worker(minifyOptions);
@@ -272,6 +276,7 @@ class ImageMinimizerPlugin {
             await cacheItem.storePromise({
               source: output.source,
               info: output.info,
+              filename: output.filename,
               warnings: output.warnings,
               errors: output.errors,
             });
@@ -293,22 +298,15 @@ class ImageMinimizerPlugin {
             return;
           }
 
-          const { path: newName } = compilation.getPathWithInfo(
-            this.options.filename,
-            {
-              filename: name,
-            }
-          );
-
-          const isNewAsset = name !== newName;
+          const isNewAsset = name !== output.filename;
 
           if (isNewAsset) {
             const newInfo = {
               ...output.info,
-              related: { minimized: newName, ...info.related },
+              related: { minimized: output.filename, ...info.related },
             };
 
-            compilation.emitAsset(newName, output.source, newInfo);
+            compilation.emitAsset(output.filename, output.source, newInfo);
 
             if (this.options.deleteOriginalAssets) {
               compilation.deleteAsset(name);

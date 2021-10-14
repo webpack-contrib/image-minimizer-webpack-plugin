@@ -40,15 +40,23 @@ module.exports = async function loader(content) {
 
   const input = content;
 
-  const { severityError, minimizerOptions } = options;
+  const {
+    minify,
+    minimizerOptions,
+    severityError,
+    filename = "[path][name][ext]",
+  } = options;
 
   const minifyOptions = /** @type {InternalWorkerOptions} */ ({
-    minify: options.minify || imageminMinify,
     input,
     filename: name,
     severityError,
+    minify: minify || imageminMinify,
     minimizerOptions,
-    isProductionMode: this.mode === "production" || !this.mode,
+    newFilename: filename,
+    generateFilename:
+      /** @type {Compilation} */
+      (this._compilation).getAssetPath.bind(this._compilation),
   });
 
   const output = await worker(minifyOptions);
@@ -70,16 +78,11 @@ module.exports = async function loader(content) {
   }
 
   const source = output.data;
-  const { path: newName } = /** @type {Compilation} */ (
-    this._compilation
-  ).getPathWithInfo(options.filename || "[path][name][ext]", {
-    filename: name,
-  });
 
-  const isNewAsset = name !== newName;
+  const isNewAsset = name !== output.filename;
 
   if (isNewAsset) {
-    this.emitFile(newName, source.toString(), "", {
+    this.emitFile(output.filename, source.toString(), "", {
       minimized: true,
     });
 
