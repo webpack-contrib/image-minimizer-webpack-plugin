@@ -4,11 +4,11 @@ import path from "path";
 import pify from "pify";
 import fileType from "file-type";
 
-import { fixturesPath, isOptimized, webpack } from "./helpers";
+import { fixturesPath, isOptimized, runWebpack } from "./helpers";
 
 describe("loader", () => {
   it("should optimizes all images", async () => {
-    const stats = await webpack({ imageminLoader: true });
+    const stats = await runWebpack({ imageminLoader: true });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
@@ -30,7 +30,7 @@ describe("loader", () => {
   });
 
   it("should optimizes all images and don't break non images", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "loader-other-imports.js"),
       imageminLoader: true,
       test: /\.(jpe?g|png|gif|svg|css|txt)$/i,
@@ -73,7 +73,7 @@ describe("loader", () => {
   });
 
   it("should transform image source to webp", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: path.resolve(__dirname, "outputs"),

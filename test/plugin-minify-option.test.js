@@ -2,11 +2,11 @@ import path from "path";
 
 import ImageMinimizerPlugin from "../src";
 
-import { fixturesPath, webpack, isOptimized } from "./helpers";
+import { fixturesPath, runWebpack, isOptimized } from "./helpers";
 
 describe("plugin minify option", () => {
   it('should work with "imageminMinify" minifier', async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
@@ -28,7 +28,7 @@ describe("plugin minify option", () => {
   });
 
   it('should work with "squooshMinify" minifier', async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
@@ -46,7 +46,7 @@ describe("plugin minify option", () => {
   it("should work when minify is custom function", async () => {
     expect.assertions(5);
 
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
@@ -79,7 +79,7 @@ describe("plugin minify option", () => {
   it("should work if minify is array && minimizerOptions is object", async () => {
     expect.assertions(5);
 
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
@@ -111,7 +111,7 @@ describe("plugin minify option", () => {
   it("should work if minify is array && minimizerOptions is array", async () => {
     expect.assertions(5);
 
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
@@ -153,7 +153,7 @@ describe("plugin minify option", () => {
   });
 
   it("should work with 'imageminMinify' minifier and 'minimizerOptions'", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
@@ -172,7 +172,7 @@ describe("plugin minify option", () => {
   });
 
   it("should work with 'squooshMinify' minifier and 'minimizerOptions'", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
@@ -201,7 +201,7 @@ describe("plugin minify option", () => {
   });
 
   it('should emit warning when file is not supported by "squooshMinify"', async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       emitPluginOptions: {

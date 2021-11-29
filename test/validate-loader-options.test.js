@@ -2,7 +2,7 @@ import path from "path";
 
 import ImageMinimizerPlugin from "../src";
 
-import { fixturesPath, plugins, webpack } from "./helpers";
+import { fixturesPath, plugins, runWebpack } from "./helpers";
 
 describe("validate loader options", () => {
   const tests = {
@@ -68,7 +68,7 @@ describe("validate loader options", () => {
       let stats;
 
       try {
-        stats = await webpack(options);
+        stats = await runWebpack(options);
       } finally {
         const shouldSuccess = type === "success";
         const {

@@ -1,6 +1,6 @@
 import path from "path";
 
-import crypto from "crypto";
+import webpack from "webpack";
 
 import fileType from "file-type";
 
@@ -9,7 +9,7 @@ import {
   isOptimized,
   hasLoader,
   plugins,
-  webpack,
+  runWebpack,
   compile,
   readAsset,
   clearDirectory,
@@ -19,7 +19,7 @@ import ImageMinimizerPlugin from "../src";
 
 describe("imagemin plugin", () => {
   it("should optimizes all images (loader + plugin)", async () => {
-    const stats = await webpack({ emitPlugin: true, imageminPlugin: true });
+    const stats = await runWebpack({ emitPlugin: true, imageminPlugin: true });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
 
@@ -49,7 +49,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should optimizes all images (loader + plugin) as minimizer", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       asMinimizer: true,
       emitPlugin: true,
       imageminPlugin: true,
@@ -83,7 +83,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should optimizes all images (loader + plugin) (multi compiler mode)", async () => {
-    const multiStats = await webpack([
+    const multiStats = await runWebpack([
       {
         entry: path.join(fixturesPath, "multiple-entry.js"),
         emitPluginOptions: {
@@ -146,7 +146,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should optimizes successfully without any assets", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPlugin: true,
     });
@@ -158,7 +158,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should throws an error if 'imagemin' plugins don't setup (by plugin)", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       emitPlugin: true,
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
@@ -180,7 +180,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should throws an error if 'imagemin' plugins don't setup (by loader)", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "single-image-loader.js"),
       imageminPluginOptions: {
         minimizerOptions: {
@@ -201,7 +201,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should optimizes all images (loader + plugin) and interpolate `[name][ext]` name", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       emitPluginOptions: {
         fileNames: ["plugin-test.png"],
       },
@@ -239,7 +239,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should optimizes all images (loader + plugin) and interpolate `[path][name][ext]` name", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./nested/deep/loader.js"),
       emitPluginOptions: {
         fileNames: ["nested/deep/plugin-test.png"],
@@ -278,7 +278,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should work with child compilation", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.resolve(__dirname, "fixtures/loader-with-child.js"),
       emitPlugin: true,
       imageminPlugin: true,
@@ -316,7 +316,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should generate real content hash", async () => {
-    const compiler = await webpack(
+    const compiler = await runWebpack(
       {
         output: {
           path: path.resolve(__dirname, "outputs"),
@@ -353,7 +353,7 @@ describe("imagemin plugin", () => {
       const [, webpackHash] = assetName.match(/^.+?\.(.+?)\..+$/);
 
       const { hashDigest, hashFunction } = output;
-      const cryptoHash = crypto
+      const cryptoHash = webpack.util
         .createHash(hashFunction)
         .update(readAsset(assetName, compiler, stats))
         .digest(hashDigest);
@@ -366,7 +366,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should work with asset/resource", async () => {
-    const compiler = await webpack(
+    const compiler = await runWebpack(
       {
         fileLoaderOff: true,
         assetResource: true,
@@ -410,7 +410,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should generate real content hash with asset/resource", async () => {
-    const compiler = await webpack(
+    const compiler = await runWebpack(
       {
         fileLoaderOff: true,
         assetResource: true,
@@ -449,7 +449,7 @@ describe("imagemin plugin", () => {
       const [, webpackHash] = assetName.match(/^.+?\.(.+?)\..+$/);
 
       const { hashDigestLength, hashDigest, hashFunction } = output;
-      const cryptoHash = crypto
+      const cryptoHash = webpack.util
         .createHash(hashFunction)
         .update(readAsset(assetName, compiler, stats))
         .digest(hashDigest)
@@ -463,7 +463,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should work with asset/inline", async () => {
-    const compiler = await webpack(
+    const compiler = await runWebpack(
       {
         fileLoaderOff: true,
         assetInline: true,
@@ -491,7 +491,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should work and use the persistent cache by default (loader + plugin)", async () => {
-    const compiler = await webpack(
+    const compiler = await runWebpack(
       {
         mode: "development",
         entry: path.join(fixturesPath, "./simple.js"),
@@ -526,7 +526,7 @@ describe("imagemin plugin", () => {
   });
 
   it('should work and use the persistent cache when "cache" option is true (loader + plugin)', async () => {
-    const compiler = await webpack(
+    const compiler = await runWebpack(
       {
         mode: "development",
         entry: path.join(fixturesPath, "./simple.js"),
@@ -561,7 +561,7 @@ describe("imagemin plugin", () => {
   });
 
   it('should work and do not use persistent cache when "cache" option is "false"', async () => {
-    const compiler = await webpack(
+    const compiler = await runWebpack(
       {
         cache: false,
         entry: path.join(fixturesPath, "./simple.js"),
@@ -598,7 +598,7 @@ describe("imagemin plugin", () => {
   it("should work and use the persistent cache when transform asset (loader + plugin)", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "cache-webp");
 
-    const compiler = await webpack(
+    const compiler = await runWebpack(
       {
         mode: "development",
         entry: path.join(fixturesPath, "./simple.js"),
@@ -668,7 +668,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should run plugin against assets added later by plugins", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       emitPlugin: true,
       imageminPlugin: true,
       EmitNewAssetPlugin: true,
@@ -686,7 +686,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should passed asset info (plugin)", async () => {
-    const compiler = await webpack(
+    const compiler = await runWebpack(
       {
         mode: "development",
         imageminPlugin: true,
@@ -709,7 +709,7 @@ describe("imagemin plugin", () => {
   });
 
   it("should work and show 'minimized' in stats when only image minification used", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
@@ -739,7 +739,7 @@ describe("imagemin plugin", () => {
 
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip("should work and show 'generated' in stats when only image generation used", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {

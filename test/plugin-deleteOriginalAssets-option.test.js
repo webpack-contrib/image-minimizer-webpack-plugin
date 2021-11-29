@@ -2,11 +2,16 @@ import path from "path";
 
 import fileType from "file-type";
 
-import { fixturesPath, isOptimized, webpack, normalizePath } from "./helpers";
+import {
+  fixturesPath,
+  isOptimized,
+  runWebpack,
+  normalizePath,
+} from "./helpers";
 
 describe('plugin "deleteOriginalAssets" option', () => {
   it("should transform asset and keep original asset (default behavior)", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       output: {
         path: path.resolve(__dirname, "outputs"),
@@ -50,7 +55,7 @@ describe('plugin "deleteOriginalAssets" option', () => {
   });
 
   it('should transform asset and keep original asset when the "deleteOriginalAssets" option is "false"', async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       output: {
         path: path.resolve(__dirname, "outputs"),
@@ -95,7 +100,7 @@ describe('plugin "deleteOriginalAssets" option', () => {
   });
 
   it('should transform asset and keep original asset when the "deleteOriginalAssets" option is "true"', async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       output: {
         path: path.resolve(__dirname, "outputs"),
@@ -136,7 +141,7 @@ describe('plugin "deleteOriginalAssets" option', () => {
   });
 
   it("should transform assets to webp (plugin + loader)", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: path.resolve(__dirname, "outputs"),
@@ -168,7 +173,7 @@ describe('plugin "deleteOriginalAssets" option', () => {
   });
 
   it('should transform asset and remove original asset when the "deleteOriginalAssets" option is "true"', async () => {
-    const multiStats = await webpack([
+    const multiStats = await runWebpack([
       {
         entry: path.join(fixturesPath, "./empty-entry.js"),
         output: {

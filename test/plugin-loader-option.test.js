@@ -1,8 +1,8 @@
-import { isOptimized, plugins, webpack } from "./helpers";
+import { isOptimized, plugins, runWebpack } from "./helpers";
 
 describe("plugin loader option", () => {
   it("should optimizes all images (plugin standalone)", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       emitPlugin: true,
       imageminPluginOptions: {
         minimizerOptions: { plugins },

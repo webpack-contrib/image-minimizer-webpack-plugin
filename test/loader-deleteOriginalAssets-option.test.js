@@ -2,11 +2,11 @@ import path from "path";
 
 import fileType from "file-type";
 
-import { fixturesPath, webpack, clearDirectory } from "./helpers";
+import { fixturesPath, runWebpack, clearDirectory } from "./helpers";
 
 describe('loader "deleteOriginalAssets" option', () => {
   it("should transform asset and keep original asset (default behavior)", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: path.resolve(__dirname, "outputs"),
@@ -41,7 +41,7 @@ describe('loader "deleteOriginalAssets" option', () => {
   });
 
   it('should transform asset and keep original asset when the "deleteOriginalAssets" option is "false"', async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: path.resolve(__dirname, "outputs"),
@@ -82,7 +82,7 @@ describe('loader "deleteOriginalAssets" option', () => {
 
     clearDirectory(outputDir);
 
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: outputDir,

@@ -2,7 +2,7 @@ import path from "path";
 
 import fileType from "file-type";
 
-import { fixturesPath, webpack, clearDirectory } from "./helpers";
+import { fixturesPath, runWebpack, clearDirectory } from "./helpers";
 
 describe('loader "filename" option', () => {
   beforeAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
@@ -10,7 +10,7 @@ describe('loader "filename" option', () => {
 
   it("should emit new transformed to webp asset with flat filename", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "loader-filename-1");
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: outputDir,
@@ -40,7 +40,7 @@ describe('loader "filename" option', () => {
 
   it("should emit new transformed to webp asset with nested filename", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "loader-filename-2");
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: outputDir,
@@ -70,7 +70,7 @@ describe('loader "filename" option', () => {
 
   it("should emit new transformed to webp asset with filename  pointing to other directory", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "loader-filename-3");
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: outputDir,
@@ -100,7 +100,7 @@ describe('loader "filename" option', () => {
 
   it("should emit new transformed to webp asset with filename when filename is function", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "loader-filename-3");
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       output: {
         path: outputDir,
