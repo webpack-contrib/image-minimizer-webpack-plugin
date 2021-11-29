@@ -2,7 +2,7 @@ import path from "path";
 
 import fileType from "file-type";
 
-import { fixturesPath, webpack, clearDirectory } from "./helpers";
+import { fixturesPath, runWebpack, clearDirectory } from "./helpers";
 
 describe("plugin filename option", () => {
   beforeAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
@@ -10,7 +10,7 @@ describe("plugin filename option", () => {
 
   it("should transform image to webp", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "filename-1");
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       output: {
         path: outputDir,
@@ -45,7 +45,7 @@ describe("plugin filename option", () => {
 
   it("should transform image to webp with flat filename", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "filename-2");
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       output: {
         path: outputDir,
@@ -76,7 +76,7 @@ describe("plugin filename option", () => {
 
   it("should transform image to webp with nested filename", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "filename-3");
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       output: {
         path: outputDir,
@@ -111,7 +111,7 @@ describe("plugin filename option", () => {
 
   it("should transform image to webp with filename pointing to other directory", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "filename-4");
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       output: {
         path: outputDir,
@@ -142,7 +142,7 @@ describe("plugin filename option", () => {
 
   it("should transform image to webp with filename when filename is function", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "filename-4");
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       output: {
         path: outputDir,

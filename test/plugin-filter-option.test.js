@@ -5,12 +5,12 @@ import {
   isOptimized,
   hasLoader,
   plugins,
-  webpack,
+  runWebpack,
 } from "./helpers";
 
 describe("plugin filter option", () => {
   it("should optimizes all images (loader + plugin) exclude filtered", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       emitPlugin: true,
       imageminPluginOptions: {
         filter: (source, sourcePath) => {
@@ -63,7 +63,7 @@ describe("plugin filter option", () => {
     let firstFilterCounter = 0;
     let secondFilterCounter = 0;
 
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "multiple-entry.js"),
       emitPluginOptions: {
         fileNames: ["multiple-plugin-test-1.svg", "multiple-plugin-test-2.svg"],
@@ -129,7 +129,7 @@ describe("plugin filter option", () => {
     let firstFilterCounter = 0;
     let secondFilterCounter = 0;
 
-    const multiStats = await webpack([
+    const multiStats = await runWebpack([
       {
         entry: path.join(fixturesPath, "multiple-entry.js"),
         emitPluginOptions: {

@@ -376,7 +376,7 @@ export default class EmitNewAssetPlugin {
 }
 
 export {
-  runWebpack as webpack,
+  runWebpack,
   compile,
   isOptimized,
   plugins,

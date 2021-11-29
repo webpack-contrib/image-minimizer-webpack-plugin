@@ -1,10 +1,10 @@
 import path from "path";
 
-import { fixturesPath, isOptimized, plugins, webpack } from "./helpers";
+import { fixturesPath, isOptimized, plugins, runWebpack } from "./helpers";
 
 describe("loader severityError option", () => {
   it("should throws error on corrupted images using `severityError` option with `error` value", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
         severityError: "error",
@@ -27,7 +27,7 @@ describe("loader severityError option", () => {
   });
 
   it("should throws error on corrupted images using `severityError` option with `warning` value", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
         severityError: "warning",
@@ -50,7 +50,7 @@ describe("loader severityError option", () => {
   });
 
   it("should throws error on corrupted images using `severityError` option with `off` value", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
         severityError: "off",
@@ -71,7 +71,7 @@ describe("loader severityError option", () => {
   });
 
   it("should throws error on corrupted images using mode `production` and `severityError` option not specify value", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       mode: "production",
       optimization: {
         emitOnErrors: true,

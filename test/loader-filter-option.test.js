@@ -1,8 +1,8 @@
-import { isOptimized, plugins, webpack } from "./helpers";
+import { isOptimized, plugins, runWebpack } from "./helpers";
 
 describe("loader filter option", () => {
   it("should optimizes all images exclude filtered", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       imageminLoaderOptions: {
         filter: (source, filename) => {
           expect(source).toBeInstanceOf(Buffer);

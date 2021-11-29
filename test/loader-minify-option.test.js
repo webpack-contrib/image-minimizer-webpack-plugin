@@ -1,10 +1,10 @@
 import ImageMinimizerPlugin from "../src";
 
-import { webpack, isOptimized } from "./helpers";
+import { runWebpack, isOptimized } from "./helpers";
 
 describe("loader minify option", () => {
   it('should work with "imagemin" minifier', async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       imageminLoader: true,
       imageminLoaderOptions: {
         minify: ImageMinimizerPlugin.imageminMinify,
@@ -36,7 +36,7 @@ describe("loader minify option", () => {
   it("should work when minify is custom function", async () => {
     expect.assertions(14);
 
-    const stats = await webpack({
+    const stats = await runWebpack({
       imageminLoader: true,
       imageminLoaderOptions: {
         minify: (input, minifiOptions) => {
@@ -73,7 +73,7 @@ describe("loader minify option", () => {
   it("should work if minify is array && minimizerOptions is object", async () => {
     expect.assertions(14);
 
-    const stats = await webpack({
+    const stats = await runWebpack({
       imageminLoader: true,
       imageminLoaderOptions: {
         minify: [
@@ -113,7 +113,7 @@ describe("loader minify option", () => {
   it("should work if minify is array && minimizerOptions is array", async () => {
     expect.assertions(14);
 
-    const stats = await webpack({
+    const stats = await runWebpack({
       imageminLoader: true,
       imageminLoaderOptions: {
         minify: [
@@ -163,7 +163,7 @@ describe("loader minify option", () => {
   });
 
   it("should emit errors", async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       imageminLoader: true,
       imageminLoaderOptions: {
         minify: () => {
@@ -192,7 +192,7 @@ describe("loader minify option", () => {
   });
 
   it('should work with "imageminMinify" minifier', async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       imageminLoader: true,
       imageminLoaderOptions: {
         minify: ImageMinimizerPlugin.imageminMinify,
@@ -212,7 +212,7 @@ describe("loader minify option", () => {
   });
 
   it('should work with "squooshMinify" minifier', async () => {
-    const stats = await webpack({
+    const stats = await runWebpack({
       imageminLoader: true,
       imageminLoaderOptions: {
         minify: ImageMinimizerPlugin.squooshMinify,
