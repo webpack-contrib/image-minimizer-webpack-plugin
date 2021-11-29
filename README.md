@@ -1223,17 +1223,6 @@ The function normalizes configuration (converts plugins names and options to `Fu
 ```js
 const imagemin = require("imagemin");
 const { imageminNormalizeConfig } = require("image-minimizer-webpack-plugin");
-const imageminConfig = imageminNormalizeConfig({
-  plugins: [
-    "jpegtran",
-    [
-      "pngquant",
-      {
-        quality: [0.6, 0.8],
-      },
-    ],
-  ],
-});
 
 /*
   console.log(imageminConfig);
@@ -1248,6 +1237,9 @@ const imageminConfig = imageminNormalizeConfig({
 */
 
 (async () => {
+  const imageminConfig = await imageminNormalizeConfig({
+    plugins: ["jpegtran", ["pngquant", { quality: [0.6, 0.8] }]],
+  });
   const files = await imagemin(["images/*.{jpg,png}"], {
     destination: "build/images",
     plugins: imageminConfig.plugins,

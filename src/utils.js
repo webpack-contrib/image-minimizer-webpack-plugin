@@ -454,8 +454,9 @@ class InvalidConfigError extends Error {
 
 /**
  * @param {ImageminMinimizerOptions} minimizerOptions
+ * @returns {Promise<ImageminOptions>}
  */
-function imageminNormalizeConfig(minimizerOptions) {
+async function imageminNormalizeConfig(minimizerOptions) {
   if (
     !minimizerOptions ||
     !minimizerOptions.plugins ||
@@ -472,78 +473,81 @@ function imageminNormalizeConfig(minimizerOptions) {
     imageminConfig.pluginsMeta = [];
   }
 
-  // @ts-ignore
-  imageminConfig.plugins = imageminConfig.plugins.map(
-    /**
-     * @template T
-     * @param {string | [string, object]} plugin
-     * @returns {T}
-     */
-    // @ts-ignore
-    (plugin) => {
-      const isPluginArray = Array.isArray(plugin);
+  /**
+   * @type {import("imagemin").Plugin[]}
+   */
+  const plugins = [];
 
-      if (typeof plugin === "string" || isPluginArray) {
-        const pluginName = isPluginArray
-          ? /** @type {[string, object]} */ (plugin)[0]
-          : /** @type {string} */ (plugin);
-        const pluginOptions = isPluginArray
-          ? /** @type {[string, object]} */ (plugin)[1]
-          : undefined;
+  for (const plugin of imageminConfig.plugins) {
+    const isPluginArray = Array.isArray(plugin);
 
-        let requiredPlugin = null;
-        let requiredPluginName = `imagemin-${pluginName}`;
+    if (typeof plugin === "string" || isPluginArray) {
+      const pluginName = isPluginArray
+        ? /** @type {[string, object]} */ (plugin)[0]
+        : /** @type {string} */ (plugin);
+      const pluginOptions = isPluginArray
+        ? /** @type {[string, object]} */ (plugin)[1]
+        : undefined;
 
-        try {
-          // eslint-disable-next-line import/no-dynamic-require
-          requiredPlugin = require(requiredPluginName)(pluginOptions);
-        } catch {
-          requiredPluginName = pluginName;
+      let requiredPlugin = null;
+      let requiredPluginName = `imagemin-${pluginName}`;
 
-          try {
-            // eslint-disable-next-line import/no-dynamic-require
-            requiredPlugin = require(requiredPluginName)(pluginOptions);
-          } catch {
-            const pluginNameForError = pluginName.startsWith("imagemin")
-              ? pluginName
-              : `imagemin-${pluginName}`;
-
-            throw new Error(
-              `Unknown plugin: ${pluginNameForError}\n\nDid you forget to install the plugin?\nYou can install it with:\n\n$ npm install ${pluginNameForError} --save-dev\n$ yarn add ${pluginNameForError} --dev`
-            );
-          }
-          // Nothing
-        }
-
-        let version = "unknown";
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        requiredPlugin = (await import(requiredPluginName)).default(
+          pluginOptions
+        );
+      } catch {
+        requiredPluginName = pluginName;
 
         try {
-          // eslint-disable-next-line import/no-dynamic-require
-          ({ version } = require(`${requiredPluginName}/package.json`));
+          // eslint-disable-next-line no-await-in-loop
+          requiredPlugin = (await import(requiredPluginName)).default(
+            pluginOptions
+          );
         } catch {
-          // Nothing
+          const pluginNameForError = pluginName.startsWith("imagemin")
+            ? pluginName
+            : `imagemin-${pluginName}`;
+
+          throw new Error(
+            `Unknown plugin: ${pluginNameForError}\n\nDid you forget to install the plugin?\nYou can install it with:\n\n$ npm install ${pluginNameForError} --save-dev\n$ yarn add ${pluginNameForError} --dev`
+          );
         }
-
-        /** @type {Array<Object>} imageminConfig.pluginsMeta */
-        (imageminConfig.pluginsMeta).push([
-          {
-            name: requiredPluginName,
-            options: pluginOptions || {},
-            version,
-          },
-        ]);
-
-        return requiredPlugin;
+        // Nothing
       }
 
+      let version = "unknown";
+
+      try {
+        // eslint-disable-next-line import/no-dynamic-require
+        ({ version } = require(`${requiredPluginName}/package.json`));
+      } catch {
+        // Nothing
+      }
+
+      /** @type {Array<Object>} imageminConfig.pluginsMeta */
+      (imageminConfig.pluginsMeta).push([
+        {
+          name: requiredPluginName,
+          options: pluginOptions || {},
+          version,
+        },
+      ]);
+
+      plugins.push(requiredPlugin);
+    } else {
       throw new InvalidConfigError(
         `Invalid plugin configuration '${JSON.stringify(
           plugin
         )}', plugin configuration should be 'string' or '[string, object]'"`
       );
     }
-  );
+  }
 
+  imageminConfig.plugins = plugins;
+
+  // @ts-ignore
   return imageminConfig;
 }
 
@@ -555,7 +559,7 @@ function imageminNormalizeConfig(minimizerOptions) {
 async function imageminGenerate(original, minimizerOptions) {
   /** @type {ImageminOptions} */
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-    imageminNormalizeConfig(minimizerOptions)
+    await imageminNormalizeConfig(minimizerOptions)
   );
   const { plugins = [] } = minimizerOptionsNormalized;
 
@@ -623,7 +627,7 @@ async function imageminGenerate(original, minimizerOptions) {
 async function imageminMinify(original, options) {
   // Implement autosearch config on root directory of project in future
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-    imageminNormalizeConfig(options)
+    await imageminNormalizeConfig(options)
   );
 
   const imagemin = (await import("imagemin")).default;
