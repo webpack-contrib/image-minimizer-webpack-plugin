@@ -174,15 +174,15 @@ describe("validate plugin options", () => {
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ maxConcurrency: 2 });
+      new ImageMinimizerPlugin({ concurrency: 2 });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ maxConcurrency: true });
+      new ImageMinimizerPlugin({ concurrency: true });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ maxConcurrency: "true" });
+      new ImageMinimizerPlugin({ concurrency: "true" });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {

@@ -7,6 +7,72 @@ import { klona } from "klona/full";
 /** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("webpack").WebpackError} WebpackError */
 
+const notSettled = Symbol("not-settled");
+
+/**
+ * @template T
+ * @typedef {() => Promise<T>} Task
+ */
+
+/**
+ * Run tasks with limited concurency.
+ * @template T
+ * @param {number} limit - Limit of tasks that run at once.
+ * @param {Task<T>[]} tasks - List of tasks to run.
+ * @returns {Promise<T[]>} A promise that fulfills to an array of the results
+ */
+function throttleAll(limit, tasks) {
+  if (!Number.isInteger(limit) || limit < 1) {
+    throw new TypeError(
+      `Expected 'limit' to be a finite number > 0, got \`${limit}\` (${typeof limit})`
+    );
+  }
+
+  if (
+    !Array.isArray(tasks) ||
+    !tasks.every((task) => typeof task === "function")
+  ) {
+    throw new TypeError(
+      "Expected 'tasks' to be a list of functions returning a promise"
+    );
+  }
+
+  return new Promise((resolve, reject) => {
+    // eslint-disable-next-line unicorn/new-for-builtins
+    const result = Array(tasks.length).fill(notSettled);
+    const entries = tasks.entries();
+    const next = () => {
+      const { done, value } = entries.next();
+
+      if (done) {
+        const isLast = !result.includes(notSettled);
+
+        if (isLast) {
+          // eslint-disable-next-line node/callback-return
+          resolve(result);
+        }
+
+        return;
+      }
+
+      const [index, task] = value;
+
+      /**
+       * @param {T} i
+       */
+      const onFulfilled = (i) => {
+        result[index] = i;
+        next();
+      };
+
+      task().then(onFulfilled, reject);
+    };
+
+    // eslint-disable-next-line unicorn/new-for-builtins
+    Array(limit).fill(0).forEach(next);
+  });
+}
+
 /**
  * @callback Uint8ArrayUtf8ByteString
  * @param {number[] | Uint8Array} array
@@ -17,7 +83,7 @@ import { klona } from "klona/full";
 
 /** @type {Uint8ArrayUtf8ByteString} */
 const uint8ArrayUtf8ByteString = (array, start, end) =>
-  String.fromCharCode(...array.slice(start, end));
+  String.fromCodePoint(...array.slice(start, end));
 
 /**
  * @callback StringToBytes
@@ -27,6 +93,7 @@ const uint8ArrayUtf8ByteString = (array, start, end) =>
 
 /** @type {StringToBytes} */
 const stringToBytes = (string) =>
+  // eslint-disable-next-line unicorn/prefer-code-point
   [...string].map((character) => character.charCodeAt(0));
 
 /**
@@ -745,6 +812,7 @@ async function squooshMinify(original, options) {
 }
 
 export {
+  throttleAll,
   imageminNormalizeConfig,
   imageminMinify,
   imageminGenerate,

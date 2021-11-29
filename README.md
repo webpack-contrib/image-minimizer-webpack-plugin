@@ -276,7 +276,7 @@ module.exports = {
 |               **[`minify`](#minify)**               |      `{Function \| Array<Function>}`      |            `ImageMinimizerPlugin.imageminMinify`            | Allows to override default minify function                                                        |
 |     **[`minimizerOptions`](#minimizeroptions)**     |         `{Object\|Array<Object>}`         |                      `{ plugins: [] }`                      | Options for `imagemin`                                                                            |
 |               **[`loader`](#loader)**               |                `{Boolean}`                |                           `true`                            | Automatically adding `imagemin-loader`                                                            |
-|       **[`maxConcurrency`](#maxconcurrency)**       |                `{Number}`                 |             `Math.max(1, os.cpus().length - 1)`             | Maximum number of concurrency optimization processes in one time                                  |
+|          **[`concurrency`](#concurrency)**          |                `{Number}`                 |             `Math.max(1, os.cpus().length - 1)`             | Maximum number of concurrency optimization processes in one time                                  |
 |             **[`filename`](#filename)**             |           `{string\|Function}`            |                    `'[path][name][ext]'`                    | Allows to set the filename for the generated asset. Useful for converting to a `webp`             |
 | **[`deleteOriginalAssets`](#deleteoriginalassets)** |                `{Boolean}`                |                           `false`                           | Allows to delete the original asset. Useful for converting to a `webp` and remove original assets |
 
@@ -603,7 +603,7 @@ module.exports = {
 };
 ```
 
-#### `maxConcurrency`
+#### `concurrency`
 
 Type: `Number`
 Default: `Math.max(1, os.cpus().length - 1)`
@@ -618,7 +618,7 @@ const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
 module.exports = {
   plugins: [
     new ImageMinimizerPlugin({
-      maxConcurrency: 3,
+      concurrency: 3,
     }),
   ],
 };
