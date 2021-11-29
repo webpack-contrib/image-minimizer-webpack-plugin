@@ -128,8 +128,8 @@ export type PluginOptions = {
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
 /** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("./loader").LoaderOptions} LoaderOptions */
-/** @typedef {import("./utils/imageminMinify").default} ImageminMinifyFunction */
-/** @typedef {import("./utils/squooshMinify").default} SquooshMinifyFunction */
+/** @typedef {import("./utils.js").imageminMinify} ImageminMinifyFunction */
+/** @typedef {import("./utils.js").squooshMinify} SquooshMinifyFunction */
 /** @typedef {RegExp | string} Rule */
 /** @typedef {Rule[] | Rule} Rules */
 /**
@@ -253,8 +253,10 @@ declare namespace ImageMinimizerPlugin {
   export { imageminMinify };
   export { imageminGenerate };
   export { squooshMinify };
+  export { squooshGenerate };
 }
-import imageminMinify from "./utils/imageminMinify";
-import squooshMinify from "./utils/squooshMinify";
-import { imageminNormalizeConfig } from "./utils/imageminMinify";
-import imageminGenerate from "./utils/imageminGenerate";
+import { imageminMinify } from "./utils.js";
+import { squooshMinify } from "./utils.js";
+import { imageminNormalizeConfig } from "./utils.js";
+import { imageminGenerate } from "./utils.js";
+import { squooshGenerate } from "./utils.js";
