@@ -108,7 +108,7 @@ export type PluginOptions = {
   /**
    * Maximum number of concurrency optimization processes in one time.
    */
-  maxConcurrency?: number | undefined;
+  concurrency?: number | undefined;
   /**
    * Allows to set the filename for the generated asset. Useful for converting to a `webp`.
    */
@@ -207,7 +207,7 @@ export type PluginOptions = {
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
- * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
+ * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  * @property {MinifyFunctions} [minify]
@@ -228,7 +228,7 @@ declare class ImageMinimizerPlugin {
     minimizerOptions: MinimizerOptions;
     include: Rules | undefined;
     loader: boolean;
-    maxConcurrency: number | undefined;
+    concurrency: number | undefined;
     test: Rules;
     filename: string | FilenameFn;
     deleteOriginalAssets: boolean;

@@ -563,7 +563,7 @@ async function imageminGenerate(original, minimizerOptions) {
     return [];
   }
 
-  const imagemin = require("imagemin");
+  const imagemin = (await import("imagemin")).default;
 
   /** @type {WorkerResult[]} */
   const results = [];
@@ -582,6 +582,7 @@ async function imageminGenerate(original, minimizerOptions) {
       /** @type {ImageminOptions["plugins"]} */ ([plugin]);
 
     try {
+      // @ts-ignore
       // eslint-disable-next-line no-await-in-loop
       result.data = await imagemin.buffer(
         original.data,
@@ -625,11 +626,13 @@ async function imageminMinify(original, options) {
     imageminNormalizeConfig(options)
   );
 
-  const imagemin = require("imagemin");
+  const imagemin = (await import("imagemin")).default;
 
   let result;
 
   try {
+    // @ts-ignore
+
     result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
   } catch (error) {
     original.errors.push(

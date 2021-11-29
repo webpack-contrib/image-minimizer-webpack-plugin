@@ -10,7 +10,8 @@ npm-debug.log*
 /local
 /reports
 /node_modules
-/test/outputs/
+/test/outputs
+/test/bundled
 .DS_Store
 Thumbs.db
 .idea

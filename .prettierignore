@@ -3,4 +3,5 @@
 /node_modules
 /test/fixtures
 /test/outputs
+/test/bundled
 CHANGELOG.md
