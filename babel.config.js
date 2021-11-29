@@ -11,8 +11,10 @@ module.exports = (api) => {
       [
         "@babel/preset-env",
         {
+          exclude:
+            process.env.NODE_ENV === "test" ? [] : ["proposal-dynamic-import"],
           targets: {
-            node: "12.13.0",
+            node: "12.20.0",
           },
         },
       ],
