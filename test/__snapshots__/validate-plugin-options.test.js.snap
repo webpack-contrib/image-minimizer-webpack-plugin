@@ -175,16 +175,16 @@ exports[`validate plugin options should work 15`] = `
 
 exports[`validate plugin options should work 16`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.maxConcurrency should be a number.
-   -> Maximum number of concurrency optimization processes in one time.
-   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#maxconcurrency"
+ - options.concurrency should be a number.
+   -> Number of concurrency optimization processes in one time.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#concurrency"
 `;
 
 exports[`validate plugin options should work 17`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
- - options.maxConcurrency should be a number.
-   -> Maximum number of concurrency optimization processes in one time.
-   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#maxconcurrency"
+ - options.concurrency should be a number.
+   -> Number of concurrency optimization processes in one time.
+   -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#concurrency"
 `;
 
 exports[`validate plugin options should work 18`] = `

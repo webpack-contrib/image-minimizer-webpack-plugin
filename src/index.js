@@ -1,14 +1,13 @@
 import * as path from "path";
 import * as os from "os";
 
-import pLimit from "p-limit";
-
 import { validate } from "schema-utils";
 import serialize from "serialize-javascript";
 
 import worker from "./worker";
 import schema from "./plugin-options.json";
 import {
+  throttleAll,
   imageminNormalizeConfig,
   imageminMinify,
   imageminGenerate,
@@ -119,7 +118,7 @@ import {
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
- * @property {number} [maxConcurrency] Maximum number of concurrency optimization processes in one time.
+ * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  * @property {MinifyFunctions} [minify]
@@ -149,7 +148,7 @@ class ImageMinimizerPlugin {
         plugins: [],
       },
       loader = true,
-      maxConcurrency,
+      concurrency,
       filename = "[path][name][ext]",
       deleteOriginalAssets = false,
     } = options;
@@ -162,7 +161,7 @@ class ImageMinimizerPlugin {
       minimizerOptions,
       include,
       loader,
-      maxConcurrency,
+      concurrency,
       test,
       filename,
       deleteOriginalAssets,
@@ -236,96 +235,92 @@ class ImageMinimizerPlugin {
     );
 
     const cpus = os.cpus() || { length: 1 };
-    const limit = pLimit(
-      this.options.maxConcurrency || Math.max(1, cpus.length - 1)
-    );
+    const limit = this.options.concurrency || Math.max(1, cpus.length - 1);
 
     const { RawSource } = compiler.webpack.sources;
 
     const scheduledTasks = [];
 
     for (const asset of assetsForMinify) {
-      scheduledTasks.push(
-        limit(async () => {
-          const { name, inputSource, cacheItem, info } = asset;
-          let { output } = asset;
-          let input;
+      scheduledTasks.push(async () => {
+        const { name, inputSource, cacheItem, info } = asset;
+        let { output } = asset;
+        let input;
 
-          const sourceFromInputSource = inputSource.source();
+        const sourceFromInputSource = inputSource.source();
 
-          if (!output) {
-            input = sourceFromInputSource;
+        if (!output) {
+          input = sourceFromInputSource;
 
-            if (!Buffer.isBuffer(input)) {
-              input = Buffer.from(input);
-            }
-
-            const { severityError, minimizerOptions, minify } = this.options;
-
-            const minifyOptions = /** @type {InternalWorkerOptions} */ ({
-              filename: name,
-              input,
-              severityError,
-              minify,
-              minimizerOptions,
-              newFilename: this.options.filename,
-              generateFilename: compilation.getAssetPath.bind(compilation),
-            });
-
-            output = await worker(minifyOptions);
-
-            output.source = new RawSource(output.data);
-
-            await cacheItem.storePromise({
-              source: output.source,
-              info: output.info,
-              filename: output.filename,
-              warnings: output.warnings,
-              errors: output.errors,
-            });
+          if (!Buffer.isBuffer(input)) {
+            input = Buffer.from(input);
           }
 
-          if (output.warnings.length > 0) {
-            /** @type {[WebpackError]} */
-            (output.warnings).forEach((warning) => {
-              compilation.warnings.push(warning);
-            });
+          const { severityError, minimizerOptions, minify } = this.options;
+
+          const minifyOptions = /** @type {InternalWorkerOptions} */ ({
+            filename: name,
+            input,
+            severityError,
+            minify,
+            minimizerOptions,
+            newFilename: this.options.filename,
+            generateFilename: compilation.getAssetPath.bind(compilation),
+          });
+
+          output = await worker(minifyOptions);
+
+          output.source = new RawSource(output.data);
+
+          await cacheItem.storePromise({
+            source: output.source,
+            info: output.info,
+            filename: output.filename,
+            warnings: output.warnings,
+            errors: output.errors,
+          });
+        }
+
+        if (output.warnings.length > 0) {
+          /** @type {[WebpackError]} */
+          (output.warnings).forEach((warning) => {
+            compilation.warnings.push(warning);
+          });
+        }
+
+        if (output.errors.length > 0) {
+          /** @type {[WebpackError]} */
+          (output.errors).forEach((error) => {
+            compilation.errors.push(error);
+          });
+
+          return;
+        }
+
+        const isNewAsset = name !== output.filename;
+
+        if (isNewAsset) {
+          const newInfo = {
+            ...output.info,
+            related: { minimized: output.filename, ...info.related },
+          };
+
+          compilation.emitAsset(output.filename, output.source, newInfo);
+
+          if (this.options.deleteOriginalAssets) {
+            compilation.deleteAsset(name);
           }
+        } else {
+          const updatedAssetsInfo = {
+            ...output.info,
+          };
 
-          if (output.errors.length > 0) {
-            /** @type {[WebpackError]} */
-            (output.errors).forEach((error) => {
-              compilation.errors.push(error);
-            });
-
-            return;
-          }
-
-          const isNewAsset = name !== output.filename;
-
-          if (isNewAsset) {
-            const newInfo = {
-              ...output.info,
-              related: { minimized: output.filename, ...info.related },
-            };
-
-            compilation.emitAsset(output.filename, output.source, newInfo);
-
-            if (this.options.deleteOriginalAssets) {
-              compilation.deleteAsset(name);
-            }
-          } else {
-            const updatedAssetsInfo = {
-              ...output.info,
-            };
-
-            compilation.updateAsset(name, output.source, updatedAssetsInfo);
-          }
-        })
-      );
+          compilation.updateAsset(name, output.source, updatedAssetsInfo);
+        }
+      });
     }
 
-    await Promise.all(scheduledTasks);
+    await throttleAll(limit, scheduledTasks);
   }
 
   /**

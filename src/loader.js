@@ -28,6 +28,7 @@ import { imageminMinify } from "./utils.js";
  * @param {Buffer} content
  */
 module.exports = async function loader(content) {
+  // @ts-ignore
   const options = this.getOptions(/** @type {Schema} */ (schema));
   const callback = this.async();
   const name = path.relative(this.rootContext, this.resourcePath);
