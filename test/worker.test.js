@@ -8,7 +8,7 @@ import pify from "pify";
 
 import worker from "../src/worker";
 
-import imageminMinify from "../src/utils/imageminMinify";
+import { imageminMinify } from "../src/utils.js";
 
 function isPromise(obj) {
   return (

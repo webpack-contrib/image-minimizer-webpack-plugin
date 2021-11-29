@@ -2,7 +2,7 @@ import path from "path";
 
 import worker from "./worker";
 import schema from "./loader-options.json";
-import imageminMinify from "./utils/imageminMinify";
+import { imageminMinify } from "./utils.js";
 
 /**
  * @typedef {Object} LoaderOptions

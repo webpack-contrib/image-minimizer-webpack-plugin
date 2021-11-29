@@ -626,7 +626,7 @@ describe("imagemin plugin", () => {
           {
             filename: "[name].json",
             minimizerOptions: {
-              plugins: ["../../test/imagemin-base64.js"],
+              plugins: [require.resolve("./imagemin-base64.js")],
             },
           },
         ],

@@ -8,12 +8,13 @@ import serialize from "serialize-javascript";
 
 import worker from "./worker";
 import schema from "./plugin-options.json";
-import imageminMinify, {
+import {
   imageminNormalizeConfig,
-} from "./utils/imageminMinify";
-import imageminGenerate from "./utils/imageminGenerate";
-import squooshMinify from "./utils/squooshMinify";
-import squooshGenerate from "./utils/squooshGenerate";
+  imageminMinify,
+  imageminGenerate,
+  squooshMinify,
+  squooshGenerate,
+} from "./utils.js";
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
@@ -24,8 +25,8 @@ import squooshGenerate from "./utils/squooshGenerate";
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
 /** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("./loader").LoaderOptions} LoaderOptions */
-/** @typedef {import("./utils/imageminMinify").default} ImageminMinifyFunction */
-/** @typedef {import("./utils/squooshMinify").default} SquooshMinifyFunction */
+/** @typedef {import("./utils.js").imageminMinify} ImageminMinifyFunction */
+/** @typedef {import("./utils.js").squooshMinify} SquooshMinifyFunction */
 
 /** @typedef {RegExp | string} Rule */
 
