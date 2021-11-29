@@ -29,10 +29,11 @@ export type MetaData = {
 export function throttleAll<T>(limit: number, tasks: Task<T>[]): Promise<T[]>;
 /**
  * @param {ImageminMinimizerOptions} minimizerOptions
+ * @returns {Promise<ImageminOptions>}
  */
 export function imageminNormalizeConfig(
   minimizerOptions: ImageminMinimizerOptions
-): import("./index").ImageminMinimizerOptions;
+): Promise<ImageminOptions>;
 /**
  * @param {WorkerResult} original
  * @param {ImageminMinimizerOptions} options
