@@ -373,9 +373,6 @@ describe("imagemin plugin", () => {
         output: {
           assetModuleFilename: "[name][ext]",
         },
-        experiments: {
-          asset: true,
-        },
         emitPlugin: true,
         imageminPlugin: true,
       },
@@ -420,9 +417,6 @@ describe("imagemin plugin", () => {
         output: {
           path: path.resolve(__dirname, "outputs"),
           assetModuleFilename: "[name].[contenthash].[fullhash].[ext]",
-        },
-        experiments: {
-          asset: true,
         },
         optimization: {
           minimize: false,
@@ -473,9 +467,6 @@ describe("imagemin plugin", () => {
       {
         fileLoaderOff: true,
         assetInline: true,
-        experiments: {
-          asset: true,
-        },
         entry: path.join(fixturesPath, "./asset-inline.js"),
         emitPlugin: true,
         imageminPlugin: true,
