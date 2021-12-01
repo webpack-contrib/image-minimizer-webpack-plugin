@@ -184,7 +184,7 @@ class ImageMinimizerPlugin {
    * @param {Compiler} compiler
    * @param {Compilation} compilation
    * @param {Record<string, import("webpack").sources.Source>} assets
-   * @param {Set<string>} moduleAssets
+   * @param {Map<string, Object>} moduleAssets
    * @returns {Promise<void>}
    */
   async optimize(compiler, compilation, assets, moduleAssets) {
@@ -210,9 +210,12 @@ class ImageMinimizerPlugin {
             return false;
           }
 
-          // TODO add test to avoid minification already generated images
           // Exclude already optimized assets from `image-minimizer-webpack-loader`
           if (this.options.loader && moduleAssets.has(name)) {
+            const newInfo = moduleAssets.get(name) || {};
+
+            compilation.updateAsset(name, source, newInfo);
+
             return false;
           }
 
@@ -255,7 +258,7 @@ class ImageMinimizerPlugin {
 
     for (const asset of assetsForMinify) {
       scheduledTasks.push(async () => {
-        const { name, inputSource, cacheItem, info } = asset;
+        const { name, inputSource, cacheItem } = asset;
         let { output } = asset;
         let input;
 
@@ -305,29 +308,18 @@ class ImageMinimizerPlugin {
           (output.errors).forEach((error) => {
             compilation.errors.push(error);
           });
-
-          return;
         }
 
         const isNewAsset = name !== output.filename;
 
         if (isNewAsset) {
-          const newInfo = {
-            ...output.info,
-            related: { minimized: output.filename, ...info.related },
-          };
-
-          compilation.emitAsset(output.filename, output.source, newInfo);
+          compilation.emitAsset(output.filename, output.source, output.info);
 
           if (this.options.deleteOriginalAssets) {
             compilation.deleteAsset(name);
           }
         } else {
-          const updatedAssetsInfo = {
-            ...output.info,
-          };
-
-          compilation.updateAsset(name, output.source, updatedAssetsInfo);
+          compilation.updateAsset(name, output.source, output.info);
         }
       });
     }
@@ -341,7 +333,7 @@ class ImageMinimizerPlugin {
   apply(compiler) {
     const pluginName = this.constructor.name;
 
-    const moduleAssets = new Set();
+    const moduleAssets = new Map();
 
     if (this.options.loader) {
       // Collect assets from modules
@@ -349,7 +341,7 @@ class ImageMinimizerPlugin {
         compilation.hooks.moduleAsset.tap(
           { name: pluginName },
           (module, file) => {
-            moduleAssets.add(file);
+            moduleAssets.set(file, module.buildMeta.imageMinimizerPluginInfo);
           }
         );
       });

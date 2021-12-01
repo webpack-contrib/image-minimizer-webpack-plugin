@@ -54,7 +54,9 @@ function runWebpack(maybeOptions, getCompiler = false) {
           ...(!options.fileLoaderOff
             ? [
                 {
-                  test: options.test ? options.test : /\.(jpe?g|png|gif|svg)$/i,
+                  test: options.test
+                    ? options.test
+                    : /\.(jpe?g|png|gif|svg|webp)$/i,
                   use: [
                     {
                       loader: "file-loader",
