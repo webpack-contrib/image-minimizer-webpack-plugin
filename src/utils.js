@@ -571,43 +571,48 @@ async function imageminGenerate(original, minimizerOptions) {
 
   const imagemin = (await import("imagemin")).default;
 
-  /** @type {WorkerResult} */
-  const result = {
-    filename: original.filename,
-    data: original.data,
-    warnings: [],
-    errors: [],
-    info: { generated: true, generatedBy: ["imagemin"] },
-  };
-
   minimizerOptionsNormalized.plugins =
     /** @type {ImageminOptions["plugins"]} */ (plugins);
 
+  let result;
+
   try {
     // @ts-ignore
-    result.data = await imagemin.buffer(
-      original.data,
-      minimizerOptionsNormalized
-    );
+    result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
   } catch (error) {
-    result.errors.push(
+    original.errors.push(
       error instanceof Error ? error : new Error(/** @type {string} */ (error))
     );
 
-    return result;
+    return original;
   }
 
-  const { ext: extOutput } = fileTypeFromBuffer(result.data) || {};
+  const { ext: extOutput } = fileTypeFromBuffer(result) || {};
   const extInput = path.extname(original.filename).slice(1).toLowerCase();
 
+  let newFilename = original.filename;
+
   if (extOutput && extInput !== extOutput) {
-    result.filename = result.filename.replace(
+    newFilename = original.filename.replace(
       new RegExp(`${extInput}$`),
       `${extOutput}`
     );
   }
 
-  return result;
+  return {
+    filename: newFilename,
+    data: result,
+    warnings: [...original.warnings],
+    errors: [...original.errors],
+    info: {
+      ...original.info,
+      generated: true,
+      generatedBy:
+        original.info && original.info.generatedBy
+          ? ["imagemin", ...original.info.generatedBy]
+          : ["imagemin"],
+    },
+  };
 }
 
 /**
@@ -710,11 +715,17 @@ async function squooshGenerate(original, minifyOptions) {
 
   return {
     filename: newFilename,
-    // TODO, avoid extra buffer
     data: Buffer.from(binary),
-    warnings: [],
-    errors: [],
-    info: { generated: true, generatedBy: ["squoosh"] },
+    warnings: [...original.warnings],
+    errors: [...original.errors],
+    info: {
+      ...original.info,
+      generated: true,
+      generatedBy:
+        original.info && original.info.generatedBy
+          ? ["squoosh", ...original.info.generatedBy]
+          : ["squoosh"],
+    },
   };
 }
 
