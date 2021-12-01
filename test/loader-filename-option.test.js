@@ -3,8 +3,9 @@ import path from "path";
 import fileType from "file-type";
 
 import { fixturesPath, runWebpack, clearDirectory } from "./helpers";
+import ImageMinimizerPlugin from "../src/index.js";
 
-describe.skip('loader "filename" option', () => {
+describe('loader "filename" option', () => {
   beforeAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
   afterAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
 
@@ -12,14 +13,24 @@ describe.skip('loader "filename" option', () => {
     const outputDir = path.resolve(__dirname, "outputs", "loader-filename-1");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
+      imageminLoaderOptions: {
+        filename: "[name].webp",
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: 1,
+                },
+              },
+            },
+          },
+        ],
+      },
       output: {
         path: outputDir,
-      },
-      imageminPluginOptions: {
-        filename: "[name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
-        },
       },
     });
     const { compilation } = stats;
@@ -42,14 +53,24 @@ describe.skip('loader "filename" option', () => {
     const outputDir = path.resolve(__dirname, "outputs", "loader-filename-2");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
+      imageminLoaderOptions: {
+        filename: "deep/[path][name].webp",
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: 1,
+                },
+              },
+            },
+          },
+        ],
+      },
       output: {
         path: outputDir,
-      },
-      imageminPluginOptions: {
-        filename: "deep/[path][name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
-        },
       },
     });
     const { compilation } = stats;
@@ -72,14 +93,24 @@ describe.skip('loader "filename" option', () => {
     const outputDir = path.resolve(__dirname, "outputs", "loader-filename-3");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
+      imageminLoaderOptions: {
+        filename: "other/[name].webp",
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: 1,
+                },
+              },
+            },
+          },
+        ],
+      },
       output: {
         path: outputDir,
-      },
-      imageminPluginOptions: {
-        filename: "other/[name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
-        },
       },
     });
     const { compilation } = stats;
@@ -102,14 +133,24 @@ describe.skip('loader "filename" option', () => {
     const outputDir = path.resolve(__dirname, "outputs", "loader-filename-3");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
+      imageminLoaderOptions: {
+        filename: () => "other/[name].webp",
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: 1,
+                },
+              },
+            },
+          },
+        ],
+      },
       output: {
         path: outputDir,
-      },
-      imageminPluginOptions: {
-        filename: () => "other/[name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
-        },
       },
     });
     const { compilation } = stats;
