@@ -29,10 +29,6 @@ describe("validate loader options", () => {
       success: ["[name].[ext]", () => "[name].[ext]"],
       failure: [{}, [], true],
     },
-    deleteOriginalAssets: {
-      success: [true, false],
-      failure: [{}, [], () => {}],
-    },
     unknown: {
       success: [],
       failure: [1, true, false, "test", /test/, [], {}, { foo: "bar" }],
