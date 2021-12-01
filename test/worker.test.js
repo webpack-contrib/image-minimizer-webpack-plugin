@@ -585,6 +585,25 @@ describe("minify", () => {
     expect(result.data.equals(optimizedSource)).toBe(true);
   });
 
+  it("should return error on empty plugin with 'imageminMinify'", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      minify: imageminMinify,
+      input,
+      filename,
+      minimizerOptions: {
+        plugins: [],
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(
+      /No plugins found for `imagemin`, please read documentation/
+    );
+  });
+
   it("should work with 'imageminGenerate'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
@@ -605,6 +624,25 @@ describe("minify", () => {
     });
 
     expect(result.data.equals(optimizedSource)).toBe(true);
+  });
+
+  it("should return error on empty plugin with 'imageminGenerate'", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      minify: imageminGenerate,
+      input,
+      filename,
+      minimizerOptions: {
+        plugins: [],
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(
+      /No plugins found for `imagemin`, please read documentation/
+    );
   });
 
   it("should work with 'squooshMinify'", async () => {
@@ -675,5 +713,22 @@ describe("minify", () => {
     const { binary } = await image.encodedWith.webp;
 
     expect(result.data.equals(binary)).toBe(true);
+  });
+
+  it("should return error on empty plugin with 'squooshGenerate'", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      minify: squooshGenerate,
+      input,
+      filename,
+      minimizerOptions: {},
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(
+      /No result from 'squoosh', please configure the 'encodeOptions' option to generate images/
+    );
   });
 });

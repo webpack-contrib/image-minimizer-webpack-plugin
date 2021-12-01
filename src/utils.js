@@ -463,7 +463,7 @@ async function imageminNormalizeConfig(minimizerOptions) {
     (minimizerOptions.plugins && minimizerOptions.plugins.length === 0)
   ) {
     throw new Error(
-      "No plugins found for `imagemin`. Please read documentation."
+      "No plugins found for `imagemin`, please read documentation"
     );
   }
 
@@ -557,22 +557,10 @@ async function imageminNormalizeConfig(minimizerOptions) {
  * @returns {Promise<WorkerResult>}
  */
 async function imageminGenerate(original, minimizerOptions) {
-  /** @type {ImageminOptions} */
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     await imageminNormalizeConfig(minimizerOptions)
   );
-  const { plugins = [] } = minimizerOptionsNormalized;
-
-  // TODO fix me
-  if (plugins.length === 0) {
-    // @ts-ignore
-    return [];
-  }
-
   const imagemin = (await import("imagemin")).default;
-
-  minimizerOptionsNormalized.plugins =
-    /** @type {ImageminOptions["plugins"]} */ (plugins);
 
   let result;
 
@@ -621,7 +609,6 @@ async function imageminGenerate(original, minimizerOptions) {
  * @returns {Promise<WorkerResult>}
  */
 async function imageminMinify(original, options) {
-  // Implement autosearch config on root directory of project in future
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     await imageminNormalizeConfig(options)
   );
@@ -678,13 +665,6 @@ async function imageminMinify(original, options) {
  */
 async function squooshGenerate(original, minifyOptions) {
   const { encodeOptions } = minifyOptions;
-
-  // TODO: handle we need only one option
-  if (typeof encodeOptions === "undefined") {
-    // @ts-ignore
-    return [];
-  }
-
   // eslint-disable-next-line node/no-unpublished-require
   const squoosh = require("@squoosh/lib");
   const { ImagePool } = squoosh;
@@ -705,6 +685,16 @@ async function squooshGenerate(original, minifyOptions) {
   }
 
   await imagePool.close();
+
+  if (Object.keys(image.encodedWith).length === 0) {
+    original.errors.push(
+      new Error(
+        "No result from 'squoosh', please configure the 'encodeOptions' option to generate images"
+      )
+    );
+
+    return original;
+  }
 
   const ext = path.extname(original.filename).toLowerCase();
   const { binary, extension } = await Object.values(image.encodedWith)[0];
