@@ -595,30 +595,40 @@ describe("imagemin plugin", () => {
     expect(secondStats.compilation.emittedAssets.size).toBe(3);
   });
 
-  // TODO fix me
-  it.skip("should work and use the persistent cache when transform asset (loader + plugin)", async () => {
+  it("should work and use the persistent cache when transform asset (loader + plugin)", async () => {
     const outputDir = path.resolve(__dirname, "outputs", "cache-webp");
 
     const compiler = await runWebpack(
       {
         mode: "development",
-        entry: path.join(fixturesPath, "./simple.js"),
+        entry: path.join(fixturesPath, "./generator.js"),
         output: {
           path: outputDir,
         },
         emitPlugin: true,
         emitAssetPlugin: true,
         imageminPluginOptions: [
-          // {
-          //   filename: "[name].webp",
-          //   minimizerOptions: {
-          //     plugins: ["imagemin-webp"],
-          //   },
-          // },
           {
-            filename: "[name].json",
+            generator: [
+              {
+                preset: "webp",
+                implementation: ImageMinimizerPlugin.squooshGenerate,
+                options: {
+                  encodeOptions: {
+                    webp: {
+                      lossless: 1,
+                    },
+                  },
+                },
+              },
+            ],
+            minify: ImageMinimizerPlugin.squooshMinify,
             minimizerOptions: {
-              plugins: [require.resolve("./imagemin-base64.js")],
+              encodeOptions: {
+                mozjpeg: {
+                  quality: 90,
+                },
+              },
             },
           },
         ],
@@ -636,8 +646,7 @@ describe("imagemin plugin", () => {
 
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
-
-    expect(stats.compilation.emittedAssets.size).toBe(4);
+    expect(stats.compilation.emittedAssets.size).toBe(3);
 
     const secondStats = await compile(compiler);
     const { compilation: secondCompilation } = secondStats;
@@ -647,24 +656,15 @@ describe("imagemin plugin", () => {
     expect(secondWarnings).toHaveLength(0);
     expect(secondErrors).toHaveLength(0);
 
-    // const extPluginWebp = await fileType.fromFile(
-    //   path.resolve(outputDir, "plugin-test.webp")
-    // );
-    const extPluginJson = await fileType.fromFile(
-      path.resolve(outputDir, "plugin-test.json")
+    const extLoaderWebp = await fileType.fromFile(
+      path.resolve(outputDir, "loader-test.webp")
     );
-    // const extLoaderWebp = await fileType.fromFile(
-    //   path.resolve(outputDir, "loader-test.webp")
-    // );
-    const extLoaderJson = await fileType.fromFile(
-      path.resolve(outputDir, "loader-test.json")
+    const extLoaderJpg = await fileType.fromFile(
+      path.resolve(outputDir, "plugin-test.jpg")
     );
 
-    expect(extPluginJson).toBeUndefined();
-    expect(extLoaderJson).toBeUndefined();
-    // expect(/image\/webp/i.test(extPluginWebp.mime)).toBe(true);
-    // expect(/image\/webp/i.test(extLoaderWebp.mime)).toBe(true);
-
+    expect(/image\/webp/i.test(extLoaderWebp.mime)).toBe(true);
+    expect(/image\/jpeg/i.test(extLoaderJpg.mime)).toBe(true);
     expect(secondStats.compilation.emittedAssets.size).toBe(0);
   });
 
