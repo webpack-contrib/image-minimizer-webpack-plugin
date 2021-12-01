@@ -472,6 +472,97 @@ describe("minify", () => {
     expect(result.errors[1].toString()).toMatch(/Error: fail/);
   });
 
+  it("should respect error happened before", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      minify: [
+        (original) => {
+          original.errors.push(new Error("fail"));
+
+          return original;
+        },
+        squooshMinify,
+      ],
+      input,
+      filename,
+      minimizerOptions: [
+        {},
+        {
+          encodeOptions: {
+            mozjpeg: {
+              quality: 90,
+            },
+          },
+        },
+      ],
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(/Error: fail/);
+
+    const imagePool = new ImagePool(1);
+    const image = imagePool.ingestImage(new Uint8Array(input));
+
+    await image.encode({
+      mozjpeg: {
+        quality: 90,
+      },
+    });
+
+    await imagePool.close();
+
+    const { binary } = await image.encodedWith.mozjpeg;
+
+    expect(result.data.equals(binary)).toBe(true);
+  });
+
+  it("should respect error happened after", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      minify: [
+        squooshMinify,
+        (original) => {
+          original.errors.push(new Error("fail"));
+
+          return original;
+        },
+      ],
+      input,
+      filename,
+      minimizerOptions: [
+        {
+          encodeOptions: {
+            mozjpeg: {
+              quality: 90,
+            },
+          },
+        },
+      ],
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].toString()).toMatch(/Error: fail/);
+
+    const imagePool = new ImagePool(1);
+    const image = imagePool.ingestImage(new Uint8Array(input));
+
+    await image.encode({
+      mozjpeg: {
+        quality: 90,
+      },
+    });
+
+    await imagePool.close();
+
+    const { binary } = await image.encodedWith.mozjpeg;
+
+    expect(result.data.equals(binary)).toBe(true);
+  });
+
   it("should work with 'imageminMinify'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
