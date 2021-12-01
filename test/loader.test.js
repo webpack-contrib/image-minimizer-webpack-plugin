@@ -5,6 +5,7 @@ import pify from "pify";
 import fileType from "file-type";
 
 import { fixturesPath, isOptimized, runWebpack } from "./helpers";
+import ImageMinimizerPlugin from "../src/index.js";
 
 describe("loader", () => {
   it("should optimizes all images", async () => {
@@ -72,30 +73,108 @@ describe("loader", () => {
     );
   });
 
-  it("should transform image source to webp", async () => {
+  // TODO: add test for asssets/modules
+  // TODO: add test for data:
+  // TODO: add test for https:
+  it("should optimizes and generate images (imageminGenerate)", async () => {
     const stats = await runWebpack({
-      entry: path.join(fixturesPath, "./loader-single.js"),
-      output: {
-        path: path.resolve(__dirname, "outputs"),
+      entry: path.join(fixturesPath, "generator.js"),
+      imageminLoader: true,
+      imageminLoaderOptions: {
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-webp"],
+            },
+          },
+        ],
       },
-      imageminPluginOptions: {
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
-        },
+      output: {
+        path: path.resolve(__dirname, "outputs/loader-generator-imagemin"),
       },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
     const file = path.resolve(
       __dirname,
       "outputs",
-      "./nested/deep/loader-test.jpg"
+      "./loader-generator-imagemin/loader-test.webp"
     );
     const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
+
+    // TODO fix me
+    // await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+    //     true
+    // );
+    // await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+    //     true
+    // );
+    // await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    //     true
+    // );
+    // await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+    //     true
+    // );
+  });
+
+  it("should optimizes and generate images (squooshGenerate)", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator.js"),
+      imageminLoader: true,
+      imageminLoaderOptions: {
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: 1,
+                },
+              },
+            },
+          },
+        ],
+      },
+      output: {
+        path: path.resolve(__dirname, "outputs/loader-generator-squoosh"),
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
+
+    const file = path.resolve(
+      __dirname,
+      "outputs",
+      "./loader-generator-squoosh/loader-test.webp"
+    );
+    const ext = await fileType.fromFile(file);
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+
+    // TODO fix me
+    // await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+    //     true
+    // );
+    // await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+    //     true
+    // );
+    // await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+    //     true
+    // );
+    // await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+    //     true
+    // );
   });
 });

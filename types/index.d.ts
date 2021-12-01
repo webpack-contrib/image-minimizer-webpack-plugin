@@ -76,6 +76,9 @@ export type FilenameFn = (
   pathData: PathData,
   assetInfo?: import("webpack").AssetInfo | undefined
 ) => string;
+export type Generator = {
+  implementation: Function;
+};
 export type PluginOptions = {
   /**
    * Allows filtering of images for optimization.
@@ -97,6 +100,10 @@ export type PluginOptions = {
    * Allows to choose how errors are displayed.
    */
   severityError?: string | undefined;
+  /**
+   * Allows to set generators.
+   */
+  generator?: Generator | Generator[] | undefined;
   /**
    * Options for `imagemin`.
    */
@@ -199,12 +206,18 @@ export type PluginOptions = {
  * @returns {string}
  */
 /**
+ * @typedef {Object} Generator
+ * @property {Function} implementation
+ * @returns {any} options
+ */
+/**
  * @typedef {Object} PluginOptions
  * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
  * @property {string} [severityError] Allows to choose how errors are displayed.
+ * @property {Generator | Generator[]} [generator] Allows to set generators.
  * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
@@ -222,10 +235,11 @@ declare class ImageMinimizerPlugin {
   constructor(options?: PluginOptions | undefined);
   options: {
     minify: MinifyFunctions;
+    minimizerOptions: MinimizerOptions;
+    generator: Generator | Generator[] | undefined;
     severityError: string | undefined;
     filter: FilterFn;
     exclude: Rules | undefined;
-    minimizerOptions: MinimizerOptions;
     include: Rules | undefined;
     loader: boolean;
     concurrency: number | undefined;

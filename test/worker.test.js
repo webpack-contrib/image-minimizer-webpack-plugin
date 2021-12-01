@@ -443,7 +443,6 @@ describe("minify", () => {
   });
 
   // TODO should respect returned errors
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip("should throw two errors", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);

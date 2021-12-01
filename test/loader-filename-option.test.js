@@ -4,7 +4,7 @@ import fileType from "file-type";
 
 import { fixturesPath, runWebpack, clearDirectory } from "./helpers";
 
-describe('loader "filename" option', () => {
+describe.skip('loader "filename" option', () => {
   beforeAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
   afterAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
 

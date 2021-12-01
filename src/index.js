@@ -109,6 +109,14 @@ import {
  * @returns {string}
  */
 
+// TODO fix types for `generator`
+/**
+ * @typedef {Object} Generator
+ * @property {Function} implementation
+ * @property {string} preset
+ * @property {any} options
+ */
+
 /**
  * @typedef {Object} PluginOptions
  * @property {FilterFn} [filter] Allows filtering of images for optimization.
@@ -116,6 +124,7 @@ import {
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
  * @property {string} [severityError] Allows to choose how errors are displayed.
+ * @property {Generator[]} [generator] Allows to set generators.
  * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
@@ -144,6 +153,7 @@ class ImageMinimizerPlugin {
       include,
       exclude,
       severityError,
+      generator,
       minimizerOptions = {
         plugins: [],
       },
@@ -155,10 +165,11 @@ class ImageMinimizerPlugin {
 
     this.options = {
       minify,
+      minimizerOptions,
+      generator,
       severityError,
       filter,
       exclude,
-      minimizerOptions,
       include,
       loader,
       concurrency,
@@ -199,6 +210,7 @@ class ImageMinimizerPlugin {
             return false;
           }
 
+          // TODO add test to avoid minification already generated images
           // Exclude already optimized assets from `image-minimizer-webpack-loader`
           if (this.options.loader && moduleAssets.has(name)) {
             return false;
@@ -345,14 +357,14 @@ class ImageMinimizerPlugin {
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
         const {
           minify,
+          minimizerOptions,
+          generator,
           filename,
-          deleteOriginalAssets,
           filter,
           test,
           include,
           exclude,
           severityError,
-          minimizerOptions,
         } = this.options;
 
         const loader = /** @type {InternalLoaderOptions} */ ({
@@ -363,8 +375,8 @@ class ImageMinimizerPlugin {
           loader: require.resolve(path.join(__dirname, "loader.js")),
           options: {
             minify,
+            generator,
             filename,
-            deleteOriginalAssets,
             severityError,
             filter,
             minimizerOptions,
