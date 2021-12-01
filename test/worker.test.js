@@ -2,13 +2,20 @@ import fs from "fs";
 import path from "path";
 
 import imagemin from "imagemin";
+import { ImagePool } from "@squoosh/lib";
 import imageminMozjpeg from "imagemin-mozjpeg";
+import imageminWebp from "imagemin-webp";
 import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
 
 import worker from "../src/worker";
 
-import { imageminMinify } from "../src/utils.js";
+import {
+  imageminMinify,
+  imageminGenerate,
+  squooshMinify,
+  squooshGenerate,
+} from "../src/utils.js";
 
 function isPromise(obj) {
   return (
@@ -442,14 +449,19 @@ describe("minify", () => {
     expect(result.data.equals(optimizedSource)).toBe(true);
   });
 
-  // TODO should respect returned errors
-  it.skip("should throw two errors", async () => {
+  it("should return two errors", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
       minify: [
-        () => ({ errors: [new Error("fail")] }),
-        () => ({ errors: [new Error("fail")] }),
+        (original) => ({
+          data: Buffer.from("test"),
+          errors: [...original.errors, new Error("fail")],
+        }),
+        (original) => ({
+          data: Buffer.from("test"),
+          errors: [...original.errors, new Error("fail")],
+        }),
       ],
       input,
       filename,
@@ -458,6 +470,119 @@ describe("minify", () => {
     expect(result.errors).toHaveLength(2);
     expect(result.errors[0].toString()).toMatch(/Error: fail/);
     expect(result.errors[1].toString()).toMatch(/Error: fail/);
-    expect(result.filename).toBe(filename);
+  });
+
+  it("should work with 'imageminMinify'", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      minify: imageminMinify,
+      input,
+      filename,
+      minimizerOptions: {
+        plugins: ["imagemin-mozjpeg"],
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminMozjpeg()],
+    });
+
+    expect(result.data.equals(optimizedSource)).toBe(true);
+  });
+
+  it("should work with 'imageminGenerate'", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      minify: imageminGenerate,
+      input,
+      filename,
+      minimizerOptions: {
+        plugins: ["imagemin-webp"],
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminWebp()],
+    });
+
+    expect(result.data.equals(optimizedSource)).toBe(true);
+  });
+
+  it("should work with 'squooshMinify'", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      minify: squooshMinify,
+      input,
+      filename,
+      minimizerOptions: {
+        encodeOptions: {
+          mozjpeg: {
+            quality: 90,
+          },
+        },
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+
+    const imagePool = new ImagePool(1);
+    const image = imagePool.ingestImage(new Uint8Array(input));
+
+    await image.encode({
+      mozjpeg: {
+        quality: 90,
+      },
+    });
+
+    await imagePool.close();
+
+    const { binary } = await image.encodedWith.mozjpeg;
+
+    expect(result.data.equals(binary)).toBe(true);
+  });
+
+  it("should work with 'squooshGenerate'", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      minify: squooshGenerate,
+      input,
+      filename,
+      minimizerOptions: {
+        encodeOptions: {
+          webp: {
+            quality: 90,
+          },
+        },
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+
+    const imagePool = new ImagePool(1);
+    const image = imagePool.ingestImage(new Uint8Array(input));
+
+    await image.encode({
+      webp: {
+        quality: 90,
+      },
+    });
+
+    await imagePool.close();
+
+    const { binary } = await image.encodedWith.webp;
+
+    expect(result.data.equals(binary)).toBe(true);
   });
 });

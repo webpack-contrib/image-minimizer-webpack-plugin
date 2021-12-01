@@ -1,1 +1,1 @@
-require("./nested/deep/loader-test.jpg");
+require("./nested/deep/loader-test.jpg?as=webp");
