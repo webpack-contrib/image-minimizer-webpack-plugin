@@ -136,6 +136,14 @@ module.exports = async function loader(content) {
     }
   }
 
+  // TODO: search better API
+  if (this._module) {
+    this._module.buildMeta = {
+      ...this._module.buildMeta,
+      imageMinimizerPluginInfo: output.info,
+    };
+  }
+
   callback(null, output.data);
 };
 

@@ -73,7 +73,7 @@ describe("loader", () => {
     );
   });
 
-  // TODO: add test for asssets/modules
+  // TODO: add test for assets/modules
   // TODO: add test for data:
   // TODO: add test for https:
   it("should optimizes and generate images (imageminGenerate)", async () => {
@@ -109,20 +109,6 @@ describe("loader", () => {
     const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
-
-    // TODO fix me
-    // await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-    //     true
-    // );
-    // await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-    //     true
-    // );
-    // await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-    //     true
-    // );
-    // await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-    //     true
-    // );
   });
 
   it("should optimizes and generate images (squooshGenerate)", async () => {
@@ -162,19 +148,5 @@ describe("loader", () => {
     const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
-
-    // TODO fix me
-    // await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-    //     true
-    // );
-    // await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-    //     true
-    // );
-    // await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-    //     true
-    // );
-    // await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-    //     true
-    // );
   });
 });
