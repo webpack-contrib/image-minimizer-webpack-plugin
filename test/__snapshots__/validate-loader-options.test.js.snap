@@ -239,47 +239,47 @@ exports[`validate loader options should throw an error on the "severityError" op
 exports[`validate loader options should throw an error on the "unknown" option with "/test/" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { filter?, severityError?, filename?, deleteOriginalAssets?, generator?, minify?, minimizerOptions? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "[]" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { filter?, severityError?, filename?, deleteOriginalAssets?, generator?, minify?, minimizerOptions? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "{"foo":"bar"}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { filter?, severityError?, filename?, deleteOriginalAssets?, generator?, minify?, minimizerOptions? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "{}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { filter?, severityError?, filename?, deleteOriginalAssets?, generator?, minify?, minimizerOptions? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "1" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { filter?, severityError?, filename?, deleteOriginalAssets?, generator?, minify?, minimizerOptions? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "false" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { filter?, severityError?, filename?, deleteOriginalAssets?, generator?, minify?, minimizerOptions? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "test" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { filter?, severityError?, filename?, deleteOriginalAssets?, generator?, minify?, minimizerOptions? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "true" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizerOptions?, filter?, severityError?, filename?, deleteOriginalAssets?, minify? }"
+   object { filter?, severityError?, filename?, deleteOriginalAssets?, generator?, minify?, minimizerOptions? }"
 `;

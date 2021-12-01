@@ -1,3 +1,12 @@
+export type FilterFn = import("./index").FilterFn;
+export type Rules = import("./index").Rules;
+export type MinifyFunctions = import("./index").MinifyFunctions;
+export type MinimizerOptions = import("./index").MinimizerOptions;
+export type Generator = import("./index").Generator;
+export type InternalWorkerOptions = import("./index").InternalWorkerOptions;
+export type Schema = import("schema-utils/declarations/validate").Schema;
+export type LoaderContext = import("webpack").LoaderContext<LoaderOptions>;
+export type Compilation = import("webpack").Compilation;
 export type LoaderOptions = {
   /**
    * Allows filtering of images for optimization.
@@ -8,10 +17,6 @@ export type LoaderOptions = {
    */
   severityError?: string | undefined;
   /**
-   * Options for `imagemin`.
-   */
-  minimizerOptions?: import("./index").MinimizerOptions | undefined;
-  /**
    * Allows to set the filename for the generated asset. Useful for converting to a `webp`.
    */
   filename?: string | undefined;
@@ -20,12 +25,12 @@ export type LoaderOptions = {
    */
   deleteOriginalAssets?: boolean | undefined;
   minify?: import("./index").MinifyFunctions | undefined;
+  /**
+   * Options for minify.
+   */
+  minimizerOptions?: import("./index").MinimizerOptions | undefined;
+  generator?:
+    | import("./index").Generator
+    | import("./index").Generator[]
+    | undefined;
 };
-export type FilterFn = import("./index").FilterFn;
-export type Rules = import("./index").Rules;
-export type MinimizerOptions = import("./index").MinimizerOptions;
-export type MinifyFunctions = import("./index").MinifyFunctions;
-export type InternalWorkerOptions = import("./index").InternalWorkerOptions;
-export type Schema = import("schema-utils/declarations/validate").Schema;
-export type LoaderContext = import("webpack").LoaderContext<LoaderOptions>;
-export type Compilation = import("webpack").Compilation;

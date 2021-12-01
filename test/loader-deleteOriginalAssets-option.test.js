@@ -4,7 +4,7 @@ import fileType from "file-type";
 
 import { fixturesPath, runWebpack, clearDirectory } from "./helpers";
 
-describe('loader "deleteOriginalAssets" option', () => {
+describe.skip('loader "deleteOriginalAssets" option', () => {
   it("should transform asset and keep original asset (default behavior)", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),

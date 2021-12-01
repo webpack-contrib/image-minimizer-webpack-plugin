@@ -554,7 +554,7 @@ async function imageminNormalizeConfig(minimizerOptions) {
 /**
  * @param {WorkerResult} original
  * @param {ImageminMinimizerOptions} minimizerOptions
- * @returns {Promise<WorkerResult[]>}
+ * @returns {Promise<WorkerResult>}
  */
 async function imageminGenerate(original, minimizerOptions) {
   /** @type {ImageminOptions} */
@@ -563,60 +563,51 @@ async function imageminGenerate(original, minimizerOptions) {
   );
   const { plugins = [] } = minimizerOptionsNormalized;
 
+  // TODO fix me
   if (plugins.length === 0) {
+    // @ts-ignore
     return [];
   }
 
   const imagemin = (await import("imagemin")).default;
 
-  /** @type {WorkerResult[]} */
-  const results = [];
+  /** @type {WorkerResult} */
+  const result = {
+    filename: original.filename,
+    data: original.data,
+    warnings: [],
+    errors: [],
+    info: { generated: true, generatedBy: ["imagemin"] },
+  };
 
-  for (const plugin of plugins) {
-    /** @type {WorkerResult} */
-    const result = {
-      filename: original.filename,
-      data: original.data,
-      warnings: [],
-      errors: [],
-      info: { generated: true, generatedBy: ["imagemin"] },
-    };
+  minimizerOptionsNormalized.plugins =
+    /** @type {ImageminOptions["plugins"]} */ (plugins);
 
-    minimizerOptionsNormalized.plugins =
-      /** @type {ImageminOptions["plugins"]} */ ([plugin]);
+  try {
+    // @ts-ignore
+    result.data = await imagemin.buffer(
+      original.data,
+      minimizerOptionsNormalized
+    );
+  } catch (error) {
+    result.errors.push(
+      error instanceof Error ? error : new Error(/** @type {string} */ (error))
+    );
 
-    try {
-      // @ts-ignore
-      // eslint-disable-next-line no-await-in-loop
-      result.data = await imagemin.buffer(
-        original.data,
-        minimizerOptionsNormalized
-      );
-    } catch (error) {
-      result.errors.push(
-        error instanceof Error
-          ? error
-          : new Error(/** @type {string} */ (error))
-      );
-      results.push(result);
-
-      continue;
-    }
-
-    const { ext: extOutput } = fileTypeFromBuffer(result.data) || {};
-    const extInput = path.extname(original.filename).slice(1).toLowerCase();
-
-    if (extOutput && extInput !== extOutput) {
-      result.filename = result.filename.replace(
-        new RegExp(`${extInput}$`),
-        `${extOutput}`
-      );
-    }
-
-    results.push(result);
+    return result;
   }
 
-  return results;
+  const { ext: extOutput } = fileTypeFromBuffer(result.data) || {};
+  const extInput = path.extname(original.filename).slice(1).toLowerCase();
+
+  if (extOutput && extInput !== extOutput) {
+    result.filename = result.filename.replace(
+      new RegExp(`${extInput}$`),
+      `${extOutput}`
+    );
+  }
+
+  return result;
 }
 
 /**
@@ -636,7 +627,6 @@ async function imageminMinify(original, options) {
 
   try {
     // @ts-ignore
-
     result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
   } catch (error) {
     original.errors.push(
@@ -646,6 +636,7 @@ async function imageminMinify(original, options) {
     return original;
   }
 
+  // TODO fix me
   // const extInput = path.extname(original.filename).slice(1).toLowerCase();
   // const { ext: extOutput } = fileTypeFromBuffer(result) || {};
   //
@@ -678,13 +669,14 @@ async function imageminMinify(original, options) {
 /**
  * @param {WorkerResult} original
  * @param {SquooshMinimizerOptions} minifyOptions
- * @returns {Promise<WorkerResult[]>}
+ * @returns {Promise<WorkerResult>}
  */
-
 async function squooshGenerate(original, minifyOptions) {
   const { encodeOptions } = minifyOptions;
 
+  // TODO: handle we need only one option
   if (typeof encodeOptions === "undefined") {
+    // @ts-ignore
     return [];
   }
 
@@ -704,39 +696,26 @@ async function squooshGenerate(original, minifyOptions) {
       error instanceof Error ? error : new Error(/** @type {string} */ (error))
     );
 
-    return [original];
+    return original;
   }
 
   await imagePool.close();
 
-  /** @type {WorkerResult[]} */
-  const results = [];
   const ext = path.extname(original.filename).toLowerCase();
-  const tasks = [];
+  const { binary, extension } = await Object.values(image.encodedWith)[0];
+  const newFilename = original.filename.replace(
+    new RegExp(`${ext}$`),
+    `.${extension}`
+  );
 
-  for (const encodedImage of Object.values(image.encodedWith)) {
-    tasks.push(encodedImage);
-  }
-
-  const encodedImages = await Promise.all(tasks);
-
-  for (const encodedImage of encodedImages) {
-    const { extension, binary } = encodedImage;
-    const newFilename = original.filename.replace(
-      new RegExp(`${ext}$`),
-      `.${extension}`
-    );
-
-    results.push({
-      filename: newFilename,
-      data: Buffer.from(binary),
-      warnings: [],
-      errors: [],
-      info: { generated: true, generatedBy: ["squoosh"] },
-    });
-  }
-
-  return results;
+  return {
+    filename: newFilename,
+    // TODO, avoid extra buffer
+    data: Buffer.from(binary),
+    warnings: [],
+    errors: [],
+    info: { generated: true, generatedBy: ["squoosh"] },
+  };
 }
 
 /**
@@ -800,11 +779,11 @@ async function squooshMinify(original, options) {
 
   await imagePool.close();
 
-  const encodedImage = await image.encodedWith[targets[ext]];
+  const { binary } = await image.encodedWith[targets[ext]];
 
   return {
     filename: original.filename,
-    data: Buffer.from(encodedImage.binary),
+    data: Buffer.from(binary),
     warnings: [...original.warnings],
     errors: [...original.errors],
     info: {

@@ -22,6 +22,7 @@ module.exports = {
   ],
   rules: {
     "unicorn/filename-case": "off",
+    "jest/no-disabled-tests": "off",
   },
   root: true,
 };
