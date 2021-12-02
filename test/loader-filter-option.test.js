@@ -1,9 +1,14 @@
+import ImageMinimizerPlugin from "../src";
 import { isOptimized, plugins, runWebpack } from "./helpers";
 
 describe("loader filter option", () => {
   it("should optimizes all images exclude filtered", async () => {
     const stats = await runWebpack({
       imageminLoaderOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
+        },
         filter: (source, filename) => {
           expect(source).toBeInstanceOf(Buffer);
           expect(typeof filename).toBe("string");
@@ -14,7 +19,6 @@ describe("loader filter option", () => {
 
           return true;
         },
-        minimizerOptions: { plugins },
       },
     });
 

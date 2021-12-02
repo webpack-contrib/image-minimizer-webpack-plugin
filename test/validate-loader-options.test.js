@@ -6,16 +6,76 @@ import { fixturesPath, plugins, runWebpack } from "./helpers";
 
 describe("validate loader options", () => {
   const tests = {
-    minify: {
+    minimizer: {
       success: [
-        ImageMinimizerPlugin.imageminMinify,
-        [ImageMinimizerPlugin.imageminMinify],
+        {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+        },
+        {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 90,
+              },
+            },
+          },
+        },
+        [
+          {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+          },
+        ],
+        [
+          {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            options: {
+              encodeOptions: {
+                mozjpeg: {
+                  quality: 90,
+                },
+              },
+            },
+          },
+        ],
+        [
+          {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+          },
+          {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            options: {
+              encodeOptions: {
+                mozjpeg: {
+                  quality: 90,
+                },
+              },
+            },
+          },
+        ],
       ],
-      failure: [1, true, false, null],
+      failure: [1, true, false, null, []],
     },
-    minimizerOptions: {
-      success: [{ plugins }],
-      failure: [1, true, false, [], null],
+    generator: {
+      success: [
+        [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+          },
+        ],
+        [
+          {
+            preset: "one",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+          },
+          {
+            preset: "two",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+          },
+        ],
+      ],
+      failure: [1, true, false, null, []],
     },
     filter: {
       success: [() => false],
@@ -57,8 +117,11 @@ describe("validate loader options", () => {
         },
       };
 
-      if (key !== "minimizerOptions") {
-        options.imageminLoaderOptions.minimizerOptions = { plugins };
+      if (key !== "minimizer") {
+        options.imageminLoaderOptions.minimizer = {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
+        };
       }
 
       let stats;

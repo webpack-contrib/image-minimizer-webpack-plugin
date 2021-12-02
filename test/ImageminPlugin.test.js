@@ -19,7 +19,15 @@ import ImageMinimizerPlugin from "../src";
 
 describe("imagemin plugin", () => {
   it("should optimizes all images (loader + plugin)", async () => {
-    const stats = await runWebpack({ emitPlugin: true, imageminPlugin: true });
+    const stats = await runWebpack({
+      emitPlugin: true,
+      imageminPluginOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
+        },
+      },
+    });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
 
@@ -52,7 +60,12 @@ describe("imagemin plugin", () => {
     const stats = await runWebpack({
       asMinimizer: true,
       emitPlugin: true,
-      imageminPlugin: true,
+      imageminPluginOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
+        },
+      },
     });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
@@ -89,14 +102,24 @@ describe("imagemin plugin", () => {
         emitPluginOptions: {
           fileNames: ["multiple-plugin-test-1.svg"],
         },
-        imageminPlugin: true,
+        imageminPluginOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
+        },
       },
       {
         entry: path.join(fixturesPath, "multiple-entry-2.js"),
         emitPluginOptions: {
           fileNames: ["multiple-plugin-test-2.svg"],
         },
-        imageminPlugin: true,
+        imageminPluginOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
+        },
       },
     ]);
 
@@ -148,7 +171,12 @@ describe("imagemin plugin", () => {
   it("should optimizes successfully without any assets", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "empty-entry.js"),
-      imageminPlugin: true,
+      imageminPluginOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
+        },
+      },
     });
 
     const { warnings, errors } = stats.compilation;
@@ -162,8 +190,9 @@ describe("imagemin plugin", () => {
       emitPlugin: true,
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
-        minimizerOptions: {
-          plugins: [],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins: [] },
         },
       },
     });
@@ -183,8 +212,9 @@ describe("imagemin plugin", () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "single-image-loader.js"),
       imageminPluginOptions: {
-        minimizerOptions: {
-          plugins: [],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins: [] },
         },
       },
     });
@@ -206,8 +236,11 @@ describe("imagemin plugin", () => {
         fileNames: ["plugin-test.png"],
       },
       imageminPluginOptions: {
-        minimizerOptions: { plugins },
         filename: "[name][ext]",
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
+        },
       },
     });
     const { compilation } = stats;
@@ -245,7 +278,10 @@ describe("imagemin plugin", () => {
         fileNames: ["nested/deep/plugin-test.png"],
       },
       imageminPluginOptions: {
-        minimizerOptions: { plugins },
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
+        },
         filename: "[path][name][ext]",
       },
     });
@@ -281,8 +317,13 @@ describe("imagemin plugin", () => {
     const stats = await runWebpack({
       entry: path.resolve(__dirname, "fixtures/loader-with-child.js"),
       emitPlugin: true,
-      imageminPlugin: true,
       childPlugin: true,
+      imageminPluginOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
+        },
+      },
     });
     const { compilation } = stats;
     const { warnings, errors, modules } = compilation;
@@ -327,7 +368,12 @@ describe("imagemin plugin", () => {
           realContentHash: true,
         },
         emitPlugin: true,
-        imageminPlugin: true,
+        imageminPluginOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
+        },
       },
       true
     );
@@ -374,7 +420,12 @@ describe("imagemin plugin", () => {
           assetModuleFilename: "[name][ext]",
         },
         emitPlugin: true,
-        imageminPlugin: true,
+        imageminPluginOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
+        },
       },
       true
     );
@@ -423,7 +474,12 @@ describe("imagemin plugin", () => {
           realContentHash: true,
         },
         emitPlugin: true,
-        imageminPlugin: true,
+        imageminPluginOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
+        },
       },
       true
     );
@@ -469,7 +525,12 @@ describe("imagemin plugin", () => {
         assetInline: true,
         entry: path.join(fixturesPath, "./asset-inline.js"),
         emitPlugin: true,
-        imageminPlugin: true,
+        imageminPluginOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
+        },
       },
       true
     );
@@ -498,7 +559,10 @@ describe("imagemin plugin", () => {
         emitPlugin: true,
         emitAssetPlugin: true,
         imageminPluginOptions: {
-          minimizerOptions: { plugins },
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
         },
       },
       true
@@ -533,7 +597,10 @@ describe("imagemin plugin", () => {
         emitPlugin: true,
         emitAssetPlugin: true,
         imageminPluginOptions: {
-          minimizerOptions: { plugins },
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
         },
       },
       true
@@ -568,7 +635,10 @@ describe("imagemin plugin", () => {
         emitPlugin: true,
         emitAssetPlugin: true,
         imageminPluginOptions: {
-          minimizerOptions: { plugins },
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
         },
       },
       true
@@ -622,9 +692,9 @@ describe("imagemin plugin", () => {
                 },
               },
             ],
-            minify: ImageMinimizerPlugin.squooshMinify,
-            minimizerOptions: {
-              encodeOptions: {
+            minimizer: {
+              implementation: ImageMinimizerPlugin.squooshMinify,
+              options: {
                 mozjpeg: {
                   quality: 90,
                 },
@@ -671,8 +741,13 @@ describe("imagemin plugin", () => {
   it("should run plugin against assets added later by plugins", async () => {
     const stats = await runWebpack({
       emitPlugin: true,
-      imageminPlugin: true,
       EmitNewAssetPlugin: true,
+      imageminPluginOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
+        },
+      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -690,8 +765,13 @@ describe("imagemin plugin", () => {
     const compiler = await runWebpack(
       {
         mode: "development",
-        imageminPlugin: true,
         copyPlugin: true,
+        imageminPluginOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
+        },
       },
       true
     );
@@ -714,9 +794,11 @@ describe("imagemin plugin", () => {
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: [ImageMinimizerPlugin.imageminMinify],
-        minimizerOptions: {
-          plugins: ["mozjpeg"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins: ["mozjpeg"],
+          },
         },
       },
     });
@@ -783,13 +865,16 @@ describe("imagemin plugin", () => {
             },
           },
         ],
-        minimizerOptions: {
-          plugins: [
-            "imagemin-gifsicle",
-            "imagemin-mozjpeg",
-            "imagemin-pngquant",
-            "imagemin-svgo",
-          ],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins: [
+              "imagemin-gifsicle",
+              "imagemin-mozjpeg",
+              "imagemin-pngquant",
+              "imagemin-svgo",
+            ],
+          },
         },
       },
       output: {
@@ -843,14 +928,16 @@ describe("imagemin plugin", () => {
             },
           },
         ],
-        minify: ImageMinimizerPlugin.squooshMinify,
-        minimizerOptions: {
-          encodeOptions: {
-            mozjpeg: {
-              quality: 40,
-            },
-            oxipng: {
-              quality: 40,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 40,
+              },
+              oxipng: {
+                quality: 40,
+              },
             },
           },
         },

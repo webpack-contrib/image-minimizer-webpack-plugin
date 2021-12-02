@@ -3,6 +3,7 @@ import path from "path";
 import fileType from "file-type";
 
 import { fixturesPath, runWebpack, clearDirectory } from "./helpers";
+import ImageMinimizerPlugin from "../src/index.js";
 
 describe("plugin filename option", () => {
   beforeAll(() => clearDirectory(path.resolve(__dirname, "outputs")));
@@ -19,8 +20,9 @@ describe("plugin filename option", () => {
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
         filename: "[path][name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins: ["imagemin-webp"] },
         },
       },
     });
@@ -54,8 +56,9 @@ describe("plugin filename option", () => {
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
         filename: "[name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins: ["imagemin-webp"] },
         },
       },
     });
@@ -85,8 +88,9 @@ describe("plugin filename option", () => {
       emitPluginOptions: { fileNames: ["plugin-test.png"] },
       imageminPluginOptions: {
         filename: "./nested/deep/[name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins: ["imagemin-webp"] },
         },
       },
     });
@@ -120,8 +124,9 @@ describe("plugin filename option", () => {
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
         filename: "./other/[name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins: ["imagemin-webp"] },
         },
       },
     });
@@ -151,8 +156,9 @@ describe("plugin filename option", () => {
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
         filename: () => "./other/[name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins: ["imagemin-webp"] },
         },
       },
     });

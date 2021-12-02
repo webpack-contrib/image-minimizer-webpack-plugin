@@ -10,9 +10,11 @@ describe("plugin minify option", () => {
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: ImageMinimizerPlugin.imageminMinify,
-        minimizerOptions: {
-          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+          },
         },
       },
     });
@@ -32,7 +34,9 @@ describe("plugin minify option", () => {
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: ImageMinimizerPlugin.squooshMinify,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+        },
       },
     });
     const { compilation } = stats;
@@ -50,18 +54,20 @@ describe("plugin minify option", () => {
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: (data, minifiOptions) => {
-          const [[, input]] = Object.entries(data);
+        minimizer: {
+          implementation: (data, minifiOptions) => {
+            const [[, input]] = Object.entries(data);
 
-          expect(data).toBeDefined();
-          expect(minifiOptions).toBeDefined();
+            expect(data).toBeDefined();
+            expect(minifiOptions).toBeDefined();
 
-          return {
-            data: input,
-          };
-        },
-        minimizerOptions: {
-          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+            return {
+              data: input,
+            };
+          },
+          options: {
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+          },
         },
       },
     });
@@ -76,25 +82,29 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it("should work if minify is array && minimizerOptions is object", async () => {
+  it("should work if minify is array && minimizerOptions without values", async () => {
     expect.assertions(5);
 
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: [
-          ImageMinimizerPlugin.imageminMinify,
-          (input, minifiOptions) => {
-            expect(input).toBeDefined();
-            expect(minifiOptions).toBeDefined();
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: {
+              plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+            },
+          },
+          {
+            implementation: (input, minifiOptions) => {
+              expect(input).toBeDefined();
+              expect(minifiOptions).toBeDefined();
 
-            return input;
+              return input;
+            },
           },
         ],
-        minimizerOptions: {
-          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
-        },
       },
     });
     const { compilation } = stats;
@@ -115,28 +125,32 @@ describe("plugin minify option", () => {
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: [
-          ImageMinimizerPlugin.imageminMinify,
-          (input, minifiOptions) => {
-            expect("options2" in minifiOptions).toBe(true);
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: {
+              plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+            },
+          },
+          {
+            implementation: (input, minifiOptions) => {
+              expect("options2" in minifiOptions).toBe(true);
 
-            return input;
+              return input;
+            },
+            options: {
+              options2: "passed",
+            },
           },
-          (input, minifiOptions) => {
-            expect("options3" in minifiOptions).toBe(true);
+          {
+            implementation: (input, minifiOptions) => {
+              expect("options3" in minifiOptions).toBe(true);
 
-            return input;
-          },
-        ],
-        minimizerOptions: [
-          {
-            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
-          },
-          {
-            options2: "passed",
-          },
-          {
-            options3: "passed",
+              return input;
+            },
+            options: {
+              options3: "passed",
+            },
           },
         ],
       },
@@ -157,9 +171,11 @@ describe("plugin minify option", () => {
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: ImageMinimizerPlugin.imageminMinify,
-        minimizerOptions: {
-          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+          },
         },
       },
     });
@@ -176,17 +192,19 @@ describe("plugin minify option", () => {
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: ImageMinimizerPlugin.squooshMinify,
-        minimizerOptions: {
-          encodeOptions: {
-            mozjpeg: {
-              quality: 75,
-            },
-            webp: {
-              lossless: 1,
-            },
-            avif: {
-              cqLevel: 0,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 75,
+              },
+              webp: {
+                lossless: 1,
+              },
+              avif: {
+                cqLevel: 0,
+              },
             },
           },
         },
@@ -208,7 +226,9 @@ describe("plugin minify option", () => {
         fileNames: ["plugin-test.svg"],
       },
       imageminPluginOptions: {
-        minify: ImageMinimizerPlugin.squooshMinify,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+        },
       },
     });
     const { compilation } = stats;

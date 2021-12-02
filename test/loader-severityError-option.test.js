@@ -1,5 +1,6 @@
 import path from "path";
 
+import ImageMinimizerPlugin from "../src";
 import { fixturesPath, isOptimized, plugins, runWebpack } from "./helpers";
 
 describe("loader severityError option", () => {
@@ -8,7 +9,12 @@ describe("loader severityError option", () => {
       entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
         severityError: "error",
-        minimizerOptions: { plugins },
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins,
+          },
+        },
       },
     });
     const { compilation } = stats;
@@ -30,8 +36,13 @@ describe("loader severityError option", () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins,
+          },
+        },
         severityError: "warning",
-        minimizerOptions: { plugins },
       },
     });
     const { compilation } = stats;
@@ -53,8 +64,13 @@ describe("loader severityError option", () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminLoaderOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins,
+          },
+        },
         severityError: "off",
-        minimizerOptions: { plugins },
       },
     });
     const { compilation } = stats;
@@ -77,7 +93,14 @@ describe("loader severityError option", () => {
         emitOnErrors: true,
       },
       entry: path.join(fixturesPath, "loader-corrupted.js"),
-      imageminLoaderOptions: { minimizerOptions: { plugins } },
+      imageminLoaderOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins,
+          },
+        },
+      },
     });
     const { compilation } = stats;
     const { assets, warnings, errors } = compilation;

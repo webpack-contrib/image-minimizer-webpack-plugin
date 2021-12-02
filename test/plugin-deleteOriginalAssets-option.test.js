@@ -8,6 +8,7 @@ import {
   runWebpack,
   normalizePath,
 } from "./helpers";
+import ImageMinimizerPlugin from "../src/index.js";
 
 describe('plugin "deleteOriginalAssets" option', () => {
   it("should transform asset and keep original asset (default behavior)", async () => {
@@ -20,8 +21,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
         filename: "[path][name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins: ["imagemin-webp"] },
         },
       },
     });
@@ -65,8 +67,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
       imageminPluginOptions: {
         deleteOriginalAssets: false,
         filename: "[path][name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins: ["imagemin-webp"] },
         },
       },
     });
@@ -110,8 +113,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
       imageminPluginOptions: {
         deleteOriginalAssets: true,
         filename: "[path][name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins: ["imagemin-webp"] },
         },
       },
     });
@@ -151,8 +155,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
         filename: "[path][name].webp",
-        minimizerOptions: {
-          plugins: ["imagemin-webp"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins: ["imagemin-webp"] },
         },
       },
     });
@@ -185,8 +190,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
         imageminPluginOptions: {
           deleteOriginalAssets: true,
           filename: "[path][name].webp",
-          minimizerOptions: {
-            plugins: ["imagemin-webp"],
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins: ["imagemin-webp"] },
           },
         },
       },
@@ -198,8 +204,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
         emitPlugin: true,
         emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
         imageminPluginOptions: {
-          minimizerOptions: {
-            plugins: ["pngquant"],
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins: ["pngquant"] },
           },
         },
       },

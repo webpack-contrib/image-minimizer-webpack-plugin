@@ -46,12 +46,12 @@ export function imageminMinify(
 /**
  * @param {WorkerResult} original
  * @param {ImageminMinimizerOptions} minimizerOptions
- * @returns {Promise<WorkerResult[]>}
+ * @returns {Promise<WorkerResult>}
  */
 export function imageminGenerate(
   original: WorkerResult,
   minimizerOptions: ImageminMinimizerOptions
-): Promise<WorkerResult[]>;
+): Promise<WorkerResult>;
 /**
  * @param {WorkerResult} original
  * @param {SquooshMinimizerOptions} options
@@ -64,9 +64,9 @@ export function squooshMinify(
 /**
  * @param {WorkerResult} original
  * @param {SquooshMinimizerOptions} minifyOptions
- * @returns {Promise<WorkerResult[]>}
+ * @returns {Promise<WorkerResult>}
  */
 export function squooshGenerate(
   original: WorkerResult,
   minifyOptions: SquooshMinimizerOptions
-): Promise<WorkerResult[]>;
+): Promise<WorkerResult>;

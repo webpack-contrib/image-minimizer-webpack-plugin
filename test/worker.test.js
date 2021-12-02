@@ -33,8 +33,10 @@ describe("minify", () => {
     expect(
       isPromise(
         worker({
-          minify: imageminMinify,
-          minimizerOptions: { plugins: ["mozjpeg"] },
+          transformer: {
+            implementation: imageminMinify,
+            options: { plugins: ["mozjpeg"] },
+          },
         })
       )
     ).toBe(true));
@@ -43,11 +45,11 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: ["mozjpeg"],
+      transformer: {
+        implementation: imageminMinify,
+        options: { plugins: ["mozjpeg"] },
       },
     });
 
@@ -66,11 +68,11 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename: path.relative(process.cwd(), filename),
-      minimizerOptions: {
-        plugins: ["mozjpeg"],
+      transformer: {
+        implementation: imageminMinify,
+        options: { plugins: ["mozjpeg"] },
       },
     });
 
@@ -104,10 +106,12 @@ describe("minify", () => {
     );
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: { plugins: [["svgo", svgoOptions]] },
+      transformer: {
+        implementation: imageminMinify,
+        options: { plugins: [["svgo", svgoOptions]] },
+      },
     });
 
     expect(result.warnings).toHaveLength(0);
@@ -134,7 +138,11 @@ describe("minify", () => {
   it("should throw error on empty `imagemin` options", async () => {
     const input = Buffer.from("Foo");
     const filename = path.resolve("foo.png");
-    const result = await worker({ minify: imageminMinify, input, filename });
+    const result = await worker({
+      input,
+      filename,
+      transformer: { implementation: imageminMinify },
+    });
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(1);
@@ -149,10 +157,12 @@ describe("minify", () => {
     const input = Buffer.from("Foo");
     const filename = path.resolve("foo.png");
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: { plugins: [] },
+      transformer: {
+        implementation: imageminMinify,
+        options: { plugins: [] },
+      },
     });
 
     expect(result.warnings).toHaveLength(0);
@@ -168,10 +178,12 @@ describe("minify", () => {
     const input = Buffer.from("Foo");
     const filename = path.resolve("foo.png");
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: { plugins: false },
+      transformer: {
+        implementation: imageminMinify,
+        options: { plugins: false },
+      },
     });
 
     expect(result.warnings).toHaveLength(0);
@@ -187,11 +199,13 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: ["imagemin-mozjpeg", "unknown"],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: ["imagemin-mozjpeg", "unknown"],
+        },
       },
     });
 
@@ -207,11 +221,13 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: ["imagemin-unknown"],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: ["imagemin-unknown"],
+        },
       },
     });
 
@@ -227,10 +243,14 @@ describe("minify", () => {
   it("should return original content and emit a error on invalid content (`String`)", async () => {
     const input = "Foo";
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename: "foo.jpg",
-      minimizerOptions: { plugins: ["mozjpeg"] },
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: ["mozjpeg"],
+        },
+      },
     });
 
     expect(result.warnings).toHaveLength(0);
@@ -242,11 +262,13 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: ["mozjpeg"],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: ["mozjpeg"],
+        },
       },
     });
 
@@ -265,11 +287,13 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: ["mozjpeg"],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: ["mozjpeg"],
+        },
       },
     });
 
@@ -288,11 +312,13 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: [["mozjpeg", { quality: 0 }]],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: [["mozjpeg", { quality: 0 }]],
+        },
       },
     });
 
@@ -311,11 +337,13 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: [["mozjpeg"]],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: [["mozjpeg"]],
+        },
       },
     });
 
@@ -337,8 +365,11 @@ describe("minify", () => {
       minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: ["imagemin-mozjpeg"],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: ["imagemin-mozjpeg"],
+        },
       },
     });
 
@@ -360,8 +391,11 @@ describe("minify", () => {
       minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: [["imagemin-mozjpeg", { quality: 0 }]],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: [["imagemin-mozjpeg", { quality: 0 }]],
+        },
       },
     });
 
@@ -380,11 +414,13 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: [["imagemin-mozjpeg"]],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: [["imagemin-mozjpeg"]],
+        },
       },
     });
 
@@ -403,11 +439,13 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: [imageminMozjpeg()],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: [imageminMozjpeg()],
+        },
       },
     });
 
@@ -433,10 +471,14 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/svg-with-id.svg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: { plugins: [["svgo", svgoOptions]] },
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: [["svgo", svgoOptions]],
+        },
+      },
     });
 
     expect(result.warnings).toHaveLength(0);
@@ -453,18 +495,22 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: [
-        (original) => ({
-          data: Buffer.from("test"),
-          errors: [...original.errors, new Error("fail")],
-        }),
-        (original) => ({
-          data: Buffer.from("test"),
-          errors: [...original.errors, new Error("fail")],
-        }),
-      ],
       input,
       filename,
+      transformer: [
+        {
+          implementation: (original) => ({
+            data: Buffer.from("test"),
+            errors: [...original.errors, new Error("fail")],
+          }),
+        },
+        {
+          implementation: (original) => ({
+            data: Buffer.from("test"),
+            errors: [...original.errors, new Error("fail")],
+          }),
+        },
+      ],
     });
 
     expect(result.errors).toHaveLength(2);
@@ -476,22 +522,23 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: [
-        (original) => {
-          original.errors.push(new Error("fail"));
-
-          return original;
-        },
-        squooshMinify,
-      ],
       input,
       filename,
-      minimizerOptions: [
-        {},
+      transformer: [
         {
-          encodeOptions: {
-            mozjpeg: {
-              quality: 90,
+          implementation: (original) => {
+            original.errors.push(new Error("fail"));
+
+            return original;
+          },
+        },
+        {
+          implementation: squooshMinify,
+          options: {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 90,
+              },
             },
           },
         },
@@ -522,22 +569,24 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: [
-        squooshMinify,
-        (original) => {
-          original.errors.push(new Error("fail"));
-
-          return original;
-        },
-      ],
       input,
       filename,
-      minimizerOptions: [
+      transformer: [
         {
-          encodeOptions: {
-            mozjpeg: {
-              quality: 90,
+          implementation: squooshMinify,
+          options: {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 90,
+              },
             },
+          },
+        },
+        {
+          implementation: (original) => {
+            original.errors.push(new Error("fail"));
+
+            return original;
           },
         },
       ],
@@ -567,11 +616,13 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: ["imagemin-mozjpeg"],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: ["imagemin-mozjpeg"],
+        },
       },
     });
 
@@ -592,8 +643,11 @@ describe("minify", () => {
       minify: imageminMinify,
       input,
       filename,
-      minimizerOptions: {
-        plugins: [],
+      transformer: {
+        implementation: imageminMinify,
+        options: {
+          plugins: [],
+        },
       },
     });
 
@@ -608,11 +662,13 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminGenerate,
       input,
       filename,
-      minimizerOptions: {
-        plugins: ["imagemin-webp"],
+      transformer: {
+        implementation: imageminGenerate,
+        options: {
+          plugins: ["imagemin-webp"],
+        },
       },
     });
 
@@ -630,11 +686,11 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: imageminGenerate,
       input,
       filename,
-      minimizerOptions: {
-        plugins: [],
+      transformer: {
+        implementation: imageminGenerate,
+        options: { plugins: [] },
       },
     });
 
@@ -649,13 +705,15 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: squooshMinify,
       input,
       filename,
-      minimizerOptions: {
-        encodeOptions: {
-          mozjpeg: {
-            quality: 90,
+      transformer: {
+        implementation: squooshMinify,
+        options: {
+          encodeOptions: {
+            mozjpeg: {
+              quality: 90,
+            },
           },
         },
       },
@@ -684,13 +742,15 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: squooshGenerate,
       input,
       filename,
-      minimizerOptions: {
-        encodeOptions: {
-          webp: {
-            quality: 90,
+      transformer: {
+        implementation: squooshGenerate,
+        options: {
+          encodeOptions: {
+            webp: {
+              quality: 90,
+            },
           },
         },
       },
@@ -719,10 +779,12 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
-      minify: squooshGenerate,
       input,
       filename,
-      minimizerOptions: {},
+      transformer: {
+        implementation: squooshGenerate,
+        options: {},
+      },
     });
 
     expect(result.warnings).toHaveLength(0);

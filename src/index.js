@@ -50,25 +50,6 @@ import {
  */
 
 /**
- * @typedef {Record<string, any>} CustomFnMinimizerOptions
- */
-
-/**
- * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
- */
-
-/**
- * @typedef {Object} InternalWorkerOptions
- * @property {string} filename
- * @property {Buffer} input
- * @property {MinifyFunctions} minify
- * @property {MinimizerOptions} [minimizerOptions]
- * @property {string} [severityError]
- * @property {string | FilenameFn} [newFilename]
- * @property {Function} [generateFilename]
- */
-
-/**
  * @callback CustomMinifyFunction
  * @param {WorkerResult} original
  * @param {CustomFnMinimizerOptions} options
@@ -76,7 +57,15 @@ import {
  */
 
 /**
+ * @typedef {Record<string, any>} CustomFnMinimizerOptions
+ */
+
+/**
  * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
+ */
+
+/**
+ * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
  */
 
 /**
@@ -88,6 +77,43 @@ import {
  * @property {AssetInfo} info
  */
 
+/**
+ * @typedef {Object} TransformerOptions
+ */
+
+/**
+ * @callback TransformerFunction
+ * @param {WorkerResult} original
+ * @param {TransformerOptions} options
+ * @returns {Promise<WorkerResult>}
+ */
+
+// TODO fix types for `generator`
+/**
+ * @typedef {Object} Transformer
+ * @property {TransformerFunction} implementation
+ * @property {TransformerOptions | undefined} [options]
+ */
+
+/**
+ * @typedef {Transformer & { preset: string }} Generator
+ */
+
+/**
+ * @typedef {Transformer} Minimizer
+ */
+
+/**
+ * @typedef {Object} InternalWorkerOptions
+ * @property {string} filename
+ * @property {Buffer} input
+ * @property {Transformer | Transformer[]} transformer
+ * @property {string} [severityError]
+ * @property {string | FilenameFn} [newFilename]
+ * @property {Function} [generateFilename]
+ */
+
+// TODO add types
 /**
  * @typedef {Object} InternalLoaderOptions
  * @property {Rules} [test] Test to match files against.
@@ -109,28 +135,19 @@ import {
  * @returns {string}
  */
 
-// TODO fix types for `generator`
-/**
- * @typedef {Object} Generator
- * @property {Function} implementation
- * @property {string} preset
- * @property {any} options
- */
-
 /**
  * @typedef {Object} PluginOptions
  * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
- * @property {string} [severityError] Allows to choose how errors are displayed.
- * @property {Generator[]} [generator] Allows to set generators.
- * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
+ * @property {Minimizer} [minimizer] Allows to setup the minimizer.
+ * @property {Generator[]} [generator] Allows to set the generator.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
+ * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
- * @property {MinifyFunctions} [minify]
  */
 
 /**
@@ -147,16 +164,13 @@ class ImageMinimizerPlugin {
     });
 
     const {
-      minify = imageminMinify,
+      minimizer = { implementation: imageminMinify, options: { plugins: [] } },
       filter = () => true,
       test = /\.(jpe?g|png|gif|tif|webp|svg|avif|jxl)$/i,
       include,
       exclude,
       severityError,
       generator,
-      minimizerOptions = {
-        plugins: [],
-      },
       loader = true,
       concurrency,
       filename = "[path][name][ext]",
@@ -164,8 +178,7 @@ class ImageMinimizerPlugin {
     } = options;
 
     this.options = {
-      minify,
-      minimizerOptions,
+      minimizer,
       generator,
       severityError,
       filter,
@@ -237,8 +250,8 @@ class ImageMinimizerPlugin {
 
           const cacheName = serialize({
             name,
-            minify: this.options.minify,
-            minimizerOptions: this.options.minimizerOptions,
+            minimizer: this.options.minimizer,
+            generator: this.options.generator,
           });
 
           const eTag = cache.getLazyHashedEtag(source);
@@ -271,14 +284,11 @@ class ImageMinimizerPlugin {
             input = Buffer.from(input);
           }
 
-          const { severityError, minimizerOptions, minify } = this.options;
-
           const minifyOptions = /** @type {InternalWorkerOptions} */ ({
             filename: name,
             input,
-            severityError,
-            minify,
-            minimizerOptions,
+            severityError: this.options.severityError,
+            transformer: this.options.minimizer,
             newFilename: this.options.filename,
             generateFilename: compilation.getAssetPath.bind(compilation),
           });
@@ -348,8 +358,7 @@ class ImageMinimizerPlugin {
 
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
         const {
-          minify,
-          minimizerOptions,
+          minimizer,
           generator,
           filename,
           filter,
@@ -365,14 +374,7 @@ class ImageMinimizerPlugin {
           exclude,
           enforce: "pre",
           loader: require.resolve(path.join(__dirname, "loader.js")),
-          options: {
-            minify,
-            generator,
-            filename,
-            severityError,
-            filter,
-            minimizerOptions,
-          },
+          options: { generator, minimizer, filename, filter, severityError },
         });
 
         compiler.options.module.rules.push(loader);
