@@ -1,0 +1,1 @@
+console.log(new URL("../fixtures/loader-test.png?as=webp", import.meta.url));
