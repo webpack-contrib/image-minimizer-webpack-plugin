@@ -35,7 +35,7 @@ describe("loader generator option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       outputDir,
-      "loader-test.webp"
+      "./nested/deep/loader-test.webp"
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
