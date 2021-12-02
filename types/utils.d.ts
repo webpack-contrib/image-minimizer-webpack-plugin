@@ -1,6 +1,4 @@
 export type Task<T> = () => Promise<T>;
-export type ImageminMinimizerOptions =
-  import("./index").ImageminMinimizerOptions;
 export type WorkerResult = import("./index").WorkerResult;
 export type SquooshMinimizerOptions = import("./index").SquooshMinimizerOptions;
 export type ImageminOptions = import("imagemin").Options;
@@ -28,45 +26,50 @@ export type MetaData = {
  */
 export function throttleAll<T>(limit: number, tasks: Task<T>[]): Promise<T[]>;
 /**
- * @param {ImageminMinimizerOptions} minimizerOptions
+ * @template T
+ * @param {ImageminOptions} imageminConfig
  * @returns {Promise<ImageminOptions>}
  */
-export function imageminNormalizeConfig(
-  minimizerOptions: ImageminMinimizerOptions
+export function imageminNormalizeConfig<T>(
+  imageminConfig: ImageminOptions
 ): Promise<ImageminOptions>;
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {ImageminMinimizerOptions} options
+ * @param {T} options
  * @returns {Promise<WorkerResult>}
  */
-export function imageminMinify(
+export function imageminMinify<T>(
   original: WorkerResult,
-  options: ImageminMinimizerOptions
+  options: T
 ): Promise<WorkerResult>;
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {ImageminMinimizerOptions} minimizerOptions
+ * @param {T} minimizerOptions
  * @returns {Promise<WorkerResult>}
  */
-export function imageminGenerate(
+export function imageminGenerate<T>(
   original: WorkerResult,
-  minimizerOptions: ImageminMinimizerOptions
+  minimizerOptions: T
 ): Promise<WorkerResult>;
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SquooshMinimizerOptions} options
+ * @param {T} options
  * @returns {Promise<WorkerResult>}
  */
-export function squooshMinify(
+export function squooshMinify<T>(
   original: WorkerResult,
-  options: SquooshMinimizerOptions
+  options: T
 ): Promise<WorkerResult>;
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SquooshMinimizerOptions} minifyOptions
+ * @param {T} minifyOptions
  * @returns {Promise<WorkerResult>}
  */
-export function squooshGenerate(
+export function squooshGenerate<T>(
   original: WorkerResult,
-  minifyOptions: SquooshMinimizerOptions
+  minifyOptions: T
 ): Promise<WorkerResult>;

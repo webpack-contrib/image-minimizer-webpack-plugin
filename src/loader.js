@@ -4,25 +4,20 @@ import worker from "./worker";
 import schema from "./loader-options.json";
 import { imageminMinify } from "./utils.js";
 
-/** @typedef {import("./index").FilterFn} FilterFn */
-/** @typedef {import("./index").Rules} Rules */
-/** @typedef {import("./index").Minimizer} Minimizer */
-/** @typedef {import("./index").Generator} Generator */
-/** @typedef {import("./index").InternalWorkerOptions} InternalWorkerOptions */
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
-/** @typedef {import("webpack").LoaderContext<LoaderOptions>} LoaderContext */
 /** @typedef {import("webpack").Compilation} Compilation */
 
 /**
- * @typedef {Object} LoaderOptions
+ * @template T
+ * @typedef {Object} LoaderOptions<T>
  * @property {string} [severityError] Allows to choose how errors are displayed.
- * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
- * @property {Minimizer} [minimizer]
- * @property {Generator[]} [generator]
+ * @property {import("./index").Minimizer<T> | import("./index").Minimizer<T>[]} [minimizer]
+ * @property {import("./index").Generator<T>[]} [generator]
  */
 
 /**
- * @this {LoaderContext}
+ * @template T
+ * @this {import("webpack").LoaderContext<LoaderOptions<T>>}
  * @param {Buffer} content
  */
 module.exports = async function loader(content) {
@@ -67,15 +62,16 @@ module.exports = async function loader(content) {
   }
 
   const name = path.relative(this.rootContext, this.resourcePath);
-  const minifyOptions = /** @type {InternalWorkerOptions} */ ({
-    input: content,
-    filename: name,
-    severityError,
-    transformer,
-    generateFilename:
-      /** @type {Compilation} */
-      (this._compilation).getAssetPath.bind(this._compilation),
-  });
+  const minifyOptions =
+    /** @type {import("./index").InternalWorkerOptions<T>} */ ({
+      input: content,
+      filename: name,
+      severityError,
+      transformer,
+      generateFilename:
+        /** @type {Compilation} */
+        (this._compilation).getAssetPath.bind(this._compilation),
+    });
 
   const output = await worker(minifyOptions);
 

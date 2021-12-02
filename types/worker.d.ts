@@ -1,15 +1,12 @@
-export = worker;
-/** @typedef {import("./index").InternalWorkerOptions} InternalWorkerOptions */
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").FilenameFn} FilenameFn */
 /**
- * @param {InternalWorkerOptions} options
+ * @template T
+ * @param {import("./index").InternalWorkerOptions<T>} options
  * @returns {Promise<WorkerResult>}
  */
-declare function worker(options: InternalWorkerOptions): Promise<WorkerResult>;
-declare namespace worker {
-  export { InternalWorkerOptions, WorkerResult, FilenameFn };
-}
-type InternalWorkerOptions = import("./index").InternalWorkerOptions;
-type WorkerResult = import("./index").WorkerResult;
-type FilenameFn = import("./index").FilenameFn;
+export default function worker<T>(
+  options: import("./index").InternalWorkerOptions<T>
+): Promise<WorkerResult>;
+export type WorkerResult = import("./index").WorkerResult;
+export type FilenameFn = import("./index").FilenameFn;

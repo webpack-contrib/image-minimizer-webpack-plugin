@@ -1,12 +1,12 @@
-/** @typedef {import("./index").InternalWorkerOptions} InternalWorkerOptions */
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").FilenameFn} FilenameFn */
 
 /**
- * @param {InternalWorkerOptions} options
+ * @template T
+ * @param {import("./index").InternalWorkerOptions<T>} options
  * @returns {Promise<WorkerResult>}
  */
-async function worker(options) {
+export default async function worker(options) {
   /** @type {WorkerResult} */
   let result = {
     data: options.input,
@@ -87,7 +87,7 @@ async function worker(options) {
       // eslint-disable-next-line no-await-in-loop
       processedResult = await transformers[i].implementation(
         result,
-        transformers[i].options || {}
+        transformers[i].options
       );
     } catch (error) {
       result.errors.push(
@@ -117,5 +117,3 @@ async function worker(options) {
 
   return result;
 }
-
-module.exports = worker;

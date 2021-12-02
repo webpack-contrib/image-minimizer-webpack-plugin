@@ -1,7 +1,5 @@
 import path from "path";
-import { klona } from "klona/full";
 
-/** @typedef {import("./index").ImageminMinimizerOptions} ImageminMinimizerOptions */
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").SquooshMinimizerOptions} SquooshMinimizerOptions */
 /** @typedef {import("imagemin").Options} ImageminOptions */
@@ -453,24 +451,19 @@ class InvalidConfigError extends Error {
 }
 
 /**
- * @param {ImageminMinimizerOptions} minimizerOptions
+ * @template T
+ * @param {ImageminOptions} imageminConfig
  * @returns {Promise<ImageminOptions>}
  */
-async function imageminNormalizeConfig(minimizerOptions) {
+async function imageminNormalizeConfig(imageminConfig) {
   if (
-    !minimizerOptions ||
-    !minimizerOptions.plugins ||
-    (minimizerOptions.plugins && minimizerOptions.plugins.length === 0)
+    !imageminConfig ||
+    !imageminConfig.plugins ||
+    (imageminConfig.plugins && imageminConfig.plugins.length === 0)
   ) {
     throw new Error(
       "No plugins found for `imagemin`, please read documentation"
     );
-  }
-
-  const imageminConfig = klona(minimizerOptions);
-
-  if (!imageminConfig.pluginsMeta) {
-    imageminConfig.pluginsMeta = [];
   }
 
   /**
@@ -482,17 +475,14 @@ async function imageminNormalizeConfig(minimizerOptions) {
     const isPluginArray = Array.isArray(plugin);
 
     if (typeof plugin === "string" || isPluginArray) {
-      const pluginName = isPluginArray
-        ? /** @type {[string, object]} */ (plugin)[0]
-        : /** @type {string} */ (plugin);
-      const pluginOptions = isPluginArray
-        ? /** @type {[string, object]} */ (plugin)[1]
-        : undefined;
+      const pluginName = isPluginArray ? plugin[0] : plugin;
+      const pluginOptions = isPluginArray ? plugin[1] : undefined;
 
       let requiredPlugin = null;
       let requiredPluginName = `imagemin-${pluginName}`;
 
       try {
+        // @ts-ignore
         // eslint-disable-next-line no-await-in-loop
         requiredPlugin = (await import(requiredPluginName)).default(
           pluginOptions
@@ -501,6 +491,7 @@ async function imageminNormalizeConfig(minimizerOptions) {
         requiredPluginName = pluginName;
 
         try {
+          // @ts-ignore
           // eslint-disable-next-line no-await-in-loop
           requiredPlugin = (await import(requiredPluginName)).default(
             pluginOptions
@@ -517,23 +508,23 @@ async function imageminNormalizeConfig(minimizerOptions) {
         // Nothing
       }
 
-      let version = "unknown";
+      // let version = "unknown";
 
-      try {
-        // eslint-disable-next-line import/no-dynamic-require
-        ({ version } = require(`${requiredPluginName}/package.json`));
-      } catch {
-        // Nothing
-      }
+      // try {
+      //   // eslint-disable-next-line import/no-dynamic-require
+      //   ({ version } = require(`${requiredPluginName}/package.json`));
+      // } catch {
+      //   // Nothing
+      // }
 
-      /** @type {Array<Object>} imageminConfig.pluginsMeta */
-      (imageminConfig.pluginsMeta).push([
-        {
-          name: requiredPluginName,
-          options: pluginOptions || {},
-          version,
-        },
-      ]);
+      // /** @type {Array<Object>} imageminConfig.pluginsMeta */
+      // pluginsMeta.push([
+      //   {
+      //     name: requiredPluginName,
+      //     options: pluginOptions || {},
+      //     version,
+      //   },
+      // ]);
 
       plugins.push(requiredPlugin);
     } else {
@@ -545,21 +536,23 @@ async function imageminNormalizeConfig(minimizerOptions) {
     }
   }
 
-  imageminConfig.plugins = plugins;
-
-  // @ts-ignore
-  return imageminConfig;
+  return { plugins };
 }
 
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {ImageminMinimizerOptions} minimizerOptions
+ * @param {T} minimizerOptions
  * @returns {Promise<WorkerResult>}
  */
 async function imageminGenerate(original, minimizerOptions) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-    await imageminNormalizeConfig(minimizerOptions)
+    await imageminNormalizeConfig(
+      /** @type {ImageminOptions} */ (/** @type {?} */ (minimizerOptions))
+    )
   );
+
+  // @ts-ignore
   const imagemin = (await import("imagemin")).default;
 
   let result;
@@ -604,15 +597,19 @@ async function imageminGenerate(original, minimizerOptions) {
 }
 
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {ImageminMinimizerOptions} options
+ * @param {T} options
  * @returns {Promise<WorkerResult>}
  */
 async function imageminMinify(original, options) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-    await imageminNormalizeConfig(options)
+    await imageminNormalizeConfig(
+      /** @type {ImageminOptions} */ (/** @type {?} */ (options))
+    )
   );
 
+  // @ts-ignore
   const imagemin = (await import("imagemin")).default;
 
   let result;
@@ -659,18 +656,22 @@ async function imageminMinify(original, options) {
 }
 
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SquooshMinimizerOptions} minifyOptions
+ * @param {T} minifyOptions
  * @returns {Promise<WorkerResult>}
  */
 async function squooshGenerate(original, minifyOptions) {
-  const { encodeOptions } = minifyOptions;
   // eslint-disable-next-line node/no-unpublished-require
   const squoosh = require("@squoosh/lib");
   const { ImagePool } = squoosh;
   // TODO https://github.com/GoogleChromeLabs/squoosh/issues/1111
   const imagePool = new ImagePool(1);
   const image = imagePool.ingestImage(new Uint8Array(original.data));
+
+  const { encodeOptions } = /** @type {SquooshMinimizerOptions} */ (
+    minifyOptions
+  );
 
   try {
     await image.encode(encodeOptions);
@@ -720,8 +721,9 @@ async function squooshGenerate(original, minifyOptions) {
 }
 
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SquooshMinimizerOptions} options
+ * @param {T} options
  * @returns {Promise<WorkerResult>}
  */
 async function squooshMinify(original, options) {
@@ -757,7 +759,9 @@ async function squooshMinify(original, options) {
     return original;
   }
 
-  const { encodeOptions = {} } = options;
+  const { encodeOptions = {} } = /** @type {SquooshMinimizerOptions} */ (
+    options
+  );
 
   if (!encodeOptions[targetCodec]) {
     encodeOptions[targetCodec] = {};
