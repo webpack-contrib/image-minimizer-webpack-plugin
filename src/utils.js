@@ -1,7 +1,7 @@
 import path from "path";
 
 /** @typedef {import("./index").WorkerResult} WorkerResult */
-/** @typedef {import("./index").SquooshMinimizerOptions} SquooshMinimizerOptions */
+/** @typedef {import("./index").SquooshOptions} SquooshOptions */
 /** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("webpack").WebpackError} WebpackError */
 
@@ -671,13 +671,28 @@ async function squooshGenerate(original, minifyOptions) {
   const imagePool = new ImagePool(1);
   const image = imagePool.ingestImage(new Uint8Array(original.data));
 
-  const { encodeOptions, resize } = /** @type {SquooshMinimizerOptions} */ (
-    minifyOptions || {}
-  );
+  const squooshOptions = /** @type {SquooshOptions} */ (minifyOptions || {});
 
-  if (typeof resize !== "undefined") {
-    await image.preprocess({ resize });
+  /**
+   * @type {undefined | Object.<string, any>}
+   */
+  let preprocessors;
+
+  for (const preprocessor of Object.keys(squoosh.preprocessors)) {
+    if (typeof squooshOptions[preprocessor] !== "undefined") {
+      if (!preprocessors) {
+        preprocessors = {};
+      }
+
+      preprocessors[preprocessor] = squooshOptions[preprocessor];
+    }
   }
+
+  if (typeof preprocessors !== "undefined") {
+    await image.preprocess(preprocessors);
+  }
+
+  const { encodeOptions } = squooshOptions;
 
   try {
     await image.encode(encodeOptions);
@@ -765,18 +780,33 @@ async function squooshMinify(original, options) {
     return original;
   }
 
-  const { encodeOptions = {}, resize } =
-    /** @type {SquooshMinimizerOptions} */ (options || {});
-
-  if (!encodeOptions[targetCodec]) {
-    encodeOptions[targetCodec] = {};
-  }
-
+  const squooshOptions = /** @type {SquooshOptions} */ (options || {});
   const imagePool = new ImagePool(1);
   const image = imagePool.ingestImage(new Uint8Array(original.data));
 
-  if (typeof resize !== "undefined") {
-    await image.preprocess({ resize });
+  /**
+   * @type {undefined | Object.<string, any>}
+   */
+  let preprocessors;
+
+  for (const preprocessor of Object.keys(squoosh.preprocessors)) {
+    if (typeof squooshOptions[preprocessor] !== "undefined") {
+      if (!preprocessors) {
+        preprocessors = {};
+      }
+
+      preprocessors[preprocessor] = squooshOptions[preprocessor];
+    }
+  }
+
+  if (typeof preprocessors !== "undefined") {
+    await image.preprocess(preprocessors);
+  }
+
+  const { encodeOptions = {} } = squooshOptions;
+
+  if (!encodeOptions[targetCodec]) {
+    encodeOptions[targetCodec] = {};
   }
 
   try {

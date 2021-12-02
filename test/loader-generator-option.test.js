@@ -335,6 +335,9 @@ describe("loader generator option", () => {
                 width: 100,
                 height: 50,
               },
+              rotate: {
+                numRotations: 90,
+              },
               encodeOptions: {
                 webp: {
                   lossless: 1,

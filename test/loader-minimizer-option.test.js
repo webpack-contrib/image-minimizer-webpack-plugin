@@ -427,6 +427,9 @@ describe("loader minimizer option", () => {
               width: 100,
               height: 50,
             },
+            rotate: {
+              numRotations: 90,
+            },
           },
         },
       },
