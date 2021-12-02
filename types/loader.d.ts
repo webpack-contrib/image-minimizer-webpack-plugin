@@ -8,10 +8,6 @@ export type LoaderContext = import("webpack").LoaderContext<LoaderOptions>;
 export type Compilation = import("webpack").Compilation;
 export type LoaderOptions = {
   /**
-   * Allows filtering of images for optimization.
-   */
-  filter?: import("./index").FilterFn | undefined;
-  /**
    * Allows to choose how errors are displayed.
    */
   severityError?: string | undefined;

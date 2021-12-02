@@ -88,12 +88,25 @@ import {
  * @returns {Promise<WorkerResult>}
  */
 
+/**
+ * @typedef {Object} PathData
+ * @property {string} [filename]
+ */
+
+/**
+ * @callback FilenameFn
+ * @param {PathData} pathData
+ * @param {AssetInfo} [assetInfo]
+ * @returns {string}
+ */
+
 // TODO fix types for `generator`
 /**
  * @typedef {Object} Transformer
  * @property {TransformerFunction} implementation
  * @property {FilterFn} [filter]
- * @property {TransformerOptions | undefined} [options]
+ * @property {string | FilenameFn} [filename]
+ * @property {TransformerOptions} [options]
  */
 
 /**
@@ -110,7 +123,6 @@ import {
  * @property {Buffer} input
  * @property {Transformer | Transformer[]} transformer
  * @property {string} [severityError]
- * @property {string | FilenameFn} [newFilename]
  * @property {Function} [generateFilename]
  */
 
@@ -125,18 +137,6 @@ import {
  */
 
 /**
- * @typedef {Object} PathData
- * @property {string} [filename]
- */
-
-/**
- * @callback FilenameFn
- * @param {PathData} pathData
- * @param {AssetInfo} [assetInfo]
- * @returns {string}
- */
-
-/**
  * @typedef {Object} PluginOptions
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
@@ -146,7 +146,6 @@ import {
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string} [severityError] Allows to choose how errors are displayed.
- * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  */
 
@@ -172,7 +171,6 @@ class ImageMinimizerPlugin {
       generator,
       loader = true,
       concurrency,
-      filename = "[path][name][ext]",
       deleteOriginalAssets = false,
     } = options;
 
@@ -185,7 +183,6 @@ class ImageMinimizerPlugin {
       loader,
       concurrency,
       test,
-      filename,
       deleteOriginalAssets,
     };
   }
@@ -278,7 +275,6 @@ class ImageMinimizerPlugin {
             input,
             severityError: this.options.severityError,
             transformer: this.options.minimizer,
-            newFilename: this.options.filename,
             generateFilename: compilation.getAssetPath.bind(compilation),
           });
 
@@ -346,15 +342,8 @@ class ImageMinimizerPlugin {
       });
 
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
-        const {
-          minimizer,
-          generator,
-          filename,
-          test,
-          include,
-          exclude,
-          severityError,
-        } = this.options;
+        const { minimizer, generator, test, include, exclude, severityError } =
+          this.options;
 
         const loader = /** @type {InternalLoaderOptions} */ ({
           test,
@@ -362,7 +351,7 @@ class ImageMinimizerPlugin {
           exclude,
           enforce: "pre",
           loader: require.resolve(path.join(__dirname, "loader.js")),
-          options: { generator, minimizer, filename, severityError },
+          options: { generator, minimizer, severityError },
         });
 
         compiler.options.module.rules.push(loader);

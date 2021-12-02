@@ -20,9 +20,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
-        filename: "[path][name].webp",
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
+          filename: "[path][name].webp",
           options: { plugins: ["imagemin-webp"] },
         },
       },
@@ -66,9 +66,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
         deleteOriginalAssets: false,
-        filename: "[path][name].webp",
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
+          filename: "[path][name].webp",
           options: { plugins: ["imagemin-webp"] },
         },
       },
@@ -112,9 +112,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
         deleteOriginalAssets: true,
-        filename: "[path][name].webp",
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
+          filename: "[path][name].webp",
           options: { plugins: ["imagemin-webp"] },
         },
       },
@@ -154,9 +154,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
-        filename: "[path][name].webp",
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
+          filename: "[path][name].webp",
           options: { plugins: ["imagemin-webp"] },
         },
       },
@@ -189,9 +189,9 @@ describe('plugin "deleteOriginalAssets" option', () => {
         emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
         imageminPluginOptions: {
           deleteOriginalAssets: true,
-          filename: "[path][name].webp",
           minimizer: {
             implementation: ImageMinimizerPlugin.imageminMinify,
+            filename: "[path][name].webp",
             options: { plugins: ["imagemin-webp"] },
           },
         },

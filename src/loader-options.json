@@ -1,4 +1,74 @@
 {
+  "definitions": {
+    "Minimizer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "implementation": {
+          "description": "Implementation of the minimizer function.",
+          "instanceof": "Function"
+        },
+        "filter": {
+          "description": "Allows filtering of images.",
+          "instanceof": "Function"
+        },
+        "filename": {
+          "description": "Allows to set the filename for the minimized asset.",
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "instanceof": "Function"
+            }
+          ]
+        },
+        "options": {
+          "description": "Options for the minimizer function.",
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "Generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preset": {
+          "description": "Name of preset, i.e. using in '?as=webp'.",
+          "type": "string",
+          "minLength": 1
+        },
+        "implementation": {
+          "description": "Implementation of the generator function.",
+          "instanceof": "Function"
+        },
+        "filter": {
+          "description": "Allows filtering of images.",
+          "instanceof": "Function"
+        },
+        "filename": {
+          "description": "Allows to set the filename for the generated asset.",
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "instanceof": "Function"
+            }
+          ]
+        },
+        "options": {
+          "description": "Options for the generator function.",
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": ["implementation", "preset"]
+    }
+  },
   "title": "Image Minimizer Plugin Loader options",
   "type": "object",
   "additionalProperties": false,
@@ -11,43 +81,11 @@
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "implementation": {
-                "description": "Implementation of the minimizer function.",
-                "instanceof": "Function"
-              },
-              "filter": {
-                "description": "Allows filtering of images for optimization.",
-                "instanceof": "Function"
-              },
-              "options": {
-                "description": "Options for the minimizer function.",
-                "type": "object",
-                "additionalProperties": true
-              }
-            }
+            "$ref": "#/definitions/Minimizer"
           }
         },
         {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "implementation": {
-              "description": "Implementation of the minimizer function.",
-              "instanceof": "Function"
-            },
-            "filter": {
-              "description": "Allows filtering of images.",
-              "instanceof": "Function"
-            },
-            "options": {
-              "description": "Options for the minimizer function.",
-              "type": "object",
-              "additionalProperties": true
-            }
-          }
+          "$ref": "#/definitions/Minimizer"
         }
       ]
     },
@@ -57,47 +95,13 @@
       "type": "array",
       "minItems": 1,
       "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "preset": {
-            "description": "Name of preset, i.e. using in '?as=webp'.",
-            "type": "string",
-            "minLength": 1
-          },
-          "implementation": {
-            "description": "Implementation of the generator function.",
-            "instanceof": "Function"
-          },
-          "filter": {
-            "description": "Allows filtering of images.",
-            "instanceof": "Function"
-          },
-          "options": {
-            "description": "Options for the generator function.",
-            "type": "object",
-            "additionalProperties": true
-          }
-        },
-        "required": ["implementation", "preset"]
+        "$ref": "#/definitions/Generator"
       }
-    },
-    "filename": {
-      "description": "Allows to set the filename for the generated asset.",
-      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filename-1",
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "instanceof": "Function"
-        }
-      ]
     },
     "severityError": {
       "description": "Allows to choose how errors are displayed.",
-      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror-1",
-      "type": "string"
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror",
+      "enum": ["off", "warning", "error"]
     }
   }
 }

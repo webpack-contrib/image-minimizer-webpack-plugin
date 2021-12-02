@@ -1,22 +1,15 @@
 export = worker;
-/** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
-/** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
 /** @typedef {import("./index").InternalWorkerOptions} InternalWorkerOptions */
 /** @typedef {import("./index").WorkerResult} WorkerResult */
+/** @typedef {import("./index").FilenameFn} FilenameFn */
 /**
  * @param {InternalWorkerOptions} options
  * @returns {Promise<WorkerResult>}
  */
 declare function worker(options: InternalWorkerOptions): Promise<WorkerResult>;
 declare namespace worker {
-  export {
-    MinimizerOptions,
-    MinifyFunctions,
-    InternalWorkerOptions,
-    WorkerResult,
-  };
+  export { InternalWorkerOptions, WorkerResult, FilenameFn };
 }
 type InternalWorkerOptions = import("./index").InternalWorkerOptions;
 type WorkerResult = import("./index").WorkerResult;
-type MinimizerOptions = import("./index").MinimizerOptions;
-type MinifyFunctions = import("./index").MinifyFunctions;
+type FilenameFn = import("./index").FilenameFn;

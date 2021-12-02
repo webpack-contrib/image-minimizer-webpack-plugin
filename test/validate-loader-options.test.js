@@ -63,6 +63,16 @@ describe("validate loader options", () => {
             filter: () => false,
           },
         ],
+        {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          filename: "[name].[ext]",
+        },
+        [
+          {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            filename: () => "[name].[ext]",
+          },
+        ],
       ],
       failure: [
         1,
@@ -73,6 +83,10 @@ describe("validate loader options", () => {
         {
           implementation: ImageMinimizerPlugin.squooshMinify,
           filter: true,
+        },
+        {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          filename: true,
         },
       ],
     },
@@ -101,6 +115,20 @@ describe("validate loader options", () => {
             filter: () => false,
           },
         ],
+        [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            filename: "[name].[ext]",
+          },
+        ],
+        [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            filename: () => "[name].[ext]",
+          },
+        ],
       ],
       failure: [
         1,
@@ -116,15 +144,18 @@ describe("validate loader options", () => {
           implementation: ImageMinimizerPlugin.squooshGenerate,
           filter: true,
         },
+        [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            filename: true,
+          },
+        ],
       ],
     },
     severityError: {
       success: ["error"],
       failure: [true, false, {}, [], () => {}],
-    },
-    filename: {
-      success: ["[name].[ext]", () => "[name].[ext]"],
-      failure: [{}, [], true],
     },
     unknown: {
       success: [],

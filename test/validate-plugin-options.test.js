@@ -100,22 +100,6 @@ describe("validate plugin options", () => {
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ filename: "[name].[ext]" });
-    }).not.toThrow();
-
-    expect(() => {
-      new ImageMinimizerPlugin({ filename: () => "[name].[ext]" });
-    }).not.toThrow();
-
-    expect(() => {
-      new ImageMinimizerPlugin({ filename: true });
-    }).toThrowErrorMatchingSnapshot();
-
-    expect(() => {
-      new ImageMinimizerPlugin({ filename: {} });
-    }).toThrowErrorMatchingSnapshot();
-
-    expect(() => {
       new ImageMinimizerPlugin({ severityError: false });
     }).toThrowErrorMatchingSnapshot();
 
@@ -241,6 +225,64 @@ describe("validate plugin options", () => {
 
     expect(() => {
       new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          filename: "[name].[ext]",
+        },
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            filename: "[name].[ext]",
+          },
+        ],
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          filename: () => "[name].[ext]",
+        },
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            filename: () => "[name].[ext]",
+          },
+        ],
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          filename: true,
+        },
+      });
+    }).toThrowErrorMatchingSnapshot();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          filename: true,
+        },
+      });
+    }).toThrowErrorMatchingSnapshot();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
         generator: [
           {
             preset: "webp",
@@ -279,6 +321,10 @@ describe("validate plugin options", () => {
     }).not.toThrow();
 
     expect(() => {
+      new ImageMinimizerPlugin({ generator: true });
+    }).toThrowErrorMatchingSnapshot();
+
+    expect(() => {
       new ImageMinimizerPlugin({
         generator: [
           {
@@ -305,7 +351,38 @@ describe("validate plugin options", () => {
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ generator: true });
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            filename: "[name].[ext]",
+          },
+        ],
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            filename: () => "[name].[ext]",
+          },
+        ],
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "webp",
+            filename: true,
+          },
+        ],
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
