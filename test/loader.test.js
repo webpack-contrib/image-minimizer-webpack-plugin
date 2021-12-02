@@ -161,4 +161,36 @@ describe("loader", () => {
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
+
+  it("should throw an error on empty minimizer", async () => {
+    const stats = await runWebpack({
+      imageminLoaderOptions: {
+        minimizer: undefined,
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(4);
+    expect(errors[0].message).toMatch(
+      /Not configured 'minimizer' or 'generator' options, please setup them/
+    );
+  });
+
+  it("should throw an error on empty generator", async () => {
+    const stats = await runWebpack({
+      imageminLoaderOptions: {
+        generator: undefined,
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(4);
+    expect(errors[0].message).toMatch(
+      /Not configured 'minimizer' or 'generator' options, please setup them/
+    );
+  });
 });

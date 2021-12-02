@@ -2,7 +2,6 @@ import path from "path";
 
 import worker from "./worker";
 import schema from "./loader-options.json";
-import { imageminMinify } from "./utils.js";
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -26,7 +25,7 @@ module.exports = async function loader(content) {
   const callback = this.async();
   const { generator, minimizer, severityError } = options;
 
-  let transformer = minimizer || { implementation: imageminMinify };
+  let transformer = minimizer;
   let isGenerator = false;
   let parsedQuery;
 
@@ -68,6 +67,16 @@ module.exports = async function loader(content) {
       [transformer] = presets;
       isGenerator = true;
     }
+  }
+
+  if (!transformer) {
+    callback(
+      new Error(
+        "Not configured 'minimizer' or 'generator' options, please setup them"
+      )
+    );
+
+    return;
   }
 
   const name = path.relative(this.rootContext, this.resourcePath);

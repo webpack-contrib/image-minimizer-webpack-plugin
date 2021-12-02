@@ -139,7 +139,7 @@ class ImageMinimizerPlugin {
     });
 
     const {
-      minimizer = { implementation: imageminMinify, options: { plugins: [] } },
+      minimizer,
       test = /\.(jpe?g|png|gif|tif|webp|svg|avif|jxl)$/i,
       include,
       exclude,
@@ -149,6 +149,12 @@ class ImageMinimizerPlugin {
       concurrency,
       deleteOriginalAssets = true,
     } = options;
+
+    if (!minimizer && !generator) {
+      throw new Error(
+        "Not configured 'minimizer' or 'generator' options, please setup them"
+      );
+    }
 
     /**
      * @private
