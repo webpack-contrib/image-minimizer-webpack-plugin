@@ -24,34 +24,46 @@ export type SquooshMinimizerOptions = {
       }
     | undefined;
 };
-export type CustomFnMinimizerOptions = Record<string, any>;
-export type MinimizerOptions =
-  | ImageminMinimizerOptions
-  | SquooshMinimizerOptions
-  | CustomFnMinimizerOptions;
-export type InternalWorkerOptions = {
-  filename: string;
-  input: Buffer;
-  minify: MinifyFunctions;
-  minimizerOptions?: MinimizerOptions | undefined;
-  severityError?: string | undefined;
-  newFilename?: string | FilenameFn | undefined;
-  generateFilename?: Function | undefined;
-};
 export type CustomMinifyFunction = (
   original: WorkerResult,
   options: CustomFnMinimizerOptions
 ) => Promise<WorkerResult>;
+export type CustomFnMinimizerOptions = Record<string, any>;
 export type MinifyFunctions =
   | ImageminMinifyFunction
   | SquooshMinifyFunction
   | CustomMinifyFunction;
+export type MinimizerOptions =
+  | ImageminMinimizerOptions
+  | SquooshMinimizerOptions
+  | CustomFnMinimizerOptions;
 export type WorkerResult = {
   filename: string;
   data: Buffer;
   warnings: Array<Error>;
   errors: Array<Error>;
   info: AssetInfo;
+};
+export type TransformerOptions = Object;
+export type TransformerFunction = (
+  original: WorkerResult,
+  options: TransformerOptions
+) => Promise<WorkerResult>;
+export type Transformer = {
+  implementation: TransformerFunction;
+  options?: TransformerOptions | undefined;
+};
+export type Generator = Transformer & {
+  preset: string;
+};
+export type Minimizer = Transformer;
+export type InternalWorkerOptions = {
+  filename: string;
+  input: Buffer;
+  transformer: Transformer | Transformer[];
+  severityError?: string | undefined;
+  newFilename?: string | FilenameFn | undefined;
+  generateFilename?: Function | undefined;
 };
 export type InternalLoaderOptions = {
   /**
@@ -76,9 +88,6 @@ export type FilenameFn = (
   pathData: PathData,
   assetInfo?: import("webpack").AssetInfo | undefined
 ) => string;
-export type Generator = {
-  implementation: Function;
-};
 export type PluginOptions = {
   /**
    * Allows filtering of images for optimization.
@@ -97,17 +106,13 @@ export type PluginOptions = {
    */
   exclude?: Rules | undefined;
   /**
-   * Allows to choose how errors are displayed.
+   * Allows to setup the minimizer.
    */
-  severityError?: string | undefined;
+  minimizer?: Transformer | undefined;
   /**
-   * Allows to set generators.
+   * Allows to set the generator.
    */
-  generator?: Generator | Generator[] | undefined;
-  /**
-   * Options for `imagemin`.
-   */
-  minimizerOptions?: MinimizerOptions | undefined;
+  generator?: Generator[] | undefined;
   /**
    * Automatically adding `imagemin-loader`.
    */
@@ -117,6 +122,10 @@ export type PluginOptions = {
    */
   concurrency?: number | undefined;
   /**
+   * Allows to choose how errors are displayed.
+   */
+  severityError?: string | undefined;
+  /**
    * Allows to set the filename for the generated asset. Useful for converting to a `webp`.
    */
   filename?: string | FilenameFn | undefined;
@@ -124,7 +133,6 @@ export type PluginOptions = {
    * Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
    */
   deleteOriginalAssets?: boolean | undefined;
-  minify?: MinifyFunctions | undefined;
 };
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
@@ -155,29 +163,19 @@ export type PluginOptions = {
  * @property {Object.<string, object>} [encodeOptions]
  */
 /**
- * @typedef {Record<string, any>} CustomFnMinimizerOptions
- */
-/**
- * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
- */
-/**
- * @typedef {Object} InternalWorkerOptions
- * @property {string} filename
- * @property {Buffer} input
- * @property {MinifyFunctions} minify
- * @property {MinimizerOptions} [minimizerOptions]
- * @property {string} [severityError]
- * @property {string | FilenameFn} [newFilename]
- * @property {Function} [generateFilename]
- */
-/**
  * @callback CustomMinifyFunction
  * @param {WorkerResult} original
  * @param {CustomFnMinimizerOptions} options
  * @returns {Promise<WorkerResult>}
  */
 /**
+ * @typedef {Record<string, any>} CustomFnMinimizerOptions
+ */
+/**
  * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
+ */
+/**
+ * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
  */
 /**
  * @typedef {Object} WorkerResult
@@ -186,6 +184,35 @@ export type PluginOptions = {
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
  * @property {AssetInfo} info
+ */
+/**
+ * @typedef {Object} TransformerOptions
+ */
+/**
+ * @callback TransformerFunction
+ * @param {WorkerResult} original
+ * @param {TransformerOptions} options
+ * @returns {Promise<WorkerResult>}
+ */
+/**
+ * @typedef {Object} Transformer
+ * @property {TransformerFunction} implementation
+ * @property {TransformerOptions | undefined} [options]
+ */
+/**
+ * @typedef {Transformer & { preset: string }} Generator
+ */
+/**
+ * @typedef {Transformer} Minimizer
+ */
+/**
+ * @typedef {Object} InternalWorkerOptions
+ * @property {string} filename
+ * @property {Buffer} input
+ * @property {Transformer | Transformer[]} transformer
+ * @property {string} [severityError]
+ * @property {string | FilenameFn} [newFilename]
+ * @property {Function} [generateFilename]
  */
 /**
  * @typedef {Object} InternalLoaderOptions
@@ -206,24 +233,18 @@ export type PluginOptions = {
  * @returns {string}
  */
 /**
- * @typedef {Object} Generator
- * @property {Function} implementation
- * @returns {any} options
- */
-/**
  * @typedef {Object} PluginOptions
  * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
- * @property {string} [severityError] Allows to choose how errors are displayed.
- * @property {Generator | Generator[]} [generator] Allows to set generators.
- * @property {MinimizerOptions} [minimizerOptions] Options for `imagemin`.
+ * @property {Minimizer} [minimizer] Allows to setup the minimizer.
+ * @property {Generator[]} [generator] Allows to set the generator.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
+ * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
- * @property {MinifyFunctions} [minify]
  */
 /**
  * @extends {WebpackPluginInstance}
@@ -234,9 +255,15 @@ declare class ImageMinimizerPlugin {
    */
   constructor(options?: PluginOptions | undefined);
   options: {
-    minify: MinifyFunctions;
-    minimizerOptions: MinimizerOptions;
-    generator: Generator | Generator[] | undefined;
+    minimizer:
+      | Transformer
+      | {
+          implementation: typeof imageminMinify;
+          options: {
+            plugins: never[];
+          };
+        };
+    generator: Generator[] | undefined;
     severityError: string | undefined;
     filter: FilterFn;
     exclude: Rules | undefined;
@@ -252,7 +279,7 @@ declare class ImageMinimizerPlugin {
    * @param {Compiler} compiler
    * @param {Compilation} compilation
    * @param {Record<string, import("webpack").sources.Source>} assets
-   * @param {Set<string>} moduleAssets
+   * @param {Map<string, Object>} moduleAssets
    * @returns {Promise<void>}
    */
   private optimize;

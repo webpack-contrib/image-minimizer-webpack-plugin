@@ -1,7 +1,6 @@
 export type FilterFn = import("./index").FilterFn;
 export type Rules = import("./index").Rules;
-export type MinifyFunctions = import("./index").MinifyFunctions;
-export type MinimizerOptions = import("./index").MinimizerOptions;
+export type Minimizer = import("./index").Minimizer;
 export type Generator = import("./index").Generator;
 export type InternalWorkerOptions = import("./index").InternalWorkerOptions;
 export type Schema = import("schema-utils/declarations/validate").Schema;
@@ -20,17 +19,6 @@ export type LoaderOptions = {
    * Allows to set the filename for the generated asset. Useful for converting to a `webp`.
    */
   filename?: string | undefined;
-  /**
-   * Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
-   */
-  deleteOriginalAssets?: boolean | undefined;
-  minify?: import("./index").MinifyFunctions | undefined;
-  /**
-   * Options for minify.
-   */
-  minimizerOptions?: import("./index").MinimizerOptions | undefined;
-  generator?:
-    | import("./index").Generator
-    | import("./index").Generator[]
-    | undefined;
+  minimizer?: import("./index").Transformer | undefined;
+  generator?: import("./index").Generator[] | undefined;
 };

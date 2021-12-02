@@ -60,14 +60,17 @@ describe("validate loader options", () => {
       success: [
         [
           {
+            preset: "webp",
             implementation: ImageMinimizerPlugin.squooshGenerate,
           },
         ],
         [
           {
+            preset: "one",
             implementation: ImageMinimizerPlugin.squooshGenerate,
           },
           {
+            preset: "two",
             implementation: ImageMinimizerPlugin.squooshGenerate,
           },
         ],

@@ -1,6 +1,7 @@
 import path from "path";
 
 import { fixturesPath, isOptimized, plugins, runWebpack } from "./helpers";
+import ImageMinimizerPlugin from "../src/index.js";
 
 describe("plugin severityError option", () => {
   it("should optimizes images and throws error on corrupted images using `plugin.severityError` option with `error` value (by plugin)", async () => {
@@ -11,8 +12,9 @@ describe("plugin severityError option", () => {
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
         severityError: "error",
-        minimizerOptions: {
-          plugins,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
         },
       },
     });
@@ -38,8 +40,9 @@ describe("plugin severityError option", () => {
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
         severityError: "off",
-        minimizerOptions: {
-          plugins,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
         },
       },
     });
@@ -62,8 +65,9 @@ describe("plugin severityError option", () => {
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
         severityError: "warning",
-        minimizerOptions: {
-          plugins,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
         },
       },
     });
@@ -88,8 +92,9 @@ describe("plugin severityError option", () => {
       },
       entry: path.join(fixturesPath, "empty-entry.js"),
       imageminPluginOptions: {
-        minimizerOptions: {
-          plugins,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
         },
       },
     });
@@ -112,8 +117,9 @@ describe("plugin severityError option", () => {
       entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
         severityError: "error",
-        minimizerOptions: {
-          plugins,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
         },
       },
     });
@@ -135,8 +141,9 @@ describe("plugin severityError option", () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
-        minimizerOptions: {
-          plugins,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
         },
       },
     });
@@ -159,8 +166,9 @@ describe("plugin severityError option", () => {
       entry: path.join(fixturesPath, "loader-corrupted.js"),
       imageminPluginOptions: {
         severityError: "off",
-        minimizerOptions: {
-          plugins,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
         },
       },
     });

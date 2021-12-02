@@ -7,6 +7,7 @@ import {
   plugins,
   runWebpack,
 } from "./helpers";
+import ImageMinimizerPlugin from "../src/index.js";
 
 describe("plugin filter option", () => {
   it("should optimizes all images (loader + plugin) exclude filtered", async () => {
@@ -26,8 +27,9 @@ describe("plugin filter option", () => {
 
           return true;
         },
-        minimizerOptions: {
-          plugins,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
         },
       },
     });
@@ -79,8 +81,9 @@ describe("plugin filter option", () => {
 
             return false;
           },
-          minimizerOptions: {
-            plugins,
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
           },
         },
         {
@@ -93,8 +96,9 @@ describe("plugin filter option", () => {
 
             return false;
           },
-          minimizerOptions: {
-            plugins,
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
           },
         },
       ],
@@ -148,8 +152,9 @@ describe("plugin filter option", () => {
 
             return false;
           },
-          minimizerOptions: {
-            plugins,
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
           },
         },
       },
@@ -171,8 +176,9 @@ describe("plugin filter option", () => {
 
             return false;
           },
-          minimizerOptions: {
-            plugins,
+          minimizer: {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
           },
         },
       },

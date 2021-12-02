@@ -59,7 +59,8 @@
             "type": "object",
             "additionalProperties": true
           }
-        }
+        },
+        "required": ["implementation", "preset"]
       }
     },
     "filter": {

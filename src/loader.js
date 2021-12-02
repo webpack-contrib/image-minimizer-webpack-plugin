@@ -66,6 +66,7 @@ module.exports = async function loader(content) {
       }
 
       const as = parsedQuery.get("as");
+      // TODO should be unique
       const preset = generator.find((item) => item.preset === as);
 
       if (!preset) {
