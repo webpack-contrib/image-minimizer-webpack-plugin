@@ -45,18 +45,27 @@ module.exports = async function loader(content) {
       }
 
       const as = parsedQuery.get("as");
-      // TODO should be unique
-      const preset = generator.find((item) => item.preset === as);
+      const presets = generator.filter((item) => item.preset === as);
 
-      if (!preset) {
+      if (presets.length > 1) {
         callback(
-          new Error(`Can't find '${preset}' preset in the 'generator' option.`)
+          new Error(
+            "Found several identical pereset names, the 'preset' option should be unique"
+          )
         );
 
         return;
       }
 
-      transformer = preset;
+      if (presets.length === 0) {
+        callback(
+          new Error(`Can't find '${as}' preset in the 'generator' option`)
+        );
+
+        return;
+      }
+
+      [transformer] = presets;
       isGenerator = true;
     }
   }
@@ -98,8 +107,6 @@ module.exports = async function loader(content) {
     const query =
       stringifiedParsedQuery.length > 0 ? `?${stringifiedParsedQuery}` : "";
 
-    // TODO check watch/resolver
-    // TODO change `resource` too
     // For `file-loader` and other old loaders
     this.resourcePath = path.join(this.rootContext, output.filename);
     this.resourceQuery = query;
