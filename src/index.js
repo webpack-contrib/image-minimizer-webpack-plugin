@@ -50,25 +50,6 @@ import {
  */
 
 /**
- * @typedef {Record<string, any>} CustomFnMinimizerOptions
- */
-
-/**
- * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
- */
-
-/**
- * @typedef {Object} InternalWorkerOptions
- * @property {string} filename
- * @property {Buffer} input
- * @property {MinifyFunctions} minify
- * @property {MinimizerOptions} [minimizerOptions]
- * @property {string} [severityError]
- * @property {string | FilenameFn} [newFilename]
- * @property {Function} [generateFilename]
- */
-
-/**
  * @callback CustomMinifyFunction
  * @param {WorkerResult} original
  * @param {CustomFnMinimizerOptions} options
@@ -76,7 +57,15 @@ import {
  */
 
 /**
+ * @typedef {Record<string, any>} CustomFnMinimizerOptions
+ */
+
+/**
  * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
+ */
+
+/**
+ * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
  */
 
 /**
@@ -86,6 +75,34 @@ import {
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
  * @property {AssetInfo} info
+ */
+
+/**
+ * @typedef {Object} TransformerOptions
+ */
+
+/**
+ * @callback TransformerFunction
+ * @param {WorkerResult} original
+ * @param {TransformerOptions} options
+ * @returns {Promise<WorkerResult>}
+ */
+
+// TODO fix types for `generator`
+/**
+ * @typedef {Object} Transformer
+ * @property {TransformerFunction} implementation
+ * @property {TransformerOptions | undefined} [options]
+ */
+
+/**
+ * @typedef {Object} InternalWorkerOptions
+ * @property {string} filename
+ * @property {Buffer} input
+ * @property {Transformer | Transformer[]} transformer
+ * @property {string} [severityError]
+ * @property {string | FilenameFn} [newFilename]
+ * @property {Function} [generateFilename]
  */
 
 /**
@@ -109,12 +126,8 @@ import {
  * @returns {string}
  */
 
-// TODO fix types for `generator`
 /**
- * @typedef {Object} Generator
- * @property {Function} implementation
- * @property {string} preset
- * @property {any} options
+ * @typedef {Transformer & { preset: string }} Generator
  */
 
 /**
@@ -271,14 +284,20 @@ class ImageMinimizerPlugin {
             input = Buffer.from(input);
           }
 
-          const { severityError, minimizerOptions, minify } = this.options;
-
           const minifyOptions = /** @type {InternalWorkerOptions} */ ({
             filename: name,
             input,
-            severityError,
-            minify,
-            minimizerOptions,
+            severityError: this.options.severityError,
+            transformer: Array.isArray(this.options.minify)
+              ? this.options.minify.map((impl, index) => ({
+                  implementation: impl,
+                  // @ts-ignore
+                  options: (this.options.minimizerOptions || {})[index],
+                }))
+              : {
+                  implementation: this.options.minify,
+                  options: this.options.minimizerOptions,
+                },
             newFilename: this.options.filename,
             generateFilename: compilation.getAssetPath.bind(compilation),
           });

@@ -76,7 +76,7 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it("should work if minify is array && minimizerOptions is object", async () => {
+  it("should work if minify is array && minimizerOptions without values", async () => {
     expect.assertions(5);
 
     const stats = await runWebpack({
@@ -92,9 +92,11 @@ describe("plugin minify option", () => {
             return input;
           },
         ],
-        minimizerOptions: {
-          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
-        },
+        minimizerOptions: [
+          {
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+          },
+        ],
       },
     });
     const { compilation } = stats;

@@ -8,8 +8,8 @@ describe("validate loader options", () => {
   const tests = {
     minify: {
       success: [
-        ImageMinimizerPlugin.imageminMinify,
-        [ImageMinimizerPlugin.imageminMinify],
+        ImageMinimizerPlugin.squooshMinify,
+        [ImageMinimizerPlugin.squooshMinify],
       ],
       failure: [1, true, false, null],
     },

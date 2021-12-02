@@ -23,10 +23,6 @@ async function worker(options) {
     return result;
   }
 
-  const minifyFns = /** @type {[MinifyFunctions]} */ (
-    typeof options.minify === "function" ? [options.minify] : options.minify
-  );
-
   /**
    * @param {any} item
    * @returns {WorkerResult}
@@ -64,18 +60,20 @@ async function worker(options) {
     return item;
   };
 
-  for (let i = 0; i <= minifyFns.length - 1; i++) {
-    const minifyFn = minifyFns[i];
-    const minifyOptions = Array.isArray(options.minimizerOptions)
-      ? options.minimizerOptions[i]
-      : options.minimizerOptions || {};
+  const transformers = Array.isArray(options.transformer)
+    ? options.transformer
+    : [options.transformer];
 
+  for (let i = 0; i <= transformers.length - 1; i++) {
     /** @type {WorkerResult} */
     let processedResult;
 
     try {
       // eslint-disable-next-line no-await-in-loop
-      processedResult = await minifyFn(result, minifyOptions);
+      processedResult = await transformers[i].implementation(
+        result,
+        transformers[i].options || {}
+      );
     } catch (error) {
       result.errors.push(
         error instanceof Error

@@ -714,7 +714,7 @@ describe("imagemin plugin", () => {
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
       imageminPluginOptions: {
-        minify: [ImageMinimizerPlugin.imageminMinify],
+        minify: ImageMinimizerPlugin.imageminMinify,
         minimizerOptions: {
           plugins: ["mozjpeg"],
         },

@@ -91,8 +91,16 @@ module.exports = async function loader(content) {
     input,
     filename: name,
     severityError,
-    minify: implementation,
-    minimizerOptions: implementationOptions,
+    transformer: Array.isArray(implementation)
+      ? implementation.map((impl, index) => ({
+          implementation: impl,
+          // @ts-ignore
+          options: (implementationOptions || {})[index],
+        }))
+      : {
+          implementation,
+          options: implementationOptions,
+        },
     newFilename: filename,
     generateFilename:
       /** @type {Compilation} */

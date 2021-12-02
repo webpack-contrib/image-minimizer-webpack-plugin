@@ -85,9 +85,11 @@ describe("loader minify option", () => {
             return input;
           },
         ],
-        minimizerOptions: {
-          plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
-        },
+        minimizerOptions: [
+          {
+            plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+          },
+        ],
       },
     });
     const { compilation } = stats;
