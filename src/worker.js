@@ -32,6 +32,10 @@ async function worker(options) {
       item.info = {};
     }
 
+    if (!item.filename) {
+      item.filename = options.filename;
+    }
+
     if (!item.errors) {
       item.errors = [];
     }

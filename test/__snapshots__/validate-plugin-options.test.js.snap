@@ -123,7 +123,7 @@ exports[`validate plugin options should work 9`] = `
 exports[`validate plugin options should work 10`] = `
 "Invalid options object. Image Minimizer Plugin has been initialized using an options object that does not match the API schema.
  - options.deleteOriginalAssets should be a boolean.
-   -> Allows to remove original assets.
+   -> Allows to remove original assets after minimization.
    -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#deleteoriginalassets"
 `;
 
