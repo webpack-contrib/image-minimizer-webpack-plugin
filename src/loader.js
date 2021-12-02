@@ -69,7 +69,7 @@ module.exports = async function loader(content) {
     }
   }
 
-  if (!transformer) {
+  if (!minimizer && !generator) {
     callback(
       new Error(
         "Not configured 'minimizer' or 'generator' options, please setup them"
@@ -94,8 +94,8 @@ module.exports = async function loader(content) {
   const output = await worker(minifyOptions);
 
   if (output.errors && output.errors.length > 0) {
-    output.errors.forEach((warning) => {
-      this.emitError(warning);
+    output.errors.forEach((error) => {
+      this.emitError(error);
     });
 
     callback(null, content);
