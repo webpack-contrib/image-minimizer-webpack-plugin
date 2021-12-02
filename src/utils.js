@@ -771,12 +771,6 @@ async function squooshMinify(original, options) {
   const targetCodec = targets[ext];
 
   if (!targetCodec) {
-    original.warnings.push(
-      new Error(
-        `"${original.filename}" is not minimized, because has an unsupported format`
-      )
-    );
-
     return original;
   }
 

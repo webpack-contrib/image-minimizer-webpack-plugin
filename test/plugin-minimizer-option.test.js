@@ -225,30 +225,6 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should emit warning when file is not supported by "squooshMinify"', async () => {
-    const stats = await runWebpack({
-      entry: path.join(fixturesPath, "./empty-entry.js"),
-      emitPlugin: true,
-      emitPluginOptions: {
-        fileNames: ["plugin-test.svg"],
-      },
-      imageminPluginOptions: {
-        minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
-        },
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
-
-    expect(compilation.getAsset("plugin-test.svg")).toBeDefined();
-    expect(errors).toHaveLength(0);
-    expect(warnings).toHaveLength(1);
-    expect(warnings[0].toString()).toMatch(
-      'Error: "plugin-test.svg" is not minimized, because has an unsupported format'
-    );
-  });
-
   it("should optimizes all images (loader + plugin) exclude filtered", async () => {
     const stats = await runWebpack({
       emitPlugin: true,
