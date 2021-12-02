@@ -553,6 +553,7 @@ async function imageminGenerate(original, minimizerOptions) {
   );
 
   // @ts-ignore
+  // eslint-disable-next-line node/no-unpublished-import
   const imagemin = (await import("imagemin")).default;
 
   let result;
@@ -610,6 +611,7 @@ async function imageminMinify(original, options) {
   );
 
   // @ts-ignore
+  // eslint-disable-next-line node/no-unpublished-import
   const imagemin = (await import("imagemin")).default;
 
   let result;

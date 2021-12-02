@@ -4,127 +4,313 @@ describe("validate plugin options", () => {
   it("should work", () => {
     /* eslint-disable no-new */
     expect(() => {
-      new ImageMinimizerPlugin({ test: /foo/ });
+      new ImageMinimizerPlugin({
+        test: /foo/,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ test: "foo" });
+      new ImageMinimizerPlugin({
+        test: "foo",
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ test: [/foo/] });
+      new ImageMinimizerPlugin({
+        test: [/foo/],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ test: [/foo/, /bar/] });
+      new ImageMinimizerPlugin({
+        test: [/foo/, /bar/],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ test: ["foo", "bar"] });
+      new ImageMinimizerPlugin({
+        test: ["foo", "bar"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ test: [/foo/, "bar"] });
+      new ImageMinimizerPlugin({
+        test: [/foo/, "bar"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ test: true });
+      new ImageMinimizerPlugin({
+        test: true,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ test: [true] });
+      new ImageMinimizerPlugin({
+        test: [true],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ include: /foo/ });
+      new ImageMinimizerPlugin({
+        include: /foo/,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ include: "foo" });
+      new ImageMinimizerPlugin({
+        include: "foo",
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ include: [/foo/] });
+      new ImageMinimizerPlugin({
+        include: [/foo/],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ include: [/foo/, /bar/] });
+      new ImageMinimizerPlugin({
+        include: [/foo/, /bar/],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ include: ["foo", "bar"] });
+      new ImageMinimizerPlugin({
+        include: ["foo", "bar"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ include: [/foo/, "bar"] });
+      new ImageMinimizerPlugin({
+        include: [/foo/, "bar"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ include: true });
+      new ImageMinimizerPlugin({
+        include: true,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ include: [true] });
+      new ImageMinimizerPlugin({
+        include: [true],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ exclude: /foo/ });
+      new ImageMinimizerPlugin({
+        exclude: /foo/,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ exclude: "foo" });
+      new ImageMinimizerPlugin({
+        exclude: "foo",
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ exclude: [/foo/] });
+      new ImageMinimizerPlugin({
+        exclude: [/foo/],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ exclude: [/foo/, /bar/] });
+      new ImageMinimizerPlugin({
+        exclude: [/foo/, /bar/],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ exclude: ["foo", "bar"] });
+      new ImageMinimizerPlugin({
+        exclude: ["foo", "bar"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ exclude: [/foo/, "bar"] });
+      new ImageMinimizerPlugin({
+        exclude: [/foo/, "bar"],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ exclude: true });
+      new ImageMinimizerPlugin({
+        exclude: true,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ exclude: [true] });
+      new ImageMinimizerPlugin({
+        exclude: [true],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ severityError: false });
+      new ImageMinimizerPlugin({
+        severityError: false,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ severityError: true });
+      new ImageMinimizerPlugin({
+        severityError: true,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ severityError: "error" });
+      new ImageMinimizerPlugin({
+        severityError: "error",
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ severityError: () => {} });
+      new ImageMinimizerPlugin({
+        severityError: () => {},
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ deleteOriginalAssets: false });
+      new ImageMinimizerPlugin({
+        deleteOriginalAssets: false,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ deleteOriginalAssets: {} });
+      new ImageMinimizerPlugin({
+        deleteOriginalAssets: {},
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ deleteOriginalAssets: true });
+      new ImageMinimizerPlugin({
+        deleteOriginalAssets: true,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
@@ -386,27 +572,63 @@ describe("validate plugin options", () => {
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ concurrency: 2 });
+      new ImageMinimizerPlugin({
+        concurrency: 2,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ concurrency: true });
+      new ImageMinimizerPlugin({
+        concurrency: true,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ concurrency: "true" });
+      new ImageMinimizerPlugin({
+        concurrency: "true",
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ loader: false });
+      new ImageMinimizerPlugin({
+        loader: false,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ loader: true });
+      new ImageMinimizerPlugin({
+        loader: true,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).not.toThrow();
 
     expect(() => {
-      new ImageMinimizerPlugin({ loader: "true" });
+      new ImageMinimizerPlugin({
+        loader: "true",
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {},
+        },
+      });
     }).toThrowErrorMatchingSnapshot();
     /* eslint-enable no-new */
   });

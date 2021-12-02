@@ -975,4 +975,26 @@ describe("imagemin plugin", () => {
       false
     );
   });
+
+  it("should throw an error on empty minimizer", async () => {
+    await expect(async () => {
+      await runWebpack({
+        emitPlugin: true,
+        imageminPluginOptions: { minimizer: undefined },
+      });
+    }).rejects.toThrow(
+      /Not configured 'minimizer' or 'generator' options, please setup them/
+    );
+  });
+
+  it("should throw an error on empty generator", async () => {
+    await expect(async () => {
+      await runWebpack({
+        emitPlugin: true,
+        imageminPluginOptions: { generator: undefined },
+      });
+    }).rejects.toThrow(
+      /Not configured 'minimizer' or 'generator' options, please setup them/
+    );
+  });
 });
