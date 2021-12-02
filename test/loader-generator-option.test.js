@@ -46,7 +46,7 @@ describe("loader generator option", () => {
   });
 
   it("should throw error on duplicate presets", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-1");
+    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-2");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -91,7 +91,7 @@ describe("loader generator option", () => {
   });
 
   it("should throw error on not found preset", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-1");
+    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-3");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -125,7 +125,7 @@ describe("loader generator option", () => {
   });
 
   it("should generate the new webp image with flat filename", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-1");
+    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-4");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -166,7 +166,7 @@ describe("loader generator option", () => {
   });
 
   it("should generate the new webp image with nested filename", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-2");
+    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-5");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -206,7 +206,7 @@ describe("loader generator option", () => {
   });
 
   it("should generate the new webp image with filename  pointing to other directory", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-3");
+    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-6");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -246,7 +246,7 @@ describe("loader generator option", () => {
   });
 
   it("should generate the new webp image when filename is function", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-4");
+    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-7");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -286,7 +286,7 @@ describe("loader generator option", () => {
   });
 
   it("should minimize image with flat filename", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-5");
+    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-8");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./simple.js"),
       imageminLoaderOptions: {
