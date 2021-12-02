@@ -92,6 +92,7 @@ import {
 /**
  * @typedef {Object} Transformer
  * @property {TransformerFunction} implementation
+ * @property {FilterFn} [filter]
  * @property {TransformerOptions | undefined} [options]
  */
 
@@ -137,7 +138,6 @@ import {
 
 /**
  * @typedef {Object} PluginOptions
- * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
@@ -165,7 +165,6 @@ class ImageMinimizerPlugin {
 
     const {
       minimizer = { implementation: imageminMinify, options: { plugins: [] } },
-      filter = () => true,
       test = /\.(jpe?g|png|gif|tif|webp|svg|avif|jxl)$/i,
       include,
       exclude,
@@ -181,7 +180,6 @@ class ImageMinimizerPlugin {
       minimizer,
       generator,
       severityError,
-      filter,
       exclude,
       include,
       loader,
@@ -229,15 +227,6 @@ class ImageMinimizerPlugin {
 
             compilation.updateAsset(name, source, newInfo);
 
-            return false;
-          }
-
-          const input = source.source();
-
-          if (
-            this.options.filter &&
-            !this.options.filter(/** @type {Buffer} */ (input), name)
-          ) {
             return false;
           }
 
@@ -361,7 +350,6 @@ class ImageMinimizerPlugin {
           minimizer,
           generator,
           filename,
-          filter,
           test,
           include,
           exclude,
@@ -374,7 +362,7 @@ class ImageMinimizerPlugin {
           exclude,
           enforce: "pre",
           loader: require.resolve(path.join(__dirname, "loader.js")),
-          options: { generator, minimizer, filename, filter, severityError },
+          options: { generator, minimizer, filename, severityError },
         });
 
         compiler.options.module.rules.push(loader);

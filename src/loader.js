@@ -15,7 +15,6 @@ import { imageminMinify } from "./utils.js";
 
 /**
  * @typedef {Object} LoaderOptions
- * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {Minimizer} [minimizer]
@@ -31,14 +30,6 @@ module.exports = async function loader(content) {
   const options = this.getOptions(/** @type {Schema} */ (schema));
   const callback = this.async();
   const name = path.relative(this.rootContext, this.resourcePath);
-
-  if (options.filter && !options.filter(content, name)) {
-    callback(null, content);
-
-    return;
-  }
-
-  const input = content;
 
   const {
     generator,
@@ -87,7 +78,7 @@ module.exports = async function loader(content) {
   }
 
   const minifyOptions = /** @type {InternalWorkerOptions} */ ({
-    input,
+    input: content,
     filename: name,
     severityError,
     transformer,

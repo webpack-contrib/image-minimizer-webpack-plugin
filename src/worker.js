@@ -65,6 +65,17 @@ async function worker(options) {
     : [options.transformer];
 
   for (let i = 0; i <= transformers.length - 1; i++) {
+    if (
+      transformers[i].filter &&
+      // @ts-ignore
+      !transformers[i].filter(
+        /** @type {Buffer} */ (options.input),
+        options.filename
+      )
+    ) {
+      continue;
+    }
+
     /** @type {WorkerResult} */
     let processedResult;
 

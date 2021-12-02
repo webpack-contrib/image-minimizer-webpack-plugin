@@ -74,9 +74,15 @@
             "additionalProperties": false,
             "properties": {
               "implementation": {
+                "description": "Implementation of the minimizer function.",
+                "instanceof": "Function"
+              },
+              "filter": {
+                "description": "Allows filtering of images.",
                 "instanceof": "Function"
               },
               "options": {
+                "description": "Options for the minimizer function.",
                 "type": "object",
                 "additionalProperties": true
               }
@@ -88,9 +94,15 @@
           "additionalProperties": false,
           "properties": {
             "implementation": {
+              "description": "Implementation of the minimizer function.",
+              "instanceof": "Function"
+            },
+            "filter": {
+              "description": "Allows filtering of images.",
               "instanceof": "Function"
             },
             "options": {
+              "description": "Options for the minimizer function.",
               "type": "object",
               "additionalProperties": true
             }
@@ -107,25 +119,26 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "implementation": {
-            "instanceof": "Function"
-          },
           "preset": {
             "type": "string",
             "minLength": 1
           },
+          "implementation": {
+            "description": "Implementation of the generator function.",
+            "instanceof": "Function"
+          },
+          "filter": {
+            "description": "Allows filtering of images.",
+            "instanceof": "Function"
+          },
           "options": {
+            "description": "Options for the generator function.",
             "type": "object",
             "additionalProperties": true
           }
         },
         "required": ["implementation", "preset"]
       }
-    },
-    "filter": {
-      "description": "Allows filtering of images for optimization.",
-      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#filter",
-      "instanceof": "Function"
     },
     "severityError": {
       "description": "Allows to choose how errors are displayed.",
