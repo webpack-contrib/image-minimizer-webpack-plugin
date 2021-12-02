@@ -50,10 +50,12 @@
   "peerDependenciesMeta": {
     "@squoosh/lib": {
       "optional": true
+    },
+    "imagemin": {
+      "optional": true
     }
   },
   "dependencies": {
-    "imagemin": "^8.0.1",
     "schema-utils": "^4.0.0",
     "serialize-javascript": "^6.0.0"
   },
@@ -84,6 +86,7 @@
     "file-loader": "^6.2.0",
     "file-type": "^16.5.3",
     "husky": "^7.0.1",
+    "imagemin": "^8.0.1",
     "imagemin-gifsicle": "^7.0.0",
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-pngquant": "^9.0.1",
