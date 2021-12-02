@@ -1,17 +1,10 @@
 import path from "path";
 
-import fileType from "file-type";
-
-import {
-  fixturesPath,
-  isOptimized,
-  runWebpack,
-  normalizePath,
-} from "./helpers";
+import { fixturesPath, runWebpack, plugins } from "./helpers";
 import ImageMinimizerPlugin from "../src/index.js";
 
 describe('plugin "deleteOriginalAssets" option', () => {
-  it("should transform asset and keep original asset (default behavior)", async () => {
+  it("should minimize asset and delete original asset (default behavior)", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       output: {
@@ -22,41 +15,54 @@ describe('plugin "deleteOriginalAssets" option', () => {
       imageminPluginOptions: {
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
-          filename: "[path][name].webp",
-          options: { plugins: ["imagemin-webp"] },
+          filename: "[path]minimizer-[name][ext]",
+          options: { plugins },
         },
       },
     });
     const { compilation } = stats;
     const { warnings, errors, assets } = compilation;
-
-    const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.webp")
+    const newAsset = Object.keys(assets).filter((asset) =>
+      asset.includes("./nested/deep/minimizer-plugin-test.png")
     );
-
-    const originalAssets = Object.keys(assets).filter((asset) =>
+    const originalAsset = Object.keys(assets).filter((asset) =>
       asset.includes("./nested/deep/plugin-test.png")
     );
 
-    const file = path.resolve(
-      __dirname,
-      "outputs",
-      "./nested/deep/plugin-test.webp"
-    );
-    const ext = await fileType.fromFile(file);
-
-    await expect(
-      isOptimized("./nested/deep/plugin-test.png", compilation)
-    ).resolves.toBe(false);
-
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
-    expect(transformedAssets).toHaveLength(1);
-    expect(originalAssets).toHaveLength(1);
+    expect(newAsset).toHaveLength(1);
+    expect(originalAsset).toHaveLength(0);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
 
-  it('should transform asset and keep original asset when the "deleteOriginalAssets" option is "false"', async () => {
+  it("should minimize asset and delete original asset when the name is the same (default behavior)", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "./empty-entry.js"),
+      output: {
+        path: path.resolve(__dirname, "outputs"),
+      },
+      emitPlugin: true,
+      emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
+      imageminPluginOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors, assets } = compilation;
+    const newAsset = Object.keys(assets).filter((asset) =>
+      asset.includes("./nested/deep/plugin-test.png")
+    );
+
+    expect(newAsset).toHaveLength(1);
+    expect(Object.keys(assets)).toHaveLength(2);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('should minimize asset and delete original asset and keep original asset when the "deleteOriginalAssets" option is "false"', async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       output: {
@@ -68,36 +74,22 @@ describe('plugin "deleteOriginalAssets" option', () => {
         deleteOriginalAssets: false,
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
-          filename: "[path][name].webp",
+          filename: "[path]minimizer-[name][ext]",
           options: { plugins: ["imagemin-webp"] },
         },
       },
     });
     const { compilation } = stats;
     const { warnings, errors, assets } = compilation;
-
-    const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.webp")
+    const newAsset = Object.keys(assets).filter((asset) =>
+      asset.includes("./nested/deep/minimizer-plugin-test.png")
     );
-
-    const originalAssets = Object.keys(assets).filter((asset) =>
+    const originalAsset = Object.keys(assets).filter((asset) =>
       asset.includes("./nested/deep/plugin-test.png")
     );
 
-    const file = path.resolve(
-      __dirname,
-      "outputs",
-      "./nested/deep/plugin-test.webp"
-    );
-    const ext = await fileType.fromFile(file);
-
-    await expect(
-      isOptimized("./nested/deep/plugin-test.png", compilation)
-    ).resolves.toBe(false);
-
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
-    expect(transformedAssets).toHaveLength(1);
-    expect(originalAssets).toHaveLength(1);
+    expect(newAsset).toHaveLength(1);
+    expect(originalAsset).toHaveLength(1);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
@@ -114,71 +106,27 @@ describe('plugin "deleteOriginalAssets" option', () => {
         deleteOriginalAssets: true,
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
-          filename: "[path][name].webp",
+          filename: "[path]minimizer-[name][ext]",
           options: { plugins: ["imagemin-webp"] },
         },
       },
     });
     const { compilation } = stats;
     const { warnings, errors, assets } = compilation;
-
-    const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.webp")
+    const newAsset = Object.keys(assets).filter((asset) =>
+      asset.includes("./nested/deep/minimizer-plugin-test.png")
     );
-
-    const originalAssets = Object.keys(assets).filter((asset) =>
+    const originalAsset = Object.keys(assets).filter((asset) =>
       asset.includes("./nested/deep/plugin-test.png")
     );
 
-    const file = path.resolve(
-      __dirname,
-      "outputs",
-      "./nested/deep/plugin-test.webp"
-    );
-    const ext = await fileType.fromFile(file);
-
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
-    expect(transformedAssets).toHaveLength(1);
-    expect(originalAssets).toHaveLength(0);
+    expect(newAsset).toHaveLength(1);
+    expect(originalAsset).toHaveLength(0);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
 
-  // TODO fix me
-  it.skip("should transform assets to webp (plugin + loader)", async () => {
-    const stats = await runWebpack({
-      entry: path.join(fixturesPath, "./loader-single.js"),
-      output: {
-        path: path.resolve(__dirname, "outputs"),
-      },
-      emitPlugin: true,
-      emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
-      imageminPluginOptions: {
-        minimizer: {
-          implementation: ImageMinimizerPlugin.imageminMinify,
-          filename: "[path][name].webp",
-          options: { plugins: ["imagemin-webp"] },
-        },
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors, assets } = compilation;
-    const assetsKeys = Object.keys(assets).map((asset) => normalizePath(asset));
-
-    [
-      "nested/deep/loader-test.webp",
-      "nested/deep/loader-test.jpg",
-      "./nested/deep/plugin-test.png",
-      "./nested/deep/plugin-test.webp",
-    ].forEach((asset) => {
-      expect(assetsKeys).toContain(asset);
-    });
-
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-  });
-
-  it('should transform asset and remove original asset when the "deleteOriginalAssets" option is "true"', async () => {
+  it('should transform asset and keep original asset when the "deleteOriginalAssets" option is "true" (multi compiler mode)', async () => {
     const multiStats = await runWebpack([
       {
         entry: path.join(fixturesPath, "./empty-entry.js"),
@@ -191,8 +139,8 @@ describe('plugin "deleteOriginalAssets" option', () => {
           deleteOriginalAssets: true,
           minimizer: {
             implementation: ImageMinimizerPlugin.imageminMinify,
-            filename: "[path][name].webp",
-            options: { plugins: ["imagemin-webp"] },
+            filename: "[path]one-minimized-[name][ext]",
+            options: { plugins },
           },
         },
       },
@@ -206,7 +154,8 @@ describe('plugin "deleteOriginalAssets" option', () => {
         imageminPluginOptions: {
           minimizer: {
             implementation: ImageMinimizerPlugin.imageminMinify,
-            options: { plugins: ["pngquant"] },
+            filename: "[path]two-minimized-[name][ext]",
+            options: { plugins },
           },
         },
       },
@@ -219,19 +168,12 @@ describe('plugin "deleteOriginalAssets" option', () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.webp")
+      asset.includes("./nested/deep/one-minimized-plugin-test.png")
     );
 
     const originalAssets = Object.keys(assets).filter((asset) =>
       asset.includes("./nested/deep/plugin-test.png")
     );
-
-    const file = path.resolve(
-      __dirname,
-      "outputs",
-      "./nested/deep/plugin-test.webp"
-    );
-    const ext = await fileType.fromFile(file);
 
     const { warnings: secondWarnings, errors: secondErrors } =
       secondCompilation;
@@ -239,11 +181,6 @@ describe('plugin "deleteOriginalAssets" option', () => {
     expect(secondWarnings).toHaveLength(0);
     expect(secondErrors).toHaveLength(0);
 
-    await expect(
-      isOptimized("./nested/deep/plugin-test.png", secondCompilation)
-    ).resolves.toBe(true);
-
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
     expect(originalAssets).toHaveLength(0);
     expect(warnings).toHaveLength(0);

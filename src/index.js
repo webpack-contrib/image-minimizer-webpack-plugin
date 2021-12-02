@@ -171,7 +171,7 @@ class ImageMinimizerPlugin {
       generator,
       loader = true,
       concurrency,
-      deleteOriginalAssets = false,
+      deleteOriginalAssets = true,
     } = options;
 
     this.options = {
@@ -305,16 +305,14 @@ class ImageMinimizerPlugin {
           });
         }
 
-        const isNewAsset = name !== output.filename;
-
-        if (isNewAsset) {
+        if (compilation.getAsset(output.filename)) {
+          compilation.updateAsset(output.filename, output.source, output.info);
+        } else {
           compilation.emitAsset(output.filename, output.source, output.info);
 
           if (this.options.deleteOriginalAssets) {
             compilation.deleteAsset(name);
           }
-        } else {
-          compilation.updateAsset(name, output.source, output.info);
         }
       });
     }
