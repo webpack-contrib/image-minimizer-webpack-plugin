@@ -1,7 +1,6 @@
-/** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
-/** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
 /** @typedef {import("./index").InternalWorkerOptions} InternalWorkerOptions */
 /** @typedef {import("./index").WorkerResult} WorkerResult */
+/** @typedef {import("./index").FilenameFn} FilenameFn */
 
 /**
  * @param {InternalWorkerOptions} options
@@ -24,10 +23,11 @@ async function worker(options) {
   }
 
   /**
-   * @param {any} item
+   * @param {WorkerResult} item
+   * @param {undefined | string | FilenameFn} filename
    * @returns {WorkerResult}
    */
-  const normalizeProcessedResult = (item) => {
+  const normalizeProcessedResult = (item, filename) => {
     if (!item.info) {
       item.info = {};
     }
@@ -49,10 +49,10 @@ async function worker(options) {
     }
 
     if (
-      typeof options.newFilename !== "undefined" &&
+      typeof filename !== "undefined" &&
       typeof options.generateFilename !== "undefined"
     ) {
-      item.filename = options.generateFilename(options.newFilename, {
+      item.filename = options.generateFilename(filename, {
         filename: item.filename,
       });
     }
@@ -105,7 +105,10 @@ async function worker(options) {
       return result;
     }
 
-    result = normalizeProcessedResult(processedResult);
+    result = normalizeProcessedResult(
+      processedResult,
+      transformers[i].filename
+    );
   }
 
   return result;

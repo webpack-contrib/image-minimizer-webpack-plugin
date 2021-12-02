@@ -236,9 +236,9 @@ describe("imagemin plugin", () => {
         fileNames: ["plugin-test.png"],
       },
       imageminPluginOptions: {
-        filename: "[name][ext]",
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
+          filename: "[name][ext]",
           options: { plugins },
         },
       },
@@ -280,9 +280,9 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
+          filename: "[path][name][ext]",
           options: { plugins },
         },
-        filename: "[path][name][ext]",
       },
     });
     const { compilation } = stats;

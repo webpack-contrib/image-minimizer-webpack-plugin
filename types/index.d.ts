@@ -49,9 +49,18 @@ export type TransformerFunction = (
   original: WorkerResult,
   options: TransformerOptions
 ) => Promise<WorkerResult>;
+export type PathData = {
+  filename?: string | undefined;
+};
+export type FilenameFn = (
+  pathData: PathData,
+  assetInfo?: import("webpack").AssetInfo | undefined
+) => string;
 export type Transformer = {
   implementation: TransformerFunction;
-  options?: TransformerOptions | undefined;
+  filter?: FilterFn | undefined;
+  filename?: string | FilenameFn | undefined;
+  options?: Object | undefined;
 };
 export type Generator = Transformer & {
   preset: string;
@@ -62,7 +71,6 @@ export type InternalWorkerOptions = {
   input: Buffer;
   transformer: Transformer | Transformer[];
   severityError?: string | undefined;
-  newFilename?: string | FilenameFn | undefined;
   generateFilename?: Function | undefined;
 };
 export type InternalLoaderOptions = {
@@ -81,18 +89,7 @@ export type InternalLoaderOptions = {
   loader?: string | undefined;
   loaderOptions?: import("./loader").LoaderOptions | undefined;
 };
-export type PathData = {
-  filename?: string | undefined;
-};
-export type FilenameFn = (
-  pathData: PathData,
-  assetInfo?: import("webpack").AssetInfo | undefined
-) => string;
 export type PluginOptions = {
-  /**
-   * Allows filtering of images for optimization.
-   */
-  filter?: FilterFn | undefined;
   /**
    * Test to match files against.
    */
@@ -125,10 +122,6 @@ export type PluginOptions = {
    * Allows to choose how errors are displayed.
    */
   severityError?: string | undefined;
-  /**
-   * Allows to set the filename for the generated asset. Useful for converting to a `webp`.
-   */
-  filename?: string | FilenameFn | undefined;
   /**
    * Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
    */
@@ -195,9 +188,21 @@ export type PluginOptions = {
  * @returns {Promise<WorkerResult>}
  */
 /**
+ * @typedef {Object} PathData
+ * @property {string} [filename]
+ */
+/**
+ * @callback FilenameFn
+ * @param {PathData} pathData
+ * @param {AssetInfo} [assetInfo]
+ * @returns {string}
+ */
+/**
  * @typedef {Object} Transformer
  * @property {TransformerFunction} implementation
- * @property {TransformerOptions | undefined} [options]
+ * @property {FilterFn} [filter]
+ * @property {string | FilenameFn} [filename]
+ * @property {TransformerOptions} [options]
  */
 /**
  * @typedef {Transformer & { preset: string }} Generator
@@ -211,7 +216,6 @@ export type PluginOptions = {
  * @property {Buffer} input
  * @property {Transformer | Transformer[]} transformer
  * @property {string} [severityError]
- * @property {string | FilenameFn} [newFilename]
  * @property {Function} [generateFilename]
  */
 /**
@@ -223,18 +227,7 @@ export type PluginOptions = {
  * @property {LoaderOptions} [loaderOptions]
  */
 /**
- * @typedef {Object} PathData
- * @property {string} [filename]
- */
-/**
- * @callback FilenameFn
- * @param {PathData} pathData
- * @param {AssetInfo} [assetInfo]
- * @returns {string}
- */
-/**
  * @typedef {Object} PluginOptions
- * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
@@ -243,7 +236,6 @@ export type PluginOptions = {
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string} [severityError] Allows to choose how errors are displayed.
- * @property {string | FilenameFn} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  */
 /**
@@ -265,13 +257,11 @@ declare class ImageMinimizerPlugin {
         };
     generator: Generator[] | undefined;
     severityError: string | undefined;
-    filter: FilterFn;
     exclude: Rules | undefined;
     include: Rules | undefined;
     loader: boolean;
     concurrency: number | undefined;
     test: Rules;
-    filename: string | FilenameFn;
     deleteOriginalAssets: boolean;
   };
   /**

@@ -29,14 +29,7 @@ module.exports = async function loader(content) {
   // @ts-ignore
   const options = this.getOptions(/** @type {Schema} */ (schema));
   const callback = this.async();
-  const name = path.relative(this.rootContext, this.resourcePath);
-
-  const {
-    generator,
-    minimizer,
-    severityError,
-    filename = "[path][name][ext]",
-  } = options;
+  const { generator, minimizer, severityError } = options;
 
   let transformer = minimizer || { implementation: imageminMinify };
   let isGenerator = false;
@@ -68,21 +61,17 @@ module.exports = async function loader(content) {
         return;
       }
 
-      transformer = {
-        implementation: preset.implementation,
-        options: preset.options,
-      };
-
+      transformer = preset;
       isGenerator = true;
     }
   }
 
+  const name = path.relative(this.rootContext, this.resourcePath);
   const minifyOptions = /** @type {InternalWorkerOptions} */ ({
     input: content,
     filename: name,
     severityError,
     transformer,
-    newFilename: filename,
     generateFilename:
       /** @type {Compilation} */
       (this._compilation).getAssetPath.bind(this._compilation),

@@ -70,7 +70,7 @@ describe("validate loader options", () => {
         [
           {
             implementation: ImageMinimizerPlugin.squooshMinify,
-            filename: () => false,
+            filename: () => "[name].[ext]",
           },
         ],
       ],
