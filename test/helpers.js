@@ -41,6 +41,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
 
   maybeMultiCompiler.forEach((options) => {
     const config = {
+      devtool: false,
       bail: options.bail,
       context: fixturesPath,
       entry: options.entry
@@ -126,6 +127,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
       output: {
         publicPath: "",
         filename: "bundle.js",
+        assetModuleFilename: "[name][ext]",
         path:
           options.output && options.output.path
             ? options.output.path
@@ -143,13 +145,21 @@ function runWebpack(maybeOptions, getCompiler = false) {
     }
 
     if (options.imageminLoaderOptions) {
-      config.module.rules[0].use = [
-        ...config.module.rules[0].use,
-        {
+      if (config.module.rules[0].use) {
+        config.module.rules[0].use = [
+          ...config.module.rules[0].use,
+          {
+            loader: ImageMinimizerPlugin.loader,
+            options: options.imageminLoaderOptions,
+          },
+        ];
+      } else {
+        config.module.rules.push({
+          test: /\.(jpe?g|png|gif|svg)$/i,
           loader: ImageMinimizerPlugin.loader,
           options: options.imageminLoaderOptions,
-        },
-      ];
+        });
+      }
     }
 
     if (options.emitPlugin || options.emitPluginOptions) {

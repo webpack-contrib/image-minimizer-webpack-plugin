@@ -267,7 +267,6 @@ describe("loader", () => {
     );
   });
 
-  // TODO: add test for assets/modules
   // TODO: add test for data:
   // TODO: add test for https:
   it("should optimizes and generate images (imageminGenerate)", async () => {
@@ -281,6 +280,44 @@ describe("loader", () => {
             implementation: ImageMinimizerPlugin.imageminGenerate,
             options: {
               plugins: ["imagemin-webp"],
+            },
+          },
+        ],
+      },
+      output: {
+        path: path.resolve(__dirname, "outputs/loader-generator-imagemin"),
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const file = path.resolve(
+      __dirname,
+      "outputs",
+      "./loader-generator-imagemin/loader-test.webp"
+    );
+    const ext = await fileType.fromFile(file);
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+  });
+
+  it("should optimizes and generate images (imageminGenerate) with assets modules", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-asset-modules.js"),
+      fileLoaderOff: true,
+      assetResource: true,
+      imageminLoaderOptions: {
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              encodeOptions: {
+                webp: {},
+              },
             },
           },
         ],
