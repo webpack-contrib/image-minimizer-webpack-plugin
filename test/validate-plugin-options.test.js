@@ -100,22 +100,6 @@ describe("validate plugin options", () => {
     }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
-      new ImageMinimizerPlugin({ filter: () => true });
-    }).not.toThrow();
-
-    expect(() => {
-      new ImageMinimizerPlugin({ filter: () => false });
-    }).not.toThrow();
-
-    expect(() => {
-      new ImageMinimizerPlugin({ filter: true });
-    }).toThrowErrorMatchingSnapshot();
-
-    expect(() => {
-      new ImageMinimizerPlugin({ filter: {} });
-    }).toThrowErrorMatchingSnapshot();
-
-    expect(() => {
       new ImageMinimizerPlugin({ filename: "[name].[ext]" });
     }).not.toThrow();
 
@@ -217,6 +201,46 @@ describe("validate plugin options", () => {
 
     expect(() => {
       new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          filter: () => true,
+        },
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          filter: true,
+        },
+      });
+    }).toThrowErrorMatchingSnapshot();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            filter: () => true,
+          },
+        ],
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            filter: true,
+          },
+        ],
+      });
+    }).toThrowErrorMatchingSnapshot();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
         generator: [
           {
             preset: "webp",
@@ -253,6 +277,32 @@ describe("validate plugin options", () => {
         ],
       });
     }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {},
+            filter: () => true,
+          },
+        ],
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {},
+            filter: true,
+          },
+        ],
+      });
+    }).toThrowErrorMatchingSnapshot();
 
     expect(() => {
       new ImageMinimizerPlugin({ generator: true });

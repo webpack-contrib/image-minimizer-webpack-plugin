@@ -1,6 +1,6 @@
 import ImageMinimizerPlugin from "../src";
 
-import { runWebpack, isOptimized } from "./helpers";
+import { runWebpack, isOptimized, plugins } from "./helpers";
 
 describe("loader minify option", () => {
   it("should work with object notation of the 'minifier' option", async () => {
@@ -277,6 +277,137 @@ describe("loader minify option", () => {
     expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(631);
     expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
       71000
+    );
+  });
+
+  it("should optimizes all images exclude filtered", async () => {
+    const stats = await runWebpack({
+      imageminLoaderOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          filter: (source, filename) => {
+            expect(source).toBeInstanceOf(Buffer);
+            expect(typeof filename).toBe("string");
+
+            if (source.byteLength === 631) {
+              return false;
+            }
+
+            return true;
+          },
+          options: { plugins },
+        },
+      },
+    });
+
+    const { compilation } = stats;
+    const { warnings, errors, assets } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+    expect(Object.keys(assets)).toHaveLength(5);
+
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      false
+    );
+  });
+
+  it("should optimizes all images exclude filtered for #2", async () => {
+    const stats = await runWebpack({
+      imageminLoaderOptions: {
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            filter: (source, filename) => {
+              expect(source).toBeInstanceOf(Buffer);
+              expect(typeof filename).toBe("string");
+
+              if (source.byteLength === 631) {
+                return false;
+              }
+
+              return true;
+            },
+            options: { plugins },
+          },
+        ],
+      },
+    });
+
+    const { compilation } = stats;
+    const { warnings, errors, assets } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+    expect(Object.keys(assets)).toHaveLength(5);
+
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      false
+    );
+  });
+
+  it("should optimizes all images exclude filtered for #3", async () => {
+    const stats = await runWebpack({
+      imageminLoaderOptions: {
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+            filter: (source, filename) => {
+              expect(source).toBeInstanceOf(Buffer);
+              expect(typeof filename).toBe("string");
+
+              if (source.byteLength === 631 || /\.png$/.test(filename)) {
+                return false;
+              }
+
+              return true;
+            },
+          },
+          {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
+        ],
+      },
+    });
+
+    const { compilation } = stats;
+    const { warnings, errors, assets } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+    expect(Object.keys(assets)).toHaveLength(5);
+
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      true
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
     );
   });
 });
