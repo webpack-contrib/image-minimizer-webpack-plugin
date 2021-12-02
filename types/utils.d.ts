@@ -1,6 +1,6 @@
 export type Task<T> = () => Promise<T>;
 export type WorkerResult = import("./index").WorkerResult;
-export type SquooshMinimizerOptions = import("./index").SquooshMinimizerOptions;
+export type SquooshOptions = import("./index").SquooshOptions;
 export type ImageminOptions = import("imagemin").Options;
 export type WebpackError = import("webpack").WebpackError;
 export type Uint8ArrayUtf8ByteString = (

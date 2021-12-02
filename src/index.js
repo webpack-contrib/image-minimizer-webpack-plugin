@@ -43,8 +43,7 @@ import {
  */
 
 /**
- * @typedef {Object} SquooshMinimizerOptions
- * @property {Object.<string, object>} [encodeOptions]
+ * @typedef {Object.<string, any>} SquooshOptions
  */
 
 /**

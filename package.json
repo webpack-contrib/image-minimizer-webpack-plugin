@@ -86,6 +86,7 @@
     "file-loader": "^6.2.0",
     "file-type": "^16.5.3",
     "husky": "^7.0.1",
+    "image-size": "^1.0.0",
     "imagemin": "^8.0.1",
     "imagemin-gifsicle": "^7.0.0",
     "imagemin-mozjpeg": "^9.0.0",
