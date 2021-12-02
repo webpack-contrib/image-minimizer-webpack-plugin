@@ -142,16 +142,12 @@ function runWebpack(maybeOptions, getCompiler = false) {
       config.output.assetModuleFilename = options.output.assetModuleFilename;
     }
 
-    if (options.imageminLoader || options.imageminLoaderOptions) {
+    if (options.imageminLoaderOptions) {
       config.module.rules[0].use = [
         ...config.module.rules[0].use,
         {
           loader: ImageMinimizerPlugin.loader,
-          options: options.imageminLoaderOptions
-            ? options.imageminLoaderOptions
-            : {
-                minimizerOptions: { plugins },
-              },
+          options: options.imageminLoaderOptions,
         },
       ];
     }

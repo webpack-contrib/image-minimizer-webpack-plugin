@@ -96,6 +96,14 @@ import {
  */
 
 /**
+ * @typedef {Transformer & { preset: string }} Generator
+ */
+
+/**
+ * @typedef {Transformer} Minimizer
+ */
+
+/**
  * @typedef {Object} InternalWorkerOptions
  * @property {string} filename
  * @property {Buffer} input
@@ -105,6 +113,7 @@ import {
  * @property {Function} [generateFilename]
  */
 
+// TODO add types
 /**
  * @typedef {Object} InternalLoaderOptions
  * @property {Rules} [test] Test to match files against.
@@ -124,10 +133,6 @@ import {
  * @param {PathData} pathData
  * @param {AssetInfo} [assetInfo]
  * @returns {string}
- */
-
-/**
- * @typedef {Transformer & { preset: string }} Generator
  */
 
 /**
@@ -377,6 +382,17 @@ class ImageMinimizerPlugin {
           exclude,
           severityError,
         } = this.options;
+        // TODO remove me
+        const minimizer = Array.isArray(minify)
+          ? minify.map((impl, index) => ({
+              implementation: impl,
+              // @ts-ignore
+              options: (minimizerOptions || {})[index],
+            }))
+          : {
+              implementation: minify,
+              options: minimizerOptions,
+            };
 
         const loader = /** @type {InternalLoaderOptions} */ ({
           test,
@@ -384,14 +400,7 @@ class ImageMinimizerPlugin {
           exclude,
           enforce: "pre",
           loader: require.resolve(path.join(__dirname, "loader.js")),
-          options: {
-            minify,
-            generator,
-            filename,
-            severityError,
-            filter,
-            minimizerOptions,
-          },
+          options: { generator, minimizer, filename, filter, severityError },
         });
 
         compiler.options.module.rules.push(loader);

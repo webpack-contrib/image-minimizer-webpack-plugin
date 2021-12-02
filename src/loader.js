@@ -6,8 +6,7 @@ import { imageminMinify } from "./utils.js";
 
 /** @typedef {import("./index").FilterFn} FilterFn */
 /** @typedef {import("./index").Rules} Rules */
-/** @typedef {import("./index").MinifyFunctions} MinifyFunctions */
-/** @typedef {import("./index").MinimizerOptions} MinimizerOptions */
+/** @typedef {import("./index").Minimizer} Minimizer */
 /** @typedef {import("./index").Generator} Generator */
 /** @typedef {import("./index").InternalWorkerOptions} InternalWorkerOptions */
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
@@ -19,8 +18,7 @@ import { imageminMinify } from "./utils.js";
  * @property {FilterFn} [filter] Allows filtering of images for optimization.
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {string} [filename] Allows to set the filename for the generated asset. Useful for converting to a `webp`.
- * @property {MinifyFunctions} [minify]
- * @property {MinimizerOptions} [minimizerOptions] Options for minify.
+ * @property {Minimizer} [minimizer]
  * @property {Generator[]} [generator]
  */
 
@@ -44,14 +42,12 @@ module.exports = async function loader(content) {
 
   const {
     generator,
-    minify,
-    minimizerOptions,
+    minimizer,
     severityError,
     filename = "[path][name][ext]",
   } = options;
 
-  let implementation = minify || imageminMinify;
-  let implementationOptions = minimizerOptions;
+  let transformer = minimizer || { implementation: imageminMinify };
   let isGenerator = false;
   let parsedQuery;
 
@@ -80,9 +76,11 @@ module.exports = async function loader(content) {
         return;
       }
 
-      // @ts-ignore
-      ({ implementation } = preset);
-      implementationOptions = preset.options;
+      transformer = {
+        implementation: preset.implementation,
+        options: preset.options,
+      };
+
       isGenerator = true;
     }
   }
@@ -91,16 +89,7 @@ module.exports = async function loader(content) {
     input,
     filename: name,
     severityError,
-    transformer: Array.isArray(implementation)
-      ? implementation.map((impl, index) => ({
-          implementation: impl,
-          // @ts-ignore
-          options: (implementationOptions || {})[index],
-        }))
-      : {
-          implementation,
-          options: implementationOptions,
-        },
+    transformer,
     newFilename: filename,
     generateFilename:
       /** @type {Compilation} */
