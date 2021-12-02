@@ -87,7 +87,7 @@ describe("loader minify option", () => {
           {
             implementation: (input, minifiOptions) => {
               expect(input).toBeDefined();
-              expect(minifiOptions).toBeDefined();
+              expect(minifiOptions).toBeUndefined();
 
               return input;
             },

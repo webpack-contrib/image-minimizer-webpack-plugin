@@ -33,15 +33,6 @@ Object {
   "plugins": Array [
     [Function],
   ],
-  "pluginsMeta": Array [
-    Array [
-      Object {
-        "name": "imagemin-mozjpeg",
-        "options": Object {},
-        "version": "9.0.0",
-      },
-    ],
-  ],
 }
 `;
 
@@ -49,15 +40,6 @@ exports[`api normalizeImageminConfig should works 8`] = `
 Object {
   "plugins": Array [
     [Function],
-  ],
-  "pluginsMeta": Array [
-    Array [
-      Object {
-        "name": "imagemin-mozjpeg",
-        "options": Object {},
-        "version": "9.0.0",
-      },
-    ],
   ],
 }
 `;
@@ -67,15 +49,6 @@ Object {
   "plugins": Array [
     [Function],
   ],
-  "pluginsMeta": Array [
-    Array [
-      Object {
-        "name": "imagemin-mozjpeg",
-        "options": Object {},
-        "version": "9.0.0",
-      },
-    ],
-  ],
 }
 `;
 
@@ -83,17 +56,6 @@ exports[`api normalizeImageminConfig should works 10`] = `
 Object {
   "plugins": Array [
     [Function],
-  ],
-  "pluginsMeta": Array [
-    Array [
-      Object {
-        "name": "imagemin-mozjpeg",
-        "options": Object {
-          "quality": 0,
-        },
-        "version": "9.0.0",
-      },
-    ],
   ],
 }
 `;

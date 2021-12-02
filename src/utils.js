@@ -548,7 +548,7 @@ async function imageminNormalizeConfig(imageminConfig) {
 async function imageminGenerate(original, minimizerOptions) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     await imageminNormalizeConfig(
-      /** @type {ImageminOptions} */ (/** @type {?} */ (minimizerOptions))
+      /** @type {ImageminOptions} */ (/** @type {?} */ (minimizerOptions || {}))
     )
   );
 
@@ -605,7 +605,7 @@ async function imageminGenerate(original, minimizerOptions) {
 async function imageminMinify(original, options) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     await imageminNormalizeConfig(
-      /** @type {ImageminOptions} */ (/** @type {?} */ (options))
+      /** @type {ImageminOptions} */ (/** @type {?} */ (options || {}))
     )
   );
 
@@ -670,7 +670,7 @@ async function squooshGenerate(original, minifyOptions) {
   const image = imagePool.ingestImage(new Uint8Array(original.data));
 
   const { encodeOptions } = /** @type {SquooshMinimizerOptions} */ (
-    minifyOptions
+    minifyOptions || {}
   );
 
   try {
@@ -760,7 +760,7 @@ async function squooshMinify(original, options) {
   }
 
   const { encodeOptions = {} } = /** @type {SquooshMinimizerOptions} */ (
-    options
+    options || {}
   );
 
   if (!encodeOptions[targetCodec]) {
