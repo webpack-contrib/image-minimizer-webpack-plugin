@@ -6,15 +6,15 @@ export type Compilation = import("webpack").Compilation;
 export type WebpackError = import("webpack").WebpackError;
 export type Asset = import("webpack").Asset;
 export type AssetInfo = import("webpack").AssetInfo;
-export type ImageminOptions = import("imagemin").Options;
-export type LoaderOptions = import("./loader").LoaderOptions;
 export type ImageminMinifyFunction = typeof imageminMinify;
 export type SquooshMinifyFunction = typeof squooshMinify;
 export type Rule = RegExp | string;
 export type Rules = Rule[] | Rule;
 export type FilterFn = (source: Buffer, sourcePath: string) => boolean;
-export type ImageminMinimizerOptions = {
-  plugins: ImageminOptions["plugins"] | [string, Record<string, any>];
+export type ImageminOptions = {
+  plugins:
+    | import("imagemin").Options["plugins"]
+    | [string, Record<string, any>];
   pluginsMeta?: Record<string, any>[] | undefined;
 };
 export type SquooshMinimizerOptions = {
@@ -24,19 +24,6 @@ export type SquooshMinimizerOptions = {
       }
     | undefined;
 };
-export type CustomMinifyFunction = (
-  original: WorkerResult,
-  options: CustomFnMinimizerOptions
-) => Promise<WorkerResult>;
-export type CustomFnMinimizerOptions = Record<string, any>;
-export type MinifyFunctions =
-  | ImageminMinifyFunction
-  | SquooshMinifyFunction
-  | CustomMinifyFunction;
-export type MinimizerOptions =
-  | ImageminMinimizerOptions
-  | SquooshMinimizerOptions
-  | CustomFnMinimizerOptions;
 export type WorkerResult = {
   filename: string;
   data: Buffer;
@@ -44,10 +31,9 @@ export type WorkerResult = {
   errors: Array<Error>;
   info: AssetInfo;
 };
-export type TransformerOptions = Object;
-export type TransformerFunction = (
+export type TransformerFunction<T> = (
   original: WorkerResult,
-  options: TransformerOptions
+  options: T | undefined
 ) => Promise<WorkerResult>;
 export type PathData = {
   filename?: string | undefined;
@@ -56,40 +42,25 @@ export type FilenameFn = (
   pathData: PathData,
   assetInfo?: import("webpack").AssetInfo | undefined
 ) => string;
-export type Transformer = {
-  implementation: TransformerFunction;
+export type Transformer<T> = {
+  implementation: TransformerFunction<T>;
   filter?: FilterFn | undefined;
   filename?: string | FilenameFn | undefined;
-  options?: Object | undefined;
+  options?: T | undefined;
 };
-export type Generator = Transformer & {
+export type Minimizer<T> = Transformer<T>;
+export type Generator<T> = Transformer<T> & {
   preset: string;
 };
-export type Minimizer = Transformer;
-export type InternalWorkerOptions = {
+export type InternalWorkerOptions<T> = {
   filename: string;
   input: Buffer;
-  transformer: Transformer | Transformer[];
+  transformer: Transformer<T> | Transformer<T>[];
   severityError?: string | undefined;
   generateFilename?: Function | undefined;
 };
-export type InternalLoaderOptions = {
-  /**
-   * Test to match files against.
-   */
-  test?: Rules | undefined;
-  /**
-   * Files to include.
-   */
-  include?: Rules | undefined;
-  /**
-   * Files to exclude.
-   */
-  exclude?: Rules | undefined;
-  loader?: string | undefined;
-  loaderOptions?: import("./loader").LoaderOptions | undefined;
-};
-export type PluginOptions = {
+export type InternalLoaderOptions<T> = import("./loader").LoaderOptions<T>;
+export type PluginOptions<T> = {
   /**
    * Test to match files against.
    */
@@ -105,11 +76,11 @@ export type PluginOptions = {
   /**
    * Allows to setup the minimizer.
    */
-  minimizer?: Transformer | undefined;
+  minimizer?: Minimizer<T> | undefined;
   /**
    * Allows to set the generator.
    */
-  generator?: Generator[] | undefined;
+  generator?: Generator<T>[] | undefined;
   /**
    * Automatically adding `imagemin-loader`.
    */
@@ -134,8 +105,6 @@ export type PluginOptions = {
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
-/** @typedef {import("imagemin").Options} ImageminOptions */
-/** @typedef {import("./loader").LoaderOptions} LoaderOptions */
 /** @typedef {import("./utils.js").imageminMinify} ImageminMinifyFunction */
 /** @typedef {import("./utils.js").squooshMinify} SquooshMinifyFunction */
 /** @typedef {RegExp | string} Rule */
@@ -147,28 +116,13 @@ export type PluginOptions = {
  * @returns {boolean}
  */
 /**
- * @typedef {Object} ImageminMinimizerOptions
- * @property {ImageminOptions["plugins"] | [string, Record<string, any>]} plugins
+ * @typedef {Object} ImageminOptions
+ * @property {import("imagemin").Options["plugins"] | [string, Record<string, any>]} plugins
  * @property {Array<Record<string, any>>} [pluginsMeta]
  */
 /**
  * @typedef {Object} SquooshMinimizerOptions
  * @property {Object.<string, object>} [encodeOptions]
- */
-/**
- * @callback CustomMinifyFunction
- * @param {WorkerResult} original
- * @param {CustomFnMinimizerOptions} options
- * @returns {Promise<WorkerResult>}
- */
-/**
- * @typedef {Record<string, any>} CustomFnMinimizerOptions
- */
-/**
- * @typedef {ImageminMinifyFunction | SquooshMinifyFunction | CustomMinifyFunction} MinifyFunctions
- */
-/**
- * @typedef {ImageminMinimizerOptions | SquooshMinimizerOptions | CustomFnMinimizerOptions} MinimizerOptions
  */
 /**
  * @typedef {Object} WorkerResult
@@ -179,12 +133,10 @@ export type PluginOptions = {
  * @property {AssetInfo} info
  */
 /**
- * @typedef {Object} TransformerOptions
- */
-/**
+ * @template T
  * @callback TransformerFunction
  * @param {WorkerResult} original
- * @param {TransformerOptions} options
+ * @param {T | undefined} options
  * @returns {Promise<WorkerResult>}
  */
 /**
@@ -198,72 +150,60 @@ export type PluginOptions = {
  * @returns {string}
  */
 /**
+ * @template T
  * @typedef {Object} Transformer
- * @property {TransformerFunction} implementation
+ * @property {TransformerFunction<T>} implementation
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
- * @property {TransformerOptions} [options]
+ * @property {T} [options]
  */
 /**
- * @typedef {Transformer & { preset: string }} Generator
+ * @template T
+ * @typedef {Transformer<T>} Minimizer
  */
 /**
- * @typedef {Transformer} Minimizer
+ * @template T
+ * @typedef {Transformer<T> & { preset: string }} Generator
  */
 /**
+ * @template T
  * @typedef {Object} InternalWorkerOptions
  * @property {string} filename
  * @property {Buffer} input
- * @property {Transformer | Transformer[]} transformer
+ * @property {Transformer<T> | Transformer<T>[]} transformer
  * @property {string} [severityError]
  * @property {Function} [generateFilename]
  */
 /**
- * @typedef {Object} InternalLoaderOptions
- * @property {Rules} [test] Test to match files against.
- * @property {Rules} [include] Files to include.
- * @property {Rules} [exclude] Files to exclude.
- * @property {string} [loader]
- * @property {LoaderOptions} [loaderOptions]
+ * @template T
+ * @typedef {import("./loader").LoaderOptions<T>} InternalLoaderOptions
  */
 /**
+ * @template T
  * @typedef {Object} PluginOptions
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
- * @property {Minimizer} [minimizer] Allows to setup the minimizer.
- * @property {Generator[]} [generator] Allows to set the generator.
+ * @property {Minimizer<T>} [minimizer] Allows to setup the minimizer.
+ * @property {Generator<T>[]} [generator] Allows to set the generator.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  */
 /**
+ * @template T
  * @extends {WebpackPluginInstance}
  */
-declare class ImageMinimizerPlugin {
+declare class ImageMinimizerPlugin<T> {
   /**
-   * @param {PluginOptions} [options={}] Plugin options.
+   * @param {PluginOptions<T>} [options={}] Plugin options.
    */
-  constructor(options?: PluginOptions | undefined);
-  options: {
-    minimizer:
-      | Transformer
-      | {
-          implementation: typeof imageminMinify;
-          options: {
-            plugins: never[];
-          };
-        };
-    generator: Generator[] | undefined;
-    severityError: string | undefined;
-    exclude: Rules | undefined;
-    include: Rules | undefined;
-    loader: boolean;
-    concurrency: number | undefined;
-    test: Rules;
-    deleteOriginalAssets: boolean;
-  };
+  constructor(options?: PluginOptions<T> | undefined);
+  /**
+   * @private
+   */
+  private options;
   /**
    * @private
    * @param {Compiler} compiler

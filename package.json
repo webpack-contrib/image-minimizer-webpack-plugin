@@ -54,7 +54,6 @@
   },
   "dependencies": {
     "imagemin": "^8.0.1",
-    "klona": "^2.0.4",
     "schema-utils": "^4.0.0",
     "serialize-javascript": "^6.0.0"
   },
@@ -68,7 +67,6 @@
     "@types/imagemin": "^8.0.0",
     "@types/serialize-javascript": "^5.0.1",
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
-    "babel-eslint": "^10.1.0",
     "babel-jest": "^27.0.5",
     "copy-webpack-plugin": "^9.0.0",
     "cross-env": "^7.0.3",
@@ -102,7 +100,7 @@
     "remark-preset-lint-itgalaxy": "^16.0.0",
     "standard-version": "^9.3.1",
     "tempy": "^1.0.1",
-    "typescript": "^4.6.0-dev.20211126",
+    "typescript": "^4.5.2",
     "url-loader": "^4.1.1",
     "webpack": "^5.51.1"
   },
