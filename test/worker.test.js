@@ -793,4 +793,121 @@ describe("minify", () => {
       /No result from 'squoosh', please configure the 'encodeOptions' option to generate images/
     );
   });
+
+  it("should work and allow to rename filename", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      input,
+      filename,
+      generateFilename: () => "generated-image.png",
+      transformer: {
+        implementation: squooshMinify,
+        filename: "generated-image.png",
+        options: {
+          encodeOptions: {
+            mozjpeg: {
+              quality: 90,
+            },
+          },
+        },
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.filename).toBe("generated-image.png");
+
+    const imagePool = new ImagePool(1);
+    const image = imagePool.ingestImage(new Uint8Array(input));
+
+    await image.encode({
+      mozjpeg: {
+        quality: 90,
+      },
+    });
+
+    await imagePool.close();
+
+    const { binary } = await image.encodedWith.mozjpeg;
+
+    expect(result.data.equals(binary)).toBe(true);
+  });
+
+  it("should work and allow to rename filename #2", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      input,
+      filename: "image.jpg",
+      generateFilename: (_, info) => `generated-${info.filename}`,
+      transformer: [
+        {
+          implementation: squooshMinify,
+          filename: "image.jpg",
+          options: {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 90,
+              },
+            },
+          },
+        },
+        {
+          implementation: squooshMinify,
+          filename: "image.jpg",
+          options: {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 90,
+              },
+            },
+          },
+        },
+      ],
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.filename).toBe("generated-generated-image.jpg");
+
+    const imagePool = new ImagePool(1);
+    const image = imagePool.ingestImage(new Uint8Array(input));
+
+    await image.encode({
+      mozjpeg: {
+        quality: 90,
+      },
+    });
+
+    await imagePool.close();
+
+    const { binary } = await image.encodedWith.mozjpeg;
+
+    expect(result.data.equals(binary)).toBe(true);
+  });
+
+  it("should work and allow to filter", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      input,
+      filename,
+      transformer: {
+        implementation: squooshMinify,
+        filter: () => false,
+        options: {
+          encodeOptions: {
+            mozjpeg: {
+              quality: 90,
+            },
+          },
+        },
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+    expect(result.info).toEqual({});
+  });
 });
