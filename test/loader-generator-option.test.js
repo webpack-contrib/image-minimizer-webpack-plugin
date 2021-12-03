@@ -8,7 +8,6 @@ import { runWebpack, fixturesPath } from "./helpers";
 
 describe("loader generator option", () => {
   it("should work", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-1");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -26,9 +25,6 @@ describe("loader generator option", () => {
           },
         ],
       },
-      output: {
-        path: outputDir,
-      },
     });
 
     const { compilation } = stats;
@@ -36,7 +32,7 @@ describe("loader generator option", () => {
 
     const transformedAsset = path.resolve(
       __dirname,
-      outputDir,
+      compilation.options.output.path,
       "./nested/deep/loader-test.webp"
     );
 
@@ -48,7 +44,6 @@ describe("loader generator option", () => {
   });
 
   it("should throw error on duplicate presets", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-2");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -76,9 +71,6 @@ describe("loader generator option", () => {
             },
           },
         ],
-      },
-      output: {
-        path: outputDir,
       },
     });
 
@@ -93,7 +85,6 @@ describe("loader generator option", () => {
   });
 
   it("should throw error on not found preset", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-3");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -111,9 +102,6 @@ describe("loader generator option", () => {
           },
         ],
       },
-      output: {
-        path: outputDir,
-      },
     });
 
     const { compilation } = stats;
@@ -127,7 +115,6 @@ describe("loader generator option", () => {
   });
 
   it("should generate the new webp image with flat filename", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-4");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -146,9 +133,6 @@ describe("loader generator option", () => {
           },
         ],
       },
-      output: {
-        path: outputDir,
-      },
     });
 
     const { compilation } = stats;
@@ -156,7 +140,7 @@ describe("loader generator option", () => {
 
     const transformedAsset = path.resolve(
       __dirname,
-      outputDir,
+      compilation.options.output.path,
       "loader-test.webp"
     );
 
@@ -168,7 +152,6 @@ describe("loader generator option", () => {
   });
 
   it("should generate the new webp image with nested filename", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-5");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -187,16 +170,13 @@ describe("loader generator option", () => {
           },
         ],
       },
-      output: {
-        path: outputDir,
-      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
     const transformedAsset = path.resolve(
       __dirname,
-      outputDir,
+      compilation.options.output.path,
       "deep/nested/deep/loader-test.webp"
     );
 
@@ -208,7 +188,6 @@ describe("loader generator option", () => {
   });
 
   it("should generate the new webp image with filename  pointing to other directory", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-6");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -227,16 +206,13 @@ describe("loader generator option", () => {
           },
         ],
       },
-      output: {
-        path: outputDir,
-      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
     const transformedAsset = path.resolve(
       __dirname,
-      outputDir,
+      compilation.options.output.path,
       "other/loader-test.webp"
     );
 
@@ -248,7 +224,6 @@ describe("loader generator option", () => {
   });
 
   it("should generate the new webp image when filename is function", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-7");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -267,16 +242,13 @@ describe("loader generator option", () => {
           },
         ],
       },
-      output: {
-        path: outputDir,
-      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
     const transformedAsset = path.resolve(
       __dirname,
-      outputDir,
+      compilation.options.output.path,
       "other/loader-test.webp"
     );
 
@@ -288,7 +260,6 @@ describe("loader generator option", () => {
   });
 
   it("should minimize image with flat filename", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-8");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./simple.js"),
       imageminLoaderOptions: {
@@ -299,9 +270,6 @@ describe("loader generator option", () => {
           },
         ],
       },
-      output: {
-        path: outputDir,
-      },
     });
 
     const { compilation } = stats;
@@ -309,7 +277,7 @@ describe("loader generator option", () => {
 
     const transformedAsset = path.resolve(
       __dirname,
-      outputDir,
+      compilation.options.output.path,
       "loader-test.jpg"
     );
 
@@ -321,7 +289,6 @@ describe("loader generator option", () => {
   });
 
   it("should generate and resize", async () => {
-    const outputDir = path.resolve(__dirname, "outputs", "loader-filename-1");
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       imageminLoaderOptions: {
@@ -347,9 +314,6 @@ describe("loader generator option", () => {
           },
         ],
       },
-      output: {
-        path: outputDir,
-      },
     });
 
     const { compilation } = stats;
@@ -357,7 +321,7 @@ describe("loader generator option", () => {
 
     const transformedAsset = path.resolve(
       __dirname,
-      outputDir,
+      compilation.options.output.path,
       "./nested/deep/loader-test.webp"
     );
 

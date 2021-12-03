@@ -55,16 +55,14 @@ describe("loader", () => {
     expect(errors).toHaveLength(0);
     expect(Object.keys(assets)).toHaveLength(7);
 
-    const { path: outputPath } = compilation.options.output;
-
     const txtBuffer = await pify(fs.readFile)(
-      path.join(outputPath, "loader-test.txt")
+      path.join(compilation.options.output.path, "loader-test.txt")
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await pify(fs.readFile)(
-      path.join(outputPath, "loader-test.css")
+      path.join(compilation.options.output.path, "loader-test.css")
     );
 
     expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
@@ -111,16 +109,14 @@ describe("loader", () => {
     expect(Object.keys(assets)).toHaveLength(8);
     expect(Object.keys(assets)).toContain("loader-test.webp");
 
-    const { path: outputPath } = compilation.options.output;
-
     const txtBuffer = await pify(fs.readFile)(
-      path.join(outputPath, "loader-test.txt")
+      path.join(compilation.options.output.path, "loader-test.txt")
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await pify(fs.readFile)(
-      path.join(outputPath, "loader-test.css")
+      path.join(compilation.options.output.path, "loader-test.css")
     );
 
     expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
@@ -166,16 +162,14 @@ describe("loader", () => {
     expect(errors).toHaveLength(0);
     expect(Object.keys(assets)).toHaveLength(7);
 
-    const { path: outputPath } = compilation.options.output;
-
     const txtBuffer = await pify(fs.readFile)(
-      path.join(outputPath, "loader-test.txt")
+      path.join(compilation.options.output.path, "loader-test.txt")
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await pify(fs.readFile)(
-      path.join(outputPath, "loader-test.css")
+      path.join(compilation.options.output.path, "loader-test.css")
     );
 
     expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
@@ -237,16 +231,14 @@ describe("loader", () => {
     expect(Object.keys(assets)).toHaveLength(8);
     expect(Object.keys(assets)).toContain("loader-test.webp");
 
-    const { path: outputPath } = compilation.options.output;
-
     const txtBuffer = await pify(fs.readFile)(
-      path.join(outputPath, "loader-test.txt")
+      path.join(compilation.options.output.path, "loader-test.txt")
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await pify(fs.readFile)(
-      path.join(outputPath, "loader-test.css")
+      path.join(compilation.options.output.path, "loader-test.css")
     );
 
     expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
@@ -284,9 +276,6 @@ describe("loader", () => {
           },
         ],
       },
-      output: {
-        path: path.resolve(__dirname, "outputs/loader-generator-imagemin"),
-      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -296,8 +285,8 @@ describe("loader", () => {
 
     const file = path.resolve(
       __dirname,
-      "outputs",
-      "./loader-generator-imagemin/loader-test.webp"
+      compilation.options.output.path,
+      "./loader-test.webp"
     );
     const ext = await fileType.fromFile(file);
 
@@ -322,9 +311,6 @@ describe("loader", () => {
           },
         ],
       },
-      output: {
-        path: path.resolve(__dirname, "outputs/loader-generator-imagemin"),
-      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -334,8 +320,8 @@ describe("loader", () => {
 
     const file = path.resolve(
       __dirname,
-      "outputs",
-      "./loader-generator-imagemin/loader-test.webp"
+      compilation.options.output.path,
+      "./loader-test.webp"
     );
     const ext = await fileType.fromFile(file);
 
@@ -361,9 +347,6 @@ describe("loader", () => {
           },
         ],
       },
-      output: {
-        path: path.resolve(__dirname, "outputs/loader-generator-squoosh"),
-      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -373,8 +356,8 @@ describe("loader", () => {
 
     const file = path.resolve(
       __dirname,
-      "outputs",
-      "./loader-generator-squoosh/loader-test.webp"
+      compilation.options.output.path,
+      "loader-test.webp"
     );
     const ext = await fileType.fromFile(file);
 

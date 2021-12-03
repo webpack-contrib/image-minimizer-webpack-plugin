@@ -359,9 +359,6 @@ describe("imagemin plugin", () => {
   it("should generate real content hash", async () => {
     const compiler = await runWebpack(
       {
-        output: {
-          path: path.resolve(__dirname, "outputs"),
-        },
         name: "[name].[contenthash].[fullhash].[ext]",
         optimization: {
           minimize: false,
@@ -466,7 +463,6 @@ describe("imagemin plugin", () => {
         fileLoaderOff: true,
         assetResource: true,
         output: {
-          path: path.resolve(__dirname, "outputs"),
           assetModuleFilename: "[name].[contenthash].[fullhash].[ext]",
         },
         optimization: {
@@ -877,9 +873,6 @@ describe("imagemin plugin", () => {
           },
         },
       },
-      output: {
-        path: path.resolve(__dirname, "outputs/plugin-generator-imagemin"),
-      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -889,8 +882,8 @@ describe("imagemin plugin", () => {
 
     const file = path.resolve(
       __dirname,
-      "outputs",
-      "./plugin-generator-imagemin/loader-test.webp"
+      compilation.options.output.path,
+      "./loader-test.webp"
     );
     const ext = await fileType.fromFile(file);
 
@@ -942,9 +935,6 @@ describe("imagemin plugin", () => {
           },
         },
       },
-      output: {
-        path: path.resolve(__dirname, "outputs/plugin-generator-squoosh"),
-      },
     });
     const { compilation } = stats;
     const { warnings, errors } = compilation;
@@ -954,8 +944,8 @@ describe("imagemin plugin", () => {
 
     const file = path.resolve(
       __dirname,
-      "outputs",
-      "./plugin-generator-squoosh/loader-test.webp"
+      compilation.options.output.path,
+      "./loader-test.webp"
     );
     const ext = await fileType.fromFile(file);
 
@@ -1026,8 +1016,8 @@ describe("imagemin plugin", () => {
 
     const file = path.resolve(
       __dirname,
-      "outputs",
-      "./plugin-generator-squoosh/loader-test.webp"
+      compilation.options.output.path,
+      "./loader-test.webp"
     );
     const ext = await fileType.fromFile(file);
 
@@ -1094,8 +1084,8 @@ describe("imagemin plugin", () => {
 
     const file = path.resolve(
       __dirname,
-      "outputs",
-      "./plugin-generator-squoosh/loader-test.webp"
+      compilation.options.output.path,
+      "./loader-test.webp"
     );
 
     const ext = await fileType.fromFile(file);
