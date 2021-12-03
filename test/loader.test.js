@@ -293,7 +293,7 @@ describe("loader", () => {
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
 
-  it("should optimizes and generate images (imageminGenerate) with assets modules", async () => {
+  it("should generate and minimize images (imageminGenerate) using absolute URLs", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "generator-asset-modules.js"),
       fileLoaderOff: true,

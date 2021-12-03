@@ -41,6 +41,8 @@ function runWebpack(maybeOptions, getCompiler = false) {
 
   maybeMultiCompiler.forEach((options) => {
     const config = {
+      externals: options.externals,
+      experiments: options.experiments,
       devtool: false,
       bail: options.bail,
       context: fixturesPath,
@@ -127,6 +129,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
       output: {
         publicPath: "",
         filename: "bundle.js",
+        pathinfo: false,
         assetModuleFilename: "[name][ext]",
         path:
           options.output && options.output.path
