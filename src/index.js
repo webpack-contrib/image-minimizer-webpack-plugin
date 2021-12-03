@@ -189,7 +189,7 @@ class ImageMinimizerPlugin {
           );
 
           // Skip double minimize assets from child compilation
-          if (info.minimized) {
+          if (info.minimized || info.generated) {
             return false;
           }
 

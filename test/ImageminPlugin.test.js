@@ -997,4 +997,128 @@ describe("imagemin plugin", () => {
       /Not configured 'minimizer' or 'generator' options, please setup them/
     );
   });
+
+  it("should generate and do not throw an error on unsupported file types in minizer", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: 1,
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const file = path.resolve(
+      __dirname,
+      "outputs",
+      "./plugin-generator-squoosh/loader-test.webp"
+    );
+    const ext = await fileType.fromFile(file);
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+
+    // TODO fix me
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      false
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      false
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      false
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      false
+    );
+  });
+
+  it("should not try to generate and minimize twice", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer.js"),
+      imageminPluginOptions: [
+        {
+          test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+          generator: [
+            {
+              preset: "webp",
+              implementation: ImageMinimizerPlugin.squooshGenerate,
+              options: {
+                encodeOptions: {
+                  webp: {
+                    lossless: 1,
+                  },
+                },
+              },
+            },
+          ],
+        },
+        {
+          test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+          generator: [
+            {
+              preset: "webp",
+              implementation: ImageMinimizerPlugin.squooshGenerate,
+              options: {
+                encodeOptions: {
+                  webp: {
+                    quality: 0,
+                  },
+                },
+              },
+            },
+          ],
+        },
+      ],
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const file = path.resolve(
+      __dirname,
+      "outputs",
+      "./plugin-generator-squoosh/loader-test.webp"
+    );
+
+    const ext = await fileType.fromFile(file);
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+
+    const webpAsset = compilation.getAsset("loader-test.webp");
+
+    expect(webpAsset.info.generated).toBe(true);
+    expect(webpAsset.info.generatedBy).toEqual(["squoosh"]);
+
+    // TODO fix me
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      false
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      false
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      false
+    );
+    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+      false
+    );
+  });
 });
