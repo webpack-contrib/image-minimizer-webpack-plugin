@@ -337,8 +337,17 @@ class ImageMinimizerPlugin {
             /** @type {import("./loader").LoaderOptions<T>} */
             ({ generator, minimizer, severityError }),
         });
+        const dataURILoader = /** @type {InternalLoaderOptions<T>} */ ({
+          scheme: /^data$/,
+          enforce: "pre",
+          loader: require.resolve(path.join(__dirname, "loader.js")),
+          options:
+            /** @type {import("./loader").LoaderOptions<T>} */
+            ({ generator, minimizer, severityError }),
+        });
 
         compiler.options.module.rules.push(loader);
+        compiler.options.module.rules.push(dataURILoader);
       });
     }
 

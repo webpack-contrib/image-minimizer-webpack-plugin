@@ -71,6 +71,21 @@ function throttleAll(limit, tasks) {
   });
 }
 
+const ABSOLUTE_URL_REGEX = /^[a-zA-Z][a-zA-Z\d+\-.]*?:/;
+const WINDOWS_PATH_REGEX = /^[a-zA-Z]:\\/;
+
+/**
+ * @param {string} url
+ * @returns {boolean}
+ */
+function isAbsoluteURL(url) {
+  if (WINDOWS_PATH_REGEX.test(url)) {
+    return false;
+  }
+
+  return ABSOLUTE_URL_REGEX.test(url);
+}
+
 /**
  * @callback Uint8ArrayUtf8ByteString
  * @param {number[] | Uint8Array} array
@@ -837,6 +852,7 @@ async function squooshMinify(original, options) {
 
 export {
   throttleAll,
+  isAbsoluteURL,
   imageminNormalizeConfig,
   imageminMinify,
   imageminGenerate,

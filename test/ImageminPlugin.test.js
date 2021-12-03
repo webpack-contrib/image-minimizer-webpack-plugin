@@ -1,9 +1,11 @@
 import path from "path";
 
+import fs from "fs";
 import webpack from "webpack";
 
 import fileType from "file-type";
 
+import pify from "pify";
 import {
   fixturesPath,
   isOptimized,
@@ -1110,5 +1112,179 @@ describe("imagemin plugin", () => {
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
       false
     );
+  });
+
+  it("should generate and minimize images using absolute URLs", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-2.js"),
+      fileLoaderOff: true,
+      experiments: {
+        buildHttp: {
+          allowedUris: [/^http(s)?:/],
+          cacheLocation: path.resolve(fixturesPath, "./cache/absolute-url"),
+          lockfileLocation: path.resolve(
+            fixturesPath,
+            "./cache/absolute-url/lock.json"
+          ),
+        },
+      },
+      imageminPluginOptions: {
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-webp"],
+            },
+          },
+        ],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: { plugins },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    expect(Object.keys(compilation.assets)).toContain("loader-test.webp");
+    expect(Object.keys(compilation.assets)).toContain(
+      "PNG_transparency_demonstration_1.webp"
+    );
+    expect(Object.keys(compilation.assets)).toContain("Example.webp");
+    expect(Object.keys(compilation.assets)).toContain("icon.svg");
+
+    const webpAsset = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./loader-test.webp"
+    );
+    const ext = await fileType.fromFile(webpAsset);
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+
+    const webpAsset1 = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./PNG_transparency_demonstration_1.webp"
+    );
+    const ext1 = await fileType.fromFile(webpAsset1);
+
+    expect(/image\/webp/i.test(ext1.mime)).toBe(true);
+
+    const webpAsset2 = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./Example.webp"
+    );
+    const ext2 = await fileType.fromFile(webpAsset2);
+
+    expect(/image\/webp/i.test(ext2.mime)).toBe(true);
+
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+
+    const bundleFilename = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./bundle.js"
+    );
+    const bundle = await pify(fs.readFile)(bundleFilename);
+    const URIRegEx = /"(data:([^;,]+)?((?:;[^;,]+)*?)(?:;(base64))?,(.*))"/gi;
+    const extractedDataURI = bundle.toString().match(URIRegEx);
+
+    expect(extractedDataURI[1].length).toBeLessThan(95801);
+  });
+
+  it.skip("should generate and minimize images using absolute URLs and allow to rename", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-2.js"),
+      fileLoaderOff: true,
+      experiments: {
+        buildHttp: {
+          allowedUris: [/^http(s)?:/],
+          cacheLocation: path.resolve(fixturesPath, "./cache/absolute-url"),
+          lockfileLocation: path.resolve(
+            fixturesPath,
+            "./cache/absolute-url/lock.json"
+          ),
+        },
+      },
+      imageminPluginOptions: {
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            filename: "generated-[name][ext]",
+            options: {
+              plugins: ["imagemin-webp"],
+            },
+          },
+        ],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          filename: "minimized-[name][ext]",
+          options: { plugins },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    expect(Object.keys(compilation.assets)).toContain("loader-test.webp");
+    expect(Object.keys(compilation.assets)).toContain(
+      "PNG_transparency_demonstration_1.webp"
+    );
+    expect(Object.keys(compilation.assets)).toContain("Example.webp");
+    expect(Object.keys(compilation.assets)).toContain("icon.svg");
+
+    const webpAsset = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./loader-test.webp"
+    );
+    const ext = await fileType.fromFile(webpAsset);
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+
+    const webpAsset1 = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./PNG_transparency_demonstration_1.webp"
+    );
+    const ext1 = await fileType.fromFile(webpAsset1);
+
+    expect(/image\/webp/i.test(ext1.mime)).toBe(true);
+
+    const webpAsset2 = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./Example.webp"
+    );
+    const ext2 = await fileType.fromFile(webpAsset2);
+
+    expect(/image\/webp/i.test(ext2.mime)).toBe(true);
+
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+
+    const bundleFilename = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./bundle.js"
+    );
+    const bundle = await pify(fs.readFile)(bundleFilename);
+    const URIRegEx = /"(data:([^;,]+)?((?:;[^;,]+)*?)(?:;(base64))?,(.*))"/gi;
+    const extractedDataURI = bundle.toString().match(URIRegEx);
+
+    expect(extractedDataURI[1].length).toBeLessThan(95801);
   });
 });

@@ -2,6 +2,7 @@ import path from "path";
 
 import worker from "./worker";
 import schema from "./loader-options.json";
+import { isAbsoluteURL } from "./utils.js";
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -96,7 +97,10 @@ module.exports = async function loader(content) {
     return;
   }
 
-  const name = path.relative(this.rootContext, this.resourcePath);
+  const isAbsolute = isAbsoluteURL(this.resourcePath);
+  const name = isAbsolute
+    ? this.resourcePath
+    : path.relative(this.rootContext, this.resourcePath);
   const minifyOptions =
     /** @type {import("./index").InternalWorkerOptions<T>} */ ({
       input: content,
@@ -127,20 +131,33 @@ module.exports = async function loader(content) {
   }
 
   if (isGenerator && parsedQuery) {
+    // Remove query param from the bundle due we need that only for bundle purposes
     parsedQuery.delete("as");
 
     const stringifiedParsedQuery = parsedQuery.toString();
     const query =
       stringifiedParsedQuery.length > 0 ? `?${stringifiedParsedQuery}` : "";
 
-    // For `file-loader` and other old loaders
-    this.resourcePath = path.join(this.rootContext, output.filename);
+    // Old approach for `file-loader` and other old loaders
+    this.resourcePath = isAbsolute
+      ? output.filename
+      : path.join(this.rootContext, output.filename);
     this.resourceQuery = query;
 
-    // For assets modules
+    // Change name of assets modules after generator
     if (this._module && !this._module.matchResource) {
       this._module.matchResource = `${output.filename}${query}`;
     }
+  }
+  // Change content of the data URI after minimizer
+  else if (
+    this._module &&
+    this._module.resourceResolveData &&
+    this._module.resourceResolveData.encodedContent
+  ) {
+    // console.log(content.toString())
+    this._module.resourceResolveData.encodedContent =
+      output.data.toString("base64");
   }
 
   // TODO: search better API

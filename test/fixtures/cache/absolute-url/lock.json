@@ -1,0 +1,8 @@
+{
+  "https://cdn.rawgit.com/webpack/media/e7485eb2/logo/icon.svg": { "resolved": "https://cdn.jsdelivr.net/gh/webpack/media@e7485eb2/logo/icon.svg", "integrity": "sha512-DyC5VS91HRdJSZ1G8BOJCzXEZfQCmBAu0W2v8tcJNq3bvmXrL8vdFqDpFNrI/SL7qLBSV7DiiR0rLZcb1FGebA==", "contentType": "image/svg+xml" },
+  "https://cdn.rawgit.com/webpack/media/e7485eb2/logo/icon.svg?as=webp": { "resolved": "https://cdn.jsdelivr.net/gh/webpack/media@e7485eb2/logo/icon.svg", "integrity": "sha512-DyC5VS91HRdJSZ1G8BOJCzXEZfQCmBAu0W2v8tcJNq3bvmXrL8vdFqDpFNrI/SL7qLBSV7DiiR0rLZcb1FGebA==", "contentType": "image/svg+xml" },
+  "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png?foo=bar&as=webp": { "integrity": "sha512-oko0UnN7/aOH4loqI1F79zMZozo+Y5fbTYEvcfpE75439sR6INOke7En72cUAvbhcuKmmYUgZMxcGew9iBRTzQ==", "contentType": "image/png" },
+  "https://upload.wikimedia.org/wikipedia/commons/7/70/Example.png?as=webp": { "integrity": "sha512-5rIlhMQXmv1/+wxg+Xl12smI+bkT84f70stvfyIdKth6Nh75eM+Cyfl3mIUoiFwIaQeIXCGgqUPOceyBgZmvmg==", "contentType": "image/png" },
+  "https://upload.wikimedia.org/wikipedia/commons/7/70/Example.png?foo=bar&as=webp": { "integrity": "sha512-5rIlhMQXmv1/+wxg+Xl12smI+bkT84f70stvfyIdKth6Nh75eM+Cyfl3mIUoiFwIaQeIXCGgqUPOceyBgZmvmg==", "contentType": "image/png" },
+  "version": 1
+}
