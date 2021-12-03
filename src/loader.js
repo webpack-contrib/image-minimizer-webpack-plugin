@@ -20,10 +20,31 @@ import schema from "./loader-options.json";
  * @param {Buffer} content
  */
 module.exports = async function loader(content) {
+  // Avoid optimize twice
+  if (
+    this._module &&
+    this._module.buildMeta &&
+    this._module.buildMeta.imageMinimizerPluginInfo &&
+    (this._module.buildMeta.imageMinimizerPluginInfo.minimized ||
+      this._module.buildMeta.imageMinimizerPluginInfo.generated)
+  ) {
+    return content;
+  }
+
   // @ts-ignore
   const options = this.getOptions(/** @type {Schema} */ (schema));
   const callback = this.async();
   const { generator, minimizer, severityError } = options;
+
+  if (!minimizer && !generator) {
+    callback(
+      new Error(
+        "Not configured 'minimizer' or 'generator' options, please setup them"
+      )
+    );
+
+    return;
+  }
 
   let transformer = minimizer;
   let isGenerator = false;
@@ -69,12 +90,8 @@ module.exports = async function loader(content) {
     }
   }
 
-  if (!minimizer && !generator) {
-    callback(
-      new Error(
-        "Not configured 'minimizer' or 'generator' options, please setup them"
-      )
-    );
+  if (!transformer) {
+    callback(null, content);
 
     return;
   }
