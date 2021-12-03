@@ -7,9 +7,6 @@ describe('plugin "deleteOriginalAssets" option', () => {
   it("should minimize asset and delete original asset (default behavior)", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
-      output: {
-        path: path.resolve(__dirname, "outputs"),
-      },
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
@@ -38,9 +35,6 @@ describe('plugin "deleteOriginalAssets" option', () => {
   it("should minimize asset and delete original asset when the name is the same (default behavior)", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
-      output: {
-        path: path.resolve(__dirname, "outputs"),
-      },
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
@@ -65,9 +59,6 @@ describe('plugin "deleteOriginalAssets" option', () => {
   it('should minimize asset and delete original asset and keep original asset when the "deleteOriginalAssets" option is "false"', async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
-      output: {
-        path: path.resolve(__dirname, "outputs"),
-      },
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
@@ -97,9 +88,6 @@ describe('plugin "deleteOriginalAssets" option', () => {
   it('should transform asset and keep original asset when the "deleteOriginalAssets" option is "true"', async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
-      output: {
-        path: path.resolve(__dirname, "outputs"),
-      },
       emitPlugin: true,
       emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
       imageminPluginOptions: {
@@ -130,9 +118,6 @@ describe('plugin "deleteOriginalAssets" option', () => {
     const multiStats = await runWebpack([
       {
         entry: path.join(fixturesPath, "./empty-entry.js"),
-        output: {
-          path: path.resolve(__dirname, "outputs"),
-        },
         emitPlugin: true,
         emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
         imageminPluginOptions: {
@@ -146,9 +131,6 @@ describe('plugin "deleteOriginalAssets" option', () => {
       },
       {
         entry: path.join(fixturesPath, "./empty-entry.js"),
-        output: {
-          path: path.resolve(__dirname, "outputs"),
-        },
         emitPlugin: true,
         emitPluginOptions: { fileNames: ["./nested/deep/plugin-test.png"] },
         imageminPluginOptions: {
