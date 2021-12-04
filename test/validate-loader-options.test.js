@@ -115,20 +115,6 @@ describe("validate loader options", () => {
             filter: () => false,
           },
         ],
-        [
-          {
-            preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
-            filename: "[name].[ext]",
-          },
-        ],
-        [
-          {
-            preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
-            filename: () => "[name].[ext]",
-          },
-        ],
       ],
       failure: [
         1,
@@ -144,13 +130,6 @@ describe("validate loader options", () => {
           implementation: ImageMinimizerPlugin.squooshGenerate,
           filter: true,
         },
-        [
-          {
-            preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
-            filename: true,
-          },
-        ],
       ],
     },
     severityError: {

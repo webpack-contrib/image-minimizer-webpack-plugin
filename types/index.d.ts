@@ -42,12 +42,11 @@ export type Transformer<T> = {
   implementation: TransformerFunction<T>;
   filter?: FilterFn | undefined;
   filename?: string | FilenameFn | undefined;
+  preset?: string | undefined;
   options?: T | undefined;
 };
-export type Minimizer<T> = Transformer<T>;
-export type Generator<T> = Transformer<T> & {
-  preset: string;
-};
+export type Minimizer<T> = Omit<Transformer<T>, "preset">;
+export type Generator<T> = Omit<Transformer<T>, "filename">;
 export type InternalWorkerOptions<T> = {
   filename: string;
   input: Buffer;
@@ -72,7 +71,7 @@ export type PluginOptions<T> = {
   /**
    * Allows to setup the minimizer.
    */
-  minimizer?: Minimizer<T> | undefined;
+  minimizer?: Minimizer<T> | Minimizer<T>[] | undefined;
   /**
    * Allows to set the generator.
    */
@@ -150,15 +149,16 @@ export type PluginOptions<T> = {
  * @property {TransformerFunction<T>} implementation
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
+ * @property {string} [preset]
  * @property {T} [options]
  */
 /**
  * @template T
- * @typedef {Transformer<T>} Minimizer
+ * @typedef {Omit<Transformer<T>, "preset">} Minimizer
  */
 /**
  * @template T
- * @typedef {Transformer<T> & { preset: string }} Generator
+ * @typedef {Omit<Transformer<T>, "filename">} Generator
  */
 /**
  * @template T
@@ -179,7 +179,7 @@ export type PluginOptions<T> = {
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
- * @property {Minimizer<T>} [minimizer] Allows to setup the minimizer.
+ * @property {Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
  * @property {Generator<T>[]} [generator] Allows to set the generator.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.

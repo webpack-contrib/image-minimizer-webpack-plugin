@@ -81,17 +81,18 @@ import {
  * @property {TransformerFunction<T>} implementation
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
+ * @property {string} [preset]
  * @property {T} [options]
  */
 
 /**
  * @template T
- * @typedef {Transformer<T>} Minimizer
+ * @typedef {Omit<Transformer<T>, "preset">} Minimizer
  */
 
 /**
  * @template T
- * @typedef {Transformer<T> & { preset: string }} Generator
+ * @typedef {Omit<Transformer<T>, "filename">} Generator
  */
 
 /**
@@ -115,7 +116,7 @@ import {
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
- * @property {Minimizer<T>} [minimizer] Allows to setup the minimizer.
+ * @property {Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
  * @property {Generator<T>[]} [generator] Allows to set the generator.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.

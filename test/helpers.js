@@ -130,7 +130,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
         publicPath: "",
         filename: "bundle.js",
         pathinfo: false,
-        assetModuleFilename: "[name][ext]",
+        assetModuleFilename: options.name || "[name][ext]",
         path:
           options.output && options.output.path
             ? options.output.path
