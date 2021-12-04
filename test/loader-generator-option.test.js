@@ -114,15 +114,15 @@ describe("loader generator option", () => {
     );
   });
 
-  it("should generate the new webp image with flat filename", async () => {
+  it("should generate the new webp image with other name using old loader approach", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
+      name: "foo-[name].[ext]",
       imageminLoaderOptions: {
         generator: [
           {
             preset: "webp",
             implementation: ImageMinimizerPlugin.squooshGenerate,
-            filename: "[name].webp",
             options: {
               encodeOptions: {
                 webp: {
@@ -141,7 +141,7 @@ describe("loader generator option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "loader-test.webp"
+      "foo-loader-test.webp"
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -151,15 +151,17 @@ describe("loader generator option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it("should generate the new webp image with nested filename", async () => {
+  it("should generate the new webp image with other name using asset modules name", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
+      fileLoaderOff: true,
+      assetResource: true,
+      name: "foo-[name][ext]",
       imageminLoaderOptions: {
         generator: [
           {
             preset: "webp",
             implementation: ImageMinimizerPlugin.squooshGenerate,
-            filename: "deep/[path][name].webp",
             options: {
               encodeOptions: {
                 webp: {
@@ -171,119 +173,19 @@ describe("loader generator option", () => {
         ],
       },
     });
+
     const { compilation } = stats;
     const { warnings, errors } = compilation;
 
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "deep/nested/deep/loader-test.webp"
+      "foo-loader-test.webp"
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
 
     expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-  });
-
-  it("should generate the new webp image with filename  pointing to other directory", async () => {
-    const stats = await runWebpack({
-      entry: path.join(fixturesPath, "./loader-single.js"),
-      imageminLoaderOptions: {
-        generator: [
-          {
-            preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
-            filename: "other/[name].webp",
-            options: {
-              encodeOptions: {
-                webp: {
-                  lossless: 1,
-                },
-              },
-            },
-          },
-        ],
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
-
-    const transformedAsset = path.resolve(
-      __dirname,
-      compilation.options.output.path,
-      "other/loader-test.webp"
-    );
-
-    const transformedExt = await fileType.fromFile(transformedAsset);
-
-    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-  });
-
-  it("should generate the new webp image when filename is function", async () => {
-    const stats = await runWebpack({
-      entry: path.join(fixturesPath, "./loader-single.js"),
-      imageminLoaderOptions: {
-        generator: [
-          {
-            preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
-            filename: () => "other/[name].webp",
-            options: {
-              encodeOptions: {
-                webp: {
-                  lossless: 1,
-                },
-              },
-            },
-          },
-        ],
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
-
-    const transformedAsset = path.resolve(
-      __dirname,
-      compilation.options.output.path,
-      "other/loader-test.webp"
-    );
-
-    const transformedExt = await fileType.fromFile(transformedAsset);
-
-    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-  });
-
-  it("should minimize image with flat filename", async () => {
-    const stats = await runWebpack({
-      entry: path.join(fixturesPath, "./simple.js"),
-      imageminLoaderOptions: {
-        minimizer: [
-          {
-            implementation: ImageMinimizerPlugin.squooshMinify,
-            filename: "[name][ext]",
-          },
-        ],
-      },
-    });
-
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
-
-    const transformedAsset = path.resolve(
-      __dirname,
-      compilation.options.output.path,
-      "loader-test.jpg"
-    );
-
-    const transformedExt = await fileType.fromFile(transformedAsset);
-
-    expect(/image\/jpeg/i.test(transformedExt.mime)).toBe(true);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });

@@ -26,6 +26,11 @@ export type MetaData = {
  */
 export function throttleAll<T>(limit: number, tasks: Task<T>[]): Promise<T[]>;
 /**
+ * @param {string} url
+ * @returns {boolean}
+ */
+export function isAbsoluteURL(url: string): boolean;
+/**
  * @template T
  * @param {ImageminOptions} imageminConfig
  * @returns {Promise<ImageminOptions>}
