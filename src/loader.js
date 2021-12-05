@@ -48,7 +48,6 @@ module.exports = async function loader(content) {
   }
 
   let transformer = minimizer;
-  let isGenerator = false;
   let parsedQuery;
 
   if (this.resourceQuery.length > 0) {
@@ -87,7 +86,6 @@ module.exports = async function loader(content) {
       }
 
       [transformer] = presets;
-      isGenerator = true;
     }
   }
 
@@ -98,13 +96,13 @@ module.exports = async function loader(content) {
   }
 
   const isAbsolute = isAbsoluteURL(this.resourcePath);
-  const name = isAbsolute
+  const filename = isAbsolute
     ? this.resourcePath
     : path.relative(this.rootContext, this.resourcePath);
   const minifyOptions =
     /** @type {import("./index").InternalWorkerOptions<T>} */ ({
       input: content,
-      filename: name,
+      filename,
       severityError,
       transformer,
       generateFilename:
@@ -130,13 +128,26 @@ module.exports = async function loader(content) {
     });
   }
 
-  if (isGenerator && parsedQuery) {
-    // Remove query param from the bundle due we need that only for bundle purposes
-    parsedQuery.delete("as");
+  // Change content of the data URI after minimizer
+  if (
+    this._module &&
+    this._module.resourceResolveData &&
+    this._module.resourceResolveData.encodedContent
+  ) {
+    // console.log(content.toString())
+    this._module.resourceResolveData.encodedContent =
+      output.data.toString("base64");
+  } else {
+    let query = this.resourceQuery;
 
-    const stringifiedParsedQuery = parsedQuery.toString();
-    const query =
-      stringifiedParsedQuery.length > 0 ? `?${stringifiedParsedQuery}` : "";
+    if (parsedQuery) {
+      // Remove query param from the bundle due we need that only for bundle purposes
+      const stringifiedParsedQuery = parsedQuery.toString();
+
+      query =
+        stringifiedParsedQuery.length > 0 ? `?${stringifiedParsedQuery}` : "";
+      parsedQuery.delete("as");
+    }
 
     // Old approach for `file-loader` and other old loaders
     this.resourcePath = isAbsolute
@@ -148,16 +159,6 @@ module.exports = async function loader(content) {
     if (this._module && !this._module.matchResource) {
       this._module.matchResource = `${output.filename}${query}`;
     }
-  }
-  // Change content of the data URI after minimizer
-  else if (
-    this._module &&
-    this._module.resourceResolveData &&
-    this._module.resourceResolveData.encodedContent
-  ) {
-    // console.log(content.toString())
-    this._module.resourceResolveData.encodedContent =
-      output.data.toString("base64");
   }
 
   // TODO: search better API
