@@ -530,6 +530,45 @@ describe("validate plugin options", () => {
             preset: "webp",
             implementation: ImageMinimizerPlugin.squooshGenerate,
             options: {},
+            filename: "[name][ext]",
+          },
+        ],
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {},
+            filename: () => "[name][ext]",
+          },
+        ],
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {},
+            filename: true,
+          },
+        ],
+      });
+    }).toThrowErrorMatchingSnapshot();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {},
             filter: true,
           },
         ],

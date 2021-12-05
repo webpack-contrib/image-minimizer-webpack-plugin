@@ -75,14 +75,26 @@
           "description": "Implementation of the generator function.",
           "instanceof": "Function"
         },
-        "filter": {
-          "description": "Allows filtering of images.",
-          "instanceof": "Function"
-        },
         "options": {
           "description": "Options for the generator function.",
           "type": "object",
           "additionalProperties": true
+        },
+        "filter": {
+          "description": "Allows filtering of images.",
+          "instanceof": "Function"
+        },
+        "filename": {
+          "description": "Allows to set the filename for the minimized asset.",
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "instanceof": "Function"
+            }
+          ]
         }
       },
       "required": ["implementation", "preset"]

@@ -1266,6 +1266,7 @@ describe("imagemin plugin", () => {
         generator: [
           {
             preset: "webp",
+            filename: "generated-[name][ext]",
             implementation: ImageMinimizerPlugin.imageminGenerate,
             options: {
               plugins: ["imagemin-webp"],
@@ -1287,17 +1288,19 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    expect(Object.keys(compilation.assets)).toContain("loader-test.webp");
     expect(Object.keys(compilation.assets)).toContain(
-      "PNG_transparency_demonstration_1.webp"
+      "generated-loader-test.webp"
     );
-    expect(Object.keys(compilation.assets)).toContain("Example.webp");
-    expect(Object.keys(compilation.assets)).toContain("icon.svg");
+    expect(Object.keys(compilation.assets)).toContain(
+      "generated-PNG_transparency_demonstration_1.webp"
+    );
+    expect(Object.keys(compilation.assets)).toContain("generated-Example.webp");
+    expect(Object.keys(compilation.assets)).toContain("minimized-icon.svg");
 
     const webpAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.webp"
+      "./generated-loader-test.webp"
     );
     const ext = await fileType.fromFile(webpAsset);
 
@@ -1306,7 +1309,7 @@ describe("imagemin plugin", () => {
     const webpAsset1 = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./PNG_transparency_demonstration_1.webp"
+      "./generated-PNG_transparency_demonstration_1.webp"
     );
     const ext1 = await fileType.fromFile(webpAsset1);
 
@@ -1315,15 +1318,15 @@ describe("imagemin plugin", () => {
     const webpAsset2 = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./Example.webp"
+      "./generated-Example.webp"
     );
     const ext2 = await fileType.fromFile(webpAsset2);
 
     expect(/image\/webp/i.test(ext2.mime)).toBe(true);
 
-    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
-    );
+    await expect(
+      isOptimized(["minimized-loader-test.jpg", "loader-test.jpg"], compilation)
+    ).resolves.toBe(true);
 
     const bundleFilename = path.resolve(
       __dirname,
@@ -1355,6 +1358,7 @@ describe("imagemin plugin", () => {
           {
             preset: "webp",
             implementation: ImageMinimizerPlugin.imageminGenerate,
+            filename: "generated-[name][ext]",
             options: {
               plugins: ["imagemin-webp"],
             },
@@ -1375,33 +1379,43 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
 
-    expect(Object.keys(compilation.assets)).toContain("loader-test.gif");
-    expect(Object.keys(compilation.assets)).toContain("loader-test.jpg");
-    expect(Object.keys(compilation.assets)).toContain("loader-test.png");
-    expect(Object.keys(compilation.assets)).toContain("loader-test.webp");
-    expect(Object.keys(compilation.assets)).toContain("loader-test.svg");
+    expect(Object.keys(compilation.assets)).toContain(
+      "minimized-loader-test.gif"
+    );
+    expect(Object.keys(compilation.assets)).toContain(
+      "minimized-loader-test.jpg"
+    );
+    expect(Object.keys(compilation.assets)).toContain(
+      "minimized-loader-test.png"
+    );
+    expect(Object.keys(compilation.assets)).toContain(
+      "generated-loader-test.webp"
+    );
+    expect(Object.keys(compilation.assets)).toContain(
+      "minimized-loader-test.svg"
+    );
 
     const webpAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.webp"
+      "./generated-loader-test.webp"
     );
     const ext = await fileType.fromFile(webpAsset);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
 
-    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
-    );
-    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
-    );
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
-    );
-    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
-    );
+    await expect(
+      isOptimized(["minimized-loader-test.gif", "loader-test.gif"], compilation)
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized(["minimized-loader-test.jpg", "loader-test.jpg"], compilation)
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized(["minimized-loader-test.png", "loader-test.png"], compilation)
+    ).resolves.toBe(true);
+    await expect(
+      isOptimized(["minimized-loader-test.svg", "loader-test.svg"], compilation)
+    ).resolves.toBe(true);
   });
 
   it("should allow to filter images for generation", async () => {
