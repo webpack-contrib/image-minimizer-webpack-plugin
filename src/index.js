@@ -79,10 +79,10 @@ import {
  * @template T
  * @typedef {Object} Transformer
  * @property {TransformerFunction<T>} implementation
+ * @property {T} [options]
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
  * @property {string} [preset]
- * @property {T} [options]
  */
 
 /**
@@ -92,7 +92,7 @@ import {
 
 /**
  * @template T
- * @typedef {Omit<Transformer<T>, "filename">} Generator
+ * @typedef {Transformer<T>} Generator
  */
 
 /**
