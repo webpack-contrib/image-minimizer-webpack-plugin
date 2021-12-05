@@ -1043,6 +1043,70 @@ describe("imagemin plugin", () => {
     );
   });
 
+  it("should generate and allow to generate avif option using 'imageminGenerate'", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-4.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        generator: [
+          {
+            preset: "avif",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-avif"],
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const file = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./loader-test.avif"
+    );
+    const ext = await fileType.fromFile(file);
+
+    expect(/image\/avif/i.test(ext.mime)).toBe(true);
+  });
+
+  it("should generate and allow to use any name in the 'preset' option using 'imageminGenerate'", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        generator: [
+          {
+            preset: "webp-other",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-webp"],
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const file = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./loader-test.webp"
+    );
+    const ext = await fileType.fromFile(file);
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+  });
+
   it("should generate and allow to use any name in the 'preset' option using 'squooshGenerate'", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
@@ -1079,7 +1143,7 @@ describe("imagemin plugin", () => {
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
 
-  it("should generate and allow to use any name in the 'preset' option using 'imageminGenerate'", async () => {
+  it("should generate throw an error on multiple 'encodeOptions' options using 'squooshGenerate'", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
       imageminPluginOptions: {
@@ -1087,9 +1151,14 @@ describe("imagemin plugin", () => {
         generator: [
           {
             preset: "webp-other",
-            implementation: ImageMinimizerPlugin.imageminGenerate,
+            implementation: ImageMinimizerPlugin.squooshGenerate,
             options: {
-              plugins: ["imagemin-webp"],
+              encodeOptions: {
+                webp: {
+                  lossless: 1,
+                },
+                avif: {},
+              },
             },
           },
         ],
@@ -1099,16 +1168,10 @@ describe("imagemin plugin", () => {
     const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-
-    const file = path.resolve(
-      __dirname,
-      compilation.options.output.path,
-      "./loader-test.webp"
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toMatch(
+      /Multiple values for the 'encodeOptions' option is not supported, specify only one codec for the generator/
     );
-    const ext = await fileType.fromFile(file);
-
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
 
   it("should not try to generate and minimize twice", async () => {
@@ -1339,5 +1402,42 @@ describe("imagemin plugin", () => {
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
       true
     );
+  });
+
+  it("should allow to filter images for generation", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        generator: [
+          {
+            preset: "webp-other",
+            filter: () => false,
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: 1,
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const file = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./loader-test.png"
+    );
+    const ext = await fileType.fromFile(file);
+
+    expect(/image\/png/i.test(ext.mime)).toBe(true);
   });
 });
