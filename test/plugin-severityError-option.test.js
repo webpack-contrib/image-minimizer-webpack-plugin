@@ -127,8 +127,14 @@ describe("plugin severityError option", () => {
     const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(1);
+    expect(errors).toHaveLength(2);
+
+    // From loader
     expect(errors[0].message).toMatch(
+      /(Corrupt JPEG data|Command failed with EPIPE)/
+    );
+    // From plugin
+    expect(errors[1].message).toMatch(
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 
@@ -151,8 +157,14 @@ describe("plugin severityError option", () => {
     const { warnings, errors } = compilation;
 
     expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(1);
+    expect(errors).toHaveLength(2);
+
+    // From loader
     expect(errors[0].message).toMatch(
+      /(Corrupt JPEG data|Command failed with EPIPE)/
+    );
+    // From plugin
+    expect(errors[1].message).toMatch(
       /(Corrupt JPEG data|Command failed with EPIPE)/
     );
 

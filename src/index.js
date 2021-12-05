@@ -177,17 +177,18 @@ class ImageMinimizerPlugin {
    * @param {Compiler} compiler
    * @param {Compilation} compilation
    * @param {Record<string, import("webpack").sources.Source>} assets
-   * @param {Map<string, Object>} moduleAssets
    * @returns {Promise<void>}
    */
-  async optimize(compiler, compilation, assets, moduleAssets) {
+  async optimize(compiler, compilation, assets) {
+    if (!this.options.minimizer) {
+      return;
+    }
+
     const cache = compilation.getCache("ImageMinimizerWebpackPlugin");
     const assetsForMinify = await Promise.all(
       Object.keys(assets)
         .filter((name) => {
-          const { info, source } = /** @type {Asset} */ (
-            compilation.getAsset(name)
-          );
+          const { info } = /** @type {Asset} */ (compilation.getAsset(name));
 
           // Skip double minimize assets from child compilation
           if (info.minimized || info.generated) {
@@ -203,14 +204,14 @@ class ImageMinimizerPlugin {
             return false;
           }
 
-          // Exclude already optimized assets from `image-minimizer-webpack-loader`
-          if (this.options.loader && moduleAssets.has(name)) {
-            const newInfo = moduleAssets.get(name) || {};
-
-            compilation.updateAsset(name, source, newInfo);
-
-            return false;
-          }
+          // // Exclude already optimized assets from `image-minimizer-webpack-loader`
+          // if (this.options.loader && moduleAssets.has(name)) {
+          //   const newInfo = moduleAssets.get(name) || {};
+          //
+          //   compilation.updateAsset(name, source, newInfo);
+          //
+          //   return false;
+          // }
 
           return true;
         })
@@ -311,15 +312,43 @@ class ImageMinimizerPlugin {
   apply(compiler) {
     const pluginName = this.constructor.name;
 
-    const moduleAssets = new Map();
-
     if (this.options.loader) {
-      // Collect assets from modules
       compiler.hooks.compilation.tap({ name: pluginName }, (compilation) => {
+        // Collect asset and update info from old loaders
         compilation.hooks.moduleAsset.tap(
           { name: pluginName },
           (module, file) => {
-            moduleAssets.set(file, module.buildMeta.imageMinimizerPluginInfo);
+            const newInfo =
+              module &&
+              module.buildMeta &&
+              module.buildMeta.imageMinimizerPluginInfo;
+
+            if (newInfo) {
+              const asset = /** @type {Asset} */ (compilation.getAsset(file));
+
+              compilation.updateAsset(file, asset.source, newInfo);
+            }
+          }
+        );
+
+        // Collect asset modules and update info for asset modules
+        compilation.hooks.assetPath.tap(
+          { name: pluginName },
+          (filename, data, info) => {
+            const newInfo =
+              data &&
+              // @ts-ignore
+              data.module &&
+              // @ts-ignore
+              data.module.buildMeta &&
+              // @ts-ignore
+              data.module.buildMeta.imageMinimizerPluginInfo;
+
+            if (newInfo) {
+              Object.assign(info || {}, newInfo);
+            }
+
+            return filename;
           }
         );
       });
@@ -360,7 +389,7 @@ class ImageMinimizerPlugin {
             compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
           additionalAssets: true,
         },
-        (assets) => this.optimize(compiler, compilation, assets, moduleAssets)
+        (assets) => this.optimize(compiler, compilation, assets)
       );
 
       compilation.hooks.statsPrinter.tap(pluginName, (stats) => {

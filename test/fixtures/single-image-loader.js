@@ -1,1 +1,1 @@
-require("./loader-test.jpg");
+require("./loader-test.jpg?as=webp");
