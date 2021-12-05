@@ -329,7 +329,7 @@ module.exports = {
 |                 **[`test`](#test)**                 | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|tif\|webp\|svg\|avif)\$/i</code> | Test to match files against                                      |
 |              **[`include`](#include)**              | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to include                                                 |
 |              **[`exclude`](#exclude)**              | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to exclude                                                 |
-|             **[`minimizer`](#minify)**              |        `{Object \| Array<Object>}`        |                         `undefined`                         | Allows to setup default minimizer                                |
+|            **[`minimizer`](#minimizer)**            |        `{Object \| Array<Object>}`        |                         `undefined`                         | Allows to setup default minimizer                                |
 |            **[`generator`](#generator)**            |             `{Array<Object>}`             |                         `undefined`                         | Allow to setup default generators                                |
 |        **[`severityError`](#severityerror)**        |                `{String}`                 |                          `'error'`                          | Allows to choose how errors are displayed                        |
 |               **[`loader`](#loader)**               |                `{Boolean}`                |                           `true`                            | Automatically adding built-in loader                             |
@@ -435,7 +435,9 @@ module.exports = {
       "...",
       new ImageMinimizerPlugin({
         minimizer: {
+          // Implementation
           implementation: ImageMinimizerPlugin.imageminMinify,
+          // Options
           options: {
             plugins: [
               "imagemin-gifsicle",
@@ -466,7 +468,9 @@ module.exports = {
       "...",
       new ImageMinimizerPlugin({
         minimizer: {
+          // Implementation
           implementation: ImageMinimizerPlugin.squooshMinify,
+          // Options
           options: {
             encodeOptions: {
               mozjpeg: {
@@ -482,6 +486,180 @@ module.exports = {
 ```
 
 More information and examples [here](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh).
+
+Minimizer option list:
+
+###### `implementation`
+
+Type: `Function`
+Default: `undefined`
+
+Configure the default `implementation`.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        minimizer: {
+          // Implementation
+          implementation: ImageMinimizerPlugin.squooshMinify,
+        },
+      }),
+    ],
+  },
+};
+```
+
+###### `options`
+
+Type: `Object`
+Default: `undefined`
+
+Options for the `implementation` option (i.e. options for `imagemin`/`squoosh`/custom implementation).
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          // Options
+          options: {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 90,
+              },
+            },
+          },
+        },
+      }),
+    ],
+  },
+};
+```
+
+###### `filter`
+
+Type: `Function`
+Default: `() => true`
+
+Allows filtering of images for optimization/generation.
+
+Return `true` to optimize the image, `false` otherwise.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        minimizer: {
+          filter: (source, sourcePath) => {
+            // The `source` argument is a `Buffer` of source file
+            // The `sourcePath` argument is an absolute path to source
+            if (source.byteLength < 8192) {
+              return false;
+            }
+
+            return true;
+          },
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins: [
+              "imagemin-gifsicle",
+              "imagemin-mozjpeg",
+              "imagemin-pngquant",
+              "imagemin-svgo",
+            ],
+          },
+        },
+      }),
+    ],
+  },
+};
+```
+
+###### `filename`
+
+Type: `string | Function`
+Default: `undefined`
+
+Allows to set the filename.
+Supported values see in [`webpack template strings`](https://webpack.js.org/configuration/output/#template-strings), `File-level` section.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        minimizer: {
+          filename: "optimized-[name][ext]",
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          // Options
+          options: {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 90,
+              },
+            },
+          },
+        },
+      }),
+    ],
+  },
+};
+```
+
+Example `Function` usage:
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        minimizer: {
+          filename: () => "optimized-[name][ext]",
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          // Options
+          options: {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 90,
+              },
+            },
+          },
+        },
+      }),
+    ],
+  },
+};
+```
 
 ##### `Array`
 
@@ -543,51 +721,6 @@ module.exports = {
             },
           },
         ],
-      }),
-    ],
-  },
-};
-```
-
-###### `filter`
-
-Type: `Function`
-Default: `() => true`
-
-Allows filtering of images for optimization/generation.
-
-Return `true` to optimize the image, `false` otherwise.
-
-**webpack.config.js**
-
-```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-
-module.exports = {
-  optimization: {
-    minimizer: [
-      "...",
-      new ImageMinimizerPlugin({
-        minimizer: {
-          filter: (source, sourcePath) => {
-            // The `source` argument is a `Buffer` of source file
-            // The `sourcePath` argument is an absolute path to source
-            if (source.byteLength < 8192) {
-              return false;
-            }
-
-            return true;
-          },
-          implementation: ImageMinimizerPlugin.imageminMinify,
-          options: {
-            plugins: [
-              "imagemin-gifsicle",
-              "imagemin-mozjpeg",
-              "imagemin-pngquant",
-              "imagemin-svgo",
-            ],
-          },
-        },
       }),
     ],
   },
@@ -830,6 +963,225 @@ module.exports = {
 };
 ```
 
+Generator option list:
+
+###### `preset`
+
+Type: `String`
+Default: `undefined`
+
+Configure the name of preset, i.e. you can use it in `?as=name`.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "name",
+            // Implementation
+            implementation: ImageMinimizerPlugin.squooshMinify,
+          },
+        ],
+      }),
+    ],
+  },
+};
+```
+
+###### `implementation`
+
+Type: `Function`
+Default: `undefined`
+
+Configure the default `implementation`.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "name",
+            // Implementation
+            implementation: ImageMinimizerPlugin.squooshMinify,
+          },
+        ],
+      }),
+    ],
+  },
+};
+```
+
+###### `options`
+
+Type: `Object`
+Default: `undefined`
+
+Options for the `implementation` option (i.e. options for `imagemin`/`squoosh`/custom implementation).
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "name",
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            // Options
+            options: {
+              encodeOptions: {
+                mozjpeg: {
+                  quality: 90,
+                },
+              },
+            },
+          },
+        ],
+      }),
+    ],
+  },
+};
+```
+
+###### `filter`
+
+Type: `Function`
+Default: `() => true`
+
+Allows filtering of images for optimization/generation.
+
+Return `true` to optimize the image, `false` otherwise.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "name",
+            filter: (source, sourcePath) => {
+              // The `source` argument is a `Buffer` of source file
+              // The `sourcePath` argument is an absolute path to source
+              if (source.byteLength < 8192) {
+                return false;
+              }
+
+              return true;
+            },
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: {
+              plugins: [
+                "imagemin-gifsicle",
+                "imagemin-mozjpeg",
+                "imagemin-pngquant",
+                "imagemin-svgo",
+              ],
+            },
+          },
+        ],
+      }),
+    ],
+  },
+};
+```
+
+###### `filename`
+
+Type: `string | Function`
+Default: `undefined`
+
+Allows to set the filename.
+Supported values see in [`webpack template strings`](https://webpack.js.org/configuration/output/#template-strings), `File-level` section.
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "name",
+            filename: "generated-[name][ext]",
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            // Options
+            options: {
+              encodeOptions: {
+                mozjpeg: {
+                  quality: 90,
+                },
+              },
+            },
+          },
+        ],
+      }),
+    ],
+  },
+};
+```
+
+Example of `Function` usage:
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            preset: "name",
+            filename: () => "generated-[name][ext]",
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            // Options
+            options: {
+              encodeOptions: {
+                mozjpeg: {
+                  quality: 90,
+                },
+              },
+            },
+          },
+        ],
+      }),
+    ],
+  },
+};
+```
+
 #### `severityError`
 
 Type: `String`
@@ -876,7 +1228,7 @@ module.exports = {
 Type: `Boolean`
 Default: `true`
 
-Automatically adding `imagemin-loader`.
+Automatically adding built-in `loader`, used to optimize/generate images.
 
 **webpack.config.js**
 
@@ -947,9 +1299,9 @@ module.exports = {
 Type: `Boolean`
 Default: `true`
 
-Allows removing original assets, **please use this if you are set the `filename` option for the `minimizer` option**.
+Allows removing original assets after optimization.
 
-> ℹ️ Doesn't make sense if you haven't changed the original value of the `filename` option
+**Please use this option if you are set the `filename` option for the `minimizer` option, disable `loader: false` and want to keep optimized and not optimized assets.**
 
 **webpack.config.js**
 
@@ -961,21 +1313,20 @@ module.exports = {
     minimizer: [
       "...",
       new ImageMinimizerPlugin({
+        // Disable loader
+        loader: false,
         // Allows to keep original asset and minimized assets with different filenames
         deleteOriginalAssets: false,
-        filename: "[path][name].webp",
-        minimizerOptions: {
-          minimizer: {
-            implementation: ImageMinimizerPlugin.imageminMinify,
-            filename: "minimized-[name][ext]",
-            options: {
-              plugins: [
-                "imagemin-gifsicle",
-                "imagemin-mozjpeg",
-                "imagemin-pngquant",
-                "imagemin-svgo",
-              ],
-            },
+        minimizer: {
+          filename: "[path][name].webp",
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins: [
+              "imagemin-gifsicle",
+              "imagemin-mozjpeg",
+              "imagemin-pngquant",
+              "imagemin-svgo",
+            ],
           },
         },
       }),
@@ -988,9 +1339,9 @@ module.exports = {
 
 |                  Name                  |            Type             |   Default   | Description                               |
 | :------------------------------------: | :-------------------------: | :---------: | :---------------------------------------- |
-| **[`severityError`](severityerror-1)** |         `{String}`          |  `'error'`  | Allows to choose how errors are displayed |
-|      **[`minimizer`](#minify-1)**      | `{Object \| Array<Object>}` | `undefined` | Allows to setup default minimizer         |
+|    **[`minimizer`](#minimizer-1)**     | `{Object \| Array<Object>}` | `undefined` | Allows to setup default minimizer         |
 |    **[`generator`](#generator-1)**     |      `{Array<Object>}`      | `undefined` | Allows to setup default generator         |
+| **[`severityError`](severityerror-1)** |         `{String}`          |  `'error'`  | Allows to choose how errors are displayed |
 
 #### `severityError`
 
@@ -1043,11 +1394,6 @@ Default: `undefined`
 
 Allows to setup default minimizer.
 
-Available minimizers:
-
-- `ImageMinimizerPlugin.imageminMinify`
-- `ImageMinimizerPlugin.squooshMinify`
-
 ##### `Object`
 
 **webpack.config.js**
@@ -1080,72 +1426,7 @@ module.exports = {
 };
 ```
 
-##### `Array`
-
-**webpack.config.js**
-
-```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        type: "asset",
-      },
-      {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        loader: ImageMinimizerPlugin.loader,
-        enforce: "pre",
-        options: {
-          minimizer: [
-            {
-              implementation: ImageMinimizerPlugin.imageminMinify,
-              options: {
-                plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
-              },
-            },
-            {
-              implementation: async (original, options) => {
-                let result;
-
-                try {
-                  result = await minifyAndReturnBuffer(original.data);
-                } catch (error) {
-                  // Return original input if there was an error
-                  return {
-                    filename: original.filename,
-                    data: original.data,
-                    errors: [error],
-                    warnings: [],
-                  };
-                }
-
-                return {
-                  filename: original.filename,
-                  data: result,
-                  warnings: [],
-                  errors: [],
-                  info: {
-                    // Please always set it to prevent double minification
-                    minimized: true,
-                    // Optional
-                    minimizedBy: ["custom-name-of-minimication"],
-                  },
-                };
-              },
-              options: {
-                // Your custom options
-              },
-            },
-          ],
-        },
-      },
-    ],
-  },
-};
-```
+For more information and supported options please read [here](#minimizer).
 
 ### `generator`
 
@@ -1154,18 +1435,6 @@ Default: `undefined`
 
 Allow to setup default generators.
 Useful if you need generate `webp`/`avif`/etc from other formats.
-
-> ⚠️ If no generator was found for the image (i.e. no `?as=webp` was found in query params), the `minimizer` option will be used. Therefore, it is recommended to configure generator outputs optimized image.
-> ⚠️ The option will not work if you disable `loader` (i.e. set the `loader` option to `false`).
-
-Available generators:
-
-- `ImageMinimizerPlugin.imageminGenerate`
-- `ImageMinimizerPlugin.squooshGenerate`
-
-Example `webp` generator:
-
-- imagemin
 
 **webpack.config.js**
 
@@ -1200,42 +1469,7 @@ module.exports = {
 };
 ```
 
-- squoosh
-
-**webpack.config.js**
-
-```js
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        type: "asset",
-      },
-      {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        loader: ImageMinimizerPlugin.loader,
-        enforce: "pre",
-        options: {
-          generator: [
-            {
-              preset: "webp",
-              implementation: ImageMinimizerPlugin.squooshGenerate,
-              options: {
-                webp: {
-                  quality: 90,
-                },
-              },
-            },
-          ],
-        },
-      },
-    ],
-  },
-};
-```
+For more information and supported options please read [here](#generator).
 
 ## Additional API
 
