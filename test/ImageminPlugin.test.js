@@ -19,6 +19,8 @@ import {
 
 import ImageMinimizerPlugin from "../src";
 
+jest.setTimeout(20000);
+
 describe("imagemin plugin", () => {
   it("should optimizes all images (loader + plugin)", async () => {
     const stats = await runWebpack({
