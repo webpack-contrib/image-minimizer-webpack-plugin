@@ -733,6 +733,16 @@ async function squooshGenerate(original, minifyOptions) {
     return original;
   }
 
+  if (Object.keys(image.encodedWith).length > 1) {
+    original.errors.push(
+      new Error(
+        "Multiple values for the 'encodeOptions' option is not supported, specify only one codec for the generator"
+      )
+    );
+
+    return original;
+  }
+
   const ext = path.extname(original.filename).toLowerCase();
   const { binary, extension } = await Object.values(image.encodedWith)[0];
   const newFilename = original.filename.replace(
