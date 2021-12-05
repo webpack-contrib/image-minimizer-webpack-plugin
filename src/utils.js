@@ -577,9 +577,13 @@ async function imageminGenerate(original, minimizerOptions) {
     // @ts-ignore
     result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
   } catch (error) {
-    original.errors.push(
-      error instanceof Error ? error : new Error(/** @type {string} */ (error))
+    const originalError =
+      error instanceof Error ? error : new Error(/** @type {string} */ (error));
+    const newError = new Error(
+      `Error with '${original.filename}': ${originalError.message}`
     );
+
+    original.errors.push(newError);
 
     return original;
   }
@@ -635,26 +639,31 @@ async function imageminMinify(original, options) {
     // @ts-ignore
     result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
   } catch (error) {
-    original.errors.push(
-      error instanceof Error ? error : new Error(/** @type {string} */ (error))
+    const originalError =
+      error instanceof Error ? error : new Error(/** @type {string} */ (error));
+    const newError = new Error(
+      `Error with '${original.filename}': ${originalError.message}`
     );
+
+    original.errors.push(newError);
 
     return original;
   }
 
-  // TODO fix me
-  // const extInput = path.extname(original.filename).slice(1).toLowerCase();
-  // const { ext: extOutput } = fileTypeFromBuffer(result) || {};
-  //
-  // if (extOutput && extInput !== extOutput) {
-  //   original.warnings.push(
-  //     new Error(
-  //       `"imageminMinify" function do not support generate to "${extOutput}" from "${original.filename}". Please use "imageminGenerate" function.`
-  //     )
-  //   );
-  //
-  //   return original;
-  // }
+  if (!isAbsoluteURL(original.filename)) {
+    const extInput = path.extname(original.filename).slice(1).toLowerCase();
+    const { ext: extOutput } = fileTypeFromBuffer(result) || {};
+
+    if (extOutput && extInput !== extOutput) {
+      original.warnings.push(
+        new Error(
+          `"imageminMinify" function do not support generate to "${extOutput}" from "${original.filename}". Please use "imageminGenerate" function.`
+        )
+      );
+
+      return original;
+    }
+  }
 
   return {
     filename: original.filename,
@@ -714,9 +723,13 @@ async function squooshGenerate(original, minifyOptions) {
   } catch (error) {
     await imagePool.close();
 
-    original.errors.push(
-      error instanceof Error ? error : new Error(/** @type {string} */ (error))
+    const originalError =
+      error instanceof Error ? error : new Error(/** @type {string} */ (error));
+    const newError = new Error(
+      `Error with '${original.filename}': ${originalError.message}`
     );
+
+    original.errors.push(newError);
 
     return original;
   }
@@ -726,7 +739,7 @@ async function squooshGenerate(original, minifyOptions) {
   if (Object.keys(image.encodedWith).length === 0) {
     original.errors.push(
       new Error(
-        "No result from 'squoosh', please configure the 'encodeOptions' option to generate images"
+        `No result from 'squoosh' for '${original.filename}', please configure the 'encodeOptions' option to generate images`
       )
     );
 
@@ -736,7 +749,7 @@ async function squooshGenerate(original, minifyOptions) {
   if (Object.keys(image.encodedWith).length > 1) {
     original.errors.push(
       new Error(
-        "Multiple values for the 'encodeOptions' option is not supported, specify only one codec for the generator"
+        `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`
       )
     );
 
@@ -833,9 +846,13 @@ async function squooshMinify(original, options) {
   } catch (error) {
     await imagePool.close();
 
-    original.errors.push(
-      error instanceof Error ? error : new Error(/** @type {string} */ (error))
+    const originalError =
+      error instanceof Error ? error : new Error(/** @type {string} */ (error));
+    const newError = new Error(
+      `Error with '${original.filename}': ${originalError.message}`
     );
+
+    original.errors.push(newError);
 
     return original;
   }

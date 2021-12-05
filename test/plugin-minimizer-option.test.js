@@ -461,8 +461,8 @@ describe("plugin minify option", () => {
       imageminPluginOptions: {
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
-          filename: "[path][name].webp",
-          options: { plugins: ["imagemin-webp"] },
+          filename: "[path][name][ext]",
+          options: { plugins: ["imagemin-pngquant"] },
         },
       },
     });
@@ -470,16 +470,16 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.webp")
+      asset.includes("./nested/deep/plugin-test.png")
     );
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./nested/deep/plugin-test.webp"
+      "./nested/deep/plugin-test.png"
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -493,8 +493,8 @@ describe("plugin minify option", () => {
       imageminPluginOptions: {
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
-          filename: "[name].webp",
-          options: { plugins: ["imagemin-webp"] },
+          filename: "[name][ext]",
+          options: { plugins: ["imagemin-pngquant"] },
         },
       },
     });
@@ -502,16 +502,16 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("plugin-test.webp")
+      asset.includes("plugin-test.png")
     );
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "plugin-test.webp"
+      "plugin-test.png"
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -525,8 +525,8 @@ describe("plugin minify option", () => {
       imageminPluginOptions: {
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
-          filename: "./nested/deep/[name].webp",
-          options: { plugins: ["imagemin-webp"] },
+          filename: "./nested/deep/[name][ext]",
+          options: { plugins: ["imagemin-pngquant"] },
         },
       },
     });
@@ -534,16 +534,16 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.webp")
+      asset.includes("./nested/deep/plugin-test.png")
     );
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./nested/deep/plugin-test.webp"
+      "./nested/deep/plugin-test.png"
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -557,8 +557,8 @@ describe("plugin minify option", () => {
       imageminPluginOptions: {
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
-          filename: "./other/[name].webp",
-          options: { plugins: ["imagemin-webp"] },
+          filename: "./other/[name][ext]",
+          options: { plugins: ["imagemin-pngquant"] },
         },
       },
     });
@@ -566,16 +566,16 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./other/plugin-test.webp")
+      asset.includes("./other/plugin-test.png")
     );
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./other/plugin-test.webp"
+      "./other/plugin-test.png"
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -589,8 +589,8 @@ describe("plugin minify option", () => {
       imageminPluginOptions: {
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
-          filename: () => "./other/[name].webp",
-          options: { plugins: ["imagemin-webp"] },
+          filename: () => "./other/[name][ext]",
+          options: { plugins: ["imagemin-pngquant"] },
         },
       },
     });
@@ -598,16 +598,16 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./other/plugin-test.webp")
+      asset.includes("./other/plugin-test.png")
     );
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./other/plugin-test.webp"
+      "./other/plugin-test.png"
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);

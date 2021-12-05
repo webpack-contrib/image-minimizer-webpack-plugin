@@ -19,6 +19,8 @@ import {
 
 import ImageMinimizerPlugin from "../src";
 
+jest.setTimeout(20000);
+
 describe("imagemin plugin", () => {
   it("should optimizes all images (loader + plugin)", async () => {
     const stats = await runWebpack({
@@ -1170,7 +1172,7 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /Multiple values for the 'encodeOptions' option is not supported, specify only one codec for the generator/
+      /Multiple values for the 'encodeOptions' option is not supported for 'loader-test.png', specify only one codec for the generator/
     );
   });
 
@@ -1453,5 +1455,35 @@ describe("imagemin plugin", () => {
     const ext = await fileType.fromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
+  });
+
+  it("should throw an error on unknown format", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-5.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp|txt)$/i,
+        generator: [
+          {
+            preset: "avif",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: 1,
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toMatch(
+      /Error with 'loader-test.txt': Binary blob has an unsupported format/g
+    );
   });
 });

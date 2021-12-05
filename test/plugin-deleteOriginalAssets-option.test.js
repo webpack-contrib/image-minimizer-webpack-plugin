@@ -66,7 +66,7 @@ describe('plugin "deleteOriginalAssets" option', () => {
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
           filename: "[path]minimizer-[name][ext]",
-          options: { plugins: ["imagemin-webp"] },
+          options: { plugins: ["imagemin-pngquant"] },
         },
       },
     });
@@ -95,7 +95,7 @@ describe('plugin "deleteOriginalAssets" option', () => {
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
           filename: "[path]minimizer-[name][ext]",
-          options: { plugins: ["imagemin-webp"] },
+          options: { plugins: ["imagemin-pngquant"] },
         },
       },
     });
