@@ -789,8 +789,8 @@ describe("minify", () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(1);
-    expect(result.errors[0].toString()).toMatch(
-      /No result from 'squoosh', please configure the 'encodeOptions' option to generate images/
+    expect(result.errors[0].message).toMatch(
+      /No result from 'squoosh' for '.+', please configure the 'encodeOptions' option to generate images/
     );
   });
 

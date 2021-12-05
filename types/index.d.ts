@@ -40,13 +40,13 @@ export type FilenameFn = (
 ) => string;
 export type Transformer<T> = {
   implementation: TransformerFunction<T>;
+  options?: T | undefined;
   filter?: FilterFn | undefined;
   filename?: string | FilenameFn | undefined;
   preset?: string | undefined;
-  options?: T | undefined;
 };
 export type Minimizer<T> = Omit<Transformer<T>, "preset">;
-export type Generator<T> = Omit<Transformer<T>, "filename">;
+export type Generator<T> = Transformer<T>;
 export type InternalWorkerOptions<T> = {
   filename: string;
   input: Buffer;
@@ -147,10 +147,10 @@ export type PluginOptions<T> = {
  * @template T
  * @typedef {Object} Transformer
  * @property {TransformerFunction<T>} implementation
+ * @property {T} [options]
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
  * @property {string} [preset]
- * @property {T} [options]
  */
 /**
  * @template T
@@ -158,7 +158,7 @@ export type PluginOptions<T> = {
  */
 /**
  * @template T
- * @typedef {Omit<Transformer<T>, "filename">} Generator
+ * @typedef {Transformer<T>} Generator
  */
 /**
  * @template T
@@ -204,7 +204,6 @@ declare class ImageMinimizerPlugin<T> {
    * @param {Compiler} compiler
    * @param {Compilation} compilation
    * @param {Record<string, import("webpack").sources.Source>} assets
-   * @param {Map<string, Object>} moduleAssets
    * @returns {Promise<void>}
    */
   private optimize;
