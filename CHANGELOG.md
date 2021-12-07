@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.0.0...v3.0.1) (2021-12-07)
+
+
+### Bug Fixes
+
+* reduced memory consumption for `squoosh` ([#279](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/279)) ([0d597b7](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/0d597b751ca5eda293929ce8d71349572fbf0fb8))
+* types ([028fad3](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/028fad3403c890d691ebd636c7f55f6bf801a3b7))
+
 ## [3.0.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v2.2.0...v3.0.0) (2021-12-05)
 
 There are a lot of breaking changes, the plugin has been completely rewritten, see the documentation for information and examples.
