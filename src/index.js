@@ -56,10 +56,24 @@ import {
  */
 
 /**
+ * @typedef {{ [key: string]: any }} CustomOptions
+ */
+
+/**
  * @template T
- * @callback BasicTransformerFunction
+ * @typedef {T extends infer U ? U : CustomOptions} InferDefaultType
+ */
+
+/**
+ * @template T
+ * @typedef {InferDefaultType<T> | undefined} BasicTransformerOptions
+ */
+
+/**
+ * @template T
+ * @callback BasicTransformerImplementation
  * @param {WorkerResult} original
- * @param {T | undefined} options
+ * @param {BasicTransformerOptions<T>} [options]
  * @returns {Promise<WorkerResult>}
  */
 
@@ -71,7 +85,7 @@ import {
 
 /**
  * @template T
- * @typedef {BasicTransformerFunction<T> & BasicTransformerHelpers} TransformerFunction
+ * @typedef {BasicTransformerImplementation<T> & BasicTransformerHelpers} TransformerFunction
  */
 
 /**
@@ -90,7 +104,7 @@ import {
  * @template T
  * @typedef {Object} Transformer
  * @property {TransformerFunction<T>} implementation
- * @property {T} [options]
+ * @property {BasicTransformerOptions<T>} [options]
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
  * @property {string} [preset]

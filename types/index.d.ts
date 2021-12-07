@@ -27,15 +27,20 @@ export type WorkerResult = {
   errors: Array<Error>;
   info: AssetInfo;
 };
-export type BasicTransformerFunction<T> = (
+export type CustomOptions = {
+  [key: string]: any;
+};
+export type InferDefaultType<T> = T extends infer U ? U : CustomOptions;
+export type BasicTransformerOptions<T> = InferDefaultType<T> | undefined;
+export type BasicTransformerImplementation<T> = (
   original: WorkerResult,
-  options: T | undefined
+  options?: BasicTransformerOptions<T>
 ) => Promise<WorkerResult>;
 export type BasicTransformerHelpers = {
   setup?: (() => {}) | undefined;
   teardown?: (() => {}) | undefined;
 };
-export type TransformerFunction<T> = BasicTransformerFunction<T> &
+export type TransformerFunction<T> = BasicTransformerImplementation<T> &
   BasicTransformerHelpers;
 export type PathData = {
   filename?: string | undefined;
@@ -46,7 +51,7 @@ export type FilenameFn = (
 ) => string;
 export type Transformer<T> = {
   implementation: TransformerFunction<T>;
-  options?: T | undefined;
+  options?: BasicTransformerOptions<T>;
   filter?: FilterFn | undefined;
   filename?: string | FilenameFn | undefined;
   preset?: string | undefined;
@@ -133,10 +138,21 @@ export type PluginOptions<T> = {
  * @property {AssetInfo} info
  */
 /**
+ * @typedef {{ [key: string]: any }} CustomOptions
+ */
+/**
  * @template T
- * @callback BasicTransformerFunction
+ * @typedef {T extends infer U ? U : CustomOptions} InferDefaultType
+ */
+/**
+ * @template T
+ * @typedef {InferDefaultType<T> | undefined} BasicTransformerOptions
+ */
+/**
+ * @template T
+ * @callback BasicTransformerImplementation
  * @param {WorkerResult} original
- * @param {T | undefined} options
+ * @param {BasicTransformerOptions<T>} [options]
  * @returns {Promise<WorkerResult>}
  */
 /**
@@ -146,7 +162,7 @@ export type PluginOptions<T> = {
  */
 /**
  * @template T
- * @typedef {BasicTransformerFunction<T> & BasicTransformerHelpers} TransformerFunction
+ * @typedef {BasicTransformerImplementation<T> & BasicTransformerHelpers} TransformerFunction
  */
 /**
  * @typedef {Object} PathData
@@ -162,7 +178,7 @@ export type PluginOptions<T> = {
  * @template T
  * @typedef {Object} Transformer
  * @property {TransformerFunction<T>} implementation
- * @property {T} [options]
+ * @property {BasicTransformerOptions<T>} [options]
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
  * @property {string} [preset]
