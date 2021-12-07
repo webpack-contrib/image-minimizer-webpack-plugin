@@ -135,13 +135,13 @@ import {
  */
 
 /**
- * @template T
+ * @template T, G
  * @typedef {Object} PluginOptions
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
- * @property {Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
- * @property {Generator<T>[]} [generator] Allows to set the generator.
+ * @property {T extends any[] ? { [P in keyof T]: Minimizer<T[P]> } : Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
+ * @property {G extends any[] ? { [P in keyof G]: Generator<G[P]> } : Generator<G>[]} [generator] Allows to set the generator.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string} [severityError] Allows to choose how errors are displayed.
@@ -149,12 +149,12 @@ import {
  */
 
 /**
- * @template T
+ * @template T, [G=T]
  * @extends {WebpackPluginInstance}
  */
 class ImageMinimizerPlugin {
   /**
-   * @param {PluginOptions<T>} [options={}] Plugin options.
+   * @param {PluginOptions<T, G>} [options={}] Plugin options.
    */
   constructor(options = {}) {
     validate(/** @type {Schema} */ (schema), options, {
@@ -337,6 +337,7 @@ class ImageMinimizerPlugin {
     if (typeof this.options.generator !== "undefined") {
       const { generator } = this.options;
 
+      // @ts-ignore
       for (const item of generator) {
         if (typeof item.implementation.setup !== "undefined") {
           item.implementation.setup();
@@ -364,6 +365,7 @@ class ImageMinimizerPlugin {
     if (typeof this.options.generator !== "undefined") {
       const { generator } = this.options;
 
+      // @ts-ignore
       for (const item of generator) {
         if (typeof item.implementation.teardown !== "undefined") {
           // eslint-disable-next-line no-await-in-loop

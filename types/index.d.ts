@@ -65,7 +65,7 @@ export type InternalWorkerOptions<T> = {
   generateFilename?: Function | undefined;
 };
 export type InternalLoaderOptions<T> = import("./loader").LoaderOptions<T>;
-export type PluginOptions<T> = {
+export type PluginOptions<T, G> = {
   /**
    * Test to match files against.
    */
@@ -81,11 +81,19 @@ export type PluginOptions<T> = {
   /**
    * Allows to setup the minimizer.
    */
-  minimizer?: Minimizer<T> | Minimizer<T>[] | undefined;
+  minimizer?:
+    | (T extends any[]
+        ? { [P in keyof T]: Minimizer<T[P]> }
+        : Minimizer<T> | Minimizer<T>[])
+    | undefined;
   /**
    * Allows to set the generator.
    */
-  generator?: Generator<T>[] | undefined;
+  generator?:
+    | (G extends any[]
+        ? { [P_1 in keyof G]: Generator<G[P_1]> }
+        : Generator<G>[])
+    | undefined;
   /**
    * Automatically adding `imagemin-loader`.
    */
@@ -203,27 +211,27 @@ export type PluginOptions<T> = {
  * @typedef {import("./loader").LoaderOptions<T>} InternalLoaderOptions
  */
 /**
- * @template T
+ * @template T, G
  * @typedef {Object} PluginOptions
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
- * @property {Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
- * @property {Generator<T>[]} [generator] Allows to set the generator.
+ * @property {T extends any[] ? { [P in keyof T]: Minimizer<T[P]> } : Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
+ * @property {G extends any[] ? { [P in keyof G]: Generator<G[P]> } : Generator<G>[]} [generator] Allows to set the generator.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  */
 /**
- * @template T
+ * @template T, [G=T]
  * @extends {WebpackPluginInstance}
  */
-declare class ImageMinimizerPlugin<T> {
+declare class ImageMinimizerPlugin<T, G = T> {
   /**
-   * @param {PluginOptions<T>} [options={}] Plugin options.
+   * @param {PluginOptions<T, G>} [options={}] Plugin options.
    */
-  constructor(options?: PluginOptions<T> | undefined);
+  constructor(options?: PluginOptions<T, G> | undefined);
   /**
    * @private
    */
