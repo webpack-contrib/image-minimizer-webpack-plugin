@@ -38,8 +38,7 @@ import {
 
 /**
  * @typedef {Object} ImageminOptions
- * @property {import("imagemin").Options["plugins"] | [string, Record<string, any>]} plugins
- * @property {Array<Record<string, any>>} [pluginsMeta]
+ * @property {import("imagemin").Options["plugins"] | Array<string | [string, Record<string, any>]>} plugins
  */
 
 /**

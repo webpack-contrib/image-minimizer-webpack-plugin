@@ -14,8 +14,7 @@ export type FilterFn = (source: Buffer, sourcePath: string) => boolean;
 export type ImageminOptions = {
   plugins:
     | import("imagemin").Options["plugins"]
-    | [string, Record<string, any>];
-  pluginsMeta?: Record<string, any>[] | undefined;
+    | Array<string | [string, Record<string, any>]>;
 };
 export type SquooshOptions = {
   [x: string]: any;
@@ -123,8 +122,7 @@ export type PluginOptions<T> = {
  */
 /**
  * @typedef {Object} ImageminOptions
- * @property {import("imagemin").Options["plugins"] | [string, Record<string, any>]} plugins
- * @property {Array<Record<string, any>>} [pluginsMeta]
+ * @property {import("imagemin").Options["plugins"] | Array<string | [string, Record<string, any>]>} plugins
  */
 /**
  * @typedef {Object.<string, any>} SquooshOptions
