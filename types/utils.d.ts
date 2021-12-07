@@ -68,6 +68,10 @@ export function squooshMinify<T>(
   original: WorkerResult,
   options: T
 ): Promise<WorkerResult>;
+export namespace squooshMinify {
+  export { squooshImagePoolSetup as setup };
+  export { squooshImagePoolTeardown as teardown };
+}
 /**
  * @template T
  * @param {WorkerResult} original
@@ -78,3 +82,10 @@ export function squooshGenerate<T>(
   original: WorkerResult,
   minifyOptions: T
 ): Promise<WorkerResult>;
+export namespace squooshGenerate {
+  export { squooshImagePoolSetup as setup };
+  export { squooshImagePoolTeardown as teardown };
+}
+declare function squooshImagePoolSetup(): void;
+declare function squooshImagePoolTeardown(): Promise<void>;
+export {};
