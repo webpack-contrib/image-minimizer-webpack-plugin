@@ -344,6 +344,9 @@ class ImageMinimizerPlugin {
     }
   }
 
+  /**
+   * @private
+   */
   async teardownAll() {
     if (typeof this.options.generator !== "undefined") {
       const { generator } = this.options;

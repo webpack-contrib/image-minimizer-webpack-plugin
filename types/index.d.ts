@@ -226,7 +226,10 @@ declare class ImageMinimizerPlugin<T> {
    * @private
    */
   private setupAll;
-  teardownAll(): Promise<void>;
+  /**
+   * @private
+   */
+  private teardownAll;
   /**
    * @param {import("webpack").Compiler} compiler
    */
