@@ -7,6 +7,8 @@ import fileType from "file-type";
 import { fixturesPath, isOptimized, plugins, runWebpack } from "./helpers";
 import ImageMinimizerPlugin from "../src/index.js";
 
+jest.setTimeout(20000);
+
 describe("loader", () => {
   it("should optimizes all images", async () => {
     const stats = await runWebpack({
