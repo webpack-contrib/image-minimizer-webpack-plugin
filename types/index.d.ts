@@ -12,9 +12,9 @@ export type Rule = RegExp | string;
 export type Rules = Rule[] | Rule;
 export type FilterFn = (source: Buffer, sourcePath: string) => boolean;
 export type ImageminOptions = {
-  plugins:
-    | import("imagemin").Options["plugins"]
-    | Array<string | [string, Record<string, any>]>;
+  plugins: Array<
+    string | [string, Record<string, any>?] | import("imagemin").Plugin
+  >;
 };
 export type SquooshOptions = {
   [x: string]: any;
@@ -122,7 +122,7 @@ export type PluginOptions<T> = {
  */
 /**
  * @typedef {Object} ImageminOptions
- * @property {import("imagemin").Options["plugins"] | Array<string | [string, Record<string, any>]>} plugins
+ * @property {Array<string | [string, Record<string, any>?] | import("imagemin").Plugin>} plugins
  */
 /**
  * @typedef {Object.<string, any>} SquooshOptions

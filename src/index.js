@@ -38,7 +38,7 @@ import {
 
 /**
  * @typedef {Object} ImageminOptions
- * @property {import("imagemin").Options["plugins"] | Array<string | [string, Record<string, any>]>} plugins
+ * @property {Array<string | [string, Record<string, any>?] | import("imagemin").Plugin>} plugins
  */
 
 /**
