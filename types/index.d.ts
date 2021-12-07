@@ -27,10 +27,16 @@ export type WorkerResult = {
   errors: Array<Error>;
   info: AssetInfo;
 };
-export type TransformerFunction<T> = (
+export type BasicTransformerFunction<T> = (
   original: WorkerResult,
   options: T | undefined
 ) => Promise<WorkerResult>;
+export type BasicTransformerHelpers = {
+  setup?: (() => {}) | undefined;
+  teardown?: (() => {}) | undefined;
+};
+export type TransformerFunction<T> = BasicTransformerFunction<T> &
+  BasicTransformerHelpers;
 export type PathData = {
   filename?: string | undefined;
 };
@@ -128,10 +134,19 @@ export type PluginOptions<T> = {
  */
 /**
  * @template T
- * @callback TransformerFunction
+ * @callback BasicTransformerFunction
  * @param {WorkerResult} original
  * @param {T | undefined} options
  * @returns {Promise<WorkerResult>}
+ */
+/**
+ * @typedef {object} BasicTransformerHelpers
+ * @property {() => {}} [setup]
+ * @property {() => {}} [teardown]
+ */
+/**
+ * @template T
+ * @typedef {BasicTransformerFunction<T> & BasicTransformerHelpers} TransformerFunction
  */
 /**
  * @typedef {Object} PathData
@@ -207,6 +222,11 @@ declare class ImageMinimizerPlugin<T> {
    * @returns {Promise<void>}
    */
   private optimize;
+  /**
+   * @private
+   */
+  private setupAll;
+  teardownAll(): Promise<void>;
   /**
    * @param {import("webpack").Compiler} compiler
    */

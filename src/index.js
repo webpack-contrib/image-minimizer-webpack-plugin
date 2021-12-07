@@ -57,10 +57,21 @@ import {
 
 /**
  * @template T
- * @callback TransformerFunction
+ * @callback BasicTransformerFunction
  * @param {WorkerResult} original
  * @param {T | undefined} options
  * @returns {Promise<WorkerResult>}
+ */
+
+/**
+ * @typedef {object} BasicTransformerHelpers
+ * @property {() => {}} [setup]
+ * @property {() => {}} [teardown]
+ */
+
+/**
+ * @template T
+ * @typedef {BasicTransformerFunction<T> & BasicTransformerHelpers} TransformerFunction
  */
 
 /**
@@ -307,10 +318,65 @@ class ImageMinimizerPlugin {
   }
 
   /**
+   * @private
+   */
+  setupAll() {
+    if (typeof this.options.generator !== "undefined") {
+      const { generator } = this.options;
+
+      for (const item of generator) {
+        if (typeof item.implementation.setup !== "undefined") {
+          item.implementation.setup();
+        }
+      }
+    }
+
+    if (typeof this.options.minimizer !== "undefined") {
+      const minimizers = Array.isArray(this.options.minimizer)
+        ? this.options.minimizer
+        : [this.options.minimizer];
+
+      for (const item of minimizers) {
+        if (typeof item.implementation.setup !== "undefined") {
+          item.implementation.setup();
+        }
+      }
+    }
+  }
+
+  async teardownAll() {
+    if (typeof this.options.generator !== "undefined") {
+      const { generator } = this.options;
+
+      for (const item of generator) {
+        if (typeof item.implementation.teardown !== "undefined") {
+          // eslint-disable-next-line no-await-in-loop
+          await item.implementation.teardown();
+        }
+      }
+    }
+
+    if (typeof this.options.minimizer !== "undefined") {
+      const minimizers = Array.isArray(this.options.minimizer)
+        ? this.options.minimizer
+        : [this.options.minimizer];
+
+      for (const item of minimizers) {
+        if (typeof item.implementation.teardown !== "undefined") {
+          // eslint-disable-next-line no-await-in-loop
+          await item.implementation.teardown();
+        }
+      }
+    }
+  }
+
+  /**
    * @param {import("webpack").Compiler} compiler
    */
   apply(compiler) {
     const pluginName = this.constructor.name;
+
+    this.setupAll();
 
     if (this.options.loader) {
       compiler.hooks.compilation.tap({ name: pluginName }, (compilation) => {
@@ -389,7 +455,10 @@ class ImageMinimizerPlugin {
             compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
           additionalAssets: true,
         },
-        (assets) => this.optimize(compiler, compilation, assets)
+        async (assets) => {
+          await this.optimize(compiler, compilation, assets);
+          await this.teardownAll();
+        }
       );
 
       compilation.hooks.statsPrinter.tap(pluginName, (stats) => {

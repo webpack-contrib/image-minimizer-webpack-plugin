@@ -682,6 +682,41 @@ async function imageminMinify(original, options) {
 }
 
 /**
+ * @type {any}
+ */
+let pool;
+
+function squooshImagePoolCreate() {
+  // eslint-disable-next-line node/no-unpublished-require
+  const { ImagePool } = require("@squoosh/lib");
+
+  // TODO https://github.com/GoogleChromeLabs/squoosh/issues/1111,
+  // TODO https://github.com/GoogleChromeLabs/squoosh/issues/1012
+  //
+  // Due to the above errors, we use the value "1", it is faster and consumes less memory in common use.
+  //
+  // Also we don't know how many image (modules are built asynchronously) we will have so we can't setup
+  // the correct value and creating child processes takes a long time, unfortunately there is no perfect solution here,
+  // maybe we should provide an option for this (or API for warm up), so if you are reading this feel free to open the issue
+  return new ImagePool(1);
+}
+
+function squooshImagePoolSetup() {
+  if (!pool) {
+    pool = squooshImagePoolCreate();
+  }
+}
+
+async function squooshImagePoolTeardown() {
+  if (pool) {
+    await pool.close();
+
+    // eslint-disable-next-line require-atomic-updates
+    pool = undefined;
+  }
+}
+
+/**
  * @template T
  * @param {WorkerResult} original
  * @param {T} minifyOptions
@@ -690,9 +725,8 @@ async function imageminMinify(original, options) {
 async function squooshGenerate(original, minifyOptions) {
   // eslint-disable-next-line node/no-unpublished-require
   const squoosh = require("@squoosh/lib");
-  const { ImagePool } = squoosh;
-  // TODO https://github.com/GoogleChromeLabs/squoosh/issues/1111
-  const imagePool = new ImagePool(1);
+  const isReusePool = Boolean(pool);
+  const imagePool = pool || squooshImagePoolCreate();
   const image = imagePool.ingestImage(new Uint8Array(original.data));
 
   const squooshOptions = /** @type {SquooshOptions} */ (minifyOptions || {});
@@ -721,7 +755,9 @@ async function squooshGenerate(original, minifyOptions) {
   try {
     await image.encode(encodeOptions);
   } catch (error) {
-    await imagePool.close();
+    if (!isReusePool) {
+      await imagePool.close();
+    }
 
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
@@ -734,7 +770,9 @@ async function squooshGenerate(original, minifyOptions) {
     return original;
   }
 
-  await imagePool.close();
+  if (!isReusePool) {
+    await imagePool.close();
+  }
 
   if (Object.keys(image.encodedWith).length === 0) {
     original.errors.push(
@@ -779,6 +817,10 @@ async function squooshGenerate(original, minifyOptions) {
   };
 }
 
+squooshGenerate.setup = squooshImagePoolSetup;
+
+squooshGenerate.teardown = squooshImagePoolTeardown;
+
 /**
  * @template T
  * @param {WorkerResult} original
@@ -788,7 +830,7 @@ async function squooshGenerate(original, minifyOptions) {
 async function squooshMinify(original, options) {
   // eslint-disable-next-line node/no-unpublished-require
   const squoosh = require("@squoosh/lib");
-  const { ImagePool, encoders } = squoosh;
+  const { encoders } = squoosh;
 
   /**
    * @type {Record<string, string>}
@@ -812,10 +854,10 @@ async function squooshMinify(original, options) {
     return original;
   }
 
-  const squooshOptions = /** @type {SquooshOptions} */ (options || {});
-  const imagePool = new ImagePool(1);
+  const isReusePool = Boolean(pool);
+  const imagePool = pool || squooshImagePoolCreate();
   const image = imagePool.ingestImage(new Uint8Array(original.data));
-
+  const squooshOptions = /** @type {SquooshOptions} */ (options || {});
   /**
    * @type {undefined | Object.<string, any>}
    */
@@ -844,7 +886,9 @@ async function squooshMinify(original, options) {
   try {
     await image.encode({ [targetCodec]: encodeOptions[targetCodec] });
   } catch (error) {
-    await imagePool.close();
+    if (!isReusePool) {
+      await imagePool.close();
+    }
 
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
@@ -857,7 +901,9 @@ async function squooshMinify(original, options) {
     return original;
   }
 
-  await imagePool.close();
+  if (!isReusePool) {
+    await imagePool.close();
+  }
 
   const { binary } = await image.encodedWith[targets[ext]];
 
@@ -876,6 +922,10 @@ async function squooshMinify(original, options) {
     },
   };
 }
+
+squooshMinify.setup = squooshImagePoolSetup;
+
+squooshMinify.teardown = squooshImagePoolTeardown;
 
 export {
   throttleAll,
