@@ -682,6 +682,30 @@ describe("minify", () => {
     expect(result.data.equals(optimizedSource)).toBe(true);
   });
 
+  it("should work with 'imageminGenerate' #2", async () => {
+    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+    const input = await pify(fs.readFile)(filename);
+    const result = await worker({
+      input,
+      filename,
+      transformer: {
+        implementation: imageminGenerate,
+        options: {
+          plugins: [["imagemin-webp", { quality: 90 }]],
+        },
+      },
+    });
+
+    expect(result.warnings).toHaveLength(0);
+    expect(result.errors).toHaveLength(0);
+
+    const optimizedSource = await imagemin.buffer(input, {
+      plugins: [imageminWebp({ quality: 90 })],
+    });
+
+    expect(result.data.equals(optimizedSource)).toBe(true);
+  });
+
   it("should return error on empty plugin with 'imageminGenerate'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);

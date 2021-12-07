@@ -38,8 +38,7 @@ import {
 
 /**
  * @typedef {Object} ImageminOptions
- * @property {import("imagemin").Options["plugins"] | [string, Record<string, any>]} plugins
- * @property {Array<Record<string, any>>} [pluginsMeta]
+ * @property {Array<string | [string, Record<string, any>?] | import("imagemin").Plugin>} plugins
  */
 
 /**
@@ -56,10 +55,24 @@ import {
  */
 
 /**
+ * @typedef {{ [key: string]: any }} CustomOptions
+ */
+
+/**
  * @template T
- * @callback BasicTransformerFunction
+ * @typedef {T extends infer U ? U : CustomOptions} InferDefaultType
+ */
+
+/**
+ * @template T
+ * @typedef {InferDefaultType<T> | undefined} BasicTransformerOptions
+ */
+
+/**
+ * @template T
+ * @callback BasicTransformerImplementation
  * @param {WorkerResult} original
- * @param {T | undefined} options
+ * @param {BasicTransformerOptions<T>} [options]
  * @returns {Promise<WorkerResult>}
  */
 
@@ -71,7 +84,7 @@ import {
 
 /**
  * @template T
- * @typedef {BasicTransformerFunction<T> & BasicTransformerHelpers} TransformerFunction
+ * @typedef {BasicTransformerImplementation<T> & BasicTransformerHelpers} TransformerFunction
  */
 
 /**
@@ -90,7 +103,7 @@ import {
  * @template T
  * @typedef {Object} Transformer
  * @property {TransformerFunction<T>} implementation
- * @property {T} [options]
+ * @property {BasicTransformerOptions<T>} [options]
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
  * @property {string} [preset]
@@ -122,13 +135,13 @@ import {
  */
 
 /**
- * @template T
+ * @template T, G
  * @typedef {Object} PluginOptions
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
- * @property {Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
- * @property {Generator<T>[]} [generator] Allows to set the generator.
+ * @property {T extends any[] ? { [P in keyof T]: Minimizer<T[P]> } : Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
+ * @property {G extends any[] ? { [P in keyof G]: Generator<G[P]> } : Generator<G>[]} [generator] Allows to set the generator.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string} [severityError] Allows to choose how errors are displayed.
@@ -136,12 +149,12 @@ import {
  */
 
 /**
- * @template T
+ * @template T, [G=T]
  * @extends {WebpackPluginInstance}
  */
 class ImageMinimizerPlugin {
   /**
-   * @param {PluginOptions<T>} [options={}] Plugin options.
+   * @param {PluginOptions<T, G>} [options={}] Plugin options.
    */
   constructor(options = {}) {
     validate(/** @type {Schema} */ (schema), options, {
@@ -324,6 +337,7 @@ class ImageMinimizerPlugin {
     if (typeof this.options.generator !== "undefined") {
       const { generator } = this.options;
 
+      // @ts-ignore
       for (const item of generator) {
         if (typeof item.implementation.setup !== "undefined") {
           item.implementation.setup();
@@ -344,10 +358,14 @@ class ImageMinimizerPlugin {
     }
   }
 
+  /**
+   * @private
+   */
   async teardownAll() {
     if (typeof this.options.generator !== "undefined") {
       const { generator } = this.options;
 
+      // @ts-ignore
       for (const item of generator) {
         if (typeof item.implementation.teardown !== "undefined") {
           // eslint-disable-next-line no-await-in-loop

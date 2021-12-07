@@ -12,10 +12,9 @@ export type Rule = RegExp | string;
 export type Rules = Rule[] | Rule;
 export type FilterFn = (source: Buffer, sourcePath: string) => boolean;
 export type ImageminOptions = {
-  plugins:
-    | import("imagemin").Options["plugins"]
-    | [string, Record<string, any>];
-  pluginsMeta?: Record<string, any>[] | undefined;
+  plugins: Array<
+    string | [string, Record<string, any>?] | import("imagemin").Plugin
+  >;
 };
 export type SquooshOptions = {
   [x: string]: any;
@@ -27,15 +26,20 @@ export type WorkerResult = {
   errors: Array<Error>;
   info: AssetInfo;
 };
-export type BasicTransformerFunction<T> = (
+export type CustomOptions = {
+  [key: string]: any;
+};
+export type InferDefaultType<T> = T extends infer U ? U : CustomOptions;
+export type BasicTransformerOptions<T> = InferDefaultType<T> | undefined;
+export type BasicTransformerImplementation<T> = (
   original: WorkerResult,
-  options: T | undefined
+  options?: BasicTransformerOptions<T>
 ) => Promise<WorkerResult>;
 export type BasicTransformerHelpers = {
   setup?: (() => {}) | undefined;
   teardown?: (() => {}) | undefined;
 };
-export type TransformerFunction<T> = BasicTransformerFunction<T> &
+export type TransformerFunction<T> = BasicTransformerImplementation<T> &
   BasicTransformerHelpers;
 export type PathData = {
   filename?: string | undefined;
@@ -46,7 +50,7 @@ export type FilenameFn = (
 ) => string;
 export type Transformer<T> = {
   implementation: TransformerFunction<T>;
-  options?: T | undefined;
+  options?: BasicTransformerOptions<T>;
   filter?: FilterFn | undefined;
   filename?: string | FilenameFn | undefined;
   preset?: string | undefined;
@@ -61,7 +65,7 @@ export type InternalWorkerOptions<T> = {
   generateFilename?: Function | undefined;
 };
 export type InternalLoaderOptions<T> = import("./loader").LoaderOptions<T>;
-export type PluginOptions<T> = {
+export type PluginOptions<T, G> = {
   /**
    * Test to match files against.
    */
@@ -77,11 +81,19 @@ export type PluginOptions<T> = {
   /**
    * Allows to setup the minimizer.
    */
-  minimizer?: Minimizer<T> | Minimizer<T>[] | undefined;
+  minimizer?:
+    | (T extends any[]
+        ? { [P in keyof T]: Minimizer<T[P]> }
+        : Minimizer<T> | Minimizer<T>[])
+    | undefined;
   /**
    * Allows to set the generator.
    */
-  generator?: Generator<T>[] | undefined;
+  generator?:
+    | (G extends any[]
+        ? { [P_1 in keyof G]: Generator<G[P_1]> }
+        : Generator<G>[])
+    | undefined;
   /**
    * Automatically adding `imagemin-loader`.
    */
@@ -118,8 +130,7 @@ export type PluginOptions<T> = {
  */
 /**
  * @typedef {Object} ImageminOptions
- * @property {import("imagemin").Options["plugins"] | [string, Record<string, any>]} plugins
- * @property {Array<Record<string, any>>} [pluginsMeta]
+ * @property {Array<string | [string, Record<string, any>?] | import("imagemin").Plugin>} plugins
  */
 /**
  * @typedef {Object.<string, any>} SquooshOptions
@@ -133,10 +144,21 @@ export type PluginOptions<T> = {
  * @property {AssetInfo} info
  */
 /**
+ * @typedef {{ [key: string]: any }} CustomOptions
+ */
+/**
  * @template T
- * @callback BasicTransformerFunction
+ * @typedef {T extends infer U ? U : CustomOptions} InferDefaultType
+ */
+/**
+ * @template T
+ * @typedef {InferDefaultType<T> | undefined} BasicTransformerOptions
+ */
+/**
+ * @template T
+ * @callback BasicTransformerImplementation
  * @param {WorkerResult} original
- * @param {T | undefined} options
+ * @param {BasicTransformerOptions<T>} [options]
  * @returns {Promise<WorkerResult>}
  */
 /**
@@ -146,7 +168,7 @@ export type PluginOptions<T> = {
  */
 /**
  * @template T
- * @typedef {BasicTransformerFunction<T> & BasicTransformerHelpers} TransformerFunction
+ * @typedef {BasicTransformerImplementation<T> & BasicTransformerHelpers} TransformerFunction
  */
 /**
  * @typedef {Object} PathData
@@ -162,7 +184,7 @@ export type PluginOptions<T> = {
  * @template T
  * @typedef {Object} Transformer
  * @property {TransformerFunction<T>} implementation
- * @property {T} [options]
+ * @property {BasicTransformerOptions<T>} [options]
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
  * @property {string} [preset]
@@ -189,27 +211,27 @@ export type PluginOptions<T> = {
  * @typedef {import("./loader").LoaderOptions<T>} InternalLoaderOptions
  */
 /**
- * @template T
+ * @template T, G
  * @typedef {Object} PluginOptions
  * @property {Rules} [test] Test to match files against.
  * @property {Rules} [include] Files to include.
  * @property {Rules} [exclude] Files to exclude.
- * @property {Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
- * @property {Generator<T>[]} [generator] Allows to set the generator.
+ * @property {T extends any[] ? { [P in keyof T]: Minimizer<T[P]> } : Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
+ * @property {G extends any[] ? { [P in keyof G]: Generator<G[P]> } : Generator<G>[]} [generator] Allows to set the generator.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  */
 /**
- * @template T
+ * @template T, [G=T]
  * @extends {WebpackPluginInstance}
  */
-declare class ImageMinimizerPlugin<T> {
+declare class ImageMinimizerPlugin<T, G = T> {
   /**
-   * @param {PluginOptions<T>} [options={}] Plugin options.
+   * @param {PluginOptions<T, G>} [options={}] Plugin options.
    */
-  constructor(options?: PluginOptions<T> | undefined);
+  constructor(options?: PluginOptions<T, G> | undefined);
   /**
    * @private
    */
@@ -226,7 +248,10 @@ declare class ImageMinimizerPlugin<T> {
    * @private
    */
   private setupAll;
-  teardownAll(): Promise<void>;
+  /**
+   * @private
+   */
+  private teardownAll;
   /**
    * @param {import("webpack").Compiler} compiler
    */
