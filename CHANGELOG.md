@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.0.1...v3.1.0) (2021-12-16)
+
+
+### Features
+
+* removed cjs wrapper and generated types in commonjs format (`export =` and `namespaces` used in types), now you can directly use exported types ([#282](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/282)) ([f0fa0a7](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/f0fa0a7fb2531d9e78e37778dae5c0b267724c1b))
+
 ### [3.0.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.0.0...v3.0.1) (2021-12-07)
 
 
