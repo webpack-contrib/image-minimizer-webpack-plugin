@@ -1,4 +1,4 @@
-import path from "path";
+const path = require("path");
 
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").SquooshOptions} SquooshOptions */
@@ -927,7 +927,7 @@ squooshMinify.setup = squooshImagePoolSetup;
 
 squooshMinify.teardown = squooshImagePoolTeardown;
 
-export {
+module.exports = {
   throttleAll,
   isAbsoluteURL,
   imageminNormalizeConfig,

@@ -1,19 +1,19 @@
-import * as path from "path";
-import * as os from "os";
+const path = require("path");
+const os = require("os");
 
-import { validate } from "schema-utils";
-import serialize from "serialize-javascript";
+const { validate } = require("schema-utils");
+const serialize = require("serialize-javascript");
 
-import worker from "./worker";
-import schema from "./plugin-options.json";
-import {
+const worker = require("./worker");
+const schema = require("./plugin-options.json");
+const {
   throttleAll,
   imageminNormalizeConfig,
   imageminMinify,
   imageminGenerate,
   squooshMinify,
   squooshGenerate,
-} from "./utils.js";
+} = require("./utils.js");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
@@ -515,4 +515,4 @@ ImageMinimizerPlugin.imageminGenerate = imageminGenerate;
 ImageMinimizerPlugin.squooshMinify = squooshMinify;
 ImageMinimizerPlugin.squooshGenerate = squooshGenerate;
 
-export default ImageMinimizerPlugin;
+module.exports = ImageMinimizerPlugin;

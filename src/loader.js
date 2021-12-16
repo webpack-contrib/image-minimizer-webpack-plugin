@@ -1,8 +1,8 @@
-import path from "path";
+const path = require("path");
 
-import worker from "./worker";
-import schema from "./loader-options.json";
-import { isAbsoluteURL } from "./utils.js";
+const worker = require("./worker");
+const schema = require("./loader-options.json");
+const { isAbsoluteURL } = require("./utils.js");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -19,8 +19,9 @@ import { isAbsoluteURL } from "./utils.js";
  * @template T
  * @this {import("webpack").LoaderContext<LoaderOptions<T>>}
  * @param {Buffer} content
+ * @returns {Promise<Buffer | undefined>}
  */
-module.exports = async function loader(content) {
+async function loader(content) {
   // Avoid optimize twice
   if (
     this._module &&
@@ -170,6 +171,8 @@ module.exports = async function loader(content) {
   }
 
   callback(null, output.data);
-};
+}
 
-module.exports.raw = true;
+loader.raw = true;
+
+module.exports = loader;
