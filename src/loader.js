@@ -1,8 +1,8 @@
-import path from "path";
+const path = require("path");
 
-import worker from "./worker";
-import schema from "./loader-options.json";
-import { isAbsoluteURL } from "./utils.js";
+const worker = require("./worker");
+const schema = require("./loader-options.json");
+const { isAbsoluteURL } = require("./utils.js");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
