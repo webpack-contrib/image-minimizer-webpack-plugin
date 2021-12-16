@@ -1,116 +1,4 @@
-export default ImageMinimizerPlugin;
-export type Schema = import("schema-utils/declarations/validate").Schema;
-export type WebpackPluginInstance = import("webpack").WebpackPluginInstance;
-export type Compiler = import("webpack").Compiler;
-export type Compilation = import("webpack").Compilation;
-export type WebpackError = import("webpack").WebpackError;
-export type Asset = import("webpack").Asset;
-export type AssetInfo = import("webpack").AssetInfo;
-export type ImageminMinifyFunction = typeof imageminMinify;
-export type SquooshMinifyFunction = typeof squooshMinify;
-export type Rule = RegExp | string;
-export type Rules = Rule[] | Rule;
-export type FilterFn = (source: Buffer, sourcePath: string) => boolean;
-export type ImageminOptions = {
-  plugins: Array<
-    string | [string, Record<string, any>?] | import("imagemin").Plugin
-  >;
-};
-export type SquooshOptions = {
-  [x: string]: any;
-};
-export type WorkerResult = {
-  filename: string;
-  data: Buffer;
-  warnings: Array<Error>;
-  errors: Array<Error>;
-  info: AssetInfo;
-};
-export type CustomOptions = {
-  [key: string]: any;
-};
-export type InferDefaultType<T> = T extends infer U ? U : CustomOptions;
-export type BasicTransformerOptions<T> = InferDefaultType<T> | undefined;
-export type BasicTransformerImplementation<T> = (
-  original: WorkerResult,
-  options?: BasicTransformerOptions<T>
-) => Promise<WorkerResult>;
-export type BasicTransformerHelpers = {
-  setup?: (() => {}) | undefined;
-  teardown?: (() => {}) | undefined;
-};
-export type TransformerFunction<T> = BasicTransformerImplementation<T> &
-  BasicTransformerHelpers;
-export type PathData = {
-  filename?: string | undefined;
-};
-export type FilenameFn = (
-  pathData: PathData,
-  assetInfo?: import("webpack").AssetInfo | undefined
-) => string;
-export type Transformer<T> = {
-  implementation: TransformerFunction<T>;
-  options?: BasicTransformerOptions<T>;
-  filter?: FilterFn | undefined;
-  filename?: string | FilenameFn | undefined;
-  preset?: string | undefined;
-};
-export type Minimizer<T> = Omit<Transformer<T>, "preset">;
-export type Generator<T> = Transformer<T>;
-export type InternalWorkerOptions<T> = {
-  filename: string;
-  input: Buffer;
-  transformer: Transformer<T> | Transformer<T>[];
-  severityError?: string | undefined;
-  generateFilename?: Function | undefined;
-};
-export type InternalLoaderOptions<T> = import("./loader").LoaderOptions<T>;
-export type PluginOptions<T, G> = {
-  /**
-   * Test to match files against.
-   */
-  test?: Rules | undefined;
-  /**
-   * Files to include.
-   */
-  include?: Rules | undefined;
-  /**
-   * Files to exclude.
-   */
-  exclude?: Rules | undefined;
-  /**
-   * Allows to setup the minimizer.
-   */
-  minimizer?:
-    | (T extends any[]
-        ? { [P in keyof T]: Minimizer<T[P]> }
-        : Minimizer<T> | Minimizer<T>[])
-    | undefined;
-  /**
-   * Allows to set the generator.
-   */
-  generator?:
-    | (G extends any[]
-        ? { [P_1 in keyof G]: Generator<G[P_1]> }
-        : Generator<G>[])
-    | undefined;
-  /**
-   * Automatically adding `imagemin-loader`.
-   */
-  loader?: boolean | undefined;
-  /**
-   * Maximum number of concurrency optimization processes in one time.
-   */
-  concurrency?: number | undefined;
-  /**
-   * Allows to choose how errors are displayed.
-   */
-  severityError?: string | undefined;
-  /**
-   * Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
-   */
-  deleteOriginalAssets?: boolean | undefined;
-};
+export = ImageMinimizerPlugin;
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
 /** @typedef {import("webpack").Compiler} Compiler */
@@ -258,15 +146,159 @@ declare class ImageMinimizerPlugin<T, G = T> {
   apply(compiler: import("webpack").Compiler): void;
 }
 declare namespace ImageMinimizerPlugin {
-  export const loader: string;
-  export { imageminNormalizeConfig };
-  export { imageminMinify };
-  export { imageminGenerate };
-  export { squooshMinify };
-  export { squooshGenerate };
+  export {
+    loader,
+    imageminNormalizeConfig,
+    imageminMinify,
+    imageminGenerate,
+    squooshMinify,
+    squooshGenerate,
+    Schema,
+    WebpackPluginInstance,
+    Compiler,
+    Compilation,
+    WebpackError,
+    Asset,
+    AssetInfo,
+    ImageminMinifyFunction,
+    SquooshMinifyFunction,
+    Rule,
+    Rules,
+    FilterFn,
+    ImageminOptions,
+    SquooshOptions,
+    WorkerResult,
+    CustomOptions,
+    InferDefaultType,
+    BasicTransformerOptions,
+    BasicTransformerImplementation,
+    BasicTransformerHelpers,
+    TransformerFunction,
+    PathData,
+    FilenameFn,
+    Transformer,
+    Minimizer,
+    Generator,
+    InternalWorkerOptions,
+    InternalLoaderOptions,
+    PluginOptions,
+  };
 }
-import { imageminMinify } from "./utils.js";
-import { squooshMinify } from "./utils.js";
+type PluginOptions<T, G> = {
+  /**
+   * Test to match files against.
+   */
+  test?: Rules | undefined;
+  /**
+   * Files to include.
+   */
+  include?: Rules | undefined;
+  /**
+   * Files to exclude.
+   */
+  exclude?: Rules | undefined;
+  /**
+   * Allows to setup the minimizer.
+   */
+  minimizer?:
+    | (T extends any[]
+        ? { [P in keyof T]: Minimizer<T[P]> }
+        : Minimizer<T> | Minimizer<T>[])
+    | undefined;
+  /**
+   * Allows to set the generator.
+   */
+  generator?:
+    | (G extends any[]
+        ? { [P_1 in keyof G]: Generator<G[P_1]> }
+        : Generator<G>[])
+    | undefined;
+  /**
+   * Automatically adding `imagemin-loader`.
+   */
+  loader?: boolean | undefined;
+  /**
+   * Maximum number of concurrency optimization processes in one time.
+   */
+  concurrency?: number | undefined;
+  /**
+   * Allows to choose how errors are displayed.
+   */
+  severityError?: string | undefined;
+  /**
+   * Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+   */
+  deleteOriginalAssets?: boolean | undefined;
+};
+declare var loader: string;
 import { imageminNormalizeConfig } from "./utils.js";
+import { imageminMinify } from "./utils.js";
 import { imageminGenerate } from "./utils.js";
+import { squooshMinify } from "./utils.js";
 import { squooshGenerate } from "./utils.js";
+type Schema = import("schema-utils/declarations/validate").Schema;
+type WebpackPluginInstance = import("webpack").WebpackPluginInstance;
+type Compiler = import("webpack").Compiler;
+type Compilation = import("webpack").Compilation;
+type WebpackError = import("webpack").WebpackError;
+type Asset = import("webpack").Asset;
+type AssetInfo = import("webpack").AssetInfo;
+type ImageminMinifyFunction = typeof imageminMinify;
+type SquooshMinifyFunction = typeof squooshMinify;
+type Rule = RegExp | string;
+type Rules = Rule[] | Rule;
+type FilterFn = (source: Buffer, sourcePath: string) => boolean;
+type ImageminOptions = {
+  plugins: Array<
+    string | [string, Record<string, any>?] | import("imagemin").Plugin
+  >;
+};
+type SquooshOptions = {
+  [x: string]: any;
+};
+type WorkerResult = {
+  filename: string;
+  data: Buffer;
+  warnings: Array<Error>;
+  errors: Array<Error>;
+  info: AssetInfo;
+};
+type CustomOptions = {
+  [key: string]: any;
+};
+type InferDefaultType<T> = T extends infer U ? U : CustomOptions;
+type BasicTransformerOptions<T> = InferDefaultType<T> | undefined;
+type BasicTransformerImplementation<T> = (
+  original: WorkerResult,
+  options?: BasicTransformerOptions<T>
+) => Promise<WorkerResult>;
+type BasicTransformerHelpers = {
+  setup?: (() => {}) | undefined;
+  teardown?: (() => {}) | undefined;
+};
+type TransformerFunction<T> = BasicTransformerImplementation<T> &
+  BasicTransformerHelpers;
+type PathData = {
+  filename?: string | undefined;
+};
+type FilenameFn = (
+  pathData: PathData,
+  assetInfo?: import("webpack").AssetInfo | undefined
+) => string;
+type Transformer<T> = {
+  implementation: TransformerFunction<T>;
+  options?: BasicTransformerOptions<T>;
+  filter?: FilterFn | undefined;
+  filename?: string | FilenameFn | undefined;
+  preset?: string | undefined;
+};
+type Minimizer<T> = Omit<Transformer<T>, "preset">;
+type Generator<T> = Transformer<T>;
+type InternalWorkerOptions<T> = {
+  filename: string;
+  input: Buffer;
+  transformer: Transformer<T> | Transformer<T>[];
+  severityError?: string | undefined;
+  generateFilename?: Function | undefined;
+};
+type InternalLoaderOptions<T> = import("./loader").LoaderOptions<T>;

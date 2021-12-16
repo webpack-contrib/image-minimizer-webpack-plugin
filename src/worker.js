@@ -6,7 +6,7 @@
  * @param {import("./index").InternalWorkerOptions<T>} options
  * @returns {Promise<WorkerResult>}
  */
-export default async function worker(options) {
+async function worker(options) {
   /** @type {WorkerResult} */
   let result = {
     data: options.input,
@@ -117,3 +117,5 @@ export default async function worker(options) {
 
   return result;
 }
+
+module.exports = worker;
