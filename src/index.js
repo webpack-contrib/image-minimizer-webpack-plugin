@@ -453,6 +453,7 @@ class ImageMinimizerPlugin {
         });
         const dataURILoader = /** @type {InternalLoaderOptions<T>} */ ({
           scheme: /^data$/,
+          mimetype: /^image\/.+/i,
           enforce: "pre",
           loader: require.resolve(path.join(__dirname, "loader.js")),
           options:
