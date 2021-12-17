@@ -33,16 +33,6 @@ async function loader(content) {
     return content;
   }
 
-  // Ignore unsupported data URI by mime type
-  if (
-    this._module &&
-    this._module.resourceResolveData &&
-    typeof this._module.resourceResolveData.mimetype !== "undefined" &&
-    !/^image\/.+/i.test(this._module.resourceResolveData.mimetype)
-  ) {
-    return content;
-  }
-
   // @ts-ignore
   const options = this.getOptions(/** @type {Schema} */ (schema));
   const callback = this.async();
