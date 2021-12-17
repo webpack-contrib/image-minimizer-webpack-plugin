@@ -38,7 +38,7 @@ async function loader(content) {
     this._module &&
     this._module.resourceResolveData &&
     typeof this._module.resourceResolveData.mimetype !== "undefined" &&
-    !/^image\/.*/i.test(this._module.resourceResolveData.mimetype)
+    !/^image\/.+/i.test(this._module.resourceResolveData.mimetype)
   ) {
     return content;
   }
