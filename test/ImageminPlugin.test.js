@@ -1486,4 +1486,43 @@ describe("imagemin plugin", () => {
       /Error with 'loader-test.txt': Binary blob has an unsupported format/g
     );
   });
+
+  it("should minimize and ignore unsupported data URI", async () => {
+    let minimized = 0;
+
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-6.js"),
+      fileLoaderOff: true,
+      imageminPluginOptions: {
+        minimizer: [
+          {
+            implementation: (...args) => {
+              minimized += 1;
+
+              return ImageMinimizerPlugin.imageminMinify(...args);
+            },
+            filename: "minimized-[name][ext]",
+            options: { plugins },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+    expect(minimized).toBe(1);
+
+    const bundleFilename = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./bundle.js"
+    );
+    const bundle = await pify(fs.readFile)(bundleFilename);
+    const URIRegEx = /"(data:([^;,]+)?((?:;[^;,]+)*?)(?:;(base64))?,(.*))"/gi;
+    const extractedDataURI = bundle.toString().match(URIRegEx);
+
+    expect(extractedDataURI[1].length).toBeLessThan(95801);
+  });
 });
