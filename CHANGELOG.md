@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.1.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.1.0...v3.1.1) (2021-12-17)
+
+
+### Bug Fixes
+
+* ignore unsupported data URI by mime type ([#284](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/284)) ([d1b68c2](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/d1b68c204ab604b37effc6614e939e2e36662095))
+
 ## [3.1.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.0.1...v3.1.0) (2021-12-16)
 
 
