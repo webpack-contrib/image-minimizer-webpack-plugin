@@ -1525,4 +1525,72 @@ describe("imagemin plugin", () => {
 
     expect(extractedDataURI[1].length).toBeLessThan(95801);
   });
+
+  it("should generate new image format from copied assets", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "empty-entry.js"),
+      copyPlugin: true,
+      imageminPluginOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminGenerate,
+          options: {
+            plugins: ["imagemin-webp"],
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const file = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./plugin-test.webp"
+    );
+    const ext = await fileType.fromFile(file);
+
+    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+  });
+
+  it("should generate new image format from copied assets and keep original", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "empty-entry.js"),
+      copyPlugin: true,
+      imageminPluginOptions: {
+        deleteOriginalAssets: false,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminGenerate,
+          options: {
+            plugins: ["imagemin-webp"],
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const webpFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./plugin-test.webp"
+    );
+    const webpExt = await fileType.fromFile(webpFile);
+
+    expect(/image\/webp/i.test(webpExt.mime)).toBe(true);
+
+    const fileJpg = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./plugin-test.jpg"
+    );
+    const extJpg = await fileType.fromFile(fileJpg);
+
+    expect(/image\/jpeg/i.test(extJpg.mime)).toBe(true);
+  });
 });
