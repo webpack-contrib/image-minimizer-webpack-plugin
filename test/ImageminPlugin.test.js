@@ -1526,17 +1526,290 @@ describe("imagemin plugin", () => {
     expect(extractedDataURI[1].length).toBeLessThan(95801);
   });
 
-  it("should generate new image format from copied assets", async () => {
+  it("should generate image for 'import' type", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-4.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        generator: [
+          {
+            type: "import",
+            preset: "avif",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-avif"],
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const file = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./loader-test.avif"
+    );
+    const ext = await fileType.fromFile(file);
+
+    expect(/image\/avif/i.test(ext.mime)).toBe(true);
+  });
+
+  it("should generate image for 'asset' type", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "empty-entry.js"),
       copyPlugin: true,
       imageminPluginOptions: {
-        minimizer: {
-          implementation: ImageMinimizerPlugin.imageminGenerate,
-          options: {
-            plugins: ["imagemin-webp"],
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        generator: [
+          {
+            type: "asset",
+            preset: "avif",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-avif"],
+            },
           },
-        },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const file = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./plugin-test.avif"
+    );
+    const ext = await fileType.fromFile(file);
+
+    expect(/image\/avif/i.test(ext.mime)).toBe(true);
+  });
+
+  it("should not throw an error when no presets found using the `asset` type", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-4.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        generator: [
+          {
+            type: "asset",
+            preset: "avif",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-avif"],
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const loaderFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./loader-test.avif"
+    );
+    const loaderExt = await fileType.fromFile(loaderFile);
+
+    expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
+  });
+
+  it("should generate image for 'import' and 'asset' types", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-4.js"),
+      copyPlugin: true,
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        generator: [
+          {
+            type: "import",
+            preset: "avif",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-avif"],
+            },
+          },
+          {
+            type: "asset",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-avif"],
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+    expect(Object.keys(compilation.assets)).toContain("loader-test.avif");
+    expect(Object.keys(compilation.assets)).toContain("plugin-test.avif");
+
+    const loaderFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./loader-test.avif"
+    );
+    const loaderExt = await fileType.fromFile(loaderFile);
+
+    expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
+
+    const pluginFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./plugin-test.avif"
+    );
+    const pluginExt = await fileType.fromFile(pluginFile);
+
+    expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
+  });
+
+  it("should generate images for 'import' and 'asset' types and keep original assets", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-4.js"),
+      copyPlugin: true,
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        deleteOriginalAssets: false,
+        generator: [
+          {
+            type: "import",
+            preset: "avif",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-avif"],
+            },
+          },
+          {
+            type: "asset",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-avif"],
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+    expect(Object.keys(compilation.assets)).toContain("plugin-test.jpg");
+    expect(Object.keys(compilation.assets)).toContain("loader-test.avif");
+    expect(Object.keys(compilation.assets)).toContain("plugin-test.avif");
+
+    const loaderFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./loader-test.avif"
+    );
+    const loaderExt = await fileType.fromFile(loaderFile);
+
+    expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
+
+    const pluginFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./plugin-test.avif"
+    );
+    const pluginExt = await fileType.fromFile(pluginFile);
+
+    expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
+  });
+
+  it("should generate image for 'import' and 'asset' types, minimizer original asset and keep", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-4.js"),
+      copyPlugin: true,
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        deleteOriginalAssets: false,
+        generator: [
+          {
+            type: "import",
+            preset: "avif",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-avif"],
+            },
+          },
+          {
+            type: "asset",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-avif"],
+            },
+          },
+        ],
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+    expect(Object.keys(compilation.assets)).toContain("plugin-test.jpg");
+    expect(Object.keys(compilation.assets)).toContain("loader-test.avif");
+    expect(Object.keys(compilation.assets)).toContain("plugin-test.avif");
+
+    const loaderFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./loader-test.avif"
+    );
+    const loaderExt = await fileType.fromFile(loaderFile);
+
+    expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
+
+    const pluginFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./plugin-test.avif"
+    );
+    const pluginExt = await fileType.fromFile(pluginFile);
+
+    expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
+
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      true
+    );
+  });
+
+  it("should generate image from copied assets", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "empty-entry.js"),
+      copyPlugin: true,
+      imageminPluginOptions: {
+        generator: [
+          {
+            type: "asset",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-webp"],
+            },
+          },
+        ],
       },
     });
     const { compilation } = stats;
@@ -1555,18 +1828,34 @@ describe("imagemin plugin", () => {
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
 
-  it("should generate new image format from copied assets and keep original", async () => {
+  it("should generate image from copied assets, minimize and keep original", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "empty-entry.js"),
       copyPlugin: true,
       imageminPluginOptions: {
         deleteOriginalAssets: false,
-        minimizer: {
-          implementation: ImageMinimizerPlugin.imageminGenerate,
-          options: {
-            plugins: ["imagemin-webp"],
+        generator: [
+          {
+            type: "asset",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-webp"],
+            },
           },
-        },
+          {
+            type: "asset",
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: {
+              plugins: ["imagemin-mozjpeg"],
+            },
+          },
+        ],
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            options: { plugins },
+          },
+        ],
       },
     });
     const { compilation } = stats;
@@ -1592,5 +1881,9 @@ describe("imagemin plugin", () => {
     const extJpg = await fileType.fromFile(fileJpg);
 
     expect(/image\/jpeg/i.test(extJpg.mime)).toBe(true);
+
+    await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
+      true
+    );
   });
 });

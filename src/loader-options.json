@@ -35,6 +35,10 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "type": {
+          "description": "Type of generation",
+          "enum": ["import"]
+        },
         "preset": {
           "description": "Name of preset, i.e. using in '?as=webp'.",
           "type": "string",

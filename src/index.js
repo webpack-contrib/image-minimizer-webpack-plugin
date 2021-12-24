@@ -107,11 +107,12 @@ const {
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
  * @property {string} [preset]
+ * @property {"import" | "asset"} [type]
  */
 
 /**
  * @template T
- * @typedef {Omit<Transformer<T>, "preset">} Minimizer
+ * @typedef {Omit<Transformer<T>, "preset" | "type">} Minimizer
  */
 
 /**
@@ -204,59 +205,100 @@ class ImageMinimizerPlugin {
    * @returns {Promise<void>}
    */
   async optimize(compiler, compilation, assets) {
-    if (!this.options.minimizer) {
+    const minimizers =
+      typeof this.options.minimizer !== "undefined"
+        ? Array.isArray(this.options.minimizer)
+          ? this.options.minimizer
+          : [this.options.minimizer]
+        : [];
+    const generators =
+      typeof this.options.generator !== "undefined"
+        ? this.options.generator.filter((item) => {
+            if (item.type === "asset") {
+              return true;
+            }
+
+            return false;
+          })
+        : [];
+
+    if (minimizers.length === 0 && generators.length === 0) {
       return;
     }
 
     const cache = compilation.getCache("ImageMinimizerWebpackPlugin");
-    const assetsForMinify = await Promise.all(
-      Object.keys(assets)
-        .filter((name) => {
-          const { info } = /** @type {Asset} */ (compilation.getAsset(name));
+    const assetsForTransformers = (
+      await Promise.all(
+        Object.keys(assets)
+          .filter((name) => {
+            const { info } = /** @type {Asset} */ (compilation.getAsset(name));
 
-          // Skip double minimize assets from child compilation
-          if (info.minimized || info.generated) {
-            return false;
-          }
+            // Skip double minimize assets from child compilation
+            if (info.minimized || info.generated) {
+              return false;
+            }
 
-          if (
-            !compiler.webpack.ModuleFilenameHelpers.matchObject.bind(
-              undefined,
-              this.options
-            )(name)
-          ) {
-            return false;
-          }
+            if (
+              !compiler.webpack.ModuleFilenameHelpers.matchObject.bind(
+                undefined,
+                this.options
+              )(name)
+            ) {
+              return false;
+            }
 
-          // // Exclude already optimized assets from `image-minimizer-webpack-loader`
-          // if (this.options.loader && moduleAssets.has(name)) {
-          //   const newInfo = moduleAssets.get(name) || {};
-          //
-          //   compilation.updateAsset(name, source, newInfo);
-          //
-          //   return false;
-          // }
+            return true;
+          })
+          .map(async (name) => {
+            const { info, source } = /** @type {Asset} */ (
+              compilation.getAsset(name)
+            );
 
-          return true;
-        })
-        .map(async (name) => {
-          const { info, source } = /** @type {Asset} */ (
-            compilation.getAsset(name)
-          );
+            /**
+             * @param {Transformer<T | G>} transformer
+             * @returns {Promise<{name: string, info: AssetInfo, inputSource: import("webpack").sources.Source, output: import("webpack").sources.Source, cacheItem: ItemCacheFacade, transformer: Transformer<T | G>}>}
+             */
+            const getFromCache = async (transformer) => {
+              const cacheName = serialize({
+                name,
+                transformer,
+              });
 
-          const cacheName = serialize({
-            name,
-            minimizer: this.options.minimizer,
-            generator: this.options.generator,
-          });
+              const eTag = cache.getLazyHashedEtag(source);
+              const cacheItem = cache.getItemCache(cacheName, eTag);
+              const output = await cacheItem.getPromise();
 
-          const eTag = cache.getLazyHashedEtag(source);
-          const cacheItem = cache.getItemCache(cacheName, eTag);
-          const output = await cacheItem.getPromise();
+              return {
+                name,
+                info,
+                inputSource: source,
+                output,
+                cacheItem,
+                transformer,
+              };
+            };
 
-          return { name, info, inputSource: source, output, cacheItem };
-        })
-    );
+            /**
+             * @type {Promise<{name: string, info: AssetInfo, inputSource: import("webpack").sources.Source, output: import("webpack").sources.Source, cacheItem: ItemCacheFacade, transformer: Transformer<T | G>}>[]}
+             */
+            const tasks = [];
+
+            if (generators.length > 0) {
+              tasks.push(
+                ...(await Promise.all(
+                  generators.map((generator) => getFromCache(generator))
+                ))
+              );
+            }
+
+            if (minimizers.length > 0) {
+              tasks.push(await getFromCache(minimizers));
+            }
+
+            return tasks;
+          })
+      )
+    ).flat();
 
     const cpus = os.cpus() || { length: 1 };
     const limit = this.options.concurrency || Math.max(1, cpus.length - 1);
@@ -265,9 +307,9 @@ class ImageMinimizerPlugin {
 
     const scheduledTasks = [];
 
-    for (const asset of assetsForMinify) {
+    for (const asset of assetsForTransformers) {
       scheduledTasks.push(async () => {
-        const { name, inputSource, cacheItem } = asset;
+        const { name, inputSource, cacheItem, transformer } = asset;
         let { output } = asset;
         let input;
 
@@ -280,13 +322,15 @@ class ImageMinimizerPlugin {
             input = Buffer.from(input);
           }
 
-          const minifyOptions = /** @type {InternalWorkerOptions<T>} */ ({
-            filename: name,
-            input,
-            severityError: this.options.severityError,
-            transformer: this.options.minimizer,
-            generateFilename: compilation.getAssetPath.bind(compilation),
-          });
+          const minifyOptions =
+            /** @type {InternalWorkerOptions<T>} */
+            ({
+              filename: name,
+              input,
+              severityError: this.options.severityError,
+              transformer,
+              generateFilename: compilation.getAssetPath.bind(compilation),
+            });
 
           output = await worker(minifyOptions);
 
@@ -441,6 +485,26 @@ class ImageMinimizerPlugin {
         const { minimizer, generator, test, include, exclude, severityError } =
           this.options;
 
+        const minimizerForLoader = minimizer;
+        let generatorForLoader = generator;
+
+        if (typeof generatorForLoader !== "undefined") {
+          const importGenerators = generatorForLoader.filter((item) => {
+            if (typeof item.type === "undefined" || item.type === "import") {
+              return true;
+            }
+
+            return false;
+          });
+
+          generatorForLoader =
+            importGenerators.length > 0 ? importGenerators : undefined;
+        }
+
+        if (!minimizerForLoader && !generatorForLoader) {
+          return;
+        }
+
         const loader = /** @type {InternalLoaderOptions<T>} */ ({
           test,
           include,
@@ -449,7 +513,11 @@ class ImageMinimizerPlugin {
           loader: require.resolve(path.join(__dirname, "loader.js")),
           options:
             /** @type {import("./loader").LoaderOptions<T>} */
-            ({ generator, minimizer, severityError }),
+            ({
+              generator: generatorForLoader,
+              minimizer: minimizerForLoader,
+              severityError,
+            }),
         });
         const dataURILoader = /** @type {InternalLoaderOptions<T>} */ ({
           scheme: /^data$/,
@@ -458,7 +526,11 @@ class ImageMinimizerPlugin {
           loader: require.resolve(path.join(__dirname, "loader.js")),
           options:
             /** @type {import("./loader").LoaderOptions<T>} */
-            ({ generator, minimizer, severityError }),
+            ({
+              generator: generatorForLoader,
+              minimizer: minimizerForLoader,
+              severityError,
+            }),
         });
 
         compiler.options.module.rules.push(loader);

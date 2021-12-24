@@ -577,6 +577,48 @@ describe("validate plugin options", () => {
 
     expect(() => {
       new ImageMinimizerPlugin({
+        generator: [
+          {
+            type: "import",
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {},
+            filename: () => "[name][ext]",
+          },
+        ],
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            type: "asset",
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {},
+            filename: () => "[name][ext]",
+          },
+        ],
+      });
+    }).not.toThrow();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            type: "foo",
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {},
+            filename: true,
+          },
+        ],
+      });
+    }).toThrowErrorMatchingSnapshot();
+
+    expect(() => {
+      new ImageMinimizerPlugin({
         concurrency: 2,
         minimizer: {
           implementation: ImageMinimizerPlugin.squooshMinify,
