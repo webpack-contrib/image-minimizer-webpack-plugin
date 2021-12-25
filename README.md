@@ -965,6 +965,54 @@ module.exports = {
 
 Generator option list:
 
+###### `type`
+
+Type: `"import" | "asset"`
+Default: `"import"`
+
+Allows you to apply the generator for `import` or assets from compilation (useful for copied assets).
+By default, generators are applying on `import`/`require`, but sometimes you need to generate new images from other plugins (for example - `copy-webpack-plugin`), if you need this, please set `asset` value for the `type` option.
+
+**webpack.config.js**
+
+```js
+const CopyPlugin = require("copy-webpack-plugin");
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins: [
+              "imagemin-gifsicle",
+              "imagemin-mozjpeg",
+              "imagemin-pngquant",
+              "imagemin-svgo",
+            ],
+          },
+        },
+        generator: [
+          {
+            // Apply generator for copied assets
+            type: "asset",
+            // You can use `ImageMinimizerPlugin.squooshGenerate`
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-webp"],
+            },
+          },
+        ],
+      }),
+    ],
+  },
+  plugnins: [new CopyPlugin({ patterns: ["images/**/*.png"] })],
+};
+```
+
 ###### `preset`
 
 Type: `String`
@@ -1633,6 +1681,84 @@ module.exports = {
       }),
     ],
   },
+};
+```
+
+### Generate `webp` images from copied assets
+
+- imagemin
+
+**webpack.config.js**
+
+```js
+const CopyPlugin = require("copy-webpack-plugin");
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.imageminMinify,
+          options: {
+            plugins: [
+              "imagemin-gifsicle",
+              "imagemin-mozjpeg",
+              "imagemin-pngquant",
+              "imagemin-svgo",
+            ],
+          },
+        },
+        generator: [
+          {
+            type: "asset",
+            implementation: ImageMinimizerPlugin.imageminGenerate,
+            options: {
+              plugins: ["imagemin-webp"],
+            },
+          },
+        ],
+      }),
+    ],
+  },
+  plugnins: [new CopyPlugin({ patterns: ["images/**/*.png"] })],
+};
+```
+
+- squoosh
+
+**webpack.config.js**
+
+```js
+const CopyPlugin = require("copy-webpack-plugin");
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+        },
+        generator: [
+          {
+            type: "asset",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  quality: 90,
+                },
+              },
+            },
+          },
+        ],
+      }),
+    ],
+  },
+  plugnins: [new CopyPlugin({ patterns: ["images/**/*.png"] })],
 };
 ```
 

@@ -22,6 +22,7 @@ const {
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
+/** @typedef {import("webpack").sources.Source} Source */
 /** @typedef {import("./utils.js").imageminMinify} ImageminMinifyFunction */
 /** @typedef {import("./utils.js").squooshMinify} SquooshMinifyFunction */
 
@@ -52,6 +53,17 @@ const {
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
  * @property {AssetInfo} info
+ */
+
+/**
+ * @template T
+ * @typedef {Object} Task
+ * @property {string} name
+ * @property {AssetInfo} info
+ * @property {Source} inputSource
+ * @property {WorkerResult & { source?: Source } | undefined} output
+ * @property {ReturnType<ReturnType<Compilation["getCache"]>["getItemCache"]>} cacheItem
+ * @property {Transformer<T> | Transformer<T>[]} transformer
  */
 
 /**
@@ -107,11 +119,12 @@ const {
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
  * @property {string} [preset]
+ * @property {"import" | "asset"} [type]
  */
 
 /**
  * @template T
- * @typedef {Omit<Transformer<T>, "preset">} Minimizer
+ * @typedef {Omit<Transformer<T>, "preset" | "type">} Minimizer
  */
 
 /**
@@ -200,63 +213,105 @@ class ImageMinimizerPlugin {
    * @private
    * @param {Compiler} compiler
    * @param {Compilation} compilation
-   * @param {Record<string, import("webpack").sources.Source>} assets
+   * @param {Record<string, Source>} assets
    * @returns {Promise<void>}
    */
   async optimize(compiler, compilation, assets) {
-    if (!this.options.minimizer) {
+    const minimizers =
+      typeof this.options.minimizer !== "undefined"
+        ? Array.isArray(this.options.minimizer)
+          ? this.options.minimizer
+          : [this.options.minimizer]
+        : [];
+    const generators = Array.isArray(this.options.generator)
+      ? this.options.generator.filter((item) => {
+          if (item.type === "asset") {
+            return true;
+          }
+
+          return false;
+        })
+      : [];
+
+    if (minimizers.length === 0 && generators.length === 0) {
       return;
     }
 
     const cache = compilation.getCache("ImageMinimizerWebpackPlugin");
-    const assetsForMinify = await Promise.all(
-      Object.keys(assets)
-        .filter((name) => {
-          const { info } = /** @type {Asset} */ (compilation.getAsset(name));
+    const assetsForTransformers = (
+      await Promise.all(
+        Object.keys(assets)
+          .filter((name) => {
+            const { info } = /** @type {Asset} */ (compilation.getAsset(name));
 
-          // Skip double minimize assets from child compilation
-          if (info.minimized || info.generated) {
-            return false;
-          }
+            // Skip double minimize assets from child compilation
+            if (info.minimized || info.generated) {
+              return false;
+            }
 
-          if (
-            !compiler.webpack.ModuleFilenameHelpers.matchObject.bind(
-              undefined,
-              this.options
-            )(name)
-          ) {
-            return false;
-          }
+            if (
+              !compiler.webpack.ModuleFilenameHelpers.matchObject.bind(
+                undefined,
+                this.options
+              )(name)
+            ) {
+              return false;
+            }
 
-          // // Exclude already optimized assets from `image-minimizer-webpack-loader`
-          // if (this.options.loader && moduleAssets.has(name)) {
-          //   const newInfo = moduleAssets.get(name) || {};
-          //
-          //   compilation.updateAsset(name, source, newInfo);
-          //
-          //   return false;
-          // }
+            return true;
+          })
+          .map(async (name) => {
+            const { info, source } = /** @type {Asset} */ (
+              compilation.getAsset(name)
+            );
 
-          return true;
-        })
-        .map(async (name) => {
-          const { info, source } = /** @type {Asset} */ (
-            compilation.getAsset(name)
-          );
+            /**
+             * @template Z
+             * @param {Transformer<Z> | Array<Transformer<Z>>} transformer
+             * @returns {Promise<Task<Z>>}
+             */
+            const getFromCache = async (transformer) => {
+              const cacheName = serialize({ name, transformer });
+              const eTag = cache.getLazyHashedEtag(source);
+              const cacheItem = cache.getItemCache(cacheName, eTag);
+              const output = await cacheItem.getPromise();
 
-          const cacheName = serialize({
-            name,
-            minimizer: this.options.minimizer,
-            generator: this.options.generator,
-          });
+              return {
+                name,
+                info,
+                inputSource: source,
+                output,
+                cacheItem,
+                transformer,
+              };
+            };
 
-          const eTag = cache.getLazyHashedEtag(source);
-          const cacheItem = cache.getItemCache(cacheName, eTag);
-          const output = await cacheItem.getPromise();
+            /**
+             * @type {Task<T | G>[]}
+             */
+            const tasks = [];
 
-          return { name, info, inputSource: source, output, cacheItem };
-        })
-    );
+            if (generators.length > 0) {
+              tasks.push(
+                ...(await Promise.all(
+                  generators.map((generator) => getFromCache(generator))
+                ))
+              );
+            }
+
+            if (minimizers.length > 0) {
+              tasks.push(
+                await getFromCache(
+                  /** @type {Minimizer<T>[]} */
+                  (minimizers)
+                )
+              );
+            }
+
+            return tasks;
+          })
+      )
+    ).flat();
 
     const cpus = os.cpus() || { length: 1 };
     const limit = this.options.concurrency || Math.max(1, cpus.length - 1);
@@ -265,9 +320,9 @@ class ImageMinimizerPlugin {
 
     const scheduledTasks = [];
 
-    for (const asset of assetsForMinify) {
+    for (const asset of assetsForTransformers) {
       scheduledTasks.push(async () => {
-        const { name, inputSource, cacheItem } = asset;
+        const { name, inputSource, cacheItem, transformer } = asset;
         let { output } = asset;
         let input;
 
@@ -280,13 +335,15 @@ class ImageMinimizerPlugin {
             input = Buffer.from(input);
           }
 
-          const minifyOptions = /** @type {InternalWorkerOptions<T>} */ ({
-            filename: name,
-            input,
-            severityError: this.options.severityError,
-            transformer: this.options.minimizer,
-            generateFilename: compilation.getAssetPath.bind(compilation),
-          });
+          const minifyOptions =
+            /** @type {InternalWorkerOptions<T>} */
+            ({
+              filename: name,
+              input,
+              severityError: this.options.severityError,
+              transformer,
+              generateFilename: compilation.getAssetPath.bind(compilation),
+            });
 
           output = await worker(minifyOptions);
 
@@ -316,9 +373,17 @@ class ImageMinimizerPlugin {
         }
 
         if (compilation.getAsset(output.filename)) {
-          compilation.updateAsset(output.filename, output.source, output.info);
+          compilation.updateAsset(
+            output.filename,
+            /** @type {Source} */ (output.source),
+            output.info
+          );
         } else {
-          compilation.emitAsset(output.filename, output.source, output.info);
+          compilation.emitAsset(
+            output.filename,
+            /** @type {Source} */ (output.source),
+            output.info
+          );
 
           if (this.options.deleteOriginalAssets) {
             compilation.deleteAsset(name);
@@ -441,6 +506,29 @@ class ImageMinimizerPlugin {
         const { minimizer, generator, test, include, exclude, severityError } =
           this.options;
 
+        const minimizerForLoader = minimizer;
+        let generatorForLoader = generator;
+
+        if (Array.isArray(generatorForLoader)) {
+          const importGenerators = generatorForLoader.filter((item) => {
+            if (typeof item.type === "undefined" || item.type === "import") {
+              return true;
+            }
+
+            return false;
+          });
+
+          generatorForLoader =
+            importGenerators.length > 0
+              ? /** @type {G extends any[] ? { [P in keyof G]: Generator<G[P]>; } : Generator<G>[]} */
+                (importGenerators)
+              : undefined;
+        }
+
+        if (!minimizerForLoader && !generatorForLoader) {
+          return;
+        }
+
         const loader = /** @type {InternalLoaderOptions<T>} */ ({
           test,
           include,
@@ -449,7 +537,11 @@ class ImageMinimizerPlugin {
           loader: require.resolve(path.join(__dirname, "loader.js")),
           options:
             /** @type {import("./loader").LoaderOptions<T>} */
-            ({ generator, minimizer, severityError }),
+            ({
+              generator: generatorForLoader,
+              minimizer: minimizerForLoader,
+              severityError,
+            }),
         });
         const dataURILoader = /** @type {InternalLoaderOptions<T>} */ ({
           scheme: /^data$/,
@@ -458,7 +550,11 @@ class ImageMinimizerPlugin {
           loader: require.resolve(path.join(__dirname, "loader.js")),
           options:
             /** @type {import("./loader").LoaderOptions<T>} */
-            ({ generator, minimizer, severityError }),
+            ({
+              generator: generatorForLoader,
+              minimizer: minimizerForLoader,
+              severityError,
+            }),
         });
 
         compiler.options.module.rules.push(loader);

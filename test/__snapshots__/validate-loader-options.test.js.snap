@@ -33,7 +33,7 @@ exports[`validate loader options should throw an error on the "generator" option
 exports[`validate loader options should throw an error on the "generator" option with "1" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.generator should be an array:
-   [object { implementation, preset, options?, filter?, filename? }, ...] (should not have fewer than 1 item)
+   [object { implementation, preset, type?, options?, filter?, filename? }, ...] (should not have fewer than 1 item)
    -> Allows you to setup the generator function and options.
    -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#generator"
 `;
@@ -41,7 +41,7 @@ exports[`validate loader options should throw an error on the "generator" option
 exports[`validate loader options should throw an error on the "generator" option with "false" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.generator should be an array:
-   [object { implementation, preset, options?, filter?, filename? }, ...] (should not have fewer than 1 item)
+   [object { implementation, preset, type?, options?, filter?, filename? }, ...] (should not have fewer than 1 item)
    -> Allows you to setup the generator function and options.
    -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#generator"
 `;
@@ -49,7 +49,7 @@ exports[`validate loader options should throw an error on the "generator" option
 exports[`validate loader options should throw an error on the "generator" option with "null" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.generator should be an array:
-   [object { implementation, preset, options?, filter?, filename? }, ...] (should not have fewer than 1 item)
+   [object { implementation, preset, type?, options?, filter?, filename? }, ...] (should not have fewer than 1 item)
    -> Allows you to setup the generator function and options.
    -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#generator"
 `;
@@ -57,7 +57,7 @@ exports[`validate loader options should throw an error on the "generator" option
 exports[`validate loader options should throw an error on the "generator" option with "true" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.generator should be an array:
-   [object { implementation, preset, options?, filter?, filename? }, ...] (should not have fewer than 1 item)
+   [object { implementation, preset, type?, options?, filter?, filename? }, ...] (should not have fewer than 1 item)
    -> Allows you to setup the generator function and options.
    -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#generator"
 `;

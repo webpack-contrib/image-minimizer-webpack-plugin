@@ -6,6 +6,7 @@ export = ImageMinimizerPlugin;
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
+/** @typedef {import("webpack").sources.Source} Source */
 /** @typedef {import("./utils.js").imageminMinify} ImageminMinifyFunction */
 /** @typedef {import("./utils.js").squooshMinify} SquooshMinifyFunction */
 /** @typedef {RegExp | string} Rule */
@@ -30,6 +31,16 @@ export = ImageMinimizerPlugin;
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
  * @property {AssetInfo} info
+ */
+/**
+ * @template T
+ * @typedef {Object} Task
+ * @property {string} name
+ * @property {AssetInfo} info
+ * @property {Source} inputSource
+ * @property {WorkerResult & { source?: Source } | undefined} output
+ * @property {ReturnType<ReturnType<Compilation["getCache"]>["getItemCache"]>} cacheItem
+ * @property {Transformer<T> | Transformer<T>[]} transformer
  */
 /**
  * @typedef {{ [key: string]: any }} CustomOptions
@@ -76,10 +87,11 @@ export = ImageMinimizerPlugin;
  * @property {FilterFn} [filter]
  * @property {string | FilenameFn} [filename]
  * @property {string} [preset]
+ * @property {"import" | "asset"} [type]
  */
 /**
  * @template T
- * @typedef {Omit<Transformer<T>, "preset">} Minimizer
+ * @typedef {Omit<Transformer<T>, "preset" | "type">} Minimizer
  */
 /**
  * @template T
@@ -128,7 +140,7 @@ declare class ImageMinimizerPlugin<T, G = T> {
    * @private
    * @param {Compiler} compiler
    * @param {Compilation} compilation
-   * @param {Record<string, import("webpack").sources.Source>} assets
+   * @param {Record<string, Source>} assets
    * @returns {Promise<void>}
    */
   private optimize;
@@ -160,6 +172,7 @@ declare namespace ImageMinimizerPlugin {
     WebpackError,
     Asset,
     AssetInfo,
+    Source,
     ImageminMinifyFunction,
     SquooshMinifyFunction,
     Rule,
@@ -168,6 +181,7 @@ declare namespace ImageMinimizerPlugin {
     ImageminOptions,
     SquooshOptions,
     WorkerResult,
+    Task,
     CustomOptions,
     InferDefaultType,
     BasicTransformerOptions,
@@ -243,6 +257,7 @@ type Compilation = import("webpack").Compilation;
 type WebpackError = import("webpack").WebpackError;
 type Asset = import("webpack").Asset;
 type AssetInfo = import("webpack").AssetInfo;
+type Source = import("webpack").sources.Source;
 type ImageminMinifyFunction = typeof imageminMinify;
 type SquooshMinifyFunction = typeof squooshMinify;
 type Rule = RegExp | string;
@@ -262,6 +277,18 @@ type WorkerResult = {
   warnings: Array<Error>;
   errors: Array<Error>;
   info: AssetInfo;
+};
+type Task<T> = {
+  name: string;
+  info: AssetInfo;
+  inputSource: Source;
+  output:
+    | (WorkerResult & {
+        source?: Source;
+      })
+    | undefined;
+  cacheItem: ReturnType<ReturnType<Compilation["getCache"]>["getItemCache"]>;
+  transformer: Transformer<T> | Transformer<T>[];
 };
 type CustomOptions = {
   [key: string]: any;
@@ -291,8 +318,9 @@ type Transformer<T> = {
   filter?: FilterFn | undefined;
   filename?: string | FilenameFn | undefined;
   preset?: string | undefined;
+  type?: "import" | "asset" | undefined;
 };
-type Minimizer<T> = Omit<Transformer<T>, "preset">;
+type Minimizer<T> = Omit<Transformer<T>, "preset" | "type">;
 type Generator<T> = Transformer<T>;
 type InternalWorkerOptions<T> = {
   filename: string;
