@@ -22,6 +22,7 @@ const {
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
+/** @typedef {import("webpack").sources.Source} Source */
 /** @typedef {import("./utils.js").imageminMinify} ImageminMinifyFunction */
 /** @typedef {import("./utils.js").squooshMinify} SquooshMinifyFunction */
 
@@ -52,6 +53,17 @@ const {
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
  * @property {AssetInfo} info
+ */
+
+/**
+ * @template T
+ * @typedef {Object} Task
+ * @property {string} name
+ * @property {AssetInfo} info
+ * @property {Source} inputSource
+ * @property {WorkerResult & { source?: Source } | undefined} output
+ * @property {ReturnType<ReturnType<Compilation["getCache"]>["getItemCache"]>} cacheItem
+ * @property {Transformer<T> | Transformer<T>[]} transformer
  */
 
 /**
@@ -201,7 +213,7 @@ class ImageMinimizerPlugin {
    * @private
    * @param {Compiler} compiler
    * @param {Compilation} compilation
-   * @param {Record<string, import("webpack").sources.Source>} assets
+   * @param {Record<string, Source>} assets
    * @returns {Promise<void>}
    */
   async optimize(compiler, compilation, assets) {
@@ -211,16 +223,15 @@ class ImageMinimizerPlugin {
           ? this.options.minimizer
           : [this.options.minimizer]
         : [];
-    const generators =
-      typeof this.options.generator !== "undefined"
-        ? this.options.generator.filter((item) => {
-            if (item.type === "asset") {
-              return true;
-            }
+    const generators = Array.isArray(this.options.generator)
+      ? this.options.generator.filter((item) => {
+          if (item.type === "asset") {
+            return true;
+          }
 
-            return false;
-          })
-        : [];
+          return false;
+        })
+      : [];
 
     if (minimizers.length === 0 && generators.length === 0) {
       return;
@@ -255,8 +266,9 @@ class ImageMinimizerPlugin {
             );
 
             /**
-             * @param {Transformer<T | G>} transformer
-             * @returns {Promise<{name: string, info: AssetInfo, inputSource: import("webpack").sources.Source, output: import("webpack").sources.Source, cacheItem: ItemCacheFacade, transformer: Transformer<T | G>}>}
+             * @template Z
+             * @param {Transformer<Z> | Array<Transformer<Z>>} transformer
+             * @returns {Promise<Task<Z>>}
              */
             const getFromCache = async (transformer) => {
               const cacheName = serialize({
@@ -279,7 +291,7 @@ class ImageMinimizerPlugin {
             };
 
             /**
-             * @type {Promise<{name: string, info: AssetInfo, inputSource: import("webpack").sources.Source, output: import("webpack").sources.Source, cacheItem: ItemCacheFacade, transformer: Transformer<T | G>}>[]}
+             * @type {Task<T | G>[]}
              */
             const tasks = [];
 
@@ -292,7 +304,12 @@ class ImageMinimizerPlugin {
             }
 
             if (minimizers.length > 0) {
-              tasks.push(await getFromCache(minimizers));
+              tasks.push(
+                await getFromCache(
+                  /** @type {Minimizer<T>[]} */
+                  (minimizers)
+                )
+              );
             }
 
             return tasks;
@@ -360,9 +377,17 @@ class ImageMinimizerPlugin {
         }
 
         if (compilation.getAsset(output.filename)) {
-          compilation.updateAsset(output.filename, output.source, output.info);
+          compilation.updateAsset(
+            output.filename,
+            /** @type {Source} */ (output.source),
+            output.info
+          );
         } else {
-          compilation.emitAsset(output.filename, output.source, output.info);
+          compilation.emitAsset(
+            output.filename,
+            /** @type {Source} */ (output.source),
+            output.info
+          );
 
           if (this.options.deleteOriginalAssets) {
             compilation.deleteAsset(name);
@@ -488,7 +513,7 @@ class ImageMinimizerPlugin {
         const minimizerForLoader = minimizer;
         let generatorForLoader = generator;
 
-        if (typeof generatorForLoader !== "undefined") {
+        if (Array.isArray(generatorForLoader)) {
           const importGenerators = generatorForLoader.filter((item) => {
             if (typeof item.type === "undefined" || item.type === "import") {
               return true;
@@ -498,7 +523,10 @@ class ImageMinimizerPlugin {
           });
 
           generatorForLoader =
-            importGenerators.length > 0 ? importGenerators : undefined;
+            importGenerators.length > 0
+              ? /** @type {G extends any[] ? { [P in keyof G]: Generator<G[P]>; } : Generator<G>[]} */
+                (importGenerators)
+              : undefined;
         }
 
         if (!minimizerForLoader && !generatorForLoader) {
