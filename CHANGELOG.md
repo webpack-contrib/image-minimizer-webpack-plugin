@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.1.2...v3.2.0) (2021-12-25)
+
+
+### Features
+
+* allow generating images from copied assets using the `type` option for the `generator` option ([fab9103](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/fab910337ef3c119f991f0d71c682d5ab3a65b5c))
+
 ### [3.1.2](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.1.1...v3.1.2) (2021-12-17)
 
 
