@@ -271,11 +271,7 @@ class ImageMinimizerPlugin {
              * @returns {Promise<Task<Z>>}
              */
             const getFromCache = async (transformer) => {
-              const cacheName = serialize({
-                name,
-                transformer,
-              });
-
+              const cacheName = serialize({ name, transformer });
               const eTag = cache.getLazyHashedEtag(source);
               const cacheItem = cache.getItemCache(cacheName, eTag);
               const output = await cacheItem.getPromise();
