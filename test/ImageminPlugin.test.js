@@ -2073,6 +2073,12 @@ describe("imagemin plugin", () => {
     expect(secondErrors).toHaveLength(0);
 
     expect(secondStats.compilation.emittedAssets.size).toBe(0);
+
+    await new Promise((resolve) => {
+      compiler.close(() => {
+        resolve();
+      });
+    });
   });
 
   it("should generate image from copied assets", async () => {
