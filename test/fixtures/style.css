@@ -1,3 +1,4 @@
 a {
   background: url("./url.png");
+  background: url("./url.png?as=webp");
 }

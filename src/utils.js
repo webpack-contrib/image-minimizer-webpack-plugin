@@ -704,6 +704,10 @@ function squooshImagePoolCreate() {
 function squooshImagePoolSetup() {
   if (!pool) {
     pool = squooshImagePoolCreate();
+
+    // workarounds for https://github.com/GoogleChromeLabs/squoosh/issues/1152
+    // @ts-ignore
+    delete globalThis.navigator;
   }
 }
 
