@@ -1,5 +1,4 @@
 const path = require("path");
-const os = require("os");
 
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").SquooshOptions} SquooshOptions */
@@ -687,11 +686,7 @@ async function imageminMinify(original, options) {
  */
 let pool;
 
-/**
- * @param {number} threads
- * @returns {any}
- */
-function squooshImagePoolCreate(threads = 1) {
+function squooshImagePoolCreate() {
   // eslint-disable-next-line node/no-unpublished-require
   const { ImagePool } = require("@squoosh/lib");
 
@@ -703,14 +698,12 @@ function squooshImagePoolCreate(threads = 1) {
   // Also we don't know how many image (modules are built asynchronously) we will have so we can't setup
   // the correct value and creating child processes takes a long time, unfortunately there is no perfect solution here,
   // maybe we should provide an option for this (or API for warm up), so if you are reading this feel free to open the issue
-  return new ImagePool(threads);
+  return new ImagePool(1);
 }
 
 function squooshImagePoolSetup() {
   if (!pool) {
-    const cpus = os.cpus() || { length: 1 };
-
-    pool = squooshImagePoolCreate(cpus.length - 1);
+    pool = squooshImagePoolCreate();
 
     // workarounds for https://github.com/GoogleChromeLabs/squoosh/issues/1152
     // @ts-ignore
