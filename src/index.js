@@ -562,6 +562,12 @@ class ImageMinimizerPlugin {
       });
     }
 
+    compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
+      compilation.hooks.afterSeal.tapPromise({ name: pluginName }, async () => {
+        await this.teardownAll();
+      });
+    });
+
     compiler.hooks.compilation.tap(pluginName, (compilation) => {
       compilation.hooks.processAssets.tapPromise(
         {
@@ -572,7 +578,6 @@ class ImageMinimizerPlugin {
         },
         async (assets) => {
           await this.optimize(compiler, compilation, assets);
-          await this.teardownAll();
         }
       );
 

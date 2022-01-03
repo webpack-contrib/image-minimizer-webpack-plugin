@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`imagemin plugin should work with mini-css-extract-plugin: main.css 1`] = `
+"a {
+  background: url(url.png);
+  background: url(url.webp);
+}
+
+"
+`;

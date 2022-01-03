@@ -2171,4 +2171,75 @@ describe("imagemin plugin", () => {
       true
     );
   });
+
+  it("should work with mini-css-extract-plugin", async () => {
+    const stats = await runWebpack({
+      fileLoaderOff: true,
+      assetResource: true,
+      MCEP: true,
+      entry: path.join(fixturesPath, "entry-with-css.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|png|webp)$/i,
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: 1,
+                },
+              },
+            },
+          },
+        ],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.squooshMinify,
+          options: {
+            encodeOptions: {
+              mozjpeg: {
+                quality: 40,
+              },
+              oxipng: {
+                quality: 40,
+              },
+            },
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const pngFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./url.png"
+    );
+    const pngExt = await fileType.fromFile(pngFile);
+
+    expect(/image\/png/i.test(pngExt.mime)).toBe(true);
+
+    const webpFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./url.webp"
+    );
+    const webpExt = await fileType.fromFile(webpFile);
+
+    expect(/image\/webp/i.test(webpExt.mime)).toBe(true);
+
+    const cssFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./main.css"
+    );
+
+    const cssContent = await fs.promises.readFile(cssFile, "utf-8");
+
+    expect(cssContent).toMatchSnapshot("main.css");
+  });
 });
