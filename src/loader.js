@@ -135,9 +135,17 @@ async function loader(content) {
     this._module.resourceResolveData &&
     this._module.resourceResolveData.encodedContent
   ) {
-    // console.log(content.toString())
-    this._module.resourceResolveData.encodedContent =
-      output.data.toString("base64");
+    const isBase64 = /^base64$/i.test(
+      this._module.resourceResolveData.encoding
+    );
+
+    this._module.resourceResolveData.encodedContent = isBase64
+      ? output.data.toString("base64")
+      : encodeURIComponent(output.data.toString("utf-8")).replace(
+          /[!'()*]/g,
+          (character) =>
+            `%${/** @type {number} */ (character.codePointAt(0)).toString(16)}`
+        );
   } else {
     let query = this.resourceQuery;
 
