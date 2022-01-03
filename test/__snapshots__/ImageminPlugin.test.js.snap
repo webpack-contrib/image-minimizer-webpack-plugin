@@ -6,5 +6,13 @@ exports[`imagemin plugin should work with mini-css-extract-plugin: main.css 1`] 
   background: url(url.webp);
 }
 
+body {
+  content: url(\\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20d%3D%22m14.83%204.89%201.34.94-5.81%208.38H9.02L5.78%209.67l1.34-1.25%202.57%202.4z%22%2F%3E%3C%2Fsvg%3E\\");
+}
+
+body {
+  content: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCI+PHBhdGggZD0ibTE0LjgzIDQuODkgMS4zNC45NC01LjgxIDguMzhIOS4wMkw1Ljc4IDkuNjdsMS4zNC0xLjI1IDIuNTcgMi40eiIvPjwvc3ZnPg==);
+}
+
 "
 `;
