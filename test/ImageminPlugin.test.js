@@ -20,7 +20,7 @@ import {
 
 import ImageMinimizerPlugin from "../src";
 
-jest.setTimeout(40000);
+jest.setTimeout(100000);
 
 describe("imagemin plugin", () => {
   it("should optimizes all images (loader + plugin)", async () => {
