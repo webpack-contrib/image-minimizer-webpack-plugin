@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.2.2](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.2.1...v3.2.2) (2022-01-07)
+
+
+### Bug Fixes
+
+* perf for `squoosh` ([#295](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/295)) ([2f4d1a2](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/2f4d1a291e30b737ebff118804f7fee93c90fcd1))
+
 ### [3.2.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.2.0...v3.2.1) (2022-01-03)
 
 
