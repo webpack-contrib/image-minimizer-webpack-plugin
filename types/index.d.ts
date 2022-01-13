@@ -61,9 +61,9 @@ export = ImageMinimizerPlugin;
  * @returns {Promise<WorkerResult>}
  */
 /**
- * @typedef {object} BasicTransformerHelpers
- * @property {() => {}} [setup]
- * @property {() => {}} [teardown]
+ * @typedef {Object} BasicTransformerHelpers
+ * @property {() => void} [setup]
+ * @property {() => void} [teardown]
  */
 /**
  * @template T
@@ -300,8 +300,8 @@ type BasicTransformerImplementation<T> = (
   options?: BasicTransformerOptions<T>
 ) => Promise<WorkerResult>;
 type BasicTransformerHelpers = {
-  setup?: (() => {}) | undefined;
-  teardown?: (() => {}) | undefined;
+  setup?: (() => void) | undefined;
+  teardown?: (() => void) | undefined;
 };
 type TransformerFunction<T> = BasicTransformerImplementation<T> &
   BasicTransformerHelpers;

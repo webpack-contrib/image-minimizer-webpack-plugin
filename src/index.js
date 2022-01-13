@@ -89,9 +89,9 @@ const {
  */
 
 /**
- * @typedef {object} BasicTransformerHelpers
- * @property {() => {}} [setup]
- * @property {() => {}} [teardown]
+ * @typedef {Object} BasicTransformerHelpers
+ * @property {() => void} [setup]
+ * @property {() => void} [teardown]
  */
 
 /**
