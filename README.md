@@ -38,7 +38,7 @@ To begin, you'll need to install `image-minimizer-webpack-plugin` and image mini
 - [imagemin](https://github.com/imagemin/imagemin):
 
 ```console
-$ npm install image-minimizer-webpack-plugin imagemin --save-dev
+npm install image-minimizer-webpack-plugin imagemin --save-dev
 ```
 
 > ⚠️ imagemin uses plugin to optimize/generate images, so you need to isntall them too
@@ -46,7 +46,7 @@ $ npm install image-minimizer-webpack-plugin imagemin --save-dev
 - [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh):
 
 ```console
-$ npm install image-minimizer-webpack-plugin @squoosh/lib --save-dev
+npm install image-minimizer-webpack-plugin @squoosh/lib --save-dev
 ```
 
 Images can be optimized in two modes:
@@ -135,7 +135,7 @@ module.exports = {
 ### Optimize with [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh)
 
 ```console
-$ npm install @squoosh/lib --save-dev
+npm install @squoosh/lib --save-dev
 ```
 
 **Recommended `@squoosh/lib` options for lossy optimization**
@@ -948,7 +948,7 @@ module.exports = {
                   // Please always set it to prevent double minification
                   generated: true,
                   // Optional
-                  generatedBy: ["custom-name-of-minimication"],
+                  generatedBy: ["custom-name-of-minification"],
                 },
               };
             },
@@ -1009,7 +1009,7 @@ module.exports = {
       }),
     ],
   },
-  plugnins: [new CopyPlugin({ patterns: ["images/**/*.png"] })],
+  plugins: [new CopyPlugin({ patterns: ["images/**/*.png"] })],
 };
 ```
 
@@ -1506,7 +1506,7 @@ module.exports = {
               preset: "webp",
               implementation: ImageMinimizerPlugin.imageminGenerate,
               options: {
-                plugins: ["iamgemin-webp"],
+                plugins: ["imagemin-webp"],
               },
             },
           ],
@@ -1722,7 +1722,7 @@ module.exports = {
       }),
     ],
   },
-  plugnins: [new CopyPlugin({ patterns: ["images/**/*.png"] })],
+  plugins: [new CopyPlugin({ patterns: ["images/**/*.png"] })],
 };
 ```
 
@@ -1758,7 +1758,7 @@ module.exports = {
       }),
     ],
   },
-  plugnins: [new CopyPlugin({ patterns: ["images/**/*.png"] })],
+  plugins: [new CopyPlugin({ patterns: ["images/**/*.png"] })],
 };
 ```
 
