@@ -41,7 +41,7 @@ To begin, you'll need to install `image-minimizer-webpack-plugin` and image mini
 npm install image-minimizer-webpack-plugin imagemin --save-dev
 ```
 
-> ⚠️ imagemin uses plugin to optimize/generate images, so you need to isntall them too
+> ⚠️ imagemin uses plugin to optimize/generate images, so you need to install them too
 
 - [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh):
 
