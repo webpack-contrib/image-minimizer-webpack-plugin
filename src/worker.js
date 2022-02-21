@@ -58,7 +58,13 @@ async function worker(options) {
     errors: [],
     info: {
       sourceFilename:
-        (options.info && options.info.sourceFilename) || options.filename,
+        options.info &&
+        typeof options.info === "object" &&
+        typeof options.info.sourceFilename === "string"
+          ? options.info.sourceFilename
+          : typeof options.filename === "string"
+          ? options.filename
+          : undefined,
     },
   };
 
