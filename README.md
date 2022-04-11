@@ -324,21 +324,24 @@ module.exports = {
 
 ### Plugin Options
 
-|                        Name                         |                   Type                    |                           Default                           | Description                                                      |
-| :-------------------------------------------------: | :---------------------------------------: | :---------------------------------------------------------: | :--------------------------------------------------------------- |
-|                 **[`test`](#test)**                 | `{String\/RegExp\|Array<String\|RegExp>}` | <code>/\.(jpe?g\|png\|gif\|tif\|webp\|svg\|avif)\$/i</code> | Test to match files against                                      |
-|              **[`include`](#include)**              | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to include                                                 |
-|              **[`exclude`](#exclude)**              | `{String\/RegExp\|Array<String\|RegExp>}` |                         `undefined`                         | Files to exclude                                                 |
-|            **[`minimizer`](#minimizer)**            |        `{Object \| Array<Object>}`        |                         `undefined`                         | Allows to setup default minimizer                                |
-|            **[`generator`](#generator)**            |             `{Array<Object>}`             |                         `undefined`                         | Allow to setup default generators                                |
-|        **[`severityError`](#severityerror)**        |                `{String}`                 |                          `'error'`                          | Allows to choose how errors are displayed                        |
-|               **[`loader`](#loader)**               |                `{Boolean}`                |                           `true`                            | Automatically adding built-in loader                             |
-|          **[`concurrency`](#concurrency)**          |                `{Number}`                 |             `Math.max(1, os.cpus().length - 1)`             | Maximum number of concurrency optimization processes in one time |
-| **[`deleteOriginalAssets`](#deleteoriginalassets)** |                `{Boolean}`                |                           `true`                            | Allows to delete the original asset for minimizer                |
+- **[`test`](#test)**
+- **[`include`](#include)**
+- **[`exclude`](#exclude)**
+- **[`minimizer`](#minimizer)**
+- **[`generator`](#generator)**
+- **[`severityError`](#severityerror)**
+- **[`loader`](#loader)**
+- **[`concurrency`](#concurrency)**
+- **[`deleteOriginalAssets`](#deleteoriginalassets)**
 
 #### `test`
 
-Type: `String|RegExp|Array<String|RegExp>`
+Type:
+
+```ts
+type test = string | RegExp | Array<string | RegExp>;
+```
+
 Default: `/\.(jpe?g\|png\|gif\|tif\|webp\|svg\|avif)\$/i`
 
 Test to match files against.
@@ -362,7 +365,12 @@ module.exports = {
 
 #### `include`
 
-Type: `String|RegExp|Array<String|RegExp>`
+Type:
+
+```ts
+type include = string | RegExp | Array<string | RegExp>;
+```
+
 Default: `undefined`
 
 Files to include.
@@ -386,7 +394,12 @@ module.exports = {
 
 #### `exclude`
 
-Type: `String|RegExp|Array<String|RegExp>`
+Type:
+
+```ts
+type exclude = tring | RegExp | Array<string | RegExp>;
+```
+
 Default: `undefined`
 
 Files to exclude.
@@ -410,7 +423,60 @@ module.exports = {
 
 #### `minimizer`
 
-Type: `Object|Array<Object>`
+Type:
+
+```ts
+type minimizer =
+  | {
+      implementation: (
+        original: WorkerResult,
+        options?:
+          | {
+              [key: string]: any;
+            }
+          | undefined
+      ) => Promise<WorkerResult> & {
+        setup?: (() => void) | undefined;
+        teardown?: (() => void) | undefined;
+      };
+      options?:
+        | {
+            [key: string]: any;
+          }
+        | undefined;
+      filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
+      filename?:
+        | string
+        | ((
+            pathData: {
+              filename?: string | undefined;
+            },
+            assetInfo?: import("webpack").AssetInfo | undefined
+          ) => string)
+        | undefined;
+    }
+  | Array<{
+      implementation: (
+        original: WorkerResult,
+        options?: InferDefaultType<T> | undefined
+      ) => Promise<WorkerResult> & {
+        setup?: (() => void) | undefined;
+        teardown?: (() => void) | undefined;
+      };
+      options?: InferDefaultType<T> | undefined;
+      filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
+      filename?:
+        | string
+        | ((
+            pathData: {
+              filename?: string | undefined;
+            },
+            assetInfo?: import("webpack").AssetInfo | undefined
+          ) => string)
+        | undefined;
+    }>;
+```
+
 Default: `undefined`
 
 Allows to setup default minify function.
@@ -420,7 +486,7 @@ Available minimizers:
 - `ImageMinimizerPlugin.imageminMinify`
 - `ImageMinimizerPlugin.squooshMinify`
 
-##### `Object`
+##### `object`
 
 For imagemin:
 
@@ -491,7 +557,18 @@ Minimizer option list:
 
 ###### `implementation`
 
-Type: `Function`
+Type:
+
+```ts
+type implementation = (
+  original: WorkerResult,
+  options?: BasicTransformerOptions<T>
+) => Promise<WorkerResult> & {
+  setup?: (() => void) | undefined;
+  teardown?: (() => void) | undefined;
+};
+```
+
 Default: `undefined`
 
 Configure the default `implementation`.
@@ -518,7 +595,14 @@ module.exports = {
 
 ###### `options`
 
-Type: `Object`
+Type:
+
+```ts
+type options = {
+  [key: string]: any;
+};
+```
+
 Default: `undefined`
 
 Options for the `implementation` option (i.e. options for `imagemin`/`squoosh`/custom implementation).
@@ -552,7 +636,12 @@ module.exports = {
 
 ###### `filter`
 
-Type: `Function`
+Type:
+
+```ts
+type filter = (source: Buffer, sourcePath: string) => boolean | undefined;
+```
+
 Default: `() => true`
 
 Allows filtering of images for optimization/generation.
@@ -597,7 +686,20 @@ module.exports = {
 
 ###### `filename`
 
-Type: `string | Function`
+Type:
+
+```ts
+type filename =
+  | string
+  | ((
+      pathData: {
+        filename?: string | undefined;
+      },
+      assetInfo?: import("webpack").AssetInfo | undefined
+    ) => string)
+  | undefined;
+```
+
 Default: `undefined`
 
 Allows to set the filename.
@@ -631,7 +733,7 @@ module.exports = {
 };
 ```
 
-Example `Function` usage:
+Example `function` usage:
 
 **webpack.config.js**
 
@@ -661,7 +763,7 @@ module.exports = {
 };
 ```
 
-##### `Array`
+##### `array`
 
 Allows to setup multiple minimizers.
 
@@ -729,7 +831,41 @@ module.exports = {
 
 #### `generator`
 
-Type: `Array<Object>`
+Type:
+
+```ts
+type generator = Array<{
+  implementation: (
+    original: WorkerResult,
+    options?:
+      | {
+          [key: string]: any;
+        }
+      | undefined
+  ) => Promise<WorkerResult> & {
+    setup?: (() => void) | undefined;
+    teardown?: (() => void) | undefined;
+  };
+  options?:
+    | {
+        [key: string]: any;
+      }
+    | undefined;
+  filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
+  filename?:
+    | string
+    | ((
+        pathData: {
+          filename?: string | undefined;
+        },
+        assetInfo?: import("webpack").AssetInfo | undefined
+      ) => string)
+    | undefined;
+  preset?: string | undefined;
+  type?: "import" | "asset" | undefined;
+}>;
+```
+
 Default: `undefined`
 
 Allow to setup default generators.
@@ -967,7 +1103,12 @@ Generator option list:
 
 ###### `type`
 
-Type: `"import" | "asset"`
+Type:
+
+```ts
+type type = "import" | "asset" | undefined;
+```
+
 Default: `"import"`
 
 Allows you to apply the generator for `import` or assets from compilation (useful for copied assets).
@@ -1015,7 +1156,12 @@ module.exports = {
 
 ###### `preset`
 
-Type: `String`
+Type:
+
+```ts
+type preset = string | undefined;
+```
+
 Default: `undefined`
 
 Configure the name of preset, i.e. you can use it in `?as=name`.
@@ -1045,7 +1191,18 @@ module.exports = {
 
 ###### `implementation`
 
-Type: `Function`
+Type:
+
+```ts
+type implementation = (
+  original: WorkerResult,
+  options?: InferDefaultType<T> | undefined
+) => Promise<WorkerResult> & {
+  setup?: (() => void) | undefined;
+  teardown?: (() => void) | undefined;
+};
+```
+
 Default: `undefined`
 
 Configure the default `implementation`.
@@ -1075,7 +1232,14 @@ module.exports = {
 
 ###### `options`
 
-Type: `Object`
+Type:
+
+```ts
+type options = {
+  [key: string]: any;
+};
+```
+
 Default: `undefined`
 
 Options for the `implementation` option (i.e. options for `imagemin`/`squoosh`/custom implementation).
@@ -1112,7 +1276,12 @@ module.exports = {
 
 ###### `filter`
 
-Type: `Function`
+Type:
+
+```ts
+type filter = (source: Buffer, sourcePath: string) => boolean;
+```
+
 Default: `() => true`
 
 Allows filtering of images for optimization/generation.
@@ -1160,7 +1329,17 @@ module.exports = {
 
 ###### `filename`
 
-Type: `string | Function`
+Type:
+
+```ts
+type filename =
+  | string
+  | ((
+      pathData: PathData,
+      assetInfo?: import("webpack").AssetInfo | undefined
+    ) => string);
+```
+
 Default: `undefined`
 
 Allows to set the filename.
@@ -1197,7 +1376,7 @@ module.exports = {
 };
 ```
 
-Example of `Function` usage:
+Example of `function` usage:
 
 **webpack.config.js**
 
@@ -1232,7 +1411,12 @@ module.exports = {
 
 #### `severityError`
 
-Type: `String`
+Type:
+
+```ts
+type severityError = string;
+```
+
 Default: `'error'`
 
 Allows to choose how errors are displayed.
@@ -1273,7 +1457,12 @@ module.exports = {
 
 #### `loader`
 
-Type: `Boolean`
+Type:
+
+```ts
+type loader = boolean;
+```
+
 Default: `true`
 
 Automatically adding built-in `loader`, used to optimize/generate images.
@@ -1309,7 +1498,12 @@ module.exports = {
 
 #### `concurrency`
 
-Type: `Number`
+Type:
+
+```ts
+type concurrency = number;
+```
+
 Default: `Math.max(1, os.cpus().length - 1)`
 
 Maximum number of concurrency optimization processes in one time.
@@ -1344,7 +1538,12 @@ module.exports = {
 
 #### `deleteOriginalAssets`
 
-Type: `Boolean`
+Type:
+
+```ts
+type deleteOriginalAssets = boolean;
+```
+
 Default: `true`
 
 Allows removing original assets after optimization.
@@ -1385,15 +1584,18 @@ module.exports = {
 
 ### Loader Options
 
-|                  Name                  |            Type             |   Default   | Description                               |
-| :------------------------------------: | :-------------------------: | :---------: | :---------------------------------------- |
-|    **[`minimizer`](#minimizer-1)**     | `{Object \| Array<Object>}` | `undefined` | Allows to setup default minimizer         |
-|    **[`generator`](#generator-1)**     |      `{Array<Object>}`      | `undefined` | Allows to setup default generator         |
-| **[`severityError`](severityerror-1)** |         `{String}`          |  `'error'`  | Allows to choose how errors are displayed |
+- **[`minimizer`](#minimizer-1)**
+- **[`generator`](#generator-1)**
+- **[`severityError`](severityerror-1)**
 
 #### `severityError`
 
-Type: `String`
+Type:
+
+```ts
+type severityError = string;
+```
+
 Default: `'error'`
 
 Allows to choose how errors are displayed.
@@ -1437,12 +1639,73 @@ module.exports = {
 
 #### `minimizer`
 
-Type: `Object|Array<Object>`
+Type:
+
+```ts
+type minimizer =
+  | {
+      implementation: (
+        original: WorkerResult,
+        options?:
+          | {
+              [key: string]: any;
+            }
+          | undefined
+      ) => Promise<WorkerResult> & {
+        setup?: (() => void) | undefined;
+        teardown?: (() => void) | undefined;
+      };
+      options?:
+        | {
+            [key: string]: any;
+          }
+        | undefined;
+      filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
+      filename?:
+        | string
+        | ((
+            pathData: {
+              filename?: string | undefined;
+            },
+            assetInfo?: import("webpack").AssetInfo | undefined
+          ) => string)
+        | undefined;
+    }
+  | Array<{
+      implementation: (
+        original: WorkerResult,
+        options?:
+          | {
+              [key: string]: any;
+            }
+          | undefined
+      ) => Promise<WorkerResult> & {
+        setup?: (() => void) | undefined;
+        teardown?: (() => void) | undefined;
+      };
+      options?:
+        | {
+            [key: string]: any;
+          }
+        | undefined;
+      filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
+      filename?:
+        | string
+        | ((
+            pathData: {
+              filename?: string | undefined;
+            },
+            assetInfo?: import("webpack").AssetInfo | undefined
+          ) => string)
+        | undefined;
+    }>;
+```
+
 Default: `undefined`
 
 Allows to setup default minimizer.
 
-##### `Object`
+##### `object`
 
 **webpack.config.js**
 
@@ -1478,7 +1741,19 @@ For more information and supported options please read [here](#minimizer).
 
 ### `generator`
 
-Type: `Array<Object>`
+Type:
+
+```ts
+type generator = Array<{
+  implementation: TransformerFunction<T>;
+  options?: BasicTransformerOptions<T>;
+  filter?: FilterFn | undefined;
+  filename?: string | FilenameFn | undefined;
+  preset?: string | undefined;
+  type?: "import" | "asset" | undefined;
+}>;
+```
+
 Default: `undefined`
 
 Allow to setup default generators.
