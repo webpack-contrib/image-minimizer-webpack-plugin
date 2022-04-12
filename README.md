@@ -397,7 +397,7 @@ module.exports = {
 Type:
 
 ```ts
-type exclude = tring | RegExp | Array<string | RegExp>;
+type exclude = string | RegExp | Array<string | RegExp>;
 ```
 
 Default: `undefined`
@@ -458,12 +458,20 @@ type minimizer =
   | Array<{
       implementation: (
         original: WorkerResult,
-        options?: InferDefaultType<T> | undefined
+        options?:
+          | {
+              [key: string]: any;
+            }
+          | undefined
       ) => Promise<WorkerResult> & {
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
-      options?: InferDefaultType<T> | undefined;
+      options?:
+        | {
+            [key: string]: any;
+          }
+        | undefined;
       filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
       filename?:
         | string
@@ -1196,7 +1204,11 @@ Type:
 ```ts
 type implementation = (
   original: WorkerResult,
-  options?: InferDefaultType<T> | undefined
+  options?:
+    | {
+        [key: string]: any;
+      }
+    | undefined
 ) => Promise<WorkerResult> & {
   setup?: (() => void) | undefined;
   teardown?: (() => void) | undefined;
