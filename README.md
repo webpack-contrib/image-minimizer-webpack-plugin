@@ -429,13 +429,25 @@ Type:
 type minimizer =
   | {
       implementation: (
-        original: WorkerResult,
+        original: {
+          filename: string;
+          data: Buffer;
+          warnings: Array<Error>;
+          errors: Array<Error>;
+          info: import("webpack").AssetInfo;
+        },
         options?:
           | {
               [key: string]: any;
             }
           | undefined
-      ) => Promise<WorkerResult> & {
+      ) => Promise<{
+        filename: string;
+        data: Buffer;
+        warnings: Array<Error>;
+        errors: Array<Error>;
+        info: import("webpack").AssetInfo;
+      }> & {
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
@@ -457,13 +469,25 @@ type minimizer =
     }
   | Array<{
       implementation: (
-        original: WorkerResult,
+        original: {
+          filename: string;
+          data: Buffer;
+          warnings: Array<Error>;
+          errors: Array<Error>;
+          info: import("webpack").AssetInfo;
+        },
         options?:
           | {
               [key: string]: any;
             }
           | undefined
-      ) => Promise<WorkerResult> & {
+      ) => Promise<{
+        filename: string;
+        data: Buffer;
+        warnings: Array<Error>;
+        errors: Array<Error>;
+        info: import("webpack").AssetInfo;
+      }> & {
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
@@ -569,9 +593,21 @@ Type:
 
 ```ts
 type implementation = (
-  original: WorkerResult,
+  original: {
+    filename: string;
+    data: Buffer;
+    warnings: Array<Error>;
+    errors: Array<Error>;
+    info: import("webpack").AssetInfo;
+  },
   options?: BasicTransformerOptions<T>
-) => Promise<WorkerResult> & {
+) => Promise<{
+  filename: string;
+  data: Buffer;
+  warnings: Array<Error>;
+  errors: Array<Error>;
+  info: import("webpack").AssetInfo;
+}> & {
   setup?: (() => void) | undefined;
   teardown?: (() => void) | undefined;
 };
@@ -844,13 +880,25 @@ Type:
 ```ts
 type generator = Array<{
   implementation: (
-    original: WorkerResult,
+    original: {
+      filename: string;
+      data: Buffer;
+      warnings: Array<Error>;
+      errors: Array<Error>;
+      info: import("webpack").AssetInfo;
+    },
     options?:
       | {
           [key: string]: any;
         }
       | undefined
-  ) => Promise<WorkerResult> & {
+  ) => Promise<{
+    filename: string;
+    data: Buffer;
+    warnings: Array<Error>;
+    errors: Array<Error>;
+    info: import("webpack").AssetInfo;
+  }> & {
     setup?: (() => void) | undefined;
     teardown?: (() => void) | undefined;
   };
@@ -1203,13 +1251,25 @@ Type:
 
 ```ts
 type implementation = (
-  original: WorkerResult,
+  original: {
+    filename: string;
+    data: Buffer;
+    warnings: Array<Error>;
+    errors: Array<Error>;
+    info: import("webpack").AssetInfo;
+  },
   options?:
     | {
         [key: string]: any;
       }
     | undefined
-) => Promise<WorkerResult> & {
+) => Promise<{
+  filename: string;
+  data: Buffer;
+  warnings: Array<Error>;
+  errors: Array<Error>;
+  info: import("webpack").AssetInfo;
+}> & {
   setup?: (() => void) | undefined;
   teardown?: (() => void) | undefined;
 };
@@ -1657,13 +1717,25 @@ Type:
 type minimizer =
   | {
       implementation: (
-        original: WorkerResult,
+        original: {
+          filename: string;
+          data: Buffer;
+          warnings: Array<Error>;
+          errors: Array<Error>;
+          info: import("webpack").AssetInfo;
+        },
         options?:
           | {
               [key: string]: any;
             }
           | undefined
-      ) => Promise<WorkerResult> & {
+      ) => Promise<{
+        filename: string;
+        data: Buffer;
+        warnings: Array<Error>;
+        errors: Array<Error>;
+        info: import("webpack").AssetInfo;
+      }> & {
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
@@ -1685,13 +1757,25 @@ type minimizer =
     }
   | Array<{
       implementation: (
-        original: WorkerResult,
+        original: {
+          filename: string;
+          data: Buffer;
+          warnings: Array<Error>;
+          errors: Array<Error>;
+          info: import("webpack").AssetInfo;
+        },
         options?:
           | {
               [key: string]: any;
             }
           | undefined
-      ) => Promise<WorkerResult> & {
+      ) => Promise<{
+        filename: string;
+        data: Buffer;
+        warnings: Array<Error>;
+        errors: Array<Error>;
+        info: import("webpack").AssetInfo;
+      }> & {
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
