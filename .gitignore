@@ -18,3 +18,4 @@ Thumbs.db
 *.iml
 *.sublime-project
 *.sublime-workspace
+yarn.lock
