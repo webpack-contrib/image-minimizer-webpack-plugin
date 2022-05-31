@@ -80,7 +80,6 @@ For `imagemin-svgo` v9.0.0+ need use svgo [configuration](https://github.com/svg
 
 ```js
 const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-const { extendDefaultPlugins } = require("svgo");
 
 module.exports = {
   module: {
@@ -108,18 +107,23 @@ module.exports = {
               [
                 "svgo",
                 {
-                  plugins: extendDefaultPlugins([
+                  plugins: [
                     {
-                      name: "removeViewBox",
-                      active: false,
-                    },
-                    {
-                      name: "addAttributesToSVGElement",
+                      name: "preset-default",
                       params: {
-                        attributes: [{ xmlns: "http://www.w3.org/2000/svg" }],
+                        overrides: {
+                          removeViewBox: false,
+                          addAttributesToSVGElement: {
+                            params: {
+                              attributes: [
+                                { xmlns: "http://www.w3.org/2000/svg" },
+                              ],
+                            },
+                          },
+                        },
                       },
                     },
-                  ]),
+                  ],
                 },
               ],
             ],
