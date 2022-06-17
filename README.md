@@ -30,7 +30,9 @@ This plugin can use 2 tools to optimize/generate images:
 - [`imagemin`](https://github.com/imagemin/imagemin) - optimize your images by default, since it is stable and works with all types of images
 - [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh) - while working in experimental mode with `.jpg`, `.jpeg`, `.png`, `.webp`, `.avif` file types.
 
-> ⚠️ By default we don't install anything
+> **Warning**
+>
+> By default we don't install anything
 
 To begin, you'll need to install `image-minimizer-webpack-plugin` and image minimizer/generator:
 
@@ -40,7 +42,9 @@ To begin, you'll need to install `image-minimizer-webpack-plugin` and image mini
 npm install image-minimizer-webpack-plugin imagemin --save-dev
 ```
 
-> ⚠️ imagemin uses plugin to optimize/generate images, so you need to install them too
+> **Warning**
+>
+> imagemin uses plugin to optimize/generate images, so you need to install them too
 
 - [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh):
 
@@ -55,7 +59,7 @@ Images can be optimized in two modes:
 
 ### Optimize with [imagemin](https://github.com/imagemin/imagemin)
 
-Note:
+> **Note**
 
 - [imagemin-mozjpeg](https://github.com/imagemin/imagemin-mozjpeg) can be configured in lossless and lossy mode.
 - [imagemin-svgo](https://github.com/imagemin/imagemin-svgo) can be configured in lossless and lossy mode.
@@ -926,8 +930,13 @@ Default: `undefined`
 Allow to setup default generators.
 Useful if you need generate `webp`/`avif`/etc from other formats.
 
-> ⚠️ If no generator was found for the image (i.e. no `?as=webp` was found in query params), the `minimizer` option will be used. Therefore, it is recommended to configure generator outputs optimized image.
-> ⚠️ The option will not work if you disable `loader` (i.e. set the `loader` option to `false`).
+> **Warning**
+>
+> If no generator was found for the image (i.e. no `?as=webp` was found in query params), the `minimizer` option will be used. Therefore, it is recommended to configure generator outputs optimized image.
+
+> **Warning**
+>
+> The option will not work if you disable `loader` (i.e. set the `loader` option to `false`).
 
 Available generators:
 
