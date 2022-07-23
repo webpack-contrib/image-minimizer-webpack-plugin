@@ -10,10 +10,20 @@ const { isAbsoluteURL } = require("./utils.js");
 
 /**
  * @template T
+ * @typedef {import("./index").Minimizer<T>} Minimizer<T>
+ */
+
+/**
+ * @template T
+ * @typedef {import("./index").Generator<T>} Generator<T>
+ */
+
+/**
+ * @template T
  * @typedef {Object} LoaderOptions<T>
  * @property {string} [severityError] Allows to choose how errors are displayed.
- * @property {import("./index").Minimizer<T> | import("./index").Minimizer<T>[]} [minimizer]
- * @property {import("./index").Generator<T>[]} [generator]
+ * @property {Minimizer<T> | Minimizer<T>[]} [minimizer]
+ * @property {Generator<T>[]} [generator]
  */
 
 // Workaround - https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/341
@@ -22,13 +32,53 @@ const { isAbsoluteURL } = require("./utils.js");
  * @param {import("webpack").LoaderContext<LoaderOptions<T>>} loaderContext
  * @param {boolean} isAbsolute
  * @param {WorkerResult} output
- * @param {string} query
  */
-function changeResource(loaderContext, isAbsolute, output, query) {
+function changeResource(loaderContext, isAbsolute, output) {
   loaderContext.resourcePath = isAbsolute
     ? output.filename
     : path.join(loaderContext.rootContext, output.filename);
-  loaderContext.resourceQuery = query;
+}
+
+/**
+ * @template T
+ * @param {Minimizer<T>[]} transformers
+ * @param {string | null} widthQuery
+ * @param {string | null} heightQuery
+ * @return {Minimizer<T>[]}
+ */
+function processSizeQuery(transformers, widthQuery, heightQuery) {
+  return transformers.map((transformer) => {
+    const minimizer = { ...transformer };
+
+    const resizeOptions = { ...minimizer.options?.resize };
+
+    if (widthQuery === "auto") {
+      delete resizeOptions.width;
+    } else if (widthQuery) {
+      const width = Number.parseInt(widthQuery, 10);
+
+      if (Number.isFinite(width) && width > 0) {
+        resizeOptions.width = width;
+      }
+    }
+
+    if (heightQuery === "auto") {
+      delete resizeOptions.height;
+    } else if (heightQuery) {
+      const height = Number.parseInt(heightQuery, 10);
+
+      if (Number.isFinite(height) && height > 0) {
+        resizeOptions.height = height;
+      }
+    }
+
+    if (resizeOptions.width || resizeOptions.height) {
+      minimizer.options = { ...minimizer.options };
+      minimizer.options.resize = resizeOptions;
+    }
+
+    return minimizer;
+  });
 }
 
 /**
@@ -62,51 +112,58 @@ async function loader(content) {
   }
 
   let transformer = minimizer;
-  let parsedQuery;
+  const parsedQuery = new URLSearchParams(this.resourceQuery);
+  const presetName = parsedQuery.get("as");
 
-  if (this.resourceQuery.length > 0) {
-    parsedQuery = new URLSearchParams(this.resourceQuery);
+  if (presetName) {
+    if (!generator) {
+      callback(
+        new Error(
+          "Please specify the 'generator' option to use 'as' query param for generation purposes."
+        )
+      );
 
-    if (parsedQuery.has("as")) {
-      if (!generator) {
-        callback(
-          new Error(
-            "Please specify the 'generator' option to use 'as' query param for generation purposes."
-          )
-        );
-
-        return;
-      }
-
-      const as = parsedQuery.get("as");
-      const presets = generator.filter((item) => item.preset === as);
-
-      if (presets.length > 1) {
-        callback(
-          new Error(
-            "Found several identical pereset names, the 'preset' option should be unique"
-          )
-        );
-
-        return;
-      }
-
-      if (presets.length === 0) {
-        callback(
-          new Error(`Can't find '${as}' preset in the 'generator' option`)
-        );
-
-        return;
-      }
-
-      [transformer] = presets;
+      return;
     }
+
+    const presets = generator.filter((item) => item.preset === presetName);
+
+    if (presets.length > 1) {
+      callback(
+        new Error(
+          "Found several identical pereset names, the 'preset' option should be unique"
+        )
+      );
+
+      return;
+    }
+
+    if (presets.length === 0) {
+      callback(
+        new Error(`Can't find '${presetName}' preset in the 'generator' option`)
+      );
+
+      return;
+    }
+
+    [transformer] = presets;
   }
 
   if (!transformer) {
     callback(null, content);
 
     return;
+  }
+
+  const widthQuery = parsedQuery.get("width") ?? parsedQuery.get("w");
+  const heightQuery = parsedQuery.get("height") ?? parsedQuery.get("h");
+
+  if (widthQuery || heightQuery) {
+    if (Array.isArray(transformer)) {
+      transformer = processSizeQuery(transformer, widthQuery, heightQuery);
+    } else {
+      [transformer] = processSizeQuery([transformer], widthQuery, heightQuery);
+    }
   }
 
   const isAbsolute = isAbsoluteURL(this.resourcePath);
@@ -156,23 +213,12 @@ async function loader(content) {
             `%${/** @type {number} */ (character.codePointAt(0)).toString(16)}`
         );
   } else {
-    let query = this.resourceQuery;
-
-    if (parsedQuery) {
-      // Remove query param from the bundle due we need that only for bundle purposes
-      const stringifiedParsedQuery = parsedQuery.toString();
-
-      query =
-        stringifiedParsedQuery.length > 0 ? `?${stringifiedParsedQuery}` : "";
-      parsedQuery.delete("as");
-    }
-
     // Old approach for `file-loader` and other old loaders
-    changeResource(this, isAbsolute, output, query);
+    changeResource(this, isAbsolute, output);
 
     // Change name of assets modules after generator
     if (this._module && !this._module.matchResource) {
-      this._module.matchResource = `${output.filename}${query}`;
+      this._module.matchResource = `${output.filename}${this.resourceQuery}`;
     }
   }
 

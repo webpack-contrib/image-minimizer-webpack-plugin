@@ -799,6 +799,7 @@ async function squooshGenerate(original, minifyOptions) {
 
   const { binary, extension } = await Object.values(image.encodedWith)[0];
   const { width, height } = (await image.decoded).bitmap;
+
   const { dir: fileDir, name: fileName } = path.parse(original.filename);
   const filename = path.join(fileDir, `${fileName}.${extension}`);
 
