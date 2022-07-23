@@ -48,52 +48,86 @@ async function loader(content) {
     return;
   }
 
-  let transformer = minimizer;
-  let parsedQuery;
+  let transformer = Array.isArray(minimizer) ? minimizer[0] : minimizer;
+  const parsedQuery = new URLSearchParams(this.resourceQuery);
+  const presetName = parsedQuery.get("as");
 
-  if (this.resourceQuery.length > 0) {
-    parsedQuery = new URLSearchParams(this.resourceQuery);
+  if (presetName) {
+    if (!generator) {
+      callback(
+        new Error(
+          "Please specify the 'generator' option to use 'as' query param for generation purposes."
+        )
+      );
 
-    if (parsedQuery.has("as")) {
-      if (!generator) {
-        callback(
-          new Error(
-            "Please specify the 'generator' option to use 'as' query param for generation purposes."
-          )
-        );
-
-        return;
-      }
-
-      const as = parsedQuery.get("as");
-      const presets = generator.filter((item) => item.preset === as);
-
-      if (presets.length > 1) {
-        callback(
-          new Error(
-            "Found several identical pereset names, the 'preset' option should be unique"
-          )
-        );
-
-        return;
-      }
-
-      if (presets.length === 0) {
-        callback(
-          new Error(`Can't find '${as}' preset in the 'generator' option`)
-        );
-
-        return;
-      }
-
-      [transformer] = presets;
+      return;
     }
+
+    const presets = generator.filter((item) => item.preset === presetName);
+
+    if (presets.length > 1) {
+      callback(
+        new Error(
+          "Found several identical pereset names, the 'preset' option should be unique"
+        )
+      );
+
+      return;
+    }
+
+    if (presets.length === 0) {
+      callback(
+        new Error(`Can't find '${presetName}' preset in the 'generator' option`)
+      );
+
+      return;
+    }
+
+    [transformer] = presets;
   }
 
   if (!transformer) {
     callback(null, content);
 
     return;
+  }
+
+  const widthQuery = parsedQuery.get("width") ?? parsedQuery.get("w");
+  const heightQuery = parsedQuery.get("height") ?? parsedQuery.get("h");
+
+  if (widthQuery || heightQuery) {
+    const width = widthQuery ? Number.parseInt(widthQuery, 10) : Number.NaN;
+    const height = heightQuery ? Number.parseInt(heightQuery, 10) : Number.NaN;
+
+    if (width || height) {
+      transformer.options ??= {};
+      transformer.options.resize ??= {};
+
+      if (Number.isFinite(width) && width > 0) {
+        transformer.options.resize.width = width;
+      }
+
+      if (Number.isFinite(height) && height > 0) {
+        transformer.options.resize.height = height;
+      }
+    }
+
+    if (transformer?.options?.resize) {
+      if (widthQuery === "auto") {
+        delete transformer.options.resize.width;
+      }
+
+      if (heightQuery === "auto") {
+        delete transformer.options.resize.height;
+      }
+
+      if (
+        !transformer.options.resize.width &&
+        !transformer.options.resize.height
+      ) {
+        delete transformer.options.resize;
+      }
+    }
   }
 
   const isAbsolute = isAbsoluteURL(this.resourcePath);
@@ -147,26 +181,14 @@ async function loader(content) {
             `%${/** @type {number} */ (character.codePointAt(0)).toString(16)}`
         );
   } else {
-    let query = this.resourceQuery;
-
-    if (parsedQuery) {
-      // Remove query param from the bundle due we need that only for bundle purposes
-      const stringifiedParsedQuery = parsedQuery.toString();
-
-      query =
-        stringifiedParsedQuery.length > 0 ? `?${stringifiedParsedQuery}` : "";
-      parsedQuery.delete("as");
-    }
-
     // Old approach for `file-loader` and other old loaders
     this.resourcePath = isAbsolute
       ? output.filename
       : path.join(this.rootContext, output.filename);
-    this.resourceQuery = query;
 
     // Change name of assets modules after generator
     if (this._module && !this._module.matchResource) {
-      this._module.matchResource = `${output.filename}${query}`;
+      this._module.matchResource = `${output.filename}${this.resourceQuery}`;
     }
   }
 

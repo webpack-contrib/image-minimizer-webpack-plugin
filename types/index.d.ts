@@ -51,7 +51,19 @@ export = ImageMinimizerPlugin;
  */
 /**
  * @template T
- * @typedef {InferDefaultType<T> | undefined} BasicTransformerOptions
+ * @typedef {Object} BasicTransformerOptions
+ * @property {ResizeOptions} [resize]
+ * @property {EncodeOptions} [encodeOptions]
+ */
+/**
+ * @typedef {Object} ResizeOptions
+ * @property {number} [width]
+ * @property {number} [height]
+ * @property {boolean} [enabled]
+ */
+/**
+ * @typedef EncodeOptions
+ * @type {CustomOptions}
  */
 /**
  * @template T
@@ -185,6 +197,8 @@ declare namespace ImageMinimizerPlugin {
     CustomOptions,
     InferDefaultType,
     BasicTransformerOptions,
+    ResizeOptions,
+    EncodeOptions,
     BasicTransformerImplementation,
     BasicTransformerHelpers,
     TransformerFunction,
@@ -216,7 +230,9 @@ type PluginOptions<T, G> = {
    */
   minimizer?:
     | (T extends any[]
-        ? { [P in keyof T]: Minimizer<T[P]> }
+        ? T extends infer T_1
+          ? { [P in keyof T_1]: Minimizer<T[P]> }
+          : never
         : Minimizer<T> | Minimizer<T>[])
     | undefined;
   /**
@@ -224,7 +240,9 @@ type PluginOptions<T, G> = {
    */
   generator?:
     | (G extends any[]
-        ? { [P_1 in keyof G]: Generator<G[P_1]> }
+        ? G extends infer T_2
+          ? { [P_1 in keyof T_2]: Generator<G[P_1]> }
+          : never
         : Generator<G>[])
     | undefined;
   /**
@@ -294,10 +312,19 @@ type CustomOptions = {
   [key: string]: any;
 };
 type InferDefaultType<T> = T extends infer U ? U : CustomOptions;
-type BasicTransformerOptions<T> = InferDefaultType<T> | undefined;
+type BasicTransformerOptions<T> = {
+  resize?: ResizeOptions | undefined;
+  encodeOptions?: CustomOptions | undefined;
+};
+type ResizeOptions = {
+  width?: number | undefined;
+  height?: number | undefined;
+  enabled?: boolean | undefined;
+};
+type EncodeOptions = CustomOptions;
 type BasicTransformerImplementation<T> = (
   original: WorkerResult,
-  options?: BasicTransformerOptions<T>
+  options?: BasicTransformerOptions<T> | undefined
 ) => Promise<WorkerResult>;
 type BasicTransformerHelpers = {
   setup?: (() => void) | undefined;
@@ -314,7 +341,7 @@ type FilenameFn = (
 ) => string;
 type Transformer<T> = {
   implementation: TransformerFunction<T>;
-  options?: BasicTransformerOptions<T>;
+  options?: BasicTransformerOptions<T> | undefined;
   filter?: FilterFn | undefined;
   filename?: string | FilenameFn | undefined;
   preset?: string | undefined;
