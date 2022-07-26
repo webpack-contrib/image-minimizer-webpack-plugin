@@ -96,37 +96,32 @@ async function loader(content) {
   const heightQuery = parsedQuery.get("height") ?? parsedQuery.get("h");
 
   if (widthQuery || heightQuery) {
-    const width = widthQuery ? Number.parseInt(widthQuery, 10) : Number.NaN;
-    const height = heightQuery ? Number.parseInt(heightQuery, 10) : Number.NaN;
+    const resizeOptions = { ...transformer?.options?.resize };
 
-    if (width || height) {
-      transformer.options ??= {};
-      transformer.options.resize ??= {};
+    if (widthQuery === "auto") {
+      delete resizeOptions.width;
+    } else if (widthQuery) {
+      const width = Number.parseInt(widthQuery, 10);
 
       if (Number.isFinite(width) && width > 0) {
-        transformer.options.resize.width = width;
-      }
-
-      if (Number.isFinite(height) && height > 0) {
-        transformer.options.resize.height = height;
+        resizeOptions.width = width;
       }
     }
 
-    if (transformer?.options?.resize) {
-      if (widthQuery === "auto") {
-        delete transformer.options.resize.width;
-      }
+    if (heightQuery === "auto") {
+      delete resizeOptions.height;
+    } else if (heightQuery) {
+      const height = Number.parseInt(heightQuery, 10);
 
-      if (heightQuery === "auto") {
-        delete transformer.options.resize.height;
+      if (Number.isFinite(height) && height > 0) {
+        resizeOptions.height = height;
       }
+    }
 
-      if (
-        !transformer.options.resize.width &&
-        !transformer.options.resize.height
-      ) {
-        delete transformer.options.resize;
-      }
+    if (resizeOptions.width || resizeOptions.height) {
+      transformer = { ...transformer };
+      transformer.options = { ...transformer.options };
+      transformer.options.resize = resizeOptions;
     }
   }
 
