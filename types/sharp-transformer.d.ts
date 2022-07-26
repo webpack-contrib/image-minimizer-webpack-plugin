@@ -14,16 +14,16 @@ export type SharpEncodeOptions = {
 export type SharpFormat = keyof SharpEncodeOptions;
 export type SharpOptions = {
   resize?: import("sharp").ResizeOptions | undefined;
-  encodeOptions: SharpEncodeOptions;
+  encodeOptions?: SharpEncodeOptions | undefined;
 };
 /**
  * @param {WorkerResult} original
- * @param {SharpOptions} minimizerOptions
+ * @param {SharpOptions} [minimizerOptions]
  * @returns {Promise<WorkerResult>}
  */
 export function sharpMinify(
   original: WorkerResult,
-  minimizerOptions: SharpOptions
+  minimizerOptions?: SharpOptions | undefined
 ): Promise<WorkerResult>;
 /**
  * @param {WorkerResult} original

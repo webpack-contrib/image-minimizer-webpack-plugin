@@ -1,3 +1,7 @@
+// TODO
+// - add support for rotate option
+// - add resize enabled/disabled option
+
 const path = require("path");
 
 /** @typedef {import("./index.js").WorkerResult} WorkerResult */
@@ -26,7 +30,7 @@ const path = require("path");
  * @typedef SharpOptions
  * @type {object}
  * @property {ResizeOptions} [resize]
- * @property {SharpEncodeOptions} encodeOptions
+ * @property {SharpEncodeOptions} [encodeOptions]
  */
 
 // https://github.com/lovell/sharp/blob/e40a881ab4a5e7b0e37ba17e31b3b186aef8cbf6/lib/output.js#L7-L23
@@ -66,11 +70,6 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
   const inputExt = path.extname(original.filename).slice(1).toLowerCase();
 
   if (!SHARP_FORMATS.has(inputExt)) {
-    const error = new Error(
-      `Error with '${original.filename}': the 'sharp' image transformer does not support '.${inputExt}' images.`
-    );
-
-    original.errors.push(error);
     return original;
   }
 
@@ -95,10 +94,13 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
   // ====== resize ======
 
   try {
-    if (minimizerOptions.resize?.width || minimizerOptions.resize?.height) {
+    if (
+      minimizerOptions.resize &&
+      (minimizerOptions.resize.width || minimizerOptions.resize.height)
+    ) {
       imagePipeline.resize(
-        minimizerOptions.resize?.width,
-        minimizerOptions.resize?.height
+        minimizerOptions.resize.width,
+        minimizerOptions.resize.height
       );
     }
   } catch (error) {
@@ -117,7 +119,7 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
   const outputFormat =
     targetFormat ?? /** @type {SharpFormat} */ (imageMetadata.format);
 
-  const encodeOptions = minimizerOptions.encodeOptions[outputFormat];
+  const encodeOptions = minimizerOptions.encodeOptions?.[outputFormat];
 
   try {
     imagePipeline.toFormat(outputFormat, encodeOptions);
@@ -134,10 +136,11 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
 
   // ====== rename ======
 
-  const outputExt = targetFormat ? `.${outputFormat}` : `.${inputExt}`;
+  const outputExt = targetFormat ? outputFormat : inputExt;
 
-  const baseFilename = path.basename(original.filename, `.${inputExt}`);
-  const filename = `${baseFilename}${outputExt}`;
+  const dirname = path.dirname(original.filename);
+  const basename = path.basename(original.filename, `.${inputExt}`);
+  const filename = path.join(dirname, `${basename}.${outputExt}`);
 
   return {
     filename,
@@ -199,10 +202,10 @@ function sharpGenerate(original, minimizerOptions) {
 
 /**
  * @param {WorkerResult} original
- * @param {SharpOptions} minimizerOptions
+ * @param {SharpOptions} [minimizerOptions]
  * @returns {Promise<WorkerResult>}
  */
-function sharpMinify(original, minimizerOptions) {
+function sharpMinify(original, minimizerOptions = {}) {
   return sharpTransform(original, minimizerOptions);
 }
 
