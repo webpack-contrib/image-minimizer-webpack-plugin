@@ -14,8 +14,10 @@ export type SharpEncodeOptions = {
 export type SharpFormat = keyof SharpEncodeOptions;
 export type SharpOptions = {
   resize?: import("sharp").ResizeOptions | undefined;
+  sizeSuffix?: SizeSuffix | undefined;
   encodeOptions?: SharpEncodeOptions | undefined;
 };
+export type SizeSuffix = (width: number, height: number) => string;
 /**
  * @param {WorkerResult} original
  * @param {SharpOptions} [minimizerOptions]

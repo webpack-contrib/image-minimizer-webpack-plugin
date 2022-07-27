@@ -30,7 +30,13 @@ const path = require("path");
  * @typedef SharpOptions
  * @type {object}
  * @property {ResizeOptions} [resize]
+ * @property {SizeSuffix} [sizeSuffix]
  * @property {SharpEncodeOptions} [encodeOptions]
+ */
+
+/**
+ * @typedef SizeSuffix
+ * @type {(width: number, height: number) => string}
  */
 
 // https://github.com/lovell/sharp/blob/e40a881ab4a5e7b0e37ba17e31b3b186aef8cbf6/lib/output.js#L7-L23
@@ -132,19 +138,25 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
     return original;
   }
 
-  const result = await imagePipeline.toBuffer();
+  const result = await imagePipeline.toBuffer({ resolveWithObject: true });
 
   // ====== rename ======
 
   const outputExt = targetFormat ? outputFormat : inputExt;
 
-  const dirname = path.dirname(original.filename);
-  const basename = path.basename(original.filename, `.${inputExt}`);
-  const filename = path.join(dirname, `${basename}.${outputExt}`);
+  const { dir: fileDir, name: fileName } = path.parse(original.filename);
+
+  const { width, height } = result.info;
+  const sizeSuffix =
+    typeof minimizerOptions.sizeSuffix === "function"
+      ? minimizerOptions.sizeSuffix(width, height)
+      : "";
+
+  const filename = path.join(fileDir, `${fileName}${sizeSuffix}.${outputExt}`);
 
   return {
     filename,
-    data: result,
+    data: result.data,
     warnings: [...original.warnings],
     errors: [...original.errors],
     info: {
