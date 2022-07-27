@@ -48,6 +48,9 @@
     "webpack": "^5.1.0"
   },
   "peerDependenciesMeta": {
+    "sharp": {
+      "optional": true
+    },
     "@squoosh/lib": {
       "optional": true
     },
