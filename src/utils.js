@@ -807,15 +807,20 @@ async function squooshGenerate(original, minifyOptions) {
     return original;
   }
 
-  const ext = path.extname(original.filename).toLowerCase();
   const { binary, extension } = await Object.values(image.encodedWith)[0];
-  const newFilename = original.filename.replace(
-    new RegExp(`${ext}$`),
-    `.${extension}`
-  );
+  const { width, height } = (await image.decoded).bitmap;
+
+  const { dir: fileDir, name: fileName } = path.parse(original.filename);
+
+  const sizeSuffix =
+    typeof squooshOptions.sizeSuffix === "function"
+      ? squooshOptions.sizeSuffix(width, height)
+      : "";
+
+  const filename = path.join(fileDir, `${fileName}${sizeSuffix}.${extension}`);
 
   return {
-    filename: newFilename,
+    filename,
     data: Buffer.from(binary),
     warnings: [...original.warnings],
     errors: [...original.errors],
@@ -919,9 +924,23 @@ async function squooshMinify(original, options) {
   }
 
   const { binary } = await image.encodedWith[targets[ext]];
+  const { width, height } = (await image.decoded).bitmap;
+
+  const {
+    dir: fileDir,
+    name: fileName,
+    ext: fileExt,
+  } = path.parse(original.filename);
+
+  const sizeSuffix =
+    typeof squooshOptions.sizeSuffix === "function"
+      ? squooshOptions.sizeSuffix(width, height)
+      : "";
+
+  const filename = path.join(fileDir, `${fileName}${sizeSuffix}${fileExt}`);
 
   return {
-    filename: original.filename,
+    filename,
     data: Buffer.from(binary),
     warnings: [...original.warnings],
     errors: [...original.errors],
