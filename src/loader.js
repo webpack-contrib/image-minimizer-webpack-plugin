@@ -9,11 +9,63 @@ const { isAbsoluteURL } = require("./utils.js");
 
 /**
  * @template T
+ * @typedef {import("./index").Minimizer<T>} Minimizer<T>
+ */
+
+/**
+ * @template T
+ * @typedef {import("./index").Generator<T>} Generator<T>
+ */
+
+/**
+ * @template T
  * @typedef {Object} LoaderOptions<T>
  * @property {string} [severityError] Allows to choose how errors are displayed.
- * @property {import("./index").Minimizer<T> | import("./index").Minimizer<T>[]} [minimizer]
- * @property {import("./index").Generator<T>[]} [generator]
+ * @property {Minimizer<T> | Minimizer<T>[]} [minimizer]
+ * @property {Generator<T>[]} [generator]
  */
+
+/**
+ * @template T
+ * @param {Minimizer<T>[]} transformers
+ * @param {string | null} widthQuery
+ * @param {string | null} heightQuery
+ * @return {Minimizer<T>[]}
+ */
+function processSizeQuery(transformers, widthQuery, heightQuery) {
+  return transformers.map((transformer) => {
+    const minimizer = { ...transformer };
+
+    const resizeOptions = { ...minimizer?.options?.resize };
+
+    if (widthQuery === "auto") {
+      delete resizeOptions.width;
+    } else if (widthQuery) {
+      const width = Number.parseInt(widthQuery, 10);
+
+      if (Number.isFinite(width) && width > 0) {
+        resizeOptions.width = width;
+      }
+    }
+
+    if (heightQuery === "auto") {
+      delete resizeOptions.height;
+    } else if (heightQuery) {
+      const height = Number.parseInt(heightQuery, 10);
+
+      if (Number.isFinite(height) && height > 0) {
+        resizeOptions.height = height;
+      }
+    }
+
+    if (resizeOptions.width || resizeOptions.height) {
+      minimizer.options = { ...minimizer.options };
+      minimizer.options.resize = resizeOptions;
+    }
+
+    return minimizer;
+  });
+}
 
 /**
  * @template T
@@ -48,7 +100,7 @@ async function loader(content) {
     return;
   }
 
-  let transformer = Array.isArray(minimizer) ? minimizer[0] : minimizer;
+  let transformer = minimizer;
   const parsedQuery = new URLSearchParams(this.resourceQuery);
   const presetName = parsedQuery.get("as");
 
@@ -96,32 +148,10 @@ async function loader(content) {
   const heightQuery = parsedQuery.get("height") ?? parsedQuery.get("h");
 
   if (widthQuery || heightQuery) {
-    const resizeOptions = { ...transformer?.options?.resize };
-
-    if (widthQuery === "auto") {
-      delete resizeOptions.width;
-    } else if (widthQuery) {
-      const width = Number.parseInt(widthQuery, 10);
-
-      if (Number.isFinite(width) && width > 0) {
-        resizeOptions.width = width;
-      }
-    }
-
-    if (heightQuery === "auto") {
-      delete resizeOptions.height;
-    } else if (heightQuery) {
-      const height = Number.parseInt(heightQuery, 10);
-
-      if (Number.isFinite(height) && height > 0) {
-        resizeOptions.height = height;
-      }
-    }
-
-    if (resizeOptions.width || resizeOptions.height) {
-      transformer = { ...transformer };
-      transformer.options = { ...transformer.options };
-      transformer.options.resize = resizeOptions;
+    if (Array.isArray(transformer)) {
+      transformer = processSizeQuery(transformer, widthQuery, heightQuery);
+    } else {
+      [transformer] = processSizeQuery([transformer], widthQuery, heightQuery);
     }
   }
 

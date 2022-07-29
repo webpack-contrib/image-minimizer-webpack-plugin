@@ -1,13 +1,4 @@
 export = loader;
-/** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
-/** @typedef {import("webpack").Compilation} Compilation */
-/**
- * @template T
- * @typedef {Object} LoaderOptions<T>
- * @property {string} [severityError] Allows to choose how errors are displayed.
- * @property {import("./index").Minimizer<T> | import("./index").Minimizer<T>[]} [minimizer]
- * @property {import("./index").Generator<T>[]} [generator]
- */
 /**
  * @template T
  * @this {import("webpack").LoaderContext<LoaderOptions<T>>}
@@ -19,15 +10,6 @@ declare function loader<T>(
   content: Buffer
 ): Promise<Buffer | undefined>;
 declare class loader<T> {
-  /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
-  /** @typedef {import("webpack").Compilation} Compilation */
-  /**
-   * @template T
-   * @typedef {Object} LoaderOptions<T>
-   * @property {string} [severityError] Allows to choose how errors are displayed.
-   * @property {import("./index").Minimizer<T> | import("./index").Minimizer<T>[]} [minimizer]
-   * @property {import("./index").Generator<T>[]} [generator]
-   */
   /**
    * @template T
    * @this {import("webpack").LoaderContext<LoaderOptions<T>>}
@@ -41,7 +23,7 @@ declare class loader<T> {
   resourcePath: string | undefined;
 }
 declare namespace loader {
-  export { raw, Schema, Compilation, LoaderOptions };
+  export { raw, Schema, Compilation, Minimizer, Generator, LoaderOptions };
 }
 /**
  * <T>
@@ -60,3 +42,11 @@ type LoaderOptions<T> = {
 declare var raw: boolean;
 type Schema = import("schema-utils/declarations/validate").Schema;
 type Compilation = import("webpack").Compilation;
+/**
+ * <T>
+ */
+type Minimizer<T> = import("./index").Minimizer<T>;
+/**
+ * <T>
+ */
+type Generator<T> = import("./index").Generator<T>;
