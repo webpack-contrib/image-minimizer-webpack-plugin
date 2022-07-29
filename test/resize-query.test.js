@@ -6,6 +6,8 @@ import ImageMinimizerPlugin from "../src";
 
 import { runWebpack, fixturesPath } from "./helpers";
 
+jest.setTimeout(20000);
+
 describe("resize query", () => {
   it("should generate and resize with resize options", async () => {
     const stats = await runWebpack({
