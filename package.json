@@ -44,6 +44,12 @@
     "dist",
     "types"
   ],
+  "overrides": {
+    "sharp": "$sharp",
+    "imagemin-avif": {
+      "sharp": "$sharp"
+    }
+  },
   "peerDependencies": {
     "webpack": "^5.1.0"
   },
