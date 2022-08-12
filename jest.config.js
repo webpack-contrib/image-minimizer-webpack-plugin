@@ -11,6 +11,7 @@ module.exports = {
     "^node:path$": "<rootDir>/test/helpers/built-in-modules/path.js",
     "^node:stream$": "<rootDir>/test/helpers/built-in-modules/stream.js",
     "^node:url$": "<rootDir>/test/helpers/built-in-modules/url.js",
+    "^node:process$": "<rootDir>/test/helpers/built-in-modules/url.js",
   },
   collectCoverageFrom: ["src/**/*.{js,mjs,jsx}"],
   globalSetup: "<rootDir>/globalSetup.js",
