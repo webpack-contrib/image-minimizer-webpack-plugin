@@ -1,5 +1,4 @@
 // TODO
-// - add support for rotate option
 // - add resize enabled/disabled option
 
 const path = require("path");
@@ -30,6 +29,7 @@ const path = require("path");
  * @typedef SharpOptions
  * @type {object}
  * @property {ResizeOptions} [resize]
+ * @property {number | 'auto'} [rotate]
  * @property {SizeSuffix} [sizeSuffix]
  * @property {SharpEncodeOptions} [encodeOptions]
  */
@@ -75,6 +75,14 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
   // eslint-disable-next-line node/no-unpublished-require
   const sharp = require("sharp");
   const imagePipeline = sharp(original.data);
+
+  // ====== rotate ======
+
+  if (typeof minimizerOptions.rotate === "number") {
+    imagePipeline.rotate(minimizerOptions.rotate);
+  } else if (minimizerOptions.rotate === "auto") {
+    imagePipeline.rotate();
+  }
 
   // ====== resize ======
 
