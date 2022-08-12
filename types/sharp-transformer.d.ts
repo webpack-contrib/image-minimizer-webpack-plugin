@@ -1,7 +1,9 @@
 export type WorkerResult = import("./index.js").WorkerResult;
 export type SharpLib = typeof import("sharp");
 export type Sharp = import("sharp").Sharp;
-export type ResizeOptions = import("sharp").ResizeOptions;
+export type ResizeOptions = import("sharp").ResizeOptions & {
+  enabled?: boolean;
+};
 export type SharpEncodeOptions = {
   avif?: import("sharp").AvifOptions | undefined;
   gif?: import("sharp").GifOptions | undefined;
@@ -13,7 +15,8 @@ export type SharpEncodeOptions = {
 };
 export type SharpFormat = keyof SharpEncodeOptions;
 export type SharpOptions = {
-  resize?: import("sharp").ResizeOptions | undefined;
+  resize?: ResizeOptions | undefined;
+  rotate?: number | "auto" | undefined;
   sizeSuffix?: SizeSuffix | undefined;
   encodeOptions?: SharpEncodeOptions | undefined;
 };

@@ -1,12 +1,9 @@
-// TODO
-// - add resize enabled/disabled option
-
 const path = require("path");
 
 /** @typedef {import("./index.js").WorkerResult} WorkerResult */
 /** @typedef {import("sharp")} SharpLib */
 /** @typedef {import("sharp").Sharp} Sharp */
-/** @typedef {import("sharp").ResizeOptions} ResizeOptions */
+/** @typedef {import("sharp").ResizeOptions & { enabled?: boolean }} ResizeOptions */
 
 /**
  * @typedef SharpEncodeOptions
@@ -88,7 +85,8 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
 
   if (
     minimizerOptions.resize &&
-    (minimizerOptions.resize.width || minimizerOptions.resize.height)
+    (minimizerOptions.resize.width || minimizerOptions.resize.height) &&
+    minimizerOptions.resize.enabled !== false
   ) {
     imagePipeline.resize(
       minimizerOptions.resize.width,
