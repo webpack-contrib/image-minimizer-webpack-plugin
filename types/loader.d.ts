@@ -42,6 +42,7 @@ type LoaderOptions<T> = {
 declare var raw: boolean;
 type Schema = import("schema-utils/declarations/validate").Schema;
 type Compilation = import("webpack").Compilation;
+
 /**
  * <T>
  */

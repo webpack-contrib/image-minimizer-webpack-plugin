@@ -15,6 +15,8 @@ const {
   squooshGenerate,
 } = require("./utils.js");
 
+const { sharpMinify, sharpGenerate } = require("./sharp-transformer.js");
+
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
 /** @typedef {import("webpack").Compiler} Compiler */
@@ -630,5 +632,7 @@ ImageMinimizerPlugin.imageminMinify = imageminMinify;
 ImageMinimizerPlugin.imageminGenerate = imageminGenerate;
 ImageMinimizerPlugin.squooshMinify = squooshMinify;
 ImageMinimizerPlugin.squooshGenerate = squooshGenerate;
+ImageMinimizerPlugin.sharpMinify = sharpMinify;
+ImageMinimizerPlugin.sharpGenerate = sharpGenerate;
 
 module.exports = ImageMinimizerPlugin;

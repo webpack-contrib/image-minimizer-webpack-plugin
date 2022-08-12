@@ -177,6 +177,8 @@ declare namespace ImageMinimizerPlugin {
     imageminGenerate,
     squooshMinify,
     squooshGenerate,
+    sharpMinify,
+    sharpGenerate,
     Schema,
     WebpackPluginInstance,
     Compiler,
@@ -268,6 +270,8 @@ import { imageminMinify } from "./utils.js";
 import { imageminGenerate } from "./utils.js";
 import { squooshMinify } from "./utils.js";
 import { squooshGenerate } from "./utils.js";
+import { sharpMinify } from "./sharp-transformer.js";
+import { sharpGenerate } from "./sharp-transformer.js";
 type Schema = import("schema-utils/declarations/validate").Schema;
 type WebpackPluginInstance = import("webpack").WebpackPluginInstance;
 type Compiler = import("webpack").Compiler;
