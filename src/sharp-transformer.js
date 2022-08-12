@@ -59,14 +59,6 @@ const SHARP_FORMATS = new Map([
 ]);
 
 /**
- * @param {unknown} error
- * @returns {string}
- */
-function messageFromError(error) {
-  return error instanceof Error ? error.message : String(error);
-}
-
-/**
  * @param {WorkerResult} original
  * @param {SharpOptions} minimizerOptions
  * @param {SharpFormat | null} targetFormat
@@ -82,40 +74,18 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
   /** @type {SharpLib} */
   // eslint-disable-next-line node/no-unpublished-require
   const sharp = require("sharp");
-
-  /** @type {Sharp} */
-  let imagePipeline;
-
-  try {
-    imagePipeline = sharp(original.data);
-  } catch (error) {
-    const newError = new Error(
-      `Error with '${original.filename}': ${messageFromError(error)}`
-    );
-
-    original.errors.push(newError);
-    return original;
-  }
+  const imagePipeline = sharp(original.data);
 
   // ====== resize ======
 
-  try {
-    if (
-      minimizerOptions.resize &&
-      (minimizerOptions.resize.width || minimizerOptions.resize.height)
-    ) {
-      imagePipeline.resize(
-        minimizerOptions.resize.width,
-        minimizerOptions.resize.height
-      );
-    }
-  } catch (error) {
-    const newError = new Error(
-      `Error with '${original.filename}': ${messageFromError(error)}`
+  if (
+    minimizerOptions.resize &&
+    (minimizerOptions.resize.width || minimizerOptions.resize.height)
+  ) {
+    imagePipeline.resize(
+      minimizerOptions.resize.width,
+      minimizerOptions.resize.height
     );
-
-    original.errors.push(newError);
-    return original;
   }
 
   // ====== convert ======
@@ -127,16 +97,7 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
 
   const encodeOptions = minimizerOptions.encodeOptions?.[outputFormat];
 
-  try {
-    imagePipeline.toFormat(outputFormat, encodeOptions);
-  } catch (error) {
-    const newError = new Error(
-      `Error with '${original.filename}': ${messageFromError(error)}`
-    );
-
-    original.errors.push(newError);
-    return original;
-  }
+  imagePipeline.toFormat(outputFormat, encodeOptions);
 
   const result = await imagePipeline.toBuffer({ resolveWithObject: true });
 
@@ -176,17 +137,8 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
  * @returns {Promise<WorkerResult>}
  */
 function sharpGenerate(original, minimizerOptions) {
-  if (!minimizerOptions.encodeOptions) {
-    const error = new Error(
-      `No result from 'sharp' for '${original.filename}', please configure the 'encodeOptions' option to generate images`
-    );
-
-    original.errors.push(error);
-    return Promise.resolve(original);
-  }
-
   const targetFormats = /** @type {SharpFormat[]} */ (
-    Object.keys(minimizerOptions.encodeOptions)
+    Object.keys(minimizerOptions.encodeOptions ?? {})
   );
 
   if (targetFormats.length === 0) {
