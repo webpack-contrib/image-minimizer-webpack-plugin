@@ -18,12 +18,12 @@ describe("resize query", () => {
       imageminLoaderOptions: {
         minimizer: {
           implementation: ImageMinimizerPlugin.squooshMinify,
+          filename: "[name]-[width]x[height][ext]",
           options: {
             resize: {
               width: 400,
               height: 400,
             },
-            sizeSuffix: (width, height) => `-${width}x${height}`,
             encodeOptions: {
               png: {},
             },
@@ -33,12 +33,12 @@ describe("resize query", () => {
           {
             preset: "webp",
             implementation: ImageMinimizerPlugin.squooshGenerate,
+            filename: "[name]-[width]x[height][ext]",
             options: {
               resize: {
                 width: 400,
                 height: 400,
               },
-              sizeSuffix: (width, height) => `-${width}x${height}`,
               encodeOptions: {
                 webp: {},
               },
@@ -96,8 +96,8 @@ describe("resize query", () => {
       imageminLoaderOptions: {
         minimizer: {
           implementation: ImageMinimizerPlugin.squooshMinify,
+          filename: "[name]-[width]x[height][ext]",
           options: {
-            sizeSuffix: (width, height) => `-${width}x${height}`,
             encodeOptions: {
               png: {},
             },
@@ -107,8 +107,8 @@ describe("resize query", () => {
           {
             preset: "webp",
             implementation: ImageMinimizerPlugin.squooshGenerate,
+            filename: "[name]-[width]x[height][ext]",
             options: {
-              sizeSuffix: (width, height) => `-${width}x${height}`,
               encodeOptions: {
                 webp: {},
               },

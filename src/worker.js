@@ -59,6 +59,10 @@ async function worker(options) {
       item.filename = options.generateFilename(filename, {
         filename: item.filename,
       });
+
+      item.filename = item.filename
+        .replace(/\[width\]/gi, item.info.width)
+        .replace(/\[height\]/gi, item.info.height);
     }
 
     return item;
