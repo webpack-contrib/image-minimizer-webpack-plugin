@@ -614,7 +614,7 @@ module.exports = {
           // Options
           options: {
             encodeOptions: {
-              mozjpeg: {
+              jpeg: {
                 quality: 90,
               },
             },
