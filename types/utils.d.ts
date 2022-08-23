@@ -31,10 +31,8 @@ export type SharpFormat = keyof SharpEncodeOptions;
 export type SharpOptions = {
   resize?: ResizeOptions | undefined;
   rotate?: number | "auto" | undefined;
-  sizeSuffix?: SizeSuffix | undefined;
   encodeOptions?: SharpEncodeOptions | undefined;
 };
-export type SizeSuffix = (width: number, height: number) => string;
 /**
  * @template T
  * @typedef {() => Promise<T>} Task
