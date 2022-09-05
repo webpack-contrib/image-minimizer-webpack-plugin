@@ -165,6 +165,8 @@ declare namespace ImageMinimizerPlugin {
     imageminGenerate,
     squooshMinify,
     squooshGenerate,
+    sharpMinify,
+    sharpGenerate,
     Schema,
     WebpackPluginInstance,
     Compiler,
@@ -216,7 +218,9 @@ type PluginOptions<T, G> = {
    */
   minimizer?:
     | (T extends any[]
-        ? { [P in keyof T]: Minimizer<T[P]> }
+        ? T extends infer T_1
+          ? { [P in keyof T_1]: Minimizer<T[P]> }
+          : never
         : Minimizer<T> | Minimizer<T>[])
     | undefined;
   /**
@@ -224,7 +228,9 @@ type PluginOptions<T, G> = {
    */
   generator?:
     | (G extends any[]
-        ? { [P_1 in keyof G]: Generator<G[P_1]> }
+        ? G extends infer T_2
+          ? { [P_1 in keyof T_2]: Generator<G[P_1]> }
+          : never
         : Generator<G>[])
     | undefined;
   /**
@@ -250,6 +256,8 @@ import { imageminMinify } from "./utils.js";
 import { imageminGenerate } from "./utils.js";
 import { squooshMinify } from "./utils.js";
 import { squooshGenerate } from "./utils.js";
+import { sharpMinify } from "./utils.js";
+import { sharpGenerate } from "./utils.js";
 type Schema = import("schema-utils/declarations/validate").Schema;
 type WebpackPluginInstance = import("webpack").WebpackPluginInstance;
 type Compiler = import("webpack").Compiler;

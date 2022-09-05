@@ -1177,6 +1177,63 @@ describe("imagemin plugin", () => {
     );
   });
 
+  it("should generate throw an error on multiple 'encodeOptions' options using 'sharpGenerate'", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        generator: [
+          {
+            preset: "webp-other",
+            implementation: ImageMinimizerPlugin.sharpGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: true,
+                },
+                avif: {},
+              },
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toMatch(
+      /Multiple values for the 'encodeOptions' option is not supported for 'loader-test.png', specify only one codec for the generator/
+    );
+  });
+
+  it("should return error on empty encodeOptions with 'sharpGenerate'", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+        generator: [
+          {
+            preset: "webp-other",
+            implementation: ImageMinimizerPlugin.sharpGenerate,
+            options: {
+              encodeOptions: {},
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toMatch(
+      /No result from 'sharp' for '.+', please configure the 'encodeOptions' option to generate images/
+    );
+  });
+
   it("should not try to generate and minimize twice", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "generator-and-minimizer.js"),
