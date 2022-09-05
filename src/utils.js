@@ -996,12 +996,14 @@ const SHARP_FORMATS = new Map([
 
 /**
  * @param {WorkerResult} original
+ * @param {0 | 1} action
  * @param {SharpOptions} minimizerOptions
  * @param {SharpFormat | null} targetFormat
  * @returns {Promise<WorkerResult>}
  */
 async function sharpTransform(
   original,
+  action,
   minimizerOptions = {},
   targetFormat = null
 ) {
@@ -1064,19 +1066,31 @@ async function sharpTransform(
 
   const filename = path.join(fileDir, `${fileName}${sizeSuffix}.${outputExt}`);
 
+  const info =
+    action === 0
+      ? {
+          ...original.info,
+          minimized: true,
+          minimizedBy:
+            original.info && original.info.generatedBy
+              ? ["sharp", ...original.info.generatedBy]
+              : ["sharp"],
+        }
+      : {
+          ...original.info,
+          generated: true,
+          generatedBy:
+            original.info && original.info.generatedBy
+              ? ["sharp", ...original.info.generatedBy]
+              : ["sharp"],
+        };
+
   return {
     filename,
     data: result.data,
     warnings: [...original.warnings],
     errors: [...original.errors],
-    info: {
-      ...original.info,
-      generated: true,
-      generatedBy:
-        original.info && original.info.generatedBy
-          ? ["sharp", ...original.info.generatedBy]
-          : ["sharp"],
-    },
+    info,
   };
 }
 
@@ -1115,7 +1129,7 @@ function sharpGenerate(original, minimizerOptions) {
 
   const [targetFormat] = targetFormats;
 
-  return sharpTransform(original, squooshOptions, targetFormat);
+  return sharpTransform(original, 1, squooshOptions, targetFormat);
 }
 
 /**
@@ -1125,7 +1139,7 @@ function sharpGenerate(original, minimizerOptions) {
  * @returns {Promise<WorkerResult>}
  */
 function sharpMinify(original, options) {
-  return sharpTransform(original, options);
+  return sharpTransform(original, 0, options);
 }
 
 module.exports = {
