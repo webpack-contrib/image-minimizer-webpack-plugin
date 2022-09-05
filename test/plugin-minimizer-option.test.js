@@ -633,4 +633,34 @@ describe("plugin minify option", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
+
+  it("should work with 'sharpMinify' minifier and don't rename unsupported asset", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "./svg-and-jpg.js"),
+      fileLoaderOff: true,
+      imageminPluginOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.sharpMinify,
+          filename: "minified-xxx-[name]-yyy[ext]",
+          options: {
+            encodeOptions: { jpeg: { quality: 90 } },
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors, assets } = compilation;
+
+    const originalAsset = Object.keys(assets).filter((asset) =>
+      asset.includes("loader-test.svg")
+    );
+    const minifiedAsset = Object.keys(assets).filter((asset) =>
+      asset.includes("minified-xxx-loader-test-yyy.jpg")
+    );
+
+    expect(originalAsset).toHaveLength(1);
+    expect(minifiedAsset).toHaveLength(1);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
 });
