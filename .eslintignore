@@ -4,3 +4,4 @@
 /test/fixtures
 /test/outputs
 /test/bundled
+/types/**/*
