@@ -1000,7 +1000,11 @@ const SHARP_FORMATS = new Map([
  * @param {SharpFormat | null} targetFormat
  * @returns {Promise<WorkerResult>}
  */
-async function sharpTransform(original, minimizerOptions, targetFormat = null) {
+async function sharpTransform(
+  original,
+  minimizerOptions = {},
+  targetFormat = null
+) {
   const inputExt = path.extname(original.filename).slice(1).toLowerCase();
 
   if (!SHARP_FORMATS.has(inputExt)) {
@@ -1095,6 +1099,7 @@ function sharpGenerate(original, minimizerOptions) {
     );
 
     original.errors.push(error);
+
     return Promise.resolve(original);
   }
 
@@ -1104,6 +1109,7 @@ function sharpGenerate(original, minimizerOptions) {
     );
 
     original.errors.push(error);
+
     return Promise.resolve(original);
   }
 
