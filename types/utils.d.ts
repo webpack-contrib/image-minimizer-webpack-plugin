@@ -109,22 +109,24 @@ export namespace squooshGenerate {
   export { squooshImagePoolTeardown as teardown };
 }
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SharpOptions} [minimizerOptions]
+ * @param {T} options
  * @returns {Promise<WorkerResult>}
  */
-export function sharpMinify(
+export function sharpMinify<T>(
   original: WorkerResult,
-  minimizerOptions?: SharpOptions | undefined
+  options: T
 ): Promise<WorkerResult>;
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SharpOptions} minimizerOptions
+ * @param {T} minimizerOptions
  * @returns {Promise<WorkerResult>}
  */
-export function sharpGenerate(
+export function sharpGenerate<T>(
   original: WorkerResult,
-  minimizerOptions: SharpOptions
+  minimizerOptions: T
 ): Promise<WorkerResult>;
 declare function squooshImagePoolSetup(): void;
 declare function squooshImagePoolTeardown(): Promise<void>;

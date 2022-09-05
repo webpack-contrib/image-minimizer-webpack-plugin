@@ -1077,13 +1077,16 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
 }
 
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SharpOptions} minimizerOptions
+ * @param {T} minimizerOptions
  * @returns {Promise<WorkerResult>}
  */
 function sharpGenerate(original, minimizerOptions) {
+  const squooshOptions = /** @type {SharpOptions} */ (minimizerOptions || {});
+
   const targetFormats = /** @type {SharpFormat[]} */ (
-    Object.keys(minimizerOptions.encodeOptions ?? {})
+    Object.keys(squooshOptions.encodeOptions ?? {})
   );
 
   if (targetFormats.length === 0) {
@@ -1106,16 +1109,17 @@ function sharpGenerate(original, minimizerOptions) {
 
   const [targetFormat] = targetFormats;
 
-  return sharpTransform(original, minimizerOptions, targetFormat);
+  return sharpTransform(original, squooshOptions, targetFormat);
 }
 
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SharpOptions} [minimizerOptions]
+ * @param {T} options
  * @returns {Promise<WorkerResult>}
  */
-function sharpMinify(original, minimizerOptions = {}) {
-  return sharpTransform(original, minimizerOptions);
+function sharpMinify(original, options) {
+  return sharpTransform(original, options);
 }
 
 module.exports = {
