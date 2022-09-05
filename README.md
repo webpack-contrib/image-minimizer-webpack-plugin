@@ -614,7 +614,7 @@ module.exports = {
           // Options
           options: {
             encodeOptions: {
-              mozjpeg: {
+              jpeg: {
                 quality: 90,
               },
             },
@@ -1160,12 +1160,12 @@ module.exports = {
             // implementation: ImageMinimizerPlugin.sharpGenerate,
             implementation: ImageMinimizerPlugin.squooshGenerate,
             options: {
+              resize: {
+                enabled: true,
+                width: 100,
+                height: 50,
+              },
               encodeOptions: {
-                resize: {
-                  enabled: true,
-                  width: 100,
-                  height: 50,
-                },
                 webp: {
                   quality: 90,
                 },
