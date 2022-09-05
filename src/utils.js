@@ -583,6 +583,7 @@ async function imageminGenerate(original, minimizerOptions) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
+    original.info.original = true;
     original.errors.push(newError);
 
     return original;
@@ -645,6 +646,7 @@ async function imageminMinify(original, options) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
+    original.info.original = true;
     original.errors.push(newError);
 
     return original;
@@ -655,6 +657,7 @@ async function imageminMinify(original, options) {
     const { ext: extOutput } = fileTypeFromBuffer(result) || {};
 
     if (extOutput && extInput !== extOutput) {
+      original.info.original = true;
       original.warnings.push(
         new Error(
           `"imageminMinify" function do not support generate to "${extOutput}" from "${original.filename}". Please use "imageminGenerate" function.`
@@ -778,6 +781,7 @@ async function squooshGenerate(original, minifyOptions) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
+    original.info.original = true;
     original.errors.push(newError);
 
     return original;
@@ -788,6 +792,8 @@ async function squooshGenerate(original, minifyOptions) {
   }
 
   if (Object.keys(image.encodedWith).length === 0) {
+    // eslint-disable-next-line require-atomic-updates
+    original.info.original = true;
     original.errors.push(
       new Error(
         `No result from 'squoosh' for '${original.filename}', please configure the 'encodeOptions' option to generate images`
@@ -798,6 +804,8 @@ async function squooshGenerate(original, minifyOptions) {
   }
 
   if (Object.keys(image.encodedWith).length > 1) {
+    // eslint-disable-next-line require-atomic-updates
+    original.info.original = true;
     original.errors.push(
       new Error(
         `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`
@@ -864,6 +872,8 @@ async function squooshMinify(original, options) {
   const targetCodec = targets[ext];
 
   if (!targetCodec) {
+    original.info.original = true;
+
     return original;
   }
 
@@ -909,6 +919,7 @@ async function squooshMinify(original, options) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
+    original.info.original = true;
     original.errors.push(newError);
 
     return original;
@@ -1010,6 +1021,8 @@ async function sharpTransform(
   const inputExt = path.extname(original.filename).slice(1).toLowerCase();
 
   if (!SHARP_FORMATS.has(inputExt)) {
+    original.info.original = true;
+
     return original;
   }
 
@@ -1112,6 +1125,7 @@ function sharpGenerate(original, minimizerOptions) {
       `No result from 'sharp' for '${original.filename}', please configure the 'encodeOptions' option to generate images`
     );
 
+    original.info.original = true;
     original.errors.push(error);
 
     return Promise.resolve(original);
@@ -1122,6 +1136,7 @@ function sharpGenerate(original, minimizerOptions) {
       `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`
     );
 
+    original.info.original = true;
     original.errors.push(error);
 
     return Promise.resolve(original);

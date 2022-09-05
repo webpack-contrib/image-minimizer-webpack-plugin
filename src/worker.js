@@ -54,11 +54,16 @@ async function worker(options) {
 
     if (
       typeof filename !== "undefined" &&
-      typeof options.generateFilename !== "undefined"
+      typeof options.generateFilename !== "undefined" &&
+      !item.info.original
     ) {
       item.filename = options.generateFilename(filename, {
         filename: item.filename,
       });
+    }
+
+    if (item.info.original) {
+      delete item.info.original;
     }
 
     return item;
