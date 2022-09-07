@@ -41,12 +41,12 @@ function throttleAll(limit, tasks) {
     const next = () => {
       const { done, value } = entries.next();
 
-      if (tasksFulfilled === tasks.length) {
-        resolve(result);
-        return;
-      }
-
       if (done) {
+        if (tasksFulfilled === tasks.length) {
+          resolve(result);
+          return;
+        }
+
         return;
       }
 
