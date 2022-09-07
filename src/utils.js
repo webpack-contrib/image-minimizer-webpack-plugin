@@ -5,8 +5,6 @@ const path = require("path");
 /** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("webpack").WebpackError} WebpackError */
 
-const notSettled = Symbol("not-settled");
-
 /**
  * @template T
  * @typedef {() => Promise<T>} Task
@@ -36,18 +34,17 @@ function throttleAll(limit, tasks) {
   }
 
   return new Promise((resolve, reject) => {
-    // eslint-disable-next-line unicorn/new-for-builtins
-    const result = Array(tasks.length).fill(notSettled);
+    const result = /** @type {T[]} */ ([]);
     const entries = tasks.entries();
+    let tasksFulfilled = 0;
+
     const next = () => {
       const { done, value } = entries.next();
 
       if (done) {
-        const isLast = !result.includes(notSettled);
-
-        if (isLast) {
-          // eslint-disable-next-line node/callback-return
+        if (tasksFulfilled === tasks.length) {
           resolve(result);
+          return;
         }
 
         return;
@@ -56,18 +53,20 @@ function throttleAll(limit, tasks) {
       const [index, task] = value;
 
       /**
-       * @param {T} i
+       * @param {T} taskResult
        */
-      const onFulfilled = (i) => {
-        result[index] = i;
+      const onFulfilled = (taskResult) => {
+        result[index] = taskResult;
+        tasksFulfilled += 1;
         next();
       };
 
       task().then(onFulfilled, reject);
     };
 
-    // eslint-disable-next-line unicorn/new-for-builtins
-    Array(limit).fill(0).forEach(next);
+    for (let i = 0; i < limit; i++) {
+      next();
+    }
   });
 }
 
@@ -609,10 +608,7 @@ async function imageminGenerate(original, minimizerOptions) {
     info: {
       ...original.info,
       generated: true,
-      generatedBy:
-        original.info && original.info.generatedBy
-          ? ["imagemin", ...original.info.generatedBy]
-          : ["imagemin"],
+      generatedBy: ["imagemin", ...(original.info?.generatedBy ?? [])],
     },
   };
 }
@@ -676,10 +672,7 @@ async function imageminMinify(original, options) {
     info: {
       ...original.info,
       minimized: true,
-      minimizedBy:
-        original.info && original.info.minimizedBy
-          ? ["imagemin", ...original.info.minimizedBy]
-          : ["imagemin"],
+      minimizedBy: ["imagemin", ...(original.info?.minimizedBy ?? [])],
     },
   };
 }
@@ -713,9 +706,9 @@ function squooshImagePoolSetup() {
     const os = require("os");
     // In some cases cpus() returns undefined
     // https://github.com/nodejs/node/issues/19022
-    const cpus = os.cpus() || { length: 1 };
+    const threads = os.cpus()?.length ?? 1;
 
-    pool = squooshImagePoolCreate(Math.max(cpus.length - 1, 1));
+    pool = squooshImagePoolCreate(threads);
 
     // workarounds for https://github.com/GoogleChromeLabs/squoosh/issues/1152
     // @ts-ignore
@@ -815,25 +808,19 @@ async function squooshGenerate(original, minifyOptions) {
     return original;
   }
 
-  const ext = path.extname(original.filename).toLowerCase();
   const { binary, extension } = await Object.values(image.encodedWith)[0];
-  const newFilename = original.filename.replace(
-    new RegExp(`${ext}$`),
-    `.${extension}`
-  );
+  const { dir: fileDir, name: fileName } = path.parse(original.filename);
+  const filename = path.join(fileDir, `${fileName}.${extension}`);
 
   return {
-    filename: newFilename,
+    filename,
     data: Buffer.from(binary),
     warnings: [...original.warnings],
     errors: [...original.errors],
     info: {
       ...original.info,
       generated: true,
-      generatedBy:
-        original.info && original.info.generatedBy
-          ? ["squoosh", ...original.info.generatedBy]
-          : ["squoosh"],
+      generatedBy: ["squoosh", ...(original.info?.generatedBy ?? [])],
     },
   };
 }
@@ -939,10 +926,7 @@ async function squooshMinify(original, options) {
     info: {
       ...original.info,
       minimized: true,
-      minimizedBy:
-        original.info && original.info.minimizedBy
-          ? ["squoosh", ...original.info.minimizedBy]
-          : ["squoosh"],
+      minimizedBy: ["squoosh", ...(original.info?.minimizedBy ?? [])],
     },
   };
 }
@@ -1007,14 +991,12 @@ const SHARP_FORMATS = new Map([
 
 /**
  * @param {WorkerResult} original
- * @param {0 | 1} action
  * @param {SharpOptions} minimizerOptions
  * @param {SharpFormat | null} targetFormat
  * @returns {Promise<WorkerResult>}
  */
 async function sharpTransform(
   original,
-  action,
   minimizerOptions = {},
   targetFormat = null
 ) {
@@ -1078,32 +1060,19 @@ async function sharpTransform(
       : "";
 
   const filename = path.join(fileDir, `${fileName}${sizeSuffix}.${outputExt}`);
-
-  const info =
-    action === 0
-      ? {
-          ...original.info,
-          minimized: true,
-          minimizedBy:
-            original.info && original.info.generatedBy
-              ? ["sharp", ...original.info.generatedBy]
-              : ["sharp"],
-        }
-      : {
-          ...original.info,
-          generated: true,
-          generatedBy:
-            original.info && original.info.generatedBy
-              ? ["sharp", ...original.info.generatedBy]
-              : ["sharp"],
-        };
+  const processedFlag = targetFormat ? "generated" : "minimized";
+  const processedBy = targetFormat ? "generatedBy" : "minimizedBy";
 
   return {
     filename,
     data: result.data,
     warnings: [...original.warnings],
     errors: [...original.errors],
-    info,
+    info: {
+      ...original.info,
+      [processedFlag]: true,
+      [processedBy]: ["sharp", ...(original.info?.[processedBy] ?? [])],
+    },
   };
 }
 
@@ -1114,10 +1083,10 @@ async function sharpTransform(
  * @returns {Promise<WorkerResult>}
  */
 function sharpGenerate(original, minimizerOptions) {
-  const squooshOptions = /** @type {SharpOptions} */ (minimizerOptions || {});
+  const sharpOptions = /** @type {SharpOptions} */ (minimizerOptions ?? {});
 
   const targetFormats = /** @type {SharpFormat[]} */ (
-    Object.keys(squooshOptions.encodeOptions ?? {})
+    Object.keys(sharpOptions.encodeOptions ?? {})
   );
 
   if (targetFormats.length === 0) {
@@ -1144,17 +1113,20 @@ function sharpGenerate(original, minimizerOptions) {
 
   const [targetFormat] = targetFormats;
 
-  return sharpTransform(original, 1, squooshOptions, targetFormat);
+  return sharpTransform(original, sharpOptions, targetFormat);
 }
 
 /**
  * @template T
  * @param {WorkerResult} original
- * @param {T} options
+ * @param {T} minimizerOptions
  * @returns {Promise<WorkerResult>}
  */
-function sharpMinify(original, options) {
-  return sharpTransform(original, 0, options);
+function sharpMinify(original, minimizerOptions) {
+  return sharpTransform(
+    original,
+    /** @type {SharpOptions} */ (minimizerOptions)
+  );
 }
 
 module.exports = {

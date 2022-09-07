@@ -1,8 +1,8 @@
-export type Task<T> = () => Promise<T>;
 export type WorkerResult = import("./index").WorkerResult;
 export type SquooshOptions = import("./index").SquooshOptions;
 export type ImageminOptions = import("imagemin").Options;
 export type WebpackError = import("webpack").WebpackError;
+export type Task<T> = () => Promise<T>;
 export type Uint8ArrayUtf8ByteString = (
   array: number[] | Uint8Array,
   start: number,
@@ -35,6 +35,10 @@ export type SharpOptions = {
   encodeOptions?: SharpEncodeOptions | undefined;
 };
 export type SizeSuffix = (width: number, height: number) => string;
+/** @typedef {import("./index").WorkerResult} WorkerResult */
+/** @typedef {import("./index").SquooshOptions} SquooshOptions */
+/** @typedef {import("imagemin").Options} ImageminOptions */
+/** @typedef {import("webpack").WebpackError} WebpackError */
 /**
  * @template T
  * @typedef {() => Promise<T>} Task
@@ -111,12 +115,12 @@ export namespace squooshGenerate {
 /**
  * @template T
  * @param {WorkerResult} original
- * @param {T} options
+ * @param {T} minimizerOptions
  * @returns {Promise<WorkerResult>}
  */
 export function sharpMinify<T>(
   original: WorkerResult,
-  options: T
+  minimizerOptions: T
 ): Promise<WorkerResult>;
 /**
  * @template T
