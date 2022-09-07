@@ -588,17 +588,20 @@ async function imageminGenerate(original, minimizerOptions) {
     return original;
   }
 
-  const {
-    dir: fileDir,
-    name: fileName,
-    ext: fileExt,
-  } = path.parse(original.filename);
+  const { ext: extOutput } = fileTypeFromBuffer(result) || {};
+  const extInput = path.extname(original.filename).slice(1).toLowerCase();
 
-  const extOutput = fileTypeFromBuffer(result)?.ext ?? fileExt.slice(1);
-  const filename = path.join(fileDir, `${fileName}.${extOutput}`);
+  let newFilename = original.filename;
+
+  if (extOutput && extInput !== extOutput) {
+    newFilename = original.filename.replace(
+      new RegExp(`${extInput}$`),
+      `${extOutput}`
+    );
+  }
 
   return {
-    filename,
+    filename: newFilename,
     data: result,
     warnings: [...original.warnings],
     errors: [...original.errors],
