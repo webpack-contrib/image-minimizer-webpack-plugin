@@ -312,7 +312,10 @@ class ImageMinimizerPlugin {
 
     // In some cases cpus() returns undefined
     // https://github.com/nodejs/node/issues/19022
-    const limit = this.options.concurrency ?? os.cpus()?.length ?? 1;
+    const limit = Math.max(
+      1,
+      this.options.concurrency ?? os.cpus()?.length ?? 1
+    );
     const { RawSource } = compiler.webpack.sources;
 
     const scheduledTasks = assetsForTransformers.map((asset) => async () => {
