@@ -62,7 +62,7 @@ async function worker(options) {
     ? options.transformer
     : [options.transformer];
 
-  for await (const transformer of transformers) {
+  for (const transformer of transformers) {
     if (
       typeof transformer.filter === "function" &&
       !transformer.filter(options.input, options.filename)
@@ -74,6 +74,7 @@ async function worker(options) {
     let processedResult;
 
     try {
+      // eslint-disable-next-line no-await-in-loop
       processedResult = await transformer.implementation(
         result,
         transformer.options

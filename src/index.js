@@ -421,8 +421,9 @@ class ImageMinimizerPlugin {
     if (Array.isArray(this.options.generator)) {
       const { generator } = this.options;
 
-      for await (const item of generator) {
+      for (const item of generator) {
         if (typeof item.implementation.teardown === "function") {
+          // eslint-disable-next-line no-await-in-loop
           await item.implementation.teardown();
         }
       }
@@ -433,8 +434,9 @@ class ImageMinimizerPlugin {
         ? this.options.minimizer
         : [this.options.minimizer];
 
-      for await (const item of minimizers) {
+      for (const item of minimizers) {
         if (typeof item.implementation.teardown === "function") {
+          // eslint-disable-next-line no-await-in-loop
           await item.implementation.teardown();
         }
       }
