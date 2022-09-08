@@ -5,8 +5,6 @@ const path = require("path");
 /** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("webpack").WebpackError} WebpackError */
 
-const notSettled = Symbol("not-settled");
-
 /**
  * @template T
  * @typedef {() => Promise<T>} Task
@@ -36,18 +34,17 @@ function throttleAll(limit, tasks) {
   }
 
   return new Promise((resolve, reject) => {
-    // eslint-disable-next-line unicorn/new-for-builtins
-    const result = Array(tasks.length).fill(notSettled);
+    const result = /** @type {T[]} */ ([]);
     const entries = tasks.entries();
+    let tasksFulfilled = 0;
+
     const next = () => {
       const { done, value } = entries.next();
 
       if (done) {
-        const isLast = !result.includes(notSettled);
-
-        if (isLast) {
-          // eslint-disable-next-line node/callback-return
+        if (tasksFulfilled === tasks.length) {
           resolve(result);
+          return;
         }
 
         return;
@@ -56,18 +53,20 @@ function throttleAll(limit, tasks) {
       const [index, task] = value;
 
       /**
-       * @param {T} i
+       * @param {T} taskResult
        */
-      const onFulfilled = (i) => {
-        result[index] = i;
+      const onFulfilled = (taskResult) => {
+        result[index] = taskResult;
+        tasksFulfilled += 1;
         next();
       };
 
       task().then(onFulfilled, reject);
     };
 
-    // eslint-disable-next-line unicorn/new-for-builtins
-    Array(limit).fill(0).forEach(next);
+    for (let i = 0; i < limit; i++) {
+      next();
+    }
   });
 }
 
@@ -583,6 +582,7 @@ async function imageminGenerate(original, minimizerOptions) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
+    original.info.original = true;
     original.errors.push(newError);
 
     return original;
@@ -608,10 +608,7 @@ async function imageminGenerate(original, minimizerOptions) {
     info: {
       ...original.info,
       generated: true,
-      generatedBy:
-        original.info && original.info.generatedBy
-          ? ["imagemin", ...original.info.generatedBy]
-          : ["imagemin"],
+      generatedBy: ["imagemin", ...(original.info?.generatedBy ?? [])],
     },
   };
 }
@@ -645,6 +642,7 @@ async function imageminMinify(original, options) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
+    original.info.original = true;
     original.errors.push(newError);
 
     return original;
@@ -655,6 +653,7 @@ async function imageminMinify(original, options) {
     const { ext: extOutput } = fileTypeFromBuffer(result) || {};
 
     if (extOutput && extInput !== extOutput) {
+      original.info.original = true;
       original.warnings.push(
         new Error(
           `"imageminMinify" function do not support generate to "${extOutput}" from "${original.filename}". Please use "imageminGenerate" function.`
@@ -673,10 +672,7 @@ async function imageminMinify(original, options) {
     info: {
       ...original.info,
       minimized: true,
-      minimizedBy:
-        original.info && original.info.minimizedBy
-          ? ["imagemin", ...original.info.minimizedBy]
-          : ["imagemin"],
+      minimizedBy: ["imagemin", ...(original.info?.minimizedBy ?? [])],
     },
   };
 }
@@ -710,9 +706,9 @@ function squooshImagePoolSetup() {
     const os = require("os");
     // In some cases cpus() returns undefined
     // https://github.com/nodejs/node/issues/19022
-    const cpus = os.cpus() || { length: 1 };
+    const threads = os.cpus()?.length ?? 1;
 
-    pool = squooshImagePoolCreate(Math.max(cpus.length - 1, 1));
+    pool = squooshImagePoolCreate(threads);
 
     // workarounds for https://github.com/GoogleChromeLabs/squoosh/issues/1152
     // @ts-ignore
@@ -778,6 +774,7 @@ async function squooshGenerate(original, minifyOptions) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
+    original.info.original = true;
     original.errors.push(newError);
 
     return original;
@@ -788,6 +785,8 @@ async function squooshGenerate(original, minifyOptions) {
   }
 
   if (Object.keys(image.encodedWith).length === 0) {
+    // eslint-disable-next-line require-atomic-updates
+    original.info.original = true;
     original.errors.push(
       new Error(
         `No result from 'squoosh' for '${original.filename}', please configure the 'encodeOptions' option to generate images`
@@ -798,6 +797,8 @@ async function squooshGenerate(original, minifyOptions) {
   }
 
   if (Object.keys(image.encodedWith).length > 1) {
+    // eslint-disable-next-line require-atomic-updates
+    original.info.original = true;
     original.errors.push(
       new Error(
         `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`
@@ -809,7 +810,6 @@ async function squooshGenerate(original, minifyOptions) {
 
   const { binary, extension } = await Object.values(image.encodedWith)[0];
   const { width, height } = (await image.decoded).bitmap;
-
   const { dir: fileDir, name: fileName } = path.parse(original.filename);
   const filename = path.join(fileDir, `${fileName}.${extension}`);
 
@@ -823,10 +823,7 @@ async function squooshGenerate(original, minifyOptions) {
       width,
       height,
       generated: true,
-      generatedBy:
-        original.info && original.info.generatedBy
-          ? ["squoosh", ...original.info.generatedBy]
-          : ["squoosh"],
+      generatedBy: ["squoosh", ...(original.info?.generatedBy ?? [])],
     },
   };
 }
@@ -865,6 +862,8 @@ async function squooshMinify(original, options) {
   const targetCodec = targets[ext];
 
   if (!targetCodec) {
+    original.info.original = true;
+
     return original;
   }
 
@@ -910,6 +909,7 @@ async function squooshMinify(original, options) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
+    original.info.original = true;
     original.errors.push(newError);
 
     return original;
@@ -940,10 +940,7 @@ async function squooshMinify(original, options) {
       width,
       height,
       minimized: true,
-      minimizedBy:
-        original.info && original.info.minimizedBy
-          ? ["squoosh", ...original.info.minimizedBy]
-          : ["squoosh"],
+      minimizedBy: ["squoosh", ...(original.info?.minimizedBy ?? [])],
     },
   };
 }
@@ -1006,10 +1003,16 @@ const SHARP_FORMATS = new Map([
  * @param {SharpFormat | null} targetFormat
  * @returns {Promise<WorkerResult>}
  */
-async function sharpTransform(original, minimizerOptions, targetFormat = null) {
+async function sharpTransform(
+  original,
+  minimizerOptions = {},
+  targetFormat = null
+) {
   const inputExt = path.extname(original.filename).slice(1).toLowerCase();
 
   if (!SHARP_FORMATS.has(inputExt)) {
+    original.info.original = true;
+
     return original;
   }
 
@@ -1060,6 +1063,8 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
 
   const { width, height } = result.info;
   const filename = path.join(fileDir, `${fileName}.${outputExt}`);
+  const processedFlag = targetFormat ? "generated" : "minimized";
+  const processedBy = targetFormat ? "generatedBy" : "minimizedBy";
 
   return {
     filename,
@@ -1070,23 +1075,23 @@ async function sharpTransform(original, minimizerOptions, targetFormat = null) {
       ...original.info,
       width,
       height,
-      generated: true,
-      generatedBy:
-        original.info && original.info.generatedBy
-          ? ["sharp", ...original.info.generatedBy]
-          : ["sharp"],
+      [processedFlag]: true,
+      [processedBy]: ["sharp", ...(original.info?.[processedBy] ?? [])],
     },
   };
 }
 
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SharpOptions} minimizerOptions
+ * @param {T} minimizerOptions
  * @returns {Promise<WorkerResult>}
  */
 function sharpGenerate(original, minimizerOptions) {
+  const sharpOptions = /** @type {SharpOptions} */ (minimizerOptions ?? {});
+
   const targetFormats = /** @type {SharpFormat[]} */ (
-    Object.keys(minimizerOptions.encodeOptions ?? {})
+    Object.keys(sharpOptions.encodeOptions ?? {})
   );
 
   if (targetFormats.length === 0) {
@@ -1094,7 +1099,9 @@ function sharpGenerate(original, minimizerOptions) {
       `No result from 'sharp' for '${original.filename}', please configure the 'encodeOptions' option to generate images`
     );
 
+    original.info.original = true;
     original.errors.push(error);
+
     return Promise.resolve(original);
   }
 
@@ -1103,22 +1110,28 @@ function sharpGenerate(original, minimizerOptions) {
       `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`
     );
 
+    original.info.original = true;
     original.errors.push(error);
+
     return Promise.resolve(original);
   }
 
   const [targetFormat] = targetFormats;
 
-  return sharpTransform(original, minimizerOptions, targetFormat);
+  return sharpTransform(original, sharpOptions, targetFormat);
 }
 
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SharpOptions} [minimizerOptions]
+ * @param {T} minimizerOptions
  * @returns {Promise<WorkerResult>}
  */
-function sharpMinify(original, minimizerOptions = {}) {
-  return sharpTransform(original, minimizerOptions);
+function sharpMinify(original, minimizerOptions) {
+  return sharpTransform(
+    original,
+    /** @type {SharpOptions} */ (minimizerOptions)
+  );
 }
 
 module.exports = {

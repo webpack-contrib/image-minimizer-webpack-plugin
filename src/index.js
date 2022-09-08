@@ -239,14 +239,9 @@ class ImageMinimizerPlugin {
           ? this.options.minimizer
           : [this.options.minimizer]
         : [];
-    const generators = Array.isArray(this.options.generator)
-      ? this.options.generator.filter((item) => {
-          if (item.type === "asset") {
-            return true;
-          }
 
-          return false;
-        })
+    const generators = Array.isArray(this.options.generator)
+      ? this.options.generator.filter((item) => item.type === "asset")
       : [];
 
     if (minimizers.length === 0 && generators.length === 0) {
@@ -266,10 +261,10 @@ class ImageMinimizerPlugin {
             }
 
             if (
-              !compiler.webpack.ModuleFilenameHelpers.matchObject.bind(
-                undefined,
-                this.options
-              )(name)
+              !compiler.webpack.ModuleFilenameHelpers.matchObject(
+                this.options,
+                name
+              )
             ) {
               return false;
             }
@@ -329,84 +324,79 @@ class ImageMinimizerPlugin {
       )
     ).flat();
 
-    const cpus = os.cpus() || { length: 1 };
-    const limit = this.options.concurrency || Math.max(1, cpus.length - 1);
-
+    // In some cases cpus() returns undefined
+    // https://github.com/nodejs/node/issues/19022
+    const limit = Math.max(
+      1,
+      this.options.concurrency ?? os.cpus()?.length ?? 1
+    );
     const { RawSource } = compiler.webpack.sources;
 
-    const scheduledTasks = [];
+    const scheduledTasks = assetsForTransformers.map((asset) => async () => {
+      const { name, inputSource, cacheItem, transformer } = asset;
+      let { output } = asset;
+      let input;
 
-    for (const asset of assetsForTransformers) {
-      scheduledTasks.push(async () => {
-        const { name, inputSource, cacheItem, transformer } = asset;
-        let { output } = asset;
-        let input;
+      const sourceFromInputSource = inputSource.source();
 
-        const sourceFromInputSource = inputSource.source();
+      if (!output) {
+        input = sourceFromInputSource;
 
-        if (!output) {
-          input = sourceFromInputSource;
+        if (!Buffer.isBuffer(input)) {
+          input = Buffer.from(input);
+        }
 
-          if (!Buffer.isBuffer(input)) {
-            input = Buffer.from(input);
-          }
-
-          const minifyOptions =
-            /** @type {InternalWorkerOptions<T>} */
-            ({
-              filename: name,
-              input,
-              severityError: this.options.severityError,
-              transformer,
-              generateFilename: compilation.getAssetPath.bind(compilation),
-            });
-
-          output = await worker(minifyOptions);
-
-          output.source = new RawSource(output.data);
-
-          await cacheItem.storePromise({
-            source: output.source,
-            info: output.info,
-            filename: output.filename,
-            warnings: output.warnings,
-            errors: output.errors,
+        const minifyOptions =
+          /** @type {InternalWorkerOptions<T>} */
+          ({
+            filename: name,
+            input,
+            severityError: this.options.severityError,
+            transformer,
+            generateFilename: compilation.getAssetPath.bind(compilation),
           });
-        }
 
-        if (output.warnings.length > 0) {
-          /** @type {[WebpackError]} */
-          (output.warnings).forEach((warning) => {
-            compilation.warnings.push(warning);
-          });
-        }
+        output = await worker(minifyOptions);
 
-        if (output.errors.length > 0) {
-          /** @type {[WebpackError]} */
-          (output.errors).forEach((error) => {
-            compilation.errors.push(error);
-          });
-        }
+        output.source = new RawSource(output.data);
 
-        if (compilation.getAsset(output.filename)) {
-          compilation.updateAsset(
-            output.filename,
-            /** @type {Source} */ (output.source),
-            output.info
-          );
-        } else {
-          compilation.emitAsset(
-            output.filename,
-            /** @type {Source} */ (output.source),
-            output.info
-          );
+        await cacheItem.storePromise({
+          source: output.source,
+          info: output.info,
+          filename: output.filename,
+          warnings: output.warnings,
+          errors: output.errors,
+        });
+      }
 
-          if (this.options.deleteOriginalAssets) {
-            compilation.deleteAsset(name);
-          }
+      compilation.warnings = [
+        ...compilation.warnings,
+        .../** @type {[WebpackError]} */ (output.warnings),
+      ];
+
+      compilation.errors = [
+        ...compilation.errors,
+        .../** @type {[WebpackError]} */ (output.errors),
+      ];
+
+      if (compilation.getAsset(output.filename)) {
+        compilation.updateAsset(
+          output.filename,
+          /** @type {Source} */ (output.source),
+          output.info
+        );
+      } else {
+        compilation.emitAsset(
+          output.filename,
+          /** @type {Source} */ (output.source),
+          output.info
+        );
+
+        if (this.options.deleteOriginalAssets) {
+          compilation.deleteAsset(name);
         }
-      });
-    }
+      }
+    });
 
     await throttleAll(limit, scheduledTasks);
   }
@@ -415,12 +405,11 @@ class ImageMinimizerPlugin {
    * @private
    */
   setupAll() {
-    if (typeof this.options.generator !== "undefined") {
+    if (Array.isArray(this.options.generator)) {
       const { generator } = this.options;
 
-      // @ts-ignore
       for (const item of generator) {
-        if (typeof item.implementation.setup !== "undefined") {
+        if (typeof item.implementation.setup === "function") {
           item.implementation.setup();
         }
       }
@@ -432,7 +421,7 @@ class ImageMinimizerPlugin {
         : [this.options.minimizer];
 
       for (const item of minimizers) {
-        if (typeof item.implementation.setup !== "undefined") {
+        if (typeof item.implementation.setup === "function") {
           item.implementation.setup();
         }
       }
@@ -443,12 +432,11 @@ class ImageMinimizerPlugin {
    * @private
    */
   async teardownAll() {
-    if (typeof this.options.generator !== "undefined") {
+    if (Array.isArray(this.options.generator)) {
       const { generator } = this.options;
 
-      // @ts-ignore
       for (const item of generator) {
-        if (typeof item.implementation.teardown !== "undefined") {
+        if (typeof item.implementation.teardown === "function") {
           // eslint-disable-next-line no-await-in-loop
           await item.implementation.teardown();
         }
@@ -461,7 +449,7 @@ class ImageMinimizerPlugin {
         : [this.options.minimizer];
 
       for (const item of minimizers) {
-        if (typeof item.implementation.teardown !== "undefined") {
+        if (typeof item.implementation.teardown === "function") {
           // eslint-disable-next-line no-await-in-loop
           await item.implementation.teardown();
         }
@@ -483,10 +471,7 @@ class ImageMinimizerPlugin {
         compilation.hooks.moduleAsset.tap(
           { name: pluginName },
           (module, file) => {
-            const newInfo =
-              module &&
-              module.buildMeta &&
-              module.buildMeta.imageMinimizerPluginInfo;
+            const newInfo = module?.buildMeta?.imageMinimizerPluginInfo;
 
             if (newInfo) {
               const asset = /** @type {Asset} */ (compilation.getAsset(file));
@@ -500,17 +485,11 @@ class ImageMinimizerPlugin {
         compilation.hooks.assetPath.tap(
           { name: pluginName },
           (filename, data, info) => {
-            const newInfo =
-              data &&
-              // @ts-ignore
-              data.module &&
-              // @ts-ignore
-              data.module.buildMeta &&
-              // @ts-ignore
-              data.module.buildMeta.imageMinimizerPluginInfo;
+            // @ts-ignore
+            const newInfo = data?.module?.buildMeta?.imageMinimizerPluginInfo;
 
-            if (newInfo) {
-              Object.assign(info || {}, newInfo);
+            if (info && newInfo) {
+              Object.assign(info, newInfo);
             }
 
             return filename;
@@ -526,13 +505,9 @@ class ImageMinimizerPlugin {
         let generatorForLoader = generator;
 
         if (Array.isArray(generatorForLoader)) {
-          const importGenerators = generatorForLoader.filter((item) => {
-            if (typeof item.type === "undefined" || item.type === "import") {
-              return true;
-            }
-
-            return false;
-          });
+          const importGenerators = generatorForLoader.filter(
+            (item) => typeof item.type === "undefined" || item.type === "import"
+          );
 
           generatorForLoader =
             importGenerators.length > 0

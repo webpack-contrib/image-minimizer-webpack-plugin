@@ -1,8 +1,8 @@
-export type Task<T> = () => Promise<T>;
 export type WorkerResult = import("./index").WorkerResult;
 export type SquooshOptions = import("./index").SquooshOptions;
 export type ImageminOptions = import("imagemin").Options;
 export type WebpackError = import("webpack").WebpackError;
+export type Task<T> = () => Promise<T>;
 export type Uint8ArrayUtf8ByteString = (
   array: number[] | Uint8Array,
   start: number,
@@ -33,6 +33,10 @@ export type SharpOptions = {
   rotate?: number | "auto" | undefined;
   encodeOptions?: SharpEncodeOptions | undefined;
 };
+/** @typedef {import("./index").WorkerResult} WorkerResult */
+/** @typedef {import("./index").SquooshOptions} SquooshOptions */
+/** @typedef {import("imagemin").Options} ImageminOptions */
+/** @typedef {import("webpack").WebpackError} WebpackError */
 /**
  * @template T
  * @typedef {() => Promise<T>} Task
@@ -107,22 +111,24 @@ export namespace squooshGenerate {
   export { squooshImagePoolTeardown as teardown };
 }
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SharpOptions} [minimizerOptions]
+ * @param {T} minimizerOptions
  * @returns {Promise<WorkerResult>}
  */
-export function sharpMinify(
+export function sharpMinify<T>(
   original: WorkerResult,
-  minimizerOptions?: SharpOptions | undefined
+  minimizerOptions: T
 ): Promise<WorkerResult>;
 /**
+ * @template T
  * @param {WorkerResult} original
- * @param {SharpOptions} minimizerOptions
+ * @param {T} minimizerOptions
  * @returns {Promise<WorkerResult>}
  */
-export function sharpGenerate(
+export function sharpGenerate<T>(
   original: WorkerResult,
-  minimizerOptions: SharpOptions
+  minimizerOptions: T
 ): Promise<WorkerResult>;
 declare function squooshImagePoolSetup(): void;
 declare function squooshImagePoolTeardown(): Promise<void>;

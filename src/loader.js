@@ -76,11 +76,8 @@ function processSizeQuery(transformers, widthQuery, heightQuery) {
 async function loader(content) {
   // Avoid optimize twice
   if (
-    this._module &&
-    this._module.buildMeta &&
-    this._module.buildMeta.imageMinimizerPluginInfo &&
-    (this._module.buildMeta.imageMinimizerPluginInfo.minimized ||
-      this._module.buildMeta.imageMinimizerPluginInfo.generated)
+    this._module?.buildMeta?.imageMinimizerPluginInfo?.minimized ||
+    this._module?.buildMeta?.imageMinimizerPluginInfo?.generated
   ) {
     return content;
   }
@@ -189,11 +186,7 @@ async function loader(content) {
   }
 
   // Change content of the data URI after minimizer
-  if (
-    this._module &&
-    this._module.resourceResolveData &&
-    this._module.resourceResolveData.encodedContent
-  ) {
+  if (this._module?.resourceResolveData?.encodedContent) {
     const isBase64 = /^base64$/i.test(
       this._module.resourceResolveData.encoding
     );

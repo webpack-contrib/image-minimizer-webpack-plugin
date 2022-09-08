@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.3.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.3.0...v3.3.1) (2022-09-05)
+
+
+### Bug Fixes
+
+* assets info for sharp ([#338](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/338)) ([c897d30](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/c897d30bed8532fec1312be62483281589402b0b))
+* avoid renaming unsupported formats ([#339](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/339)) ([18e30ef](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/18e30ef3da70b39384f389e6729d56fb5b24af59))
+* sharp types ([#337](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/337)) ([ae3a03b](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/ae3a03b926a6bce29dee2829490a99d16394a501))
+
 ## [3.3.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.2.3...v3.3.0) (2022-08-12)
 
 

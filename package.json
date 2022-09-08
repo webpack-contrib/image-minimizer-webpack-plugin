@@ -1,6 +1,6 @@
 {
   "name": "image-minimizer-webpack-plugin",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "Webpack loader and plugin to optimize (compress) images using imagemin",
   "license": "MIT",
   "repository": "webpack-contrib/image-minimizer-webpack-plugin",
@@ -70,7 +70,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",
-    "@babel/core": "^7.18.2",
+    "@babel/core": "^7.18.13",
     "@babel/preset-env": "^7.18.2",
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-conventional": "^15.0.0",
@@ -85,7 +85,7 @@
     "css-loader": "^6.7.1",
     "del": "^6.1.1",
     "del-cli": "^4.0.1",
-    "eslint": "^8.16.0",
+    "eslint": "^8.23.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-itgalaxy": "^136.0.0",
     "eslint-plugin-jest": "^25.7.0",
