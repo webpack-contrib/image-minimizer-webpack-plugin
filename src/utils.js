@@ -922,16 +922,8 @@ async function squooshMinify(original, options) {
   const { binary } = await image.encodedWith[targets[ext]];
   const { width, height } = (await image.decoded).bitmap;
 
-  const {
-    dir: fileDir,
-    name: fileName,
-    ext: fileExt,
-  } = path.parse(original.filename);
-
-  const filename = path.join(fileDir, `${fileName}${fileExt}`);
-
   return {
-    filename,
+    filename: original.filename,
     data: Buffer.from(binary),
     warnings: [...original.warnings],
     errors: [...original.errors],
