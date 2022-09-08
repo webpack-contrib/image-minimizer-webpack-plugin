@@ -11,6 +11,8 @@ import {
   hasLoader,
 } from "./helpers";
 
+jest.setTimeout(10000);
+
 describe("plugin minify option", () => {
   it('should work with "imageminMinify" minifier', async () => {
     const stats = await runWebpack({
@@ -660,6 +662,63 @@ describe("plugin minify option", () => {
 
     expect(originalAsset).toHaveLength(1);
     expect(minifiedAsset).toHaveLength(1);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("should rename if minimizer is array", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "./svg-and-jpg.js"),
+      fileLoaderOff: true,
+      imageminPluginOptions: {
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.sharpMinify,
+            filename: "minified-by-sharp-[name][ext]",
+            options: {
+              encodeOptions: { jpeg: { quality: 90 } },
+            },
+          },
+          {
+            implementation: ImageMinimizerPlugin.sharpMinify,
+            filename: "should-be-skipped-[name][ext]",
+            options: {
+              encodeOptions: { jpeg: { quality: 90 } },
+            },
+          },
+          {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            filename: "minified-by-svgo-[name][ext]",
+            options: {
+              plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+            },
+          },
+          {
+            implementation: ImageMinimizerPlugin.imageminMinify,
+            filename: "should-be-skipped-[name][ext]",
+            options: {
+              plugins: ["gifsicle", "mozjpeg", "pngquant", "svgo"],
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors, assets } = compilation;
+
+    const sharpAsset = Object.keys(assets).filter((asset) =>
+      asset.includes("minified-by-sharp-loader-test.jpg")
+    );
+    const svgoAsset = Object.keys(assets).filter((asset) =>
+      asset.includes("minified-by-svgo-loader-test.svg")
+    );
+    const skippedAsset = Object.keys(assets).filter((asset) =>
+      asset.includes("should-be-skipped-loader-test.svg")
+    );
+
+    expect(sharpAsset).toHaveLength(1);
+    expect(svgoAsset).toHaveLength(1);
+    expect(skippedAsset).toHaveLength(0);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
