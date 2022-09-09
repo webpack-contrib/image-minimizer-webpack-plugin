@@ -794,7 +794,7 @@ Default: `undefined`
 Allows to set the filename.
 Supported values see in [`webpack template strings`](https://webpack.js.org/configuration/output/#template-strings), `File-level` section.
 
-Also we support `[width]` and `[height]` placeholders
+We also support `[width]` and `[height]` placeholders.
 
 **webpack.config.js**
 
