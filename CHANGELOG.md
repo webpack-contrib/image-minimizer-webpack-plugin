@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.4.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.3.1...v3.4.0) (2022-09-09)
+
+
+### Features
+
+* add `[width]` and `[height]` placeholders for the `filename` option ([#346](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/346)) ([682c22b](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/682c22b81f2f1af96e83f0e0805fd5406a209324))
+
+
+### Bug Fixes
+
+* types ([cd7c7a7](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/cd7c7a7c7f12eb883399cf01ad7c9102e90b845b))
+
 ### [3.3.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.3.0...v3.3.1) (2022-09-05)
 
 
