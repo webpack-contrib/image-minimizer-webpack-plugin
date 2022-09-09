@@ -1,40 +1,43 @@
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").FilenameFn} FilenameFn */
 
+const isFilenameProcessed = Symbol("isFilenameProcessed");
+
 /**
  * @template T
+ * @param {WorkerResult} result
  * @param {import("./index").InternalWorkerOptions<T>} options
- * @param {WorkerResult} item
- * @param {undefined | string | FilenameFn} filename
- * @returns {WorkerResult}
+ * @param {undefined | string | FilenameFn} filenameTemplate
  */
-function normalizeProcessedResult(options, item, filename) {
-  item.info ??= {};
-  item.filename ??= options.filename;
-  item.errors ??= [];
-  item.warnings ??= [];
-
-  if (options.severityError === "off") {
-    item.warnings = [];
-    item.errors = [];
-  } else if (options.severityError === "warning") {
-    item.warnings = [...item.warnings, ...item.errors];
-    item.errors = [];
-  }
-
+function processFilenameTemplate(result, options, filenameTemplate) {
   if (
-    typeof filename !== "undefined" &&
-    typeof options.generateFilename === "function" &&
-    !item.info.original
+    // @ts-ignore
+    !result.info[isFilenameProcessed] &&
+    typeof filenameTemplate !== "undefined" &&
+    typeof options.generateFilename === "function"
   ) {
-    item.filename = options.generateFilename(filename, {
-      filename: item.filename,
+    result.filename = options.generateFilename(filenameTemplate, {
+      filename: result.filename,
     });
+
+    // @ts-ignore
+    result.info[isFilenameProcessed] = true;
   }
+}
 
-  delete item.info.original;
-
-  return item;
+/**
+ * @template T
+ * @param {WorkerResult} result
+ * @param {import("./index").InternalWorkerOptions<T>} options
+ */
+function processSeverityError(result, options) {
+  if (options.severityError === "off") {
+    result.warnings = [];
+    result.errors = [];
+  } else if (options.severityError === "warning") {
+    result.warnings = [...result.warnings, ...result.errors];
+    result.errors = [];
+  }
 }
 
 /**
@@ -54,13 +57,15 @@ async function worker(options) {
 
   if (!result.data) {
     result.errors.push(new Error("Empty input"));
-
     return result;
   }
 
   const transformers = Array.isArray(options.transformer)
     ? options.transformer
     : [options.transformer];
+
+  /** @type {undefined | string | FilenameFn} */
+  let filenameTemplate;
 
   for (const transformer of transformers) {
     if (
@@ -70,7 +75,7 @@ async function worker(options) {
       continue;
     }
 
-    /** @type {WorkerResult} */
+    /** @type {WorkerResult | null} */
     let processedResult;
 
     try {
@@ -89,7 +94,7 @@ async function worker(options) {
       return result;
     }
 
-    if (!processedResult || !Buffer.isBuffer(processedResult.data)) {
+    if (processedResult && !Buffer.isBuffer(processedResult.data)) {
       result.errors.push(
         new Error(
           "minimizer function doesn't return the 'data' property or result is not a 'Buffer' value"
@@ -99,12 +104,19 @@ async function worker(options) {
       return result;
     }
 
-    result = normalizeProcessedResult(
-      options,
-      processedResult,
-      transformer.filename
-    );
+    if (processedResult) {
+      result = processedResult;
+      filenameTemplate ??= transformer.filename;
+    }
   }
+
+  result.info ??= {};
+  result.errors ??= [];
+  result.warnings ??= [];
+  result.filename ??= options.filename;
+
+  processSeverityError(result, options);
+  processFilenameTemplate(result, options, filenameTemplate);
 
   return result;
 }

@@ -250,7 +250,7 @@ describe("minify", () => {
     });
 
     expect(result.warnings).toHaveLength(0);
-    expect(result.errors).toHaveLength(2);
+    expect(result.errors).toHaveLength(1);
     expect(result.data).toBe(input);
   });
 
@@ -889,7 +889,7 @@ describe("minify", () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
-    expect(result.filename).toBe("generated-generated-image.jpg");
+    expect(result.filename).toBe("generated-image.jpg");
 
     const imagePool = new ImagePool(1);
     const image = imagePool.ingestImage(new Uint8Array(input));
