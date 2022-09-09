@@ -6,6 +6,8 @@ import ImageMinimizerPlugin from "../src";
 
 import { runWebpack, fixturesPath } from "./helpers";
 
+jest.setTimeout(10000);
+
 describe("loader generator option", () => {
   it("should work", async () => {
     const stats = await runWebpack({

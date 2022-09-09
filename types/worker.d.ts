@@ -1,6 +1,4 @@
 export = worker;
-/** @typedef {import("./index").WorkerResult} WorkerResult */
-/** @typedef {import("./index").FilenameFn} FilenameFn */
 /**
  * @template T
  * @param {import("./index").InternalWorkerOptions<T>} options

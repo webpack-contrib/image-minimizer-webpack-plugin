@@ -1,8 +1,8 @@
-export type Task<T> = () => Promise<T>;
 export type WorkerResult = import("./index").WorkerResult;
 export type SquooshOptions = import("./index").SquooshOptions;
 export type ImageminOptions = import("imagemin").Options;
 export type WebpackError = import("webpack").WebpackError;
+export type Task<T> = () => Promise<T>;
 export type Uint8ArrayUtf8ByteString = (
   array: number[] | Uint8Array,
   start: number,
@@ -35,6 +35,10 @@ export type SharpOptions = {
   encodeOptions?: SharpEncodeOptions | undefined;
 };
 export type SizeSuffix = (width: number, height: number) => string;
+/** @typedef {import("./index").WorkerResult} WorkerResult */
+/** @typedef {import("./index").SquooshOptions} SquooshOptions */
+/** @typedef {import("imagemin").Options} ImageminOptions */
+/** @typedef {import("webpack").WebpackError} WebpackError */
 /**
  * @template T
  * @typedef {() => Promise<T>} Task
@@ -64,32 +68,32 @@ export function imageminNormalizeConfig<T>(
  * @template T
  * @param {WorkerResult} original
  * @param {T} options
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 export function imageminMinify<T>(
   original: WorkerResult,
   options: T
-): Promise<WorkerResult>;
+): Promise<WorkerResult | null>;
 /**
  * @template T
  * @param {WorkerResult} original
  * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 export function imageminGenerate<T>(
   original: WorkerResult,
   minimizerOptions: T
-): Promise<WorkerResult>;
+): Promise<WorkerResult | null>;
 /**
  * @template T
  * @param {WorkerResult} original
  * @param {T} options
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 export function squooshMinify<T>(
   original: WorkerResult,
   options: T
-): Promise<WorkerResult>;
+): Promise<WorkerResult | null>;
 export namespace squooshMinify {
   export { squooshImagePoolSetup as setup };
   export { squooshImagePoolTeardown as teardown };
@@ -98,12 +102,12 @@ export namespace squooshMinify {
  * @template T
  * @param {WorkerResult} original
  * @param {T} minifyOptions
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 export function squooshGenerate<T>(
   original: WorkerResult,
   minifyOptions: T
-): Promise<WorkerResult>;
+): Promise<WorkerResult | null>;
 export namespace squooshGenerate {
   export { squooshImagePoolSetup as setup };
   export { squooshImagePoolTeardown as teardown };
@@ -111,23 +115,23 @@ export namespace squooshGenerate {
 /**
  * @template T
  * @param {WorkerResult} original
- * @param {T} options
- * @returns {Promise<WorkerResult>}
+ * @param {T} minimizerOptions
+ * @returns {Promise<WorkerResult | null>}
  */
 export function sharpMinify<T>(
   original: WorkerResult,
-  options: T
-): Promise<WorkerResult>;
+  minimizerOptions: T
+): Promise<WorkerResult | null>;
 /**
  * @template T
  * @param {WorkerResult} original
  * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 export function sharpGenerate<T>(
   original: WorkerResult,
   minimizerOptions: T
-): Promise<WorkerResult>;
+): Promise<WorkerResult | null>;
 declare function squooshImagePoolSetup(): void;
 declare function squooshImagePoolTeardown(): Promise<void>;
 export {};
