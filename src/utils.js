@@ -948,12 +948,19 @@ squooshMinify.teardown = squooshImagePoolTeardown;
  * @type {keyof SharpEncodeOptions}
  */
 
+// TODO remove the `SizeSuffix` option in the next major release, because we support `[width]` and `[height]`
 /**
  * @typedef SharpOptions
  * @type {object}
  * @property {ResizeOptions} [resize]
  * @property {number | 'auto'} [rotate]
+ * @property {SizeSuffix} [sizeSuffix]
  * @property {SharpEncodeOptions} [encodeOptions]
+ */
+
+/**
+ * @typedef SizeSuffix
+ * @type {(width: number, height: number) => string}
  */
 
 // https://github.com/lovell/sharp/blob/e40a881ab4a5e7b0e37ba17e31b3b186aef8cbf6/lib/output.js#L7-L23
@@ -1034,11 +1041,13 @@ async function sharpTransform(
   // ====== rename ======
 
   const outputExt = targetFormat ? outputFormat : inputExt;
-
   const { dir: fileDir, name: fileName } = path.parse(original.filename);
-
   const { width, height } = result.info;
-  const filename = path.join(fileDir, `${fileName}.${outputExt}`);
+  const sizeSuffix =
+    typeof minimizerOptions.sizeSuffix === "function"
+      ? minimizerOptions.sizeSuffix(width, height)
+      : "";
+  const filename = path.join(fileDir, `${fileName}${sizeSuffix}.${outputExt}`);
   const processedFlag = targetFormat ? "generated" : "minimized";
   const processedBy = targetFormat ? "generatedBy" : "minimizedBy";
 
