@@ -6,6 +6,7 @@ const { isAbsoluteURL } = require("./utils.js");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
+/** @typedef {import("./utils").WorkerResult} WorkerResult */
 
 /**
  * @template T
@@ -14,6 +15,21 @@ const { isAbsoluteURL } = require("./utils.js");
  * @property {import("./index").Minimizer<T> | import("./index").Minimizer<T>[]} [minimizer]
  * @property {import("./index").Generator<T>[]} [generator]
  */
+
+// Workaround - https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/341
+/**
+ * @template T
+ * @param {import("webpack").LoaderContext<LoaderOptions<T>>} loaderContext
+ * @param {boolean} isAbsolute
+ * @param {WorkerResult} output
+ * @param {string} query
+ */
+function changeResource(loaderContext, isAbsolute, output, query) {
+  loaderContext.resourcePath = isAbsolute
+    ? output.filename
+    : path.join(loaderContext.rootContext, output.filename);
+  loaderContext.resourceQuery = query;
+}
 
 /**
  * @template T
@@ -152,10 +168,7 @@ async function loader(content) {
     }
 
     // Old approach for `file-loader` and other old loaders
-    this.resourcePath = isAbsolute
-      ? output.filename
-      : path.join(this.rootContext, output.filename);
-    this.resourceQuery = query;
+    changeResource(this, isAbsolute, output, query);
 
     // Change name of assets modules after generator
     if (this._module && !this._module.matchResource) {
