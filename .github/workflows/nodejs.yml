@@ -67,6 +67,8 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    timeout-minutes: 10
+
     steps:
       - name: Setup Git
         if: matrix.os == 'windows-latest'
