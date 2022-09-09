@@ -798,6 +798,7 @@ async function squooshGenerate(original, minifyOptions) {
   }
 
   const { binary, extension } = await Object.values(image.encodedWith)[0];
+  const { width, height } = (await image.decoded).bitmap;
   const { dir: fileDir, name: fileName } = path.parse(original.filename);
   const filename = path.join(fileDir, `${fileName}.${extension}`);
 
@@ -808,6 +809,8 @@ async function squooshGenerate(original, minifyOptions) {
     errors: [...original.errors],
     info: {
       ...original.info,
+      width,
+      height,
       generated: true,
       generatedBy: ["squoosh", ...(original.info?.generatedBy ?? [])],
     },
@@ -903,6 +906,7 @@ async function squooshMinify(original, options) {
   }
 
   const { binary } = await image.encodedWith[targets[ext]];
+  const { width, height } = (await image.decoded).bitmap;
 
   return {
     filename: original.filename,
@@ -911,6 +915,8 @@ async function squooshMinify(original, options) {
     errors: [...original.errors],
     info: {
       ...original.info,
+      width,
+      height,
       minimized: true,
       minimizedBy: ["squoosh", ...(original.info?.minimizedBy ?? [])],
     },
@@ -947,13 +953,7 @@ squooshMinify.teardown = squooshImagePoolTeardown;
  * @type {object}
  * @property {ResizeOptions} [resize]
  * @property {number | 'auto'} [rotate]
- * @property {SizeSuffix} [sizeSuffix]
  * @property {SharpEncodeOptions} [encodeOptions]
- */
-
-/**
- * @typedef SizeSuffix
- * @type {(width: number, height: number) => string}
  */
 
 // https://github.com/lovell/sharp/blob/e40a881ab4a5e7b0e37ba17e31b3b186aef8cbf6/lib/output.js#L7-L23
@@ -1038,12 +1038,7 @@ async function sharpTransform(
   const { dir: fileDir, name: fileName } = path.parse(original.filename);
 
   const { width, height } = result.info;
-  const sizeSuffix =
-    typeof minimizerOptions.sizeSuffix === "function"
-      ? minimizerOptions.sizeSuffix(width, height)
-      : "";
-
-  const filename = path.join(fileDir, `${fileName}${sizeSuffix}.${outputExt}`);
+  const filename = path.join(fileDir, `${fileName}.${outputExt}`);
   const processedFlag = targetFormat ? "generated" : "minimized";
   const processedBy = targetFormat ? "generatedBy" : "minimizedBy";
 
@@ -1054,6 +1049,8 @@ async function sharpTransform(
     errors: [...original.errors],
     info: {
       ...original.info,
+      width,
+      height,
       [processedFlag]: true,
       [processedBy]: ["sharp", ...(original.info?.[processedBy] ?? [])],
     },

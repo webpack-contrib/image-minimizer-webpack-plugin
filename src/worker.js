@@ -20,6 +20,10 @@ function processFilenameTemplate(result, options, filenameTemplate) {
       filename: result.filename,
     });
 
+    result.filename = result.filename
+      .replace(/\[width\]/gi, result.info.width)
+      .replace(/\[height\]/gi, result.info.height);
+
     // @ts-ignore
     result.info[isFilenameProcessed] = true;
   }
