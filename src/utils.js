@@ -557,7 +557,7 @@ async function imageminNormalizeConfig(imageminConfig) {
  * @template T
  * @param {WorkerResult} original
  * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 async function imageminGenerate(original, minimizerOptions) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
@@ -582,10 +582,8 @@ async function imageminGenerate(original, minimizerOptions) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
-    original.info.original = true;
     original.errors.push(newError);
-
-    return original;
+    return null;
   }
 
   const { ext: extOutput } = fileTypeFromBuffer(result) || {};
@@ -617,7 +615,7 @@ async function imageminGenerate(original, minimizerOptions) {
  * @template T
  * @param {WorkerResult} original
  * @param {T} options
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 async function imageminMinify(original, options) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
@@ -642,10 +640,8 @@ async function imageminMinify(original, options) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
-    original.info.original = true;
     original.errors.push(newError);
-
-    return original;
+    return null;
   }
 
   if (!isAbsoluteURL(original.filename)) {
@@ -653,14 +649,13 @@ async function imageminMinify(original, options) {
     const { ext: extOutput } = fileTypeFromBuffer(result) || {};
 
     if (extOutput && extInput !== extOutput) {
-      original.info.original = true;
       original.warnings.push(
         new Error(
           `"imageminMinify" function do not support generate to "${extOutput}" from "${original.filename}". Please use "imageminGenerate" function.`
         )
       );
 
-      return original;
+      return null;
     }
   }
 
@@ -729,7 +724,7 @@ async function squooshImagePoolTeardown() {
  * @template T
  * @param {WorkerResult} original
  * @param {T} minifyOptions
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 async function squooshGenerate(original, minifyOptions) {
   // eslint-disable-next-line node/no-unpublished-require
@@ -774,10 +769,8 @@ async function squooshGenerate(original, minifyOptions) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
-    original.info.original = true;
     original.errors.push(newError);
-
-    return original;
+    return null;
   }
 
   if (!isReusePool) {
@@ -785,27 +778,23 @@ async function squooshGenerate(original, minifyOptions) {
   }
 
   if (Object.keys(image.encodedWith).length === 0) {
-    // eslint-disable-next-line require-atomic-updates
-    original.info.original = true;
     original.errors.push(
       new Error(
         `No result from 'squoosh' for '${original.filename}', please configure the 'encodeOptions' option to generate images`
       )
     );
 
-    return original;
+    return null;
   }
 
   if (Object.keys(image.encodedWith).length > 1) {
-    // eslint-disable-next-line require-atomic-updates
-    original.info.original = true;
     original.errors.push(
       new Error(
         `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`
       )
     );
 
-    return original;
+    return null;
   }
 
   const { binary, extension } = await Object.values(image.encodedWith)[0];
@@ -833,7 +822,7 @@ squooshGenerate.teardown = squooshImagePoolTeardown;
  * @template T
  * @param {WorkerResult} original
  * @param {T} options
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 async function squooshMinify(original, options) {
   // eslint-disable-next-line node/no-unpublished-require
@@ -859,15 +848,14 @@ async function squooshMinify(original, options) {
   const targetCodec = targets[ext];
 
   if (!targetCodec) {
-    original.info.original = true;
-
-    return original;
+    return null;
   }
 
   const isReusePool = Boolean(pool);
   const imagePool = pool || squooshImagePoolCreate();
   const image = imagePool.ingestImage(new Uint8Array(original.data));
   const squooshOptions = /** @type {SquooshOptions} */ (options || {});
+
   /**
    * @type {undefined | Object.<string, any>}
    */
@@ -906,10 +894,8 @@ async function squooshMinify(original, options) {
       `Error with '${original.filename}': ${originalError.message}`
     );
 
-    original.info.original = true;
     original.errors.push(newError);
-
-    return original;
+    return null;
   }
 
   if (!isReusePool) {
@@ -993,7 +979,7 @@ const SHARP_FORMATS = new Map([
  * @param {WorkerResult} original
  * @param {SharpOptions} minimizerOptions
  * @param {SharpFormat | null} targetFormat
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 async function sharpTransform(
   original,
@@ -1003,9 +989,7 @@ async function sharpTransform(
   const inputExt = path.extname(original.filename).slice(1).toLowerCase();
 
   if (!SHARP_FORMATS.has(inputExt)) {
-    original.info.original = true;
-
-    return original;
+    return null;
   }
 
   /** @type {SharpLib} */
@@ -1080,7 +1064,7 @@ async function sharpTransform(
  * @template T
  * @param {WorkerResult} original
  * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 function sharpGenerate(original, minimizerOptions) {
   const sharpOptions = /** @type {SharpOptions} */ (minimizerOptions ?? {});
@@ -1094,10 +1078,8 @@ function sharpGenerate(original, minimizerOptions) {
       `No result from 'sharp' for '${original.filename}', please configure the 'encodeOptions' option to generate images`
     );
 
-    original.info.original = true;
     original.errors.push(error);
-
-    return Promise.resolve(original);
+    return Promise.resolve(null);
   }
 
   if (targetFormats.length > 1) {
@@ -1105,10 +1087,8 @@ function sharpGenerate(original, minimizerOptions) {
       `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`
     );
 
-    original.info.original = true;
     original.errors.push(error);
-
-    return Promise.resolve(original);
+    return Promise.resolve(null);
   }
 
   const [targetFormat] = targetFormats;
@@ -1120,7 +1100,7 @@ function sharpGenerate(original, minimizerOptions) {
  * @template T
  * @param {WorkerResult} original
  * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 function sharpMinify(original, minimizerOptions) {
   return sharpTransform(
