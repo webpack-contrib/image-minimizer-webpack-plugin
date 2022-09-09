@@ -9,7 +9,8 @@
     "types": ["node"],
     "resolveJsonModule": true,
     "newLine": "LF",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./types"
   },
   "include": ["./src/**/*"]
 }
