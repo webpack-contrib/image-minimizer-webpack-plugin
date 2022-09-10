@@ -17,7 +17,7 @@ describe("resize query", () => {
       ),
       imageminLoaderOptions: {
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           filename: "[name]-[width]x[height][ext]",
           options: {
             resize: {
@@ -32,7 +32,7 @@ describe("resize query", () => {
         generator: [
           {
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             filename: "[name]-[width]x[height][ext]",
             options: {
               resize: {
@@ -97,7 +97,7 @@ describe("resize query", () => {
       ),
       imageminLoaderOptions: {
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           filename: "[name]-[width]x[height][ext]",
           options: {
             encodeOptions: {
@@ -108,7 +108,7 @@ describe("resize query", () => {
         generator: [
           {
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             filename: "[name]-[width]x[height][ext]",
             options: {
               encodeOptions: {
