@@ -1,3 +1,6 @@
+/* eslint-disable jest/no-standalone-expect */
+/* eslint-disable jest/require-hook */
+
 import fs from "fs";
 import path from "path";
 
@@ -12,6 +15,8 @@ import worker from "../src/worker";
 
 // eslint-disable-next-line import/default
 import utils from "../src/utils.js";
+
+import { ifit, needsTestAll } from "./helpers";
 
 function isPromise(obj) {
   return (
@@ -514,7 +519,7 @@ describe("minify", () => {
     expect(result.errors[1].toString()).toMatch(/Error: fail/);
   });
 
-  it("should respect error happened before", async () => {
+  ifit(needsTestAll)("should respect error happened before", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -561,7 +566,7 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  it("should respect error happened after", async () => {
+  ifit(needsTestAll)("should respect error happened after", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -721,7 +726,7 @@ describe("minify", () => {
     );
   });
 
-  it("should work with 'squooshMinify'", async () => {
+  ifit(needsTestAll)("should work with 'squooshMinify'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -758,7 +763,7 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  it("should work with 'squooshGenerate'", async () => {
+  ifit(needsTestAll)("should work with 'squooshGenerate'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -795,26 +800,29 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  it("should return error on empty plugin with 'squooshGenerate'", async () => {
-    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
-    const result = await worker({
-      input,
-      filename,
-      transformer: {
-        implementation: utils.squooshGenerate,
-        options: {},
-      },
-    });
+  ifit(needsTestAll)(
+    "should return error on empty plugin with 'squooshGenerate'",
+    async () => {
+      const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+      const input = await pify(fs.readFile)(filename);
+      const result = await worker({
+        input,
+        filename,
+        transformer: {
+          implementation: utils.squooshGenerate,
+          options: {},
+        },
+      });
 
-    expect(result.warnings).toHaveLength(0);
-    expect(result.errors).toHaveLength(1);
-    expect(result.errors[0].message).toMatch(
-      /No result from 'squoosh' for '.+', please configure the 'encodeOptions' option to generate images/
-    );
-  });
+      expect(result.warnings).toHaveLength(0);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].message).toMatch(
+        /No result from 'squoosh' for '.+', please configure the 'encodeOptions' option to generate images/
+      );
+    }
+  );
 
-  it("should work and allow to rename filename", async () => {
+  ifit(needsTestAll)("should work and allow to rename filename", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -854,58 +862,61 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  it("should work and allow to rename filename #2", async () => {
-    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
-    const result = await worker({
-      input,
-      filename: "image.jpg",
-      generateFilename: (_, info) => `generated-${info.filename}`,
-      transformer: [
-        {
-          implementation: utils.squooshMinify,
-          filename: "image.jpg",
-          options: {
-            encodeOptions: {
-              mozjpeg: {
-                quality: 90,
+  ifit(needsTestAll)(
+    "should work and allow to rename filename #2",
+    async () => {
+      const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+      const input = await pify(fs.readFile)(filename);
+      const result = await worker({
+        input,
+        filename: "image.jpg",
+        generateFilename: (_, info) => `generated-${info.filename}`,
+        transformer: [
+          {
+            implementation: utils.squooshMinify,
+            filename: "image.jpg",
+            options: {
+              encodeOptions: {
+                mozjpeg: {
+                  quality: 90,
+                },
               },
             },
           },
-        },
-        {
-          implementation: utils.squooshMinify,
-          filename: "image.jpg",
-          options: {
-            encodeOptions: {
-              mozjpeg: {
-                quality: 90,
+          {
+            implementation: utils.squooshMinify,
+            filename: "image.jpg",
+            options: {
+              encodeOptions: {
+                mozjpeg: {
+                  quality: 90,
+                },
               },
             },
           },
+        ],
+      });
+
+      expect(result.warnings).toHaveLength(0);
+      expect(result.errors).toHaveLength(0);
+      expect(result.filename).toBe("generated-image.jpg");
+
+      const imagePool = new ImagePool(1);
+      const image = imagePool.ingestImage(new Uint8Array(input));
+
+      await image.encode({
+        mozjpeg: {
+          quality: 90,
         },
-      ],
-    });
+      });
 
-    expect(result.warnings).toHaveLength(0);
-    expect(result.errors).toHaveLength(0);
-    expect(result.filename).toBe("generated-image.jpg");
+      await imagePool.close();
 
-    const imagePool = new ImagePool(1);
-    const image = imagePool.ingestImage(new Uint8Array(input));
+      const { binary } = await image.encodedWith.mozjpeg;
 
-    await image.encode({
-      mozjpeg: {
-        quality: 90,
-      },
-    });
-
-    await imagePool.close();
-
-    const { binary } = await image.encodedWith.mozjpeg;
-
-    expect(result.data.equals(binary)).toBe(true);
-  });
+      expect(result.data.equals(binary)).toBe(true);
+    }
+  );
 
   it("should work and allow to filter", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");

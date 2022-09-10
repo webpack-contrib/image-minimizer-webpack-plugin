@@ -357,6 +357,39 @@ function clearDirectory(dirPath) {
   fs.rmdirSync(dirPath);
 }
 
+/**
+ * @param {boolean | () => boolean} predicate
+ * @returns {import("@jest/globals").it | import("@jest/globals").xit}
+ */
+function ifit(predicate) {
+  const cond = typeof predicate === "function" ? predicate() : predicate;
+
+  return cond ? it : xit;
+}
+
+/**
+ * @returns {boolean}
+ */
+function needsTestWin() {
+  const { platform } = process;
+  const nodeMajorVer = Number(process.version.slice(1).split(".")[0]);
+
+  // Disable tests for Windows and Nodejs > 14
+  // see: https://github.com/webpack-contrib/image-minimizer-webpack-plugin/pull/345
+  return !(platform === "win32" && nodeMajorVer > 14);
+}
+
+/**
+ * @returns {boolean}
+ */
+function needsTestAll() {
+  const nodeMajorVer = Number(process.version.slice(1).split(".")[0]);
+
+  // Disable tests for all and Nodejs > 16
+  // see: https://github.com/webpack-contrib/image-minimizer-webpack-plugin/pull/345
+  return !(nodeMajorVer > 16);
+}
+
 export default class EmitNewAssetPlugin {
   constructor(options = {}) {
     this.options = options;
@@ -397,4 +430,7 @@ export {
   normalizePath,
   clearDirectory,
   EmitNewAssetPlugin,
+  ifit,
+  needsTestAll,
+  needsTestWin,
 };

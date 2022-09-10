@@ -1,3 +1,6 @@
+/* eslint-disable jest/no-standalone-expect */
+/* eslint-disable jest/require-hook */
+
 import path from "path";
 
 import fileType from "file-type";
@@ -9,6 +12,8 @@ import {
   isOptimized,
   plugins,
   hasLoader,
+  ifit,
+  needsTestAll,
 } from "./helpers";
 
 jest.setTimeout(10000);
@@ -38,7 +43,7 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it('should work with "squooshMinify" minifier', async () => {
+  ifit(needsTestAll)('should work with "squooshMinify" minifier', async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./empty-entry.js"),
       emitPlugin: true,
@@ -217,36 +222,41 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it("should work with 'squooshMinify' minifier and 'minimizerOptions'", async () => {
-    const stats = await runWebpack({
-      entry: path.join(fixturesPath, "./empty-entry.js"),
-      emitPlugin: true,
-      imageminPluginOptions: {
-        minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
-          options: {
-            encodeOptions: {
-              mozjpeg: {
-                quality: 75,
-              },
-              webp: {
-                lossless: 1,
-              },
-              avif: {
-                cqLevel: 0,
+  ifit(needsTestAll)(
+    "should work with 'squooshMinify' minifier and 'minimizerOptions'",
+    async () => {
+      const stats = await runWebpack({
+        entry: path.join(fixturesPath, "./empty-entry.js"),
+        emitPlugin: true,
+        imageminPluginOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            options: {
+              encodeOptions: {
+                mozjpeg: {
+                  quality: 75,
+                },
+                webp: {
+                  lossless: 1,
+                },
+                avif: {
+                  cqLevel: 0,
+                },
               },
             },
           },
         },
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
+      });
+      const { compilation } = stats;
+      const { warnings, errors } = compilation;
 
-    expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(335);
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-  });
+      expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(
+        335
+      );
+      expect(warnings).toHaveLength(0);
+      expect(errors).toHaveLength(0);
+    }
+  );
 
   it("should optimizes all images (loader + plugin) exclude filtered", async () => {
     const stats = await runWebpack({
