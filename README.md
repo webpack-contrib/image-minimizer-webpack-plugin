@@ -25,7 +25,7 @@
 
 ## Getting Started
 
-This plugin can use 2 tools to optimize/generate images:
+This plugin can use 3 tools to optimize/generate images:
 
 - [`imagemin`](https://github.com/imagemin/imagemin) - optimize your images by default, since it is stable and works with all types of images
 - [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh) - while working in experimental mode with `.jpg`, `.jpeg`, `.png`, `.webp`, `.avif` file types.
@@ -793,6 +793,8 @@ Default: `undefined`
 
 Allows to set the filename.
 Supported values see in [`webpack template strings`](https://webpack.js.org/configuration/output/#template-strings), `File-level` section.
+
+We also support `[width]` and `[height]` placeholders.
 
 **webpack.config.js**
 

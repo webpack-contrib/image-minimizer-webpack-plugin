@@ -9,21 +9,16 @@ declare function loader<T>(
   this: import("webpack").LoaderContext<LoaderOptions<T>>,
   content: Buffer
 ): Promise<Buffer | undefined>;
-declare class loader<T> {
-  /**
-   * @template T
-   * @this {import("webpack").LoaderContext<LoaderOptions<T>>}
-   * @param {Buffer} content
-   * @returns {Promise<Buffer | undefined>}
-   */
-  constructor(
-    this: import("webpack").LoaderContext<LoaderOptions<T>>,
-    content: Buffer
-  );
-  resourcePath: string | undefined;
-}
 declare namespace loader {
-  export { raw, Schema, Compilation, Minimizer, Generator, LoaderOptions };
+  export {
+    raw,
+    Schema,
+    Compilation,
+    WorkerResult,
+    Minimizer,
+    Generator,
+    LoaderOptions,
+  };
 }
 /**
  * <T>
@@ -42,6 +37,7 @@ type LoaderOptions<T> = {
 declare var raw: boolean;
 type Schema = import("schema-utils/declarations/validate").Schema;
 type Compilation = import("webpack").Compilation;
+type WorkerResult = import("./utils").WorkerResult;
 /**
  * <T>
  */

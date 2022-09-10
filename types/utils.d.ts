@@ -31,8 +31,10 @@ export type SharpFormat = keyof SharpEncodeOptions;
 export type SharpOptions = {
   resize?: ResizeOptions | undefined;
   rotate?: number | "auto" | undefined;
+  sizeSuffix?: SizeSuffix | undefined;
   encodeOptions?: SharpEncodeOptions | undefined;
 };
+export type SizeSuffix = (width: number, height: number) => string;
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").SquooshOptions} SquooshOptions */
 /** @typedef {import("imagemin").Options} ImageminOptions */
@@ -66,32 +68,32 @@ export function imageminNormalizeConfig<T>(
  * @template T
  * @param {WorkerResult} original
  * @param {T} options
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 export function imageminMinify<T>(
   original: WorkerResult,
   options: T
-): Promise<WorkerResult>;
+): Promise<WorkerResult | null>;
 /**
  * @template T
  * @param {WorkerResult} original
  * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 export function imageminGenerate<T>(
   original: WorkerResult,
   minimizerOptions: T
-): Promise<WorkerResult>;
+): Promise<WorkerResult | null>;
 /**
  * @template T
  * @param {WorkerResult} original
  * @param {T} options
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 export function squooshMinify<T>(
   original: WorkerResult,
   options: T
-): Promise<WorkerResult>;
+): Promise<WorkerResult | null>;
 export namespace squooshMinify {
   export { squooshImagePoolSetup as setup };
   export { squooshImagePoolTeardown as teardown };
@@ -100,12 +102,12 @@ export namespace squooshMinify {
  * @template T
  * @param {WorkerResult} original
  * @param {T} minifyOptions
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 export function squooshGenerate<T>(
   original: WorkerResult,
   minifyOptions: T
-): Promise<WorkerResult>;
+): Promise<WorkerResult | null>;
 export namespace squooshGenerate {
   export { squooshImagePoolSetup as setup };
   export { squooshImagePoolTeardown as teardown };
@@ -114,22 +116,22 @@ export namespace squooshGenerate {
  * @template T
  * @param {WorkerResult} original
  * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 export function sharpMinify<T>(
   original: WorkerResult,
   minimizerOptions: T
-): Promise<WorkerResult>;
+): Promise<WorkerResult | null>;
 /**
  * @template T
  * @param {WorkerResult} original
  * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 export function sharpGenerate<T>(
   original: WorkerResult,
   minimizerOptions: T
-): Promise<WorkerResult>;
+): Promise<WorkerResult | null>;
 declare function squooshImagePoolSetup(): void;
 declare function squooshImagePoolTeardown(): Promise<void>;
 export {};
