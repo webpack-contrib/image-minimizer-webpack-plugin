@@ -50,31 +50,32 @@ function processSizeQuery(transformers, widthQuery, heightQuery) {
   return transformers.map((transformer) => {
     const minimizer = { ...transformer };
 
-    const resizeOptions = { ...minimizer.options?.resize };
+    const minimizerOptions =
+      /** @type { import("./index").BasicTransformerOptions<T> & { resize?: import("./index").ResizeOptions }} */
+      // @ts-ignore
+      ({ ...minimizer.options });
+
+    minimizerOptions.resize = { ...minimizerOptions?.resize };
+    minimizer.options = minimizerOptions;
 
     if (widthQuery === "auto") {
-      delete resizeOptions.width;
+      delete minimizerOptions.resize.width;
     } else if (widthQuery) {
       const width = Number.parseInt(widthQuery, 10);
 
       if (Number.isFinite(width) && width > 0) {
-        resizeOptions.width = width;
+        minimizerOptions.resize.width = width;
       }
     }
 
     if (heightQuery === "auto") {
-      delete resizeOptions.height;
+      delete minimizerOptions.resize.height;
     } else if (heightQuery) {
       const height = Number.parseInt(heightQuery, 10);
 
       if (Number.isFinite(height) && height > 0) {
-        resizeOptions.height = height;
+        minimizerOptions.resize.height = height;
       }
-    }
-
-    if (resizeOptions.width || resizeOptions.height) {
-      minimizer.options = { ...minimizer.options };
-      minimizer.options.resize = resizeOptions;
     }
 
     return minimizer;

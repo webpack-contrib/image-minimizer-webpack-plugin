@@ -51,9 +51,7 @@ export = ImageMinimizerPlugin;
  */
 /**
  * @template T
- * @typedef {Object} BasicTransformerOptions
- * @property {ResizeOptions} [resize]
- * @property {InferDefaultType<T>} [encodeOptions]
+ * @typedef {InferDefaultType<T> | undefined} BasicTransformerOptions
  */
 /**
  * @typedef {Object} ResizeOptions
@@ -311,10 +309,7 @@ type CustomOptions = {
   [key: string]: any;
 };
 type InferDefaultType<T> = T extends infer U ? U : CustomOptions;
-type BasicTransformerOptions<T> = {
-  resize?: ResizeOptions | undefined;
-  encodeOptions?: InferDefaultType<T> | undefined;
-};
+type BasicTransformerOptions<T> = InferDefaultType<T> | undefined;
 type ResizeOptions = {
   width?: number | undefined;
   height?: number | undefined;
@@ -322,7 +317,7 @@ type ResizeOptions = {
 };
 type BasicTransformerImplementation<T> = (
   original: WorkerResult,
-  options?: BasicTransformerOptions<T> | undefined
+  options?: BasicTransformerOptions<T>
 ) => Promise<WorkerResult>;
 type BasicTransformerHelpers = {
   setup?: (() => void) | undefined;
@@ -339,7 +334,7 @@ type FilenameFn = (
 ) => string;
 type Transformer<T> = {
   implementation: TransformerFunction<T>;
-  options?: BasicTransformerOptions<T> | undefined;
+  options?: BasicTransformerOptions<T>;
   filter?: FilterFn | undefined;
   filename?: string | FilenameFn | undefined;
   preset?: string | undefined;

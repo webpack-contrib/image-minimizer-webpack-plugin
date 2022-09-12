@@ -79,9 +79,7 @@ const {
 
 /**
  * @template T
- * @typedef {Object} BasicTransformerOptions
- * @property {ResizeOptions} [resize]
- * @property {InferDefaultType<T>} [encodeOptions]
+ * @typedef {InferDefaultType<T> | undefined} BasicTransformerOptions
  */
 
 /**
