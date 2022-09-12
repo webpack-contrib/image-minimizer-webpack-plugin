@@ -112,41 +112,50 @@ async function loader(content) {
   }
 
   let transformer = minimizer;
-  const parsedQuery = new URLSearchParams(this.resourceQuery);
-  const presetName = parsedQuery.get("as");
 
-  if (presetName) {
-    if (!generator) {
-      callback(
-        new Error(
-          "Please specify the 'generator' option to use 'as' query param for generation purposes."
-        )
-      );
+  const parsedQuery =
+    this.resourceQuery.length > 0
+      ? new URLSearchParams(this.resourceQuery)
+      : null;
 
-      return;
+  if (parsedQuery) {
+    const presetName = parsedQuery.get("as");
+
+    if (presetName) {
+      if (!generator) {
+        callback(
+          new Error(
+            "Please specify the 'generator' option to use 'as' query param for generation purposes."
+          )
+        );
+
+        return;
+      }
+
+      const presets = generator.filter((item) => item.preset === presetName);
+
+      if (presets.length > 1) {
+        callback(
+          new Error(
+            "Found several identical pereset names, the 'preset' option should be unique"
+          )
+        );
+
+        return;
+      }
+
+      if (presets.length === 0) {
+        callback(
+          new Error(
+            `Can't find '${presetName}' preset in the 'generator' option`
+          )
+        );
+
+        return;
+      }
+
+      [transformer] = presets;
     }
-
-    const presets = generator.filter((item) => item.preset === presetName);
-
-    if (presets.length > 1) {
-      callback(
-        new Error(
-          "Found several identical pereset names, the 'preset' option should be unique"
-        )
-      );
-
-      return;
-    }
-
-    if (presets.length === 0) {
-      callback(
-        new Error(`Can't find '${presetName}' preset in the 'generator' option`)
-      );
-
-      return;
-    }
-
-    [transformer] = presets;
   }
 
   if (!transformer) {
@@ -155,14 +164,20 @@ async function loader(content) {
     return;
   }
 
-  const widthQuery = parsedQuery.get("width") ?? parsedQuery.get("w");
-  const heightQuery = parsedQuery.get("height") ?? parsedQuery.get("h");
+  if (parsedQuery) {
+    const widthQuery = parsedQuery.get("width") ?? parsedQuery.get("w");
+    const heightQuery = parsedQuery.get("height") ?? parsedQuery.get("h");
 
-  if (widthQuery || heightQuery) {
-    if (Array.isArray(transformer)) {
-      transformer = processSizeQuery(transformer, widthQuery, heightQuery);
-    } else {
-      [transformer] = processSizeQuery([transformer], widthQuery, heightQuery);
+    if (widthQuery || heightQuery) {
+      if (Array.isArray(transformer)) {
+        transformer = processSizeQuery(transformer, widthQuery, heightQuery);
+      } else {
+        [transformer] = processSizeQuery(
+          [transformer],
+          widthQuery,
+          heightQuery
+        );
+      }
     }
   }
 
