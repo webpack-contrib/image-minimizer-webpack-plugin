@@ -58,7 +58,7 @@ export = ImageMinimizerPlugin;
  * @callback BasicTransformerImplementation
  * @param {WorkerResult} original
  * @param {BasicTransformerOptions<T>} [options]
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 /**
  * @typedef {Object} BasicTransformerHelpers
@@ -306,7 +306,7 @@ type BasicTransformerOptions<T> = InferDefaultType<T> | undefined;
 type BasicTransformerImplementation<T> = (
   original: WorkerResult,
   options?: BasicTransformerOptions<T>
-) => Promise<WorkerResult>;
+) => Promise<WorkerResult | null>;
 type BasicTransformerHelpers = {
   setup?: (() => void) | undefined;
   teardown?: (() => void) | undefined;
