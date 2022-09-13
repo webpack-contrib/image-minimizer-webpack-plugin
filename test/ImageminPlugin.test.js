@@ -2259,7 +2259,7 @@ describe("imagemin plugin", () => {
     );
   });
 
-  ifit(needsTestWin)("should work with mini-css-extract-plugin", async () => {
+  it("should work with mini-css-extract-plugin", async () => {
     const stats = await runWebpack({
       fileLoaderOff: true,
       assetResource: true,
@@ -2270,11 +2270,11 @@ describe("imagemin plugin", () => {
         generator: [
           {
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {
               encodeOptions: {
                 webp: {
-                  lossless: 1,
+                  lossless: true,
                 },
               },
             },
@@ -2282,13 +2282,13 @@ describe("imagemin plugin", () => {
         ],
         minimizer: [
           {
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
             options: {
               encodeOptions: {
-                mozjpeg: {
+                jpeg: {
                   quality: 40,
                 },
-                oxipng: {
+                png: {
                   quality: 40,
                 },
               },
