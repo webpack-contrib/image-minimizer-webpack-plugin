@@ -32,11 +32,13 @@ const { isAbsoluteURL } = require("./utils.js");
  * @param {import("webpack").LoaderContext<LoaderOptions<T>>} loaderContext
  * @param {boolean} isAbsolute
  * @param {WorkerResult} output
+ * @param {string} query
  */
-function changeResource(loaderContext, isAbsolute, output) {
+function changeResource(loaderContext, isAbsolute, output, query) {
   loaderContext.resourcePath = isAbsolute
     ? output.filename
     : path.join(loaderContext.rootContext, output.filename);
+  loaderContext.resourceQuery = query;
 }
 
 /**
@@ -229,12 +231,24 @@ async function loader(content) {
             `%${/** @type {number} */ (character.codePointAt(0)).toString(16)}`
         );
   } else {
+    let query = this.resourceQuery;
+
+    if (parsedQuery) {
+      // Remove query param from the bundle due we need that only for bundle purposes
+      ["as", "width", "w", "height", "h"].forEach((key) =>
+        parsedQuery.delete(key)
+      );
+
+      query = parsedQuery.toString();
+      query = query.length > 0 ? `?${query}` : "";
+    }
+
     // Old approach for `file-loader` and other old loaders
-    changeResource(this, isAbsolute, output);
+    changeResource(this, isAbsolute, output, query);
 
     // Change name of assets modules after generator
     if (this._module && !this._module.matchResource) {
-      this._module.matchResource = `${output.filename}${this.resourceQuery}`;
+      this._module.matchResource = `${output.filename}${query}`;
     }
   }
 
