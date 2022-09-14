@@ -87,7 +87,7 @@ const {
  * @callback BasicTransformerImplementation
  * @param {WorkerResult} original
  * @param {BasicTransformerOptions<T>} [options]
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 
 /**
