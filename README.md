@@ -261,7 +261,7 @@ const myImage3 = new URL("./image.png?w=150", import.meta.url);
 // It works with the `preset` query parameter
 const myImage4 = new URL("./image.png?as=webp&w=150&h=120", import.meta.url);
 // You can use `auto` to reset `width` or `height` from the `preset` option
-const myImage3 = new URL("./image.png?as=webp&w=150&h=auto", import.meta.url);
+const myImage5 = new URL("./image.png?as=webp&w=150&h=auto", import.meta.url);
 ```
 
 ```css
