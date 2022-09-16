@@ -735,23 +735,18 @@ async function squooshGenerate(original, minifyOptions) {
 
   const squooshOptions = /** @type {SquooshOptions} */ (minifyOptions || {});
 
-  /**
-   * @type {undefined | Object.<string, any>}
-   */
-  let preprocessors;
-
-  for (const preprocessor of Object.keys(squoosh.preprocessors)) {
-    if (typeof squooshOptions[preprocessor] !== "undefined") {
-      if (!preprocessors) {
-        preprocessors = {};
+  const preprocEntries = Object.entries(squooshOptions).filter(
+    ([key, value]) => {
+      if (key === "resize" && value?.enabled === false) {
+        return false;
       }
 
-      preprocessors[preprocessor] = squooshOptions[preprocessor];
+      return typeof squoosh.preprocessors[key] !== "undefined";
     }
-  }
+  );
 
-  if (typeof preprocessors !== "undefined") {
-    await image.preprocess(preprocessors);
+  if (preprocEntries.length > 0) {
+    await image.preprocess(Object.fromEntries(preprocEntries));
   }
 
   const { encodeOptions } = squooshOptions;
@@ -860,23 +855,18 @@ async function squooshMinify(original, options) {
   const image = imagePool.ingestImage(new Uint8Array(original.data));
   const squooshOptions = /** @type {SquooshOptions} */ (options || {});
 
-  /**
-   * @type {undefined | Object.<string, any>}
-   */
-  let preprocessors;
-
-  for (const preprocessor of Object.keys(squoosh.preprocessors)) {
-    if (typeof squooshOptions[preprocessor] !== "undefined") {
-      if (!preprocessors) {
-        preprocessors = {};
+  const preprocEntries = Object.entries(squooshOptions).filter(
+    ([key, value]) => {
+      if (key === "resize" && value?.enabled === false) {
+        return false;
       }
 
-      preprocessors[preprocessor] = squooshOptions[preprocessor];
+      return typeof squoosh.preprocessors[key] !== "undefined";
     }
-  }
+  );
 
-  if (typeof preprocessors !== "undefined") {
-    await image.preprocess(preprocessors);
+  if (preprocEntries.length > 0) {
+    await image.preprocess(Object.fromEntries(preprocEntries));
   }
 
   const { encodeOptions = {} } = squooshOptions;
