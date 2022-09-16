@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.5.0...v3.6.0) (2022-09-16)
+
+
+### Features
+
+* supported more resize options (only `sharp`) ([#355](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/355)) ([d365db3](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/d365db3db18476435cf8952aaa23801dd7e466ee))
+
 ## [3.5.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.4.0...v3.5.0) (2022-09-15)
 
 
