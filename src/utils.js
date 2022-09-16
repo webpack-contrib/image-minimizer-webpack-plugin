@@ -1015,15 +1015,15 @@ async function sharpTransform(
 
   // ====== resize ======
 
-  if (
-    minimizerOptions.resize &&
-    (minimizerOptions.resize.width || minimizerOptions.resize.height) &&
-    minimizerOptions.resize.enabled !== false
-  ) {
-    imagePipeline.resize(
-      minimizerOptions.resize.width,
-      minimizerOptions.resize.height
-    );
+  if (minimizerOptions.resize) {
+    const { enabled = true, ...params } = minimizerOptions.resize;
+
+    if (
+      enabled &&
+      (typeof params.width === "number" || typeof params.height === "number")
+    ) {
+      imagePipeline.resize(params);
+    }
   }
 
   // ====== convert ======
