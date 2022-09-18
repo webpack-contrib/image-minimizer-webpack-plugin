@@ -243,7 +243,7 @@ By default, plugin configures `loader` (please use the `loader` option if you wa
 
 Loader optimizes or generates images using options, so inlined images via `data` URI (i.e. `data:`) will be optimized or generated too, not inlined images will be optimized too.
 
-### Query Parameters (only `sharp` currently)
+### Query Parameters (only `squoosh` and `sharp` currently)
 
 The plugin supports the following query parameters:
 
