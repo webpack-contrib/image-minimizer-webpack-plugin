@@ -83,11 +83,18 @@ const {
  */
 
 /**
+ * @typedef {Object} ResizeOptions
+ * @property {number} [width]
+ * @property {number} [height]
+ * @property {boolean} [enabled]
+ */
+
+/**
  * @template T
  * @callback BasicTransformerImplementation
  * @param {WorkerResult} original
  * @param {BasicTransformerOptions<T>} [options]
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 
 /**

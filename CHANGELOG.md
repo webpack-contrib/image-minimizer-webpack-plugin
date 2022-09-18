@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.6.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.5.0...v3.6.0) (2022-09-16)
+
+
+### Features
+
+* supported more resize options (only `sharp`) ([#355](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/355)) ([d365db3](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/d365db3db18476435cf8952aaa23801dd7e466ee))
+
+## [3.5.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.4.0...v3.5.0) (2022-09-15)
+
+
+### Features
+
+* add `width`/`w` and `height`/`h` query parameters to resize image ([52ee1c8](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/52ee1c84cf935e2ebbf4bfe38567a0cb73bd6c13))
+
+
+### Bug Fixes
+
+* `implementation` types ([#353](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/353)) ([a57fcdf](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/a57fcdfc7121f1ceda178dd7987623433745b21e))
+
+## [3.4.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.3.1...v3.4.0) (2022-09-09)
+
+
+### Features
+
+* add `[width]` and `[height]` placeholders for the `filename` option ([#346](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/346)) ([682c22b](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/682c22b81f2f1af96e83f0e0805fd5406a209324))
+
+
+### Bug Fixes
+
+* types ([cd7c7a7](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/cd7c7a7c7f12eb883399cf01ad7c9102e90b845b))
+
 ### [3.3.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.3.0...v3.3.1) (2022-09-05)
 
 

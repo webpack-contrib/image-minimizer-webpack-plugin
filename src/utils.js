@@ -798,6 +798,8 @@ async function squooshGenerate(original, minifyOptions) {
   }
 
   const { binary, extension } = await Object.values(image.encodedWith)[0];
+  const { width, height } = (await image.decoded).bitmap;
+
   const { dir: fileDir, name: fileName } = path.parse(original.filename);
   const filename = path.join(fileDir, `${fileName}.${extension}`);
 
@@ -808,6 +810,8 @@ async function squooshGenerate(original, minifyOptions) {
     errors: [...original.errors],
     info: {
       ...original.info,
+      width,
+      height,
       generated: true,
       generatedBy: ["squoosh", ...(original.info?.generatedBy ?? [])],
     },
@@ -903,6 +907,7 @@ async function squooshMinify(original, options) {
   }
 
   const { binary } = await image.encodedWith[targets[ext]];
+  const { width, height } = (await image.decoded).bitmap;
 
   return {
     filename: original.filename,
@@ -911,6 +916,8 @@ async function squooshMinify(original, options) {
     errors: [...original.errors],
     info: {
       ...original.info,
+      width,
+      height,
       minimized: true,
       minimizedBy: ["squoosh", ...(original.info?.minimizedBy ?? [])],
     },
@@ -942,6 +949,7 @@ squooshMinify.teardown = squooshImagePoolTeardown;
  * @type {keyof SharpEncodeOptions}
  */
 
+// TODO remove the `SizeSuffix` option in the next major release, because we support `[width]` and `[height]`
 /**
  * @typedef SharpOptions
  * @type {object}
@@ -1007,15 +1015,15 @@ async function sharpTransform(
 
   // ====== resize ======
 
-  if (
-    minimizerOptions.resize &&
-    (minimizerOptions.resize.width || minimizerOptions.resize.height) &&
-    minimizerOptions.resize.enabled !== false
-  ) {
-    imagePipeline.resize(
-      minimizerOptions.resize.width,
-      minimizerOptions.resize.height
-    );
+  if (minimizerOptions.resize) {
+    const { enabled = true, ...params } = minimizerOptions.resize;
+
+    if (
+      enabled &&
+      (typeof params.width === "number" || typeof params.height === "number")
+    ) {
+      imagePipeline.resize(params);
+    }
   }
 
   // ====== convert ======
@@ -1034,15 +1042,12 @@ async function sharpTransform(
   // ====== rename ======
 
   const outputExt = targetFormat ? outputFormat : inputExt;
-
   const { dir: fileDir, name: fileName } = path.parse(original.filename);
-
   const { width, height } = result.info;
   const sizeSuffix =
     typeof minimizerOptions.sizeSuffix === "function"
       ? minimizerOptions.sizeSuffix(width, height)
       : "";
-
   const filename = path.join(fileDir, `${fileName}${sizeSuffix}.${outputExt}`);
   const processedFlag = targetFormat ? "generated" : "minimized";
   const processedBy = targetFormat ? "generatedBy" : "minimizedBy";
@@ -1054,6 +1059,8 @@ async function sharpTransform(
     errors: [...original.errors],
     info: {
       ...original.info,
+      width,
+      height,
       [processedFlag]: true,
       [processedBy]: ["sharp", ...(original.info?.[processedBy] ?? [])],
     },
