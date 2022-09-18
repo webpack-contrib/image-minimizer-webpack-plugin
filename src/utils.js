@@ -1003,7 +1003,7 @@ async function sharpTransform(
   /** @type {SharpLib} */
   // eslint-disable-next-line node/no-unpublished-require
   const sharp = require("sharp");
-  const imagePipeline = sharp(original.data);
+  const imagePipeline = sharp(original.data, { animated: true });
 
   // ====== rotate ======
 
