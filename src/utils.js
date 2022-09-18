@@ -997,6 +997,14 @@ async function sharpTransform(
   const inputExt = path.extname(original.filename).slice(1).toLowerCase();
 
   if (!SHARP_FORMATS.has(inputExt)) {
+    if (targetFormat) {
+      const error = new Error(
+        `Error with '${original.filename}': Input file has an unsupported format`
+      );
+
+      original.errors.push(error);
+    }
+
     return null;
   }
 

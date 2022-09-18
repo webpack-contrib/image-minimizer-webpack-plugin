@@ -1515,7 +1515,7 @@ describe("imagemin plugin", () => {
     expect(/image\/png/i.test(ext.mime)).toBe(true);
   });
 
-  it("should throw an error on unknown format", async () => {
+  it("should throw an error on unknown format (squooshGenerate)", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "generator-and-minimizer-5.js"),
       imageminPluginOptions: {
@@ -1542,6 +1542,36 @@ describe("imagemin plugin", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
       /Error with 'loader-test.txt': Binary blob has an unsupported format/g
+    );
+  });
+
+  it("should throw an error on unknown format (sharpGenerate)", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-5.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|gif|json|svg|png|webp|txt)$/i,
+        generator: [
+          {
+            preset: "avif",
+            implementation: ImageMinimizerPlugin.sharpGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: true,
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toMatch(
+      /Error with 'loader-test.txt': Input file has an unsupported format/g
     );
   });
 
