@@ -974,6 +974,52 @@ describe("imagemin plugin", () => {
     );
   });
 
+  it("should optimizes and generate animated images (sharpGenerate)", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "generator-and-minimizer-animation.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|png|webp|gif)$/i,
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.sharpGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  quality: 40,
+                },
+              },
+            },
+          },
+        ],
+        minimizer: {
+          implementation: ImageMinimizerPlugin.sharpMinify,
+          options: {
+            encodeOptions: {
+              gif: {
+                colors: 8,
+              },
+            },
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const webpAsset = compilation.getAsset("animation-test.webp");
+    const gifAsset = compilation.getAsset("animation-test.gif");
+
+    expect(webpAsset.info.size).toBeGreaterThan(9_000);
+    expect(webpAsset.info.size).toBeLessThan(60_000);
+
+    expect(gifAsset.info.size).toBeGreaterThan(18_000);
+    expect(gifAsset.info.size).toBeLessThan(200_000);
+  });
+
   it("should throw an error on empty minimizer", async () => {
     await expect(async () => {
       await runWebpack({
