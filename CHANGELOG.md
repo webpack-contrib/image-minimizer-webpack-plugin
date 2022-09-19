@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.6.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.6.0...v3.6.1) (2022-09-19)
+
+
+### Bug Fixes
+
+* fix resize option enabled flag (`squoosh`) ([#356](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/356)) ([b2a5015](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/b2a50151b9dcd9f79307695e52a2b12db72a0a7e))
+* support for animated images (`sharp`) ([#358](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/358)) ([3c30355](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/3c3035536303f95cc74ebaed5247731789422965))
+* throw an error on unsupported image formats (`sharp`) ([#359](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/359)) ([c0b193b](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/c0b193b38d4e488ca0651f2bea13065700cb3bf1))
+
 ## [3.6.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.5.0...v3.6.0) (2022-09-16)
 
 
