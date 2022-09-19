@@ -1013,11 +1013,11 @@ describe("imagemin plugin", () => {
     const webpAsset = compilation.getAsset("animation-test.webp");
     const gifAsset = compilation.getAsset("animation-test.gif");
 
-    expect(webpAsset.info.size).toBeGreaterThan(9_000);
-    expect(webpAsset.info.size).toBeLessThan(60_000);
+    expect(webpAsset.info.size).toBeGreaterThan(4_000);
+    expect(webpAsset.info.size).toBeLessThan(130_000);
 
-    expect(gifAsset.info.size).toBeGreaterThan(18_000);
-    expect(gifAsset.info.size).toBeLessThan(200_000);
+    expect(gifAsset.info.size).toBeGreaterThan(2_000);
+    expect(gifAsset.info.size).toBeLessThan(130_000);
   });
 
   it("should throw an error on empty minimizer", async () => {
