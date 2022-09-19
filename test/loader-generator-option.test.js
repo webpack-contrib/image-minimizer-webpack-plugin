@@ -240,6 +240,54 @@ describe("loader generator option", () => {
     expect(errors).toHaveLength(0);
   });
 
+  it("should generate and not resize (squooshGenerate)", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "./loader-single.js"),
+      imageminLoaderOptions: {
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.squooshGenerate,
+            options: {
+              resize: {
+                enabled: false,
+                width: 100,
+                height: 50,
+              },
+              rotate: {
+                numRotations: 90,
+              },
+              encodeOptions: {
+                webp: {
+                  lossless: 1,
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const transformedAsset = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./nested/deep/loader-test.webp"
+    );
+
+    const transformedExt = await fileType.fromFile(transformedAsset);
+    const sizeOf = promisify(imageSize);
+    const dimensions = await sizeOf(transformedAsset);
+
+    expect(dimensions.height).toBe(1);
+    expect(dimensions.width).toBe(1);
+    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
   it("should generate and resize (sharpGenerate)", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
@@ -280,6 +328,51 @@ describe("loader generator option", () => {
 
     expect(dimensions.height).toBe(50);
     expect(dimensions.width).toBe(100);
+    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
+  it("should generate and not resize (sharpGenerate)", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "./loader-single.js"),
+      imageminLoaderOptions: {
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.sharpGenerate,
+            options: {
+              resize: {
+                enabled: false,
+                width: 100,
+                height: 50,
+              },
+              encodeOptions: {
+                webp: {
+                  lossless: true,
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const transformedAsset = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./nested/deep/loader-test.webp"
+    );
+
+    const transformedExt = await fileType.fromFile(transformedAsset);
+    const sizeOf = promisify(imageSize);
+    const dimensions = await sizeOf(transformedAsset);
+
+    expect(dimensions.height).toBe(1);
+    expect(dimensions.width).toBe(1);
     expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
