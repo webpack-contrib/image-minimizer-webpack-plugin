@@ -7,6 +7,8 @@ import imageminMozjpeg from "imagemin-mozjpeg";
 import imageminWebp from "imagemin-webp";
 import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
+import sharp from "sharp";
+import { ifit, needSquooshTest } from "./helpers";
 
 import worker from "../src/worker";
 
@@ -529,10 +531,10 @@ describe("minify", () => {
           },
         },
         {
-          implementation: utils.squooshMinify,
+          implementation: utils.sharpMinify,
           options: {
             encodeOptions: {
-              mozjpeg: {
+              jpeg: {
                 quality: 90,
               },
             },
@@ -545,20 +547,15 @@ describe("minify", () => {
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0].toString()).toMatch(/Error: fail/);
 
-    const imagePool = new ImagePool(1);
-    const image = imagePool.ingestImage(new Uint8Array(input));
+    const imagePipeline = sharp(new Uint8Array(input), { animated: true });
 
-    await image.encode({
-      mozjpeg: {
-        quality: 90,
-      },
+    imagePipeline.toFormat("jpeg", {
+      quality: 90,
     });
 
-    await imagePool.close();
+    const binary = await imagePipeline.toBuffer({ resolveWithObject: true });
 
-    const { binary } = await image.encodedWith.mozjpeg;
-
-    expect(result.data.equals(binary)).toBe(true);
+    expect(result.data.equals(binary.data)).toBe(true);
   });
 
   it("should respect error happened after", async () => {
@@ -569,10 +566,10 @@ describe("minify", () => {
       filename,
       transformer: [
         {
-          implementation: utils.squooshMinify,
+          implementation: utils.sharpMinify,
           options: {
             encodeOptions: {
-              mozjpeg: {
+              jpeg: {
                 quality: 90,
               },
             },
@@ -592,20 +589,15 @@ describe("minify", () => {
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0].toString()).toMatch(/Error: fail/);
 
-    const imagePool = new ImagePool(1);
-    const image = imagePool.ingestImage(new Uint8Array(input));
+    const imagePipeline = sharp(new Uint8Array(input), { animated: true });
 
-    await image.encode({
-      mozjpeg: {
-        quality: 90,
-      },
+    imagePipeline.toFormat("jpeg", {
+      quality: 90,
     });
 
-    await imagePool.close();
+    const binary = await imagePipeline.toBuffer({ resolveWithObject: true });
 
-    const { binary } = await image.encodedWith.mozjpeg;
-
-    expect(result.data.equals(binary)).toBe(true);
+    expect(result.data.equals(binary.data)).toBe(true);
   });
 
   it("should work with 'imageminMinify'", async () => {
@@ -721,7 +713,7 @@ describe("minify", () => {
     );
   });
 
-  it("should work with 'squooshMinify'", async () => {
+  ifit(needSquooshTest)("should work with 'squooshMinify'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -758,7 +750,7 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  it("should work with 'squooshGenerate'", async () => {
+  ifit(needSquooshTest)("should work with 'squooshGenerate'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -795,24 +787,27 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  it("should return error on empty plugin with 'squooshGenerate'", async () => {
-    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
-    const result = await worker({
-      input,
-      filename,
-      transformer: {
-        implementation: utils.squooshGenerate,
-        options: {},
-      },
-    });
+  ifit(needSquooshTest)(
+    "should return error on empty plugin with 'squooshGenerate'",
+    async () => {
+      const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+      const input = await pify(fs.readFile)(filename);
+      const result = await worker({
+        input,
+        filename,
+        transformer: {
+          implementation: utils.squooshGenerate,
+          options: {},
+        },
+      });
 
-    expect(result.warnings).toHaveLength(0);
-    expect(result.errors).toHaveLength(1);
-    expect(result.errors[0].message).toMatch(
-      /No result from 'squoosh' for '.+', please configure the 'encodeOptions' option to generate images/
-    );
-  });
+      expect(result.warnings).toHaveLength(0);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].message).toMatch(
+        /No result from 'squoosh' for '.+', please configure the 'encodeOptions' option to generate images/
+      );
+    }
+  );
 
   it("should work and allow to rename filename", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
@@ -822,11 +817,11 @@ describe("minify", () => {
       filename,
       generateFilename: () => "generated-image.png",
       transformer: {
-        implementation: utils.squooshMinify,
+        implementation: utils.sharpMinify,
         filename: "generated-image.png",
         options: {
           encodeOptions: {
-            mozjpeg: {
+            jpeg: {
               quality: 90,
             },
           },
@@ -838,20 +833,15 @@ describe("minify", () => {
     expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe("generated-image.png");
 
-    const imagePool = new ImagePool(1);
-    const image = imagePool.ingestImage(new Uint8Array(input));
+    const imagePipeline = sharp(new Uint8Array(input), { animated: true });
 
-    await image.encode({
-      mozjpeg: {
-        quality: 90,
-      },
+    imagePipeline.toFormat("jpeg", {
+      quality: 90,
     });
 
-    await imagePool.close();
+    const binary = await imagePipeline.toBuffer({ resolveWithObject: true });
 
-    const { binary } = await image.encodedWith.mozjpeg;
-
-    expect(result.data.equals(binary)).toBe(true);
+    expect(result.data.equals(binary.data)).toBe(true);
   });
 
   it("should work and allow to rename filename #2", async () => {
@@ -863,22 +853,22 @@ describe("minify", () => {
       generateFilename: (_, info) => `generated-${info.filename}`,
       transformer: [
         {
-          implementation: utils.squooshMinify,
+          implementation: utils.sharpMinify,
           filename: "image.jpg",
           options: {
             encodeOptions: {
-              mozjpeg: {
+              jpeg: {
                 quality: 90,
               },
             },
           },
         },
         {
-          implementation: utils.squooshMinify,
+          implementation: utils.sharpMinify,
           filename: "image.jpg",
           options: {
             encodeOptions: {
-              mozjpeg: {
+              jpeg: {
                 quality: 90,
               },
             },
@@ -891,20 +881,15 @@ describe("minify", () => {
     expect(result.errors).toHaveLength(0);
     expect(result.filename).toBe("generated-image.jpg");
 
-    const imagePool = new ImagePool(1);
-    const image = imagePool.ingestImage(new Uint8Array(input));
+    const imagePipeline = sharp(new Uint8Array(input), { animated: true });
 
-    await image.encode({
-      mozjpeg: {
-        quality: 90,
-      },
+    imagePipeline.toFormat("jpeg", {
+      quality: 90,
     });
 
-    await imagePool.close();
+    const binary = await imagePipeline.toBuffer({ resolveWithObject: true });
 
-    const { binary } = await image.encodedWith.mozjpeg;
-
-    expect(result.data.equals(binary)).toBe(true);
+    expect(result.data.equals(binary.data)).toBe(true);
   });
 
   it("should work and allow to filter", async () => {
@@ -914,7 +899,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.squooshMinify,
+        implementation: utils.sharpMinify,
         filter: () => false,
         options: {
           encodeOptions: {

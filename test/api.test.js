@@ -12,6 +12,8 @@ describe("api", () => {
       expect(typeof ImageMinimizerPlugin.imageminGenerate).toBe("function");
       expect(typeof ImageMinimizerPlugin.squooshMinify).toBe("function");
       expect(typeof ImageMinimizerPlugin.squooshGenerate).toBe("function");
+      expect(typeof ImageMinimizerPlugin.sharpMinify).toBe("function");
+      expect(typeof ImageMinimizerPlugin.sharpGenerate).toBe("function");
     });
   });
 
