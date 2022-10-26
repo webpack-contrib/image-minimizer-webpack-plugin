@@ -18,11 +18,22 @@ module.exports = {
         "**/?(*.)+(spec|test).[j]s?(x)",
         "**/test-*.[j]s?(x)",
       ],
+      rules: {
+        "jest/no-standalone-expect": [
+          "error",
+          { additionalTestBlockFunctions: ["ifit"] },
+        ],
+        "jest/require-hook": [
+          "error",
+          {
+            allowedFunctionCalls: ["ifit"],
+          },
+        ],
+      },
     },
   ],
   rules: {
     "unicorn/filename-case": "off",
-    "jest/no-disabled-tests": "off",
   },
   root: true,
 };

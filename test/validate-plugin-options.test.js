@@ -7,7 +7,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         test: /foo/,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -17,7 +17,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         test: "foo",
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -27,7 +27,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         test: [/foo/],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -37,7 +37,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         test: [/foo/, /bar/],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -47,7 +47,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         test: ["foo", "bar"],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -57,7 +57,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         test: [/foo/, "bar"],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -67,7 +67,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         test: true,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -77,7 +77,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         test: [true],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -87,7 +87,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         include: /foo/,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -97,7 +97,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         include: "foo",
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -107,7 +107,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         include: [/foo/],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -117,7 +117,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         include: [/foo/, /bar/],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -127,7 +127,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         include: ["foo", "bar"],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -137,7 +137,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         include: [/foo/, "bar"],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -147,7 +147,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         include: true,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -157,7 +157,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         include: [true],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -167,7 +167,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         exclude: /foo/,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -177,7 +177,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         exclude: "foo",
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -187,7 +187,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         exclude: [/foo/],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -197,7 +197,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         exclude: [/foo/, /bar/],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -207,7 +207,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         exclude: ["foo", "bar"],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -217,7 +217,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         exclude: [/foo/, "bar"],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -227,7 +227,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         exclude: true,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -237,7 +237,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         exclude: [true],
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -247,7 +247,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         severityError: false,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -257,7 +257,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         severityError: true,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -267,7 +267,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         severityError: "error",
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -277,7 +277,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         severityError: () => {},
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -287,7 +287,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         deleteOriginalAssets: false,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -297,7 +297,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         deleteOriginalAssets: {},
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -307,7 +307,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         deleteOriginalAssets: true,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -316,7 +316,7 @@ describe("validate plugin options", () => {
     expect(() => {
       new ImageMinimizerPlugin({
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
         },
       });
     }).not.toThrow();
@@ -324,7 +324,7 @@ describe("validate plugin options", () => {
     expect(() => {
       new ImageMinimizerPlugin({
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -334,7 +334,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         minimizer: [
           {
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
           },
         ],
       });
@@ -344,7 +344,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         minimizer: [
           {
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
             options: {},
           },
         ],
@@ -355,11 +355,11 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         minimizer: [
           {
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
             options: {},
           },
           {
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
           },
         ],
       });
@@ -372,7 +372,7 @@ describe("validate plugin options", () => {
     expect(() => {
       new ImageMinimizerPlugin({
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           filter: () => true,
         },
       });
@@ -381,7 +381,7 @@ describe("validate plugin options", () => {
     expect(() => {
       new ImageMinimizerPlugin({
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           filter: true,
         },
       });
@@ -391,7 +391,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         minimizer: [
           {
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
             filter: () => true,
           },
         ],
@@ -402,7 +402,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         minimizer: [
           {
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
             filter: true,
           },
         ],
@@ -412,7 +412,7 @@ describe("validate plugin options", () => {
     expect(() => {
       new ImageMinimizerPlugin({
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           filename: "[name].[ext]",
         },
       });
@@ -422,7 +422,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         minimizer: [
           {
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
             filename: "[name].[ext]",
           },
         ],
@@ -432,7 +432,7 @@ describe("validate plugin options", () => {
     expect(() => {
       new ImageMinimizerPlugin({
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           filename: () => "[name].[ext]",
         },
       });
@@ -442,7 +442,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         minimizer: [
           {
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
             filename: () => "[name].[ext]",
           },
         ],
@@ -452,7 +452,7 @@ describe("validate plugin options", () => {
     expect(() => {
       new ImageMinimizerPlugin({
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           filename: true,
         },
       });
@@ -461,7 +461,7 @@ describe("validate plugin options", () => {
     expect(() => {
       new ImageMinimizerPlugin({
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           filename: true,
         },
       });
@@ -472,7 +472,7 @@ describe("validate plugin options", () => {
         generator: [
           {
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
           },
         ],
       });
@@ -483,7 +483,7 @@ describe("validate plugin options", () => {
         generator: [
           {
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {},
           },
         ],
@@ -495,12 +495,12 @@ describe("validate plugin options", () => {
         generator: [
           {
             preset: "one",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {},
           },
           {
             preset: "two",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
           },
         ],
       });
@@ -515,7 +515,7 @@ describe("validate plugin options", () => {
         generator: [
           {
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {},
             filter: () => true,
           },
@@ -528,7 +528,7 @@ describe("validate plugin options", () => {
         generator: [
           {
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {},
             filename: "[name][ext]",
           },
@@ -541,7 +541,7 @@ describe("validate plugin options", () => {
         generator: [
           {
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {},
             filename: () => "[name][ext]",
           },
@@ -554,7 +554,7 @@ describe("validate plugin options", () => {
         generator: [
           {
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {},
             filename: true,
           },
@@ -567,7 +567,7 @@ describe("validate plugin options", () => {
         generator: [
           {
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {},
             filter: true,
           },
@@ -581,7 +581,7 @@ describe("validate plugin options", () => {
           {
             type: "import",
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {},
             filename: () => "[name][ext]",
           },
@@ -595,7 +595,7 @@ describe("validate plugin options", () => {
           {
             type: "asset",
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {},
             filename: () => "[name][ext]",
           },
@@ -609,7 +609,7 @@ describe("validate plugin options", () => {
           {
             type: "foo",
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {},
             filename: true,
           },
@@ -621,7 +621,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         concurrency: 2,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -631,7 +631,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         concurrency: true,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -641,7 +641,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         concurrency: "true",
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -651,7 +651,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         loader: false,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -661,7 +661,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         loader: true,
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
@@ -671,7 +671,7 @@ describe("validate plugin options", () => {
       new ImageMinimizerPlugin({
         loader: "true",
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           options: {},
         },
       });
