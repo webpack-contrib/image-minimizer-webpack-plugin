@@ -4,7 +4,13 @@ import imageSize from "image-size";
 
 import ImageMinimizerPlugin from "../src";
 
-import { runWebpack, isOptimized, plugins } from "./helpers";
+import {
+  runWebpack,
+  isOptimized,
+  plugins,
+  ifit,
+  needSquooshTest,
+} from "./helpers";
 
 describe("loader minimizer option", () => {
   it("should work with object notation of the 'minifier' option", async () => {
@@ -265,24 +271,29 @@ describe("loader minimizer option", () => {
     );
   });
 
-  it('should work with "squooshMinify" minifier', async () => {
-    const stats = await runWebpack({
-      imageminLoader: true,
-      imageminLoaderOptions: {
-        minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+  ifit(needSquooshTest)(
+    'should work with "squooshMinify" minifier',
+    async () => {
+      const stats = await runWebpack({
+        imageminLoader: true,
+        imageminLoaderOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+          },
         },
-      },
-    });
-    const { compilation } = stats;
-    const { errors } = compilation;
+      });
+      const { compilation } = stats;
+      const { errors } = compilation;
 
-    expect(errors).toHaveLength(0);
-    expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(631);
-    expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
-      71000
-    );
-  });
+      expect(errors).toHaveLength(0);
+      expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(
+        631
+      );
+      expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
+        71000
+      );
+    }
+  );
 
   it('should work with "sharpMinify" minifier', async () => {
     const stats = await runWebpack({
@@ -434,44 +445,49 @@ describe("loader minimizer option", () => {
     );
   });
 
-  it('should minimize and resize with "squooshMinify" minifier', async () => {
-    const stats = await runWebpack({
-      imageminLoader: true,
-      imageminLoaderOptions: {
-        minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
-          options: {
-            resize: {
-              enabled: true,
-              width: 100,
-              height: 50,
-            },
-            rotate: {
-              numRotations: 90,
+  ifit(needSquooshTest)(
+    'should minimize and resize with "squooshMinify" minifier',
+    async () => {
+      const stats = await runWebpack({
+        imageminLoader: true,
+        imageminLoaderOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            options: {
+              resize: {
+                enabled: true,
+                width: 100,
+                height: 50,
+              },
+              rotate: {
+                numRotations: 90,
+              },
             },
           },
         },
-      },
-    });
-    const { compilation } = stats;
-    const { errors } = compilation;
+      });
+      const { compilation } = stats;
+      const { errors } = compilation;
 
-    const sizeOf = promisify(imageSize);
-    const transformedAsset = path.resolve(
-      __dirname,
-      compilation.options.output.path,
-      "./loader-test.png"
-    );
-    const dimensions = await sizeOf(transformedAsset);
+      const sizeOf = promisify(imageSize);
+      const transformedAsset = path.resolve(
+        __dirname,
+        compilation.options.output.path,
+        "./loader-test.png"
+      );
+      const dimensions = await sizeOf(transformedAsset);
 
-    expect(dimensions.height).toBe(50);
-    expect(dimensions.width).toBe(100);
-    expect(errors).toHaveLength(0);
-    expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(631);
-    expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
-      71000
-    );
-  });
+      expect(dimensions.height).toBe(50);
+      expect(dimensions.width).toBe(100);
+      expect(errors).toHaveLength(0);
+      expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(
+        631
+      );
+      expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
+        71000
+      );
+    }
+  );
 
   it('should minimize and resize with "sharpMinify" minifier', async () => {
     const stats = await runWebpack({

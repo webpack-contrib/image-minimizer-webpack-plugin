@@ -243,6 +243,45 @@ By default, plugin configures `loader` (please use the `loader` option if you wa
 
 Loader optimizes or generates images using options, so inlined images via `data` URI (i.e. `data:`) will be optimized or generated too, not inlined images will be optimized too.
 
+### Query Parameters (only `squoosh` and `sharp` currently)
+
+The plugin supports the following query parameters:
+
+- `width`/`w` - allows you to set the image width
+- `height`/`h` - allows you to set the image height
+- `as` - to specify the [`preset`](https://github.com/webpack-contrib/image-minimizer-webpack-plugin#preset) option
+
+Examples:
+
+```js
+const myImage1 = new URL("./image.png?width=150&height=120", import.meta.url);
+const myImage2 = new URL("./image.png?w=150&h=120", import.meta.url);
+// You can omit one of the parameters to auto-scale
+const myImage3 = new URL("./image.png?w=150", import.meta.url);
+// It works with the `preset` query parameter
+const myImage4 = new URL("./image.png?as=webp&w=150&h=120", import.meta.url);
+// You can use `auto` to reset `width` or `height` from the `preset` option
+const myImage5 = new URL("./image.png?as=webp&w=150&h=auto", import.meta.url);
+```
+
+```css
+.class {
+  background: url("./image.png?width=150&height=120");
+}
+```
+
+```html
+<picture>
+  <source srcset="photo.jpg?as=avif&width=150&height=120" type="image/avif" />
+  <source srcset="photo.jpg?as=webp&width=150&height=120" type="image/webp" />
+  <img src="photo.jpg?width=150&height=120" alt="photo" />
+</picture>
+```
+
+**NOTE**: you need to setup `avif` and `webp` presets, [example for webp](https://github.com/webpack-contrib/image-minimizer-webpack-plugin#optimize-and-generate-webp-images)
+
+So you can use
+
 #### Standalone Loader
 
 [Documentation: Using loaders](https://webpack.js.org/concepts/loaders/).
@@ -794,7 +833,7 @@ Default: `undefined`
 Allows to set the filename.
 Supported values see in [`webpack template strings`](https://webpack.js.org/configuration/output/#template-strings), `File-level` section.
 
-We also support `[width]` and `[height]` placeholders.
+We also support `[width]` and `[height]` placeholders (only `sharp` and `squoosh`).
 
 **webpack.config.js**
 

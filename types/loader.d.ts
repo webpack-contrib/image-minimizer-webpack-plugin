@@ -10,7 +10,15 @@ declare function loader<T>(
   content: Buffer
 ): Promise<Buffer | undefined>;
 declare namespace loader {
-  export { raw, Schema, Compilation, WorkerResult, LoaderOptions };
+  export {
+    raw,
+    Schema,
+    Compilation,
+    WorkerResult,
+    Minimizer,
+    Generator,
+    LoaderOptions,
+  };
 }
 /**
  * <T>
@@ -30,3 +38,11 @@ declare var raw: boolean;
 type Schema = import("schema-utils/declarations/validate").Schema;
 type Compilation = import("webpack").Compilation;
 type WorkerResult = import("./utils").WorkerResult;
+/**
+ * <T>
+ */
+type Minimizer<T> = import("./index").Minimizer<T>;
+/**
+ * <T>
+ */
+type Generator<T> = import("./index").Generator<T>;

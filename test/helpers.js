@@ -357,6 +357,27 @@ function clearDirectory(dirPath) {
   fs.rmdirSync(dirPath);
 }
 
+/**
+ * @param {boolean | () => boolean} predicate
+ * @returns {import("@jest/globals").it | import("@jest/globals").xit}
+ */
+function ifit(predicate) {
+  const cond = typeof predicate === "function" ? predicate() : predicate;
+
+  return cond ? it : it.skip;
+}
+
+/**
+ * @returns {boolean}
+ */
+function needSquooshTest() {
+  const needTest = typeof process.env.SQUOOSH_TEST !== "undefined";
+
+  // Disable tests for all and Nodejs > 16
+  // see: https://github.com/webpack-contrib/image-minimizer-webpack-plugin/pull/345
+  return needTest;
+}
+
 export default class EmitNewAssetPlugin {
   constructor(options = {}) {
     this.options = options;
@@ -397,4 +418,6 @@ export {
   normalizePath,
   clearDirectory,
   EmitNewAssetPlugin,
+  ifit,
+  needSquooshTest,
 };

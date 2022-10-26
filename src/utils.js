@@ -11,7 +11,7 @@ const path = require("path");
  */
 
 /**
- * Run tasks with limited concurency.
+ * Run tasks with limited concurrency.
  * @template T
  * @param {number} limit - Limit of tasks that run at once.
  * @param {Task<T>[]} tasks - List of tasks to run.
@@ -735,23 +735,18 @@ async function squooshGenerate(original, minifyOptions) {
 
   const squooshOptions = /** @type {SquooshOptions} */ (minifyOptions || {});
 
-  /**
-   * @type {undefined | Object.<string, any>}
-   */
-  let preprocessors;
-
-  for (const preprocessor of Object.keys(squoosh.preprocessors)) {
-    if (typeof squooshOptions[preprocessor] !== "undefined") {
-      if (!preprocessors) {
-        preprocessors = {};
+  const preprocEntries = Object.entries(squooshOptions).filter(
+    ([key, value]) => {
+      if (key === "resize" && value?.enabled === false) {
+        return false;
       }
 
-      preprocessors[preprocessor] = squooshOptions[preprocessor];
+      return typeof squoosh.preprocessors[key] !== "undefined";
     }
-  }
+  );
 
-  if (typeof preprocessors !== "undefined") {
-    await image.preprocess(preprocessors);
+  if (preprocEntries.length > 0) {
+    await image.preprocess(Object.fromEntries(preprocEntries));
   }
 
   const { encodeOptions } = squooshOptions;
@@ -799,6 +794,7 @@ async function squooshGenerate(original, minifyOptions) {
 
   const { binary, extension } = await Object.values(image.encodedWith)[0];
   const { width, height } = (await image.decoded).bitmap;
+
   const { dir: fileDir, name: fileName } = path.parse(original.filename);
   const filename = path.join(fileDir, `${fileName}.${extension}`);
 
@@ -859,23 +855,18 @@ async function squooshMinify(original, options) {
   const image = imagePool.ingestImage(new Uint8Array(original.data));
   const squooshOptions = /** @type {SquooshOptions} */ (options || {});
 
-  /**
-   * @type {undefined | Object.<string, any>}
-   */
-  let preprocessors;
-
-  for (const preprocessor of Object.keys(squoosh.preprocessors)) {
-    if (typeof squooshOptions[preprocessor] !== "undefined") {
-      if (!preprocessors) {
-        preprocessors = {};
+  const preprocEntries = Object.entries(squooshOptions).filter(
+    ([key, value]) => {
+      if (key === "resize" && value?.enabled === false) {
+        return false;
       }
 
-      preprocessors[preprocessor] = squooshOptions[preprocessor];
+      return typeof squoosh.preprocessors[key] !== "undefined";
     }
-  }
+  );
 
-  if (typeof preprocessors !== "undefined") {
-    await image.preprocess(preprocessors);
+  if (preprocEntries.length > 0) {
+    await image.preprocess(Object.fromEntries(preprocEntries));
   }
 
   const { encodeOptions = {} } = squooshOptions;
@@ -996,13 +987,21 @@ async function sharpTransform(
   const inputExt = path.extname(original.filename).slice(1).toLowerCase();
 
   if (!SHARP_FORMATS.has(inputExt)) {
+    if (targetFormat) {
+      const error = new Error(
+        `Error with '${original.filename}': Input file has an unsupported format`
+      );
+
+      original.errors.push(error);
+    }
+
     return null;
   }
 
   /** @type {SharpLib} */
   // eslint-disable-next-line node/no-unpublished-require
   const sharp = require("sharp");
-  const imagePipeline = sharp(original.data);
+  const imagePipeline = sharp(original.data, { animated: true });
 
   // ====== rotate ======
 
@@ -1014,15 +1013,15 @@ async function sharpTransform(
 
   // ====== resize ======
 
-  if (
-    minimizerOptions.resize &&
-    (minimizerOptions.resize.width || minimizerOptions.resize.height) &&
-    minimizerOptions.resize.enabled !== false
-  ) {
-    imagePipeline.resize(
-      minimizerOptions.resize.width,
-      minimizerOptions.resize.height
-    );
+  if (minimizerOptions.resize) {
+    const { enabled = true, ...params } = minimizerOptions.resize;
+
+    if (
+      enabled &&
+      (typeof params.width === "number" || typeof params.height === "number")
+    ) {
+      imagePipeline.resize(params);
+    }
   }
 
   // ====== convert ======

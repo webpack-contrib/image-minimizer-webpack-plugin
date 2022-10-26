@@ -54,11 +54,17 @@ export = ImageMinimizerPlugin;
  * @typedef {InferDefaultType<T> | undefined} BasicTransformerOptions
  */
 /**
+ * @typedef {Object} ResizeOptions
+ * @property {number} [width]
+ * @property {number} [height]
+ * @property {boolean} [enabled]
+ */
+/**
  * @template T
  * @callback BasicTransformerImplementation
  * @param {WorkerResult} original
  * @param {BasicTransformerOptions<T>} [options]
- * @returns {Promise<WorkerResult>}
+ * @returns {Promise<WorkerResult | null>}
  */
 /**
  * @typedef {Object} BasicTransformerHelpers
@@ -101,6 +107,7 @@ export = ImageMinimizerPlugin;
  * @template T
  * @typedef {Object} InternalWorkerOptions
  * @property {string} filename
+ * @property {AssetInfo=} info
  * @property {Buffer} input
  * @property {Transformer<T> | Transformer<T>[]} transformer
  * @property {string} [severityError]
@@ -187,6 +194,7 @@ declare namespace ImageMinimizerPlugin {
     CustomOptions,
     InferDefaultType,
     BasicTransformerOptions,
+    ResizeOptions,
     BasicTransformerImplementation,
     BasicTransformerHelpers,
     TransformerFunction,
@@ -303,10 +311,15 @@ type CustomOptions = {
 };
 type InferDefaultType<T> = T extends infer U ? U : CustomOptions;
 type BasicTransformerOptions<T> = InferDefaultType<T> | undefined;
+type ResizeOptions = {
+  width?: number | undefined;
+  height?: number | undefined;
+  enabled?: boolean | undefined;
+};
 type BasicTransformerImplementation<T> = (
   original: WorkerResult,
   options?: BasicTransformerOptions<T>
-) => Promise<WorkerResult>;
+) => Promise<WorkerResult | null>;
 type BasicTransformerHelpers = {
   setup?: (() => void) | undefined;
   teardown?: (() => void) | undefined;
@@ -332,6 +345,7 @@ type Minimizer<T> = Omit<Transformer<T>, "preset" | "type">;
 type Generator<T> = Transformer<T>;
 type InternalWorkerOptions<T> = {
   filename: string;
+  info?: AssetInfo | undefined;
   input: Buffer;
   transformer: Transformer<T> | Transformer<T>[];
   severityError?: string | undefined;

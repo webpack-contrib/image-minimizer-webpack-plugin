@@ -56,7 +56,16 @@ async function worker(options) {
     filename: options.filename,
     warnings: [],
     errors: [],
-    info: {},
+    info: {
+      sourceFilename:
+        options.info &&
+        typeof options.info === "object" &&
+        typeof options.info.sourceFilename === "string"
+          ? options.info.sourceFilename
+          : typeof options.filename === "string"
+          ? options.filename
+          : undefined,
+    },
   };
 
   if (!result.data) {
