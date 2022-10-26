@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.6.1...v3.7.0) (2022-10-26)
+
+
+### Features
+
+* added `info.sourceFilename` ([f8b3378](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/f8b337833759835f3f67277c8bfab85986416de9))
+
 ### [3.6.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.6.0...v3.6.1) (2022-09-19)
 
 
