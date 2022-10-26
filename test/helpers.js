@@ -370,12 +370,12 @@ function ifit(predicate) {
 /**
  * @returns {boolean}
  */
-function isLessOrEqNode14() {
-  const nodeMajorVer = Number(process.version.slice(1).split(".")[0]);
+function needSquooshTest() {
+  const needTest = typeof process.env.SQUOOSH_TEST !== "undefined";
 
   // Disable tests for all and Nodejs > 16
   // see: https://github.com/webpack-contrib/image-minimizer-webpack-plugin/pull/345
-  return nodeMajorVer <= 14;
+  return needTest;
 }
 
 export default class EmitNewAssetPlugin {
@@ -419,5 +419,5 @@ export {
   clearDirectory,
   EmitNewAssetPlugin,
   ifit,
-  isLessOrEqNode14,
+  needSquooshTest,
 };

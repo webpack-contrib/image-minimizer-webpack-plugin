@@ -4,7 +4,7 @@ import fileType from "file-type";
 import imageSize from "image-size";
 import ImageMinimizerPlugin from "../src";
 
-import { runWebpack, fixturesPath, ifit, isLessOrEqNode14 } from "./helpers";
+import { runWebpack, fixturesPath, ifit, needSquooshTest } from "./helpers";
 
 jest.setTimeout(10000);
 
@@ -192,7 +192,7 @@ describe("loader generator option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should generate and resize (squooshGenerate)",
     async () => {
       const stats = await runWebpack({
@@ -243,7 +243,7 @@ describe("loader generator option", () => {
     }
   );
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should generate and not resize (squooshGenerate)",
     async () => {
       const stats = await runWebpack({

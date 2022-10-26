@@ -9,7 +9,7 @@ import {
   isOptimized,
   plugins,
   ifit,
-  isLessOrEqNode14,
+  needSquooshTest,
 } from "./helpers";
 
 describe("loader minimizer option", () => {
@@ -271,7 +271,7 @@ describe("loader minimizer option", () => {
     );
   });
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     'should work with "squooshMinify" minifier',
     async () => {
       const stats = await runWebpack({
@@ -445,7 +445,7 @@ describe("loader minimizer option", () => {
     );
   });
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     'should minimize and resize with "squooshMinify" minifier',
     async () => {
       const stats = await runWebpack({

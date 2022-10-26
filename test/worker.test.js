@@ -8,7 +8,7 @@ import imageminWebp from "imagemin-webp";
 import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
 import sharp from "sharp";
-import { ifit, isLessOrEqNode14 } from "./helpers";
+import { ifit, needSquooshTest } from "./helpers";
 
 import worker from "../src/worker";
 
@@ -713,7 +713,7 @@ describe("minify", () => {
     );
   });
 
-  ifit(isLessOrEqNode14)("should work with 'squooshMinify'", async () => {
+  ifit(needSquooshTest)("should work with 'squooshMinify'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -750,7 +750,7 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  ifit(isLessOrEqNode14)("should work with 'squooshGenerate'", async () => {
+  ifit(needSquooshTest)("should work with 'squooshGenerate'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -787,7 +787,7 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should return error on empty plugin with 'squooshGenerate'",
     async () => {
       const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");

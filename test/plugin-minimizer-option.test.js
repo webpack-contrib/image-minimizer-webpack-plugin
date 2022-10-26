@@ -10,7 +10,7 @@ import {
   plugins,
   hasLoader,
   ifit,
-  isLessOrEqNode14,
+  needSquooshTest,
 } from "./helpers";
 
 jest.setTimeout(10000);
@@ -40,7 +40,7 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     'should work with "squooshMinify" minifier',
     async () => {
       const stats = await runWebpack({
@@ -224,7 +224,7 @@ describe("plugin minify option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should work with 'squooshMinify' minifier and 'minimizerOptions'",
     async () => {
       const stats = await runWebpack({

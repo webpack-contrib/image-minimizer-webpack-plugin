@@ -17,7 +17,7 @@ import {
   readAsset,
   clearDirectory,
   ifit,
-  isLessOrEqNode14,
+  needSquooshTest,
 } from "./helpers";
 
 import ImageMinimizerPlugin from "../src";
@@ -913,7 +913,7 @@ describe("imagemin plugin", () => {
     );
   });
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should optimizes and generate images (squooshGenerate)",
     async () => {
       const stats = await runWebpack({
@@ -1161,7 +1161,7 @@ describe("imagemin plugin", () => {
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should generate and allow to use any name in the 'preset' option using 'squooshGenerate'",
     async () => {
       const stats = await runWebpack({
@@ -1200,7 +1200,7 @@ describe("imagemin plugin", () => {
     }
   );
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should generate throw an error on multiple 'encodeOptions' options using 'squooshGenerate'",
     async () => {
       const stats = await runWebpack({
@@ -1572,7 +1572,7 @@ describe("imagemin plugin", () => {
     expect(/image\/png/i.test(ext.mime)).toBe(true);
   });
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should throw an error on unknown format (squooshGenerate)",
     async () => {
       const stats = await runWebpack({

@@ -7,7 +7,7 @@ import fileType from "file-type";
 import {
   fixturesPath,
   ifit,
-  isLessOrEqNode14,
+  needSquooshTest,
   isOptimized,
   plugins,
   runWebpack,
@@ -146,7 +146,7 @@ describe("loader", () => {
     );
   });
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should optimizes all images and don't break non images ('squooshMinify')",
     async () => {
       const stats = await runWebpack({
@@ -202,7 +202,7 @@ describe("loader", () => {
     }
   );
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should generate all images and don't break non images ('squooshGenerate')",
     async () => {
       const stats = await runWebpack({
@@ -422,7 +422,7 @@ describe("loader", () => {
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should generate and minimize images (imageminGenerate) using absolute URLs",
     async () => {
       const stats = await runWebpack({
@@ -460,7 +460,7 @@ describe("loader", () => {
     }
   );
 
-  ifit(isLessOrEqNode14)(
+  ifit(needSquooshTest)(
     "should optimizes and generate images (squooshGenerate)",
     async () => {
       const stats = await runWebpack({
