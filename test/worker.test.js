@@ -713,7 +713,6 @@ describe("minify", () => {
     );
   });
 
-  // eslint-disable-next-line jest/require-hook
   ifit(isLessOrEqNode14)("should work with 'squooshMinify'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
@@ -751,7 +750,6 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  // eslint-disable-next-line jest/require-hook
   ifit(isLessOrEqNode14)("should work with 'squooshGenerate'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
@@ -789,25 +787,27 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  // eslint-disable-next-line jest/require-hook
-  ifit(isLessOrEqNode14)("should return error on empty plugin with 'squooshGenerate'", async () => {
-    const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
-    const result = await worker({
-      input,
-      filename,
-      transformer: {
-        implementation: utils.squooshGenerate,
-        options: {},
-      },
-    });
+  ifit(isLessOrEqNode14)(
+    "should return error on empty plugin with 'squooshGenerate'",
+    async () => {
+      const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
+      const input = await pify(fs.readFile)(filename);
+      const result = await worker({
+        input,
+        filename,
+        transformer: {
+          implementation: utils.squooshGenerate,
+          options: {},
+        },
+      });
 
-    expect(result.warnings).toHaveLength(0);
-    expect(result.errors).toHaveLength(1);
-    expect(result.errors[0].message).toMatch(
-      /No result from 'squoosh' for '.+', please configure the 'encodeOptions' option to generate images/
-    );
-  });
+      expect(result.warnings).toHaveLength(0);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].message).toMatch(
+        /No result from 'squoosh' for '.+', please configure the 'encodeOptions' option to generate images/
+      );
+    }
+  );
 
   it("should work and allow to rename filename", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
