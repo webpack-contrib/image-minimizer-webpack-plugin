@@ -16,6 +16,8 @@ import {
   compile,
   readAsset,
   clearDirectory,
+  ifit,
+  isLessOrEqNode14,
 } from "./helpers";
 
 import ImageMinimizerPlugin from "../src";
@@ -911,68 +913,71 @@ describe("imagemin plugin", () => {
     );
   });
 
-  it("should optimizes and generate images (squooshGenerate)", async () => {
-    const stats = await runWebpack({
-      entry: path.join(fixturesPath, "generator-and-minimizer.js"),
-      imageminPluginOptions: {
-        test: /\.(jpe?g|png|webp)$/i,
-        generator: [
-          {
-            preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+  ifit(isLessOrEqNode14)(
+    "should optimizes and generate images (squooshGenerate)",
+    async () => {
+      const stats = await runWebpack({
+        entry: path.join(fixturesPath, "generator-and-minimizer.js"),
+        imageminPluginOptions: {
+          test: /\.(jpe?g|png|webp)$/i,
+          generator: [
+            {
+              preset: "webp",
+              implementation: ImageMinimizerPlugin.squooshGenerate,
+              options: {
+                encodeOptions: {
+                  webp: {
+                    lossless: 1,
+                  },
+                },
+              },
+            },
+          ],
+          minimizer: {
+            implementation: ImageMinimizerPlugin.squooshMinify,
             options: {
               encodeOptions: {
-                webp: {
-                  lossless: 1,
+                mozjpeg: {
+                  quality: 40,
+                },
+                oxipng: {
+                  quality: 40,
                 },
               },
             },
           },
-        ],
-        minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
-          options: {
-            encodeOptions: {
-              mozjpeg: {
-                quality: 40,
-              },
-              oxipng: {
-                quality: 40,
-              },
-            },
-          },
         },
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
+      });
+      const { compilation } = stats;
+      const { warnings, errors } = compilation;
 
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
+      expect(warnings).toHaveLength(0);
+      expect(errors).toHaveLength(0);
 
-    const file = path.resolve(
-      __dirname,
-      compilation.options.output.path,
-      "./loader-test.webp"
-    );
-    const ext = await fileType.fromFile(file);
+      const file = path.resolve(
+        __dirname,
+        compilation.options.output.path,
+        "./loader-test.webp"
+      );
+      const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+      expect(/image\/webp/i.test(ext.mime)).toBe(true);
 
-    // TODO fix me
-    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      false
-    );
-    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
-    );
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      false
-    );
-    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      false
-    );
-  });
+      // TODO fix me
+      await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+        false
+      );
+      await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+        false
+      );
+      await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+        false
+      );
+      await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+        false
+      );
+    }
+  );
 
   it("should optimizes and generate animated images (sharpGenerate)", async () => {
     const stats = await runWebpack({
@@ -1156,72 +1161,78 @@ describe("imagemin plugin", () => {
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
 
-  it("should generate and allow to use any name in the 'preset' option using 'squooshGenerate'", async () => {
-    const stats = await runWebpack({
-      entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
-      imageminPluginOptions: {
-        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
-        generator: [
-          {
-            preset: "webp-other",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
-            options: {
-              encodeOptions: {
-                webp: {
-                  lossless: 1,
+  ifit(isLessOrEqNode14)(
+    "should generate and allow to use any name in the 'preset' option using 'squooshGenerate'",
+    async () => {
+      const stats = await runWebpack({
+        entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
+        imageminPluginOptions: {
+          test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+          generator: [
+            {
+              preset: "webp-other",
+              implementation: ImageMinimizerPlugin.squooshGenerate,
+              options: {
+                encodeOptions: {
+                  webp: {
+                    lossless: 1,
+                  },
                 },
               },
             },
-          },
-        ],
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
+          ],
+        },
+      });
+      const { compilation } = stats;
+      const { warnings, errors } = compilation;
 
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
+      expect(warnings).toHaveLength(0);
+      expect(errors).toHaveLength(0);
 
-    const file = path.resolve(
-      __dirname,
-      compilation.options.output.path,
-      "./loader-test.webp"
-    );
-    const ext = await fileType.fromFile(file);
+      const file = path.resolve(
+        __dirname,
+        compilation.options.output.path,
+        "./loader-test.webp"
+      );
+      const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
-  });
+      expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    }
+  );
 
-  it("should generate throw an error on multiple 'encodeOptions' options using 'squooshGenerate'", async () => {
-    const stats = await runWebpack({
-      entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
-      imageminPluginOptions: {
-        test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
-        generator: [
-          {
-            preset: "webp-other",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
-            options: {
-              encodeOptions: {
-                webp: {
-                  lossless: 1,
+  ifit(isLessOrEqNode14)(
+    "should generate throw an error on multiple 'encodeOptions' options using 'squooshGenerate'",
+    async () => {
+      const stats = await runWebpack({
+        entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
+        imageminPluginOptions: {
+          test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
+          generator: [
+            {
+              preset: "webp-other",
+              implementation: ImageMinimizerPlugin.squooshGenerate,
+              options: {
+                encodeOptions: {
+                  webp: {
+                    lossless: 1,
+                  },
+                  avif: {},
                 },
-                avif: {},
               },
             },
-          },
-        ],
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
+          ],
+        },
+      });
+      const { compilation } = stats;
+      const { warnings, errors } = compilation;
 
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(1);
-    expect(errors[0].message).toMatch(
-      /Multiple values for the 'encodeOptions' option is not supported for 'loader-test.png', specify only one codec for the generator/
-    );
-  });
+      expect(warnings).toHaveLength(0);
+      expect(errors).toHaveLength(1);
+      expect(errors[0].message).toMatch(
+        /Multiple values for the 'encodeOptions' option is not supported for 'loader-test.png', specify only one codec for the generator/
+      );
+    }
+  );
 
   it("should generate throw an error on multiple 'encodeOptions' options using 'sharpGenerate'", async () => {
     const stats = await runWebpack({
@@ -1561,35 +1572,38 @@ describe("imagemin plugin", () => {
     expect(/image\/png/i.test(ext.mime)).toBe(true);
   });
 
-  it("should throw an error on unknown format (squooshGenerate)", async () => {
-    const stats = await runWebpack({
-      entry: path.join(fixturesPath, "generator-and-minimizer-5.js"),
-      imageminPluginOptions: {
-        test: /\.(jpe?g|gif|json|svg|png|webp|txt)$/i,
-        generator: [
-          {
-            preset: "avif",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
-            options: {
-              encodeOptions: {
-                webp: {
-                  lossless: 1,
+  ifit(isLessOrEqNode14)(
+    "should throw an error on unknown format (squooshGenerate)",
+    async () => {
+      const stats = await runWebpack({
+        entry: path.join(fixturesPath, "generator-and-minimizer-5.js"),
+        imageminPluginOptions: {
+          test: /\.(jpe?g|gif|json|svg|png|webp|txt)$/i,
+          generator: [
+            {
+              preset: "avif",
+              implementation: ImageMinimizerPlugin.squooshGenerate,
+              options: {
+                encodeOptions: {
+                  webp: {
+                    lossless: 1,
+                  },
                 },
               },
             },
-          },
-        ],
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors } = compilation;
+          ],
+        },
+      });
+      const { compilation } = stats;
+      const { warnings, errors } = compilation;
 
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(1);
-    expect(errors[0].message).toMatch(
-      /Error with 'loader-test.txt': Binary blob has an unsupported format/g
-    );
-  });
+      expect(warnings).toHaveLength(0);
+      expect(errors).toHaveLength(1);
+      expect(errors[0].message).toMatch(
+        /Error with 'loader-test.txt': Binary blob has an unsupported format/g
+      );
+    }
+  );
 
   it("should throw an error on unknown format (sharpGenerate)", async () => {
     const stats = await runWebpack({

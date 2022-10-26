@@ -8,6 +8,7 @@ import imageminWebp from "imagemin-webp";
 import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
 import sharp from "sharp";
+import { ifit, isLessOrEqNode14 } from "./helpers";
 
 import worker from "../src/worker";
 
@@ -712,7 +713,8 @@ describe("minify", () => {
     );
   });
 
-  it("should work with 'squooshMinify'", async () => {
+  // eslint-disable-next-line jest/require-hook
+  ifit(isLessOrEqNode14)("should work with 'squooshMinify'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -749,7 +751,8 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  it("should work with 'squooshGenerate'", async () => {
+  // eslint-disable-next-line jest/require-hook
+  ifit(isLessOrEqNode14)("should work with 'squooshGenerate'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -786,7 +789,8 @@ describe("minify", () => {
     expect(result.data.equals(binary)).toBe(true);
   });
 
-  it("should return error on empty plugin with 'squooshGenerate'", async () => {
+  // eslint-disable-next-line jest/require-hook
+  ifit(isLessOrEqNode14)("should return error on empty plugin with 'squooshGenerate'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
