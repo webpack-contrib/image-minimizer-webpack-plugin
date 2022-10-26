@@ -146,58 +146,61 @@ describe("loader", () => {
     );
   });
 
-  it("should optimizes all images and don't break non images ('squooshMinify')", async () => {
-    const stats = await runWebpack({
-      entry: path.join(fixturesPath, "loader-other-imports.js"),
-      test: /\.(jpe?g|png|gif|svg|css|txt)$/i,
-      imageminLoaderOptions: {
-        minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
-          options: {
-            mozjpeg: {
-              quality: 40,
-            },
-            oxipng: {
-              quality: 40,
+  ifit(isLessOrEqNode14)(
+    "should optimizes all images and don't break non images ('squooshMinify')",
+    async () => {
+      const stats = await runWebpack({
+        entry: path.join(fixturesPath, "loader-other-imports.js"),
+        test: /\.(jpe?g|png|gif|svg|css|txt)$/i,
+        imageminLoaderOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.squooshMinify,
+            options: {
+              mozjpeg: {
+                quality: 40,
+              },
+              oxipng: {
+                quality: 40,
+              },
             },
           },
         },
-      },
-    });
-    const { compilation } = stats;
-    const { warnings, errors, assets } = compilation;
+      });
+      const { compilation } = stats;
+      const { warnings, errors, assets } = compilation;
 
-    expect(warnings).toHaveLength(0);
-    expect(errors).toHaveLength(0);
-    expect(Object.keys(assets)).toHaveLength(7);
+      expect(warnings).toHaveLength(0);
+      expect(errors).toHaveLength(0);
+      expect(Object.keys(assets)).toHaveLength(7);
 
-    const txtBuffer = await pify(fs.readFile)(
-      path.join(compilation.options.output.path, "loader-test.txt")
-    );
+      const txtBuffer = await pify(fs.readFile)(
+        path.join(compilation.options.output.path, "loader-test.txt")
+      );
 
-    expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
+      expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
-    const cssBuffer = await pify(fs.readFile)(
-      path.join(compilation.options.output.path, "loader-test.css")
-    );
+      const cssBuffer = await pify(fs.readFile)(
+        path.join(compilation.options.output.path, "loader-test.css")
+      );
 
-    expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
-      "a {\n  color: red;\n}\n"
-    );
+      expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
+        "a {\n  color: red;\n}\n"
+      );
 
-    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      false
-    );
-    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
-    );
-    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      false
-    );
-    await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      false
-    );
-  });
+      await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+        false
+      );
+      await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+        false
+      );
+      await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+        false
+      );
+      await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
+        false
+      );
+    }
+  );
 
   ifit(isLessOrEqNode14)(
     "should generate all images and don't break non images ('squooshGenerate')",
