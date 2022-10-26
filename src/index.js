@@ -145,6 +145,7 @@ const {
  * @template T
  * @typedef {Object} InternalWorkerOptions
  * @property {string} filename
+ * @property {AssetInfo=} info
  * @property {Buffer} input
  * @property {Transformer<T> | Transformer<T>[]} transformer
  * @property {string} [severityError]
@@ -326,7 +327,7 @@ class ImageMinimizerPlugin {
     const { RawSource } = compiler.webpack.sources;
 
     const scheduledTasks = assetsForTransformers.map((asset) => async () => {
-      const { name, inputSource, cacheItem, transformer } = asset;
+      const { name, info, inputSource, cacheItem, transformer } = asset;
       let { output } = asset;
       let input;
 
@@ -343,6 +344,7 @@ class ImageMinimizerPlugin {
           /** @type {InternalWorkerOptions<T>} */
           ({
             filename: name,
+            info,
             input,
             severityError: this.options.severityError,
             transformer,

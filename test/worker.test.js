@@ -928,6 +928,8 @@ describe("minify", () => {
 
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
-    expect(result.info).toEqual({});
+    expect(result.info).toEqual({
+      sourceFilename: filename,
+    });
   });
 });

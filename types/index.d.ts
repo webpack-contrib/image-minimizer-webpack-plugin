@@ -107,6 +107,7 @@ export = ImageMinimizerPlugin;
  * @template T
  * @typedef {Object} InternalWorkerOptions
  * @property {string} filename
+ * @property {AssetInfo=} info
  * @property {Buffer} input
  * @property {Transformer<T> | Transformer<T>[]} transformer
  * @property {string} [severityError]
@@ -344,6 +345,7 @@ type Minimizer<T> = Omit<Transformer<T>, "preset" | "type">;
 type Generator<T> = Transformer<T>;
 type InternalWorkerOptions<T> = {
   filename: string;
+  info?: AssetInfo | undefined;
   input: Buffer;
   transformer: Transformer<T> | Transformer<T>[];
   severityError?: string | undefined;

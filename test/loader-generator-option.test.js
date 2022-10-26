@@ -82,7 +82,7 @@ describe("loader generator option", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /Found several identical pereset names, the 'preset' option should be unique/
+      /Found several identical preset names, the 'preset' option should be unique/
     );
   });
 

@@ -140,7 +140,7 @@ async function loader(content) {
       if (presets.length > 1) {
         callback(
           new Error(
-            "Found several identical pereset names, the 'preset' option should be unique"
+            "Found several identical preset names, the 'preset' option should be unique"
           )
         );
 
