@@ -56,7 +56,10 @@ async function worker(options) {
     filename: options.filename,
     warnings: [],
     errors: [],
-    info: {},
+    info: {
+      sourceFilename:
+        (options.info && options.info.sourceFilename) || options.filename,
+    },
   };
 
   if (!result.data) {

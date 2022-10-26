@@ -852,7 +852,7 @@ describe("imagemin plugin", () => {
     const stringStats = stats.toString({ relatedAssets: true });
 
     expect(stringStats).toMatch(
-      /asset loader-test.webp.+\[from: loader-test.webp\] \[generated\]/
+      /asset loader-test.webp.+\[from: loader-test.png\] \[generated\]/
     );
   });
 
