@@ -378,6 +378,14 @@ module.exports = {
                 // https://sharp.pixelplumbing.com/api-output#avif
                 lossless: true,
               },
+
+              // png by default sets the quality to 100%, which is same as lossless
+              // https://sharp.pixelplumbing.com/api-output#png
+              png: {},
+
+              // gif does not support lossless compression at all
+              // https://sharp.pixelplumbing.com/api-output#gif
+              gif: {},
             },
           },
         },
