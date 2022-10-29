@@ -893,6 +893,7 @@ More information and examples [here](https://sharp.pixelplumbing.com/api-output#
 
 ```js
 const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
 module.exports = {
   optimization: {
     minimizer: [
@@ -910,7 +911,7 @@ module.exports = {
             let result;
 
             try {
-              result = minifyAndReturnBuffer(original.data);
+              result = await minifyAndReturnBuffer(original.data);
             } catch (error) {
               // Store error and return `null` if there was an error
               original.errors.push(error);
@@ -1512,7 +1513,7 @@ module.exports = {
               let result;
 
               try {
-                result = minifyAndReturnBuffer(original.data);
+                result = await minifyAndReturnBuffer(original.data);
               } catch (error) {
                 // Store error and return `null` if there was an error
                 original.errors.push(error);
