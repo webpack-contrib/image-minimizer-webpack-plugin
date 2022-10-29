@@ -1100,6 +1100,28 @@ describe("imagemin plugin", () => {
     expect(svgAsset.info.size).toBeLessThan(size);
   });
 
+  it("should optimizes images and throws error on corrupted images (svgoMinify)", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "minimizer-only-corrupted.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|png|webp|svg)$/i,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.svgoMinify,
+          options: {
+            encodeOptions: {
+              multipass: true,
+            },
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(2);
+  });
+
   it("should throw an error on empty minimizer", async () => {
     await expect(async () => {
       await runWebpack({
