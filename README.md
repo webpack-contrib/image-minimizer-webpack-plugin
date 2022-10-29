@@ -32,6 +32,7 @@ with option `"markdown.extension.toc.levels": "2..6"`
   - [Optimize with `imagemin`](#optimize-with-imagemin)
   - [Optimize with `squoosh`](#optimize-with-squoosh)
   - [Optimize with `sharp`](#optimize-with-sharp)
+  - [Optimize with `svgo`](#optimize-with-svgo)
   - [Advanced setup](#advanced-setup)
     - [Query Parameters (only `squoosh` and `sharp` currently)](#query-parameters-only-squoosh-and-sharp-currently)
     - [Standalone Loader](#standalone-loader)
@@ -45,6 +46,7 @@ with option `"markdown.extension.toc.levels": "2..6"`
     - [Single minimizer example for `imagemin`](#single-minimizer-example-for-imagemin)
     - [Single minimizer example for `squoosh`](#single-minimizer-example-for-squoosh)
     - [Single minimizer example for `sharp`](#single-minimizer-example-for-sharp)
+    - [Single minimizer example for user defined implementation](#single-minimizer-example-for-user-defined-implementation)
     - [Multiple minimizers example](#multiple-minimizers-example)
     - [Minimizer options](#minimizer-options)
       - [`implementation`](#implementation)
@@ -85,11 +87,12 @@ with option `"markdown.extension.toc.levels": "2..6"`
 
 ## Getting Started
 
-This plugin can use 3 tools to optimize/generate images:
+This plugin can use 4 tools to optimize/generate images:
 
 - [`imagemin`](https://github.com/imagemin/imagemin) - optimize your images by default, since it is stable and works with all types of images
 - [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh) - while working in experimental mode with `.jpg`, `.jpeg`, `.png`, `.webp`, `.avif` file types.
 - [`sharp`](https://github.com/lovell/sharp) - High performance Node.js image processing, the fastest module to resize and compress JPEG, PNG, WebP, AVIF and TIFF images. Uses the libvips library.
+- [`svgo`](https://github.com/svg/svgo) - tool for optimizing SVG vector graphics files. Supports only SVG files minification.
 
 > **Warning**
 >
@@ -119,6 +122,12 @@ npm install image-minimizer-webpack-plugin @squoosh/lib --save-dev
 
 ```console
 npm install image-minimizer-webpack-plugin sharp --save-dev
+```
+
+- [`svgo`](https://github.com/svg/svgo):
+
+```console
+npm install image-minimizer-webpack-plugin svgo --save-dev
 ```
 
 Images can be optimized in two modes:
@@ -330,8 +339,10 @@ module.exports = {
         minimizer: {
           implementation: ImageMinimizerPlugin.sharpMinify,
           options: {
-            // Your options for `sharp`
-            // https://sharp.pixelplumbing.com/api-output
+            encodeOptions: {
+              // Your options for `sharp`
+              // https://sharp.pixelplumbing.com/api-output
+            },
           },
         },
       }),
@@ -386,6 +397,56 @@ module.exports = {
               // gif does not support lossless compression at all
               // https://sharp.pixelplumbing.com/api-output#gif
               gif: {},
+            },
+          },
+        },
+      }),
+    ],
+  },
+};
+```
+
+### Optimize with [`svgo`](https://github.com/svg/svgo)
+
+```console
+npm install svgo --save-dev
+```
+
+**Recommended `svgo` options for optimization**
+
+For optimization we recommend using the options listed below in `minimizer.options.encodeOptions`.
+The default values for plugins can be found in the [svgo plugins source code](https://github.com/svg/svgo/tree/main/plugins).
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  module: {
+    rules: [
+      // You need this, if you are using `import file from "file.ext"`, for `new URL(...)` syntax you don't need it
+      {
+        test: /\.(svg)$/i,
+        type: "asset",
+      },
+    ],
+  },
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: ImageMinimizerPlugin.svgoMinify,
+          options: {
+            encodeOptions: {
+              // Pass over SVGs multiple times to ensure all optimizations are applied. False by default
+              multipass: true,
+              plugins: [
+                // set of built-in plugins enabled by default
+                // see: https://github.com/svg/svgo#default-preset
+                "preset-default",
+              ],
             },
           },
         },
@@ -727,6 +788,7 @@ Allows to setup default minify function.
 - `ImageMinimizerPlugin.imageminMinify`
 - `ImageMinimizerPlugin.squooshMinify`
 - `ImageMinimizerPlugin.sharpMinify`
+- `ImageMinimizerPlugin.svgoMinify`
 
 #### Single minimizer example for `imagemin`
 
@@ -825,6 +887,60 @@ module.exports = {
 
 More information and examples [here](https://sharp.pixelplumbing.com/api-output#toformat).
 
+#### Single minimizer example for user defined implementation
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        minimizer: {
+          implementation: async (original, options) => {
+            const inputExt = path.extname(original.filename).toLowerCase();
+
+            if (inputExt !== ".xxx") {
+              // Return `null` if the implementation does not support this file type
+              return null;
+            }
+
+            let result;
+
+            try {
+              result = minifyAndReturnBuffer(original.data);
+            } catch (error) {
+              // Store error and return `null` if there was an error
+              original.errors.push(error);
+              return null;
+            }
+
+            return {
+              filename: original.filename,
+              data: result,
+              warnings: [...original.warnings],
+              errors: [...original.errors],
+              info: {
+                ...original.info,
+                // Please always set it to prevent double minification
+                minimized: true,
+                // Optional
+                minimizedBy: ["custom-name-of-minimication"],
+              },
+            };
+          },
+          options: {
+            // Custom options
+          },
+        },
+      }),
+    ],
+  },
+};
+```
+
 #### Multiple minimizers example
 
 Allows to setup multiple minimizers.
@@ -841,47 +957,31 @@ module.exports = {
       new ImageMinimizerPlugin({
         minimizer: [
           {
-            implementation: ImageMinimizerPlugin.imageminMinify,
+            // `sharp` will handle all bitmap formats (JPG, PNG, GIF, ...)
+            implementation: ImageMinimizerPlugin.sharpMinify,
+
+            // exclude: /\.(svg)$/i, // exclude SVG if implementation support it. Not required for `sharp`.
+
             options: {
-              plugins: [
-                "imagemin-gifsicle",
-                "imagemin-mozjpeg",
-                "imagemin-pngquant",
-                "imagemin-svgo",
-              ],
+              encodeOptions: {
+                // Your options for `sharp`
+                // https://sharp.pixelplumbing.com/api-output
+              },
             },
           },
           {
-            implementation: (original, options) => {
-              let result;
-
-              try {
-                result = minifyAndReturnBuffer(original.data);
-              } catch (error) {
-                // Return original input if there was an error
-                return {
-                  filename: original.filename,
-                  data: original.data,
-                  errors: [error],
-                  warnings: [],
-                };
-              }
-
-              return {
-                filename: original.filename,
-                data: result,
-                warnings: [],
-                errors: [],
-                info: {
-                  // Please always set it to prevent double minification
-                  minimized: true,
-                  // Optional
-                  minimizedBy: ["custom-name-of-minimication"],
-                },
-              };
-            },
+            // `svgo` will handle vector images (SVG)
+            implementation: ImageMinimizerPlugin.svgoMinify,
             options: {
-              // Custom options
+              encodeOptions: {
+                // Pass over SVGs multiple times to ensure all optimizations are applied. False by default
+                multipass: true,
+                plugins: [
+                  // set of built-in plugins enabled by default
+                  // see: https://github.com/svg/svgo#default-preset
+                  "preset-default",
+                ],
+              },
             },
           },
         ],
@@ -1400,27 +1500,32 @@ module.exports = {
           {
             // You can apply generator using `?as=webp`, you can use any name and provide more options
             preset: "webp",
-            implementation: (original, options) => {
+            implementation: async (original, options) => {
+              const inputExt = path.extname(original.filename).toLowerCase();
+
+              if (inputExt !== ".xxx") {
+                // Store error and return `null` if the implementation does not support this file type
+                original.errors.push(error);
+                return null;
+              }
+
               let result;
 
               try {
                 result = minifyAndReturnBuffer(original.data);
               } catch (error) {
-                // Return original input if there was an error
-                return {
-                  filename: original.filename,
-                  data: original.data,
-                  errors: [error],
-                  warnings: [],
-                };
+                // Store error and return `null` if there was an error
+                original.errors.push(error);
+                return null;
               }
 
               return {
                 filename: original.filename,
                 data: result,
-                warnings: [],
-                errors: [],
+                warnings: [...original.warnings],
+                errors: [...original.errors],
                 info: {
+                  ...original.info,
                   // Please always set it to prevent double minification
                   generated: true,
                   // Optional

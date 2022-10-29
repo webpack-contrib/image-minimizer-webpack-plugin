@@ -1114,6 +1114,63 @@ function sharpMinify(original, minimizerOptions) {
   );
 }
 
+/** @typedef {import("svgo")} SvgoLib */
+
+/**
+ * @typedef SvgoOptions
+ * @type {object}
+ * @property {SvgoEncodeOptions} [encodeOptions]
+ */
+
+/** @typedef {Omit<import("svgo").Config, "path" | "datauri">} SvgoEncodeOptions */
+
+/**
+ * @template T
+ * @param {WorkerResult} original
+ * @param {T} minimizerOptions
+ * @returns {Promise<WorkerResult | null>}
+ */
+// eslint-disable-next-line require-await
+async function svgoMinify(original, minimizerOptions) {
+  if (path.extname(original.filename).toLowerCase() !== ".svg") {
+    return null;
+  }
+
+  /** @type {SvgoLib} */
+  // eslint-disable-next-line node/no-unpublished-require
+  const { optimize } = require("svgo");
+
+  const { encodeOptions } = /** @type {SvgoOptions} */ (minimizerOptions);
+
+  /** @type {import("svgo").Output} */
+  let result;
+
+  try {
+    result = optimize(original.data.toString(), encodeOptions);
+  } catch (error) {
+    const originalError =
+      error instanceof Error ? error : new Error(/** @type {string} */ (error));
+    const newError = new Error(
+      `Error with '${original.filename}': ${originalError.message}`
+    );
+
+    original.errors.push(newError);
+    return null;
+  }
+
+  return {
+    filename: original.filename,
+    data: Buffer.from(result.data),
+    warnings: [...original.warnings],
+    errors: [...original.errors],
+    info: {
+      ...original.info,
+      minimized: true,
+      minimizedBy: ["svgo", ...(original.info?.minimizedBy ?? [])],
+    },
+  };
+}
+
 module.exports = {
   throttleAll,
   isAbsoluteURL,
@@ -1124,4 +1181,5 @@ module.exports = {
   squooshGenerate,
   sharpMinify,
   sharpGenerate,
+  svgoMinify,
 };

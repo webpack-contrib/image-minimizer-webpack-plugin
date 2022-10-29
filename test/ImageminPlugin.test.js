@@ -557,6 +557,43 @@ describe("imagemin plugin", () => {
     expect(errors).toHaveLength(0);
   });
 
+  it("should work with asset/inline (svgoMinify)", async () => {
+    const compiler = await runWebpack(
+      {
+        fileLoaderOff: true,
+        assetInline: true,
+        entry: path.join(fixturesPath, "./asset-inline.js"),
+        emitPlugin: true,
+        imageminPluginOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.svgoMinify,
+            options: {
+              encodeOptions: {
+                multipass: true,
+              },
+            },
+          },
+        },
+      },
+      true
+    );
+
+    const stats = await compile(compiler);
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const result = readAsset("bundle.js", compiler, stats).toString();
+
+    const isInlineSvg =
+      /data:image\/svg\+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI\+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIHN0eWxlPSJzdHJva2U6IzAwMDtzdHJva2Utd2l0aDozO2ZpbGw6cmVkIi8\+PC9zdmc\+/.test(
+        result
+      );
+
+    expect(isInlineSvg).toBe(true);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
   it("should work and use the persistent cache by default (loader + plugin)", async () => {
     const compiler = await runWebpack(
       {
@@ -1023,6 +1060,44 @@ describe("imagemin plugin", () => {
 
     expect(gifAsset.info.size).toBeGreaterThan(2_000);
     expect(gifAsset.info.size).toBeLessThan(130_000);
+  });
+
+  it("should optimizes svg images (svgoMinify)", async () => {
+    const stats = await runWebpack({
+      entry: path.join(fixturesPath, "minimizer-only.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|png|webp|svg)$/i,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.svgoMinify,
+          options: {
+            encodeOptions: {
+              multipass: true,
+            },
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
+      false
+    );
+    await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
+      false
+    );
+    await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
+      false
+    );
+
+    const svgAsset = compilation.getAsset("loader-test.svg");
+    const svgFilePath = path.join(fixturesPath, "loader-test.svg");
+    const { size } = await fs.promises.stat(svgFilePath);
+
+    expect(svgAsset.info.size).toBeLessThan(size);
   });
 
   it("should throw an error on empty minimizer", async () => {
@@ -2385,6 +2460,70 @@ describe("imagemin plugin", () => {
     //
     // expect(/image\/webp/i.test(webpExt.mime)).toBe(true);
     //
+    const cssFile = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./main.css"
+    );
+
+    const cssContent = await fs.promises.readFile(cssFile, "utf-8");
+
+    expect(cssContent).toMatchSnapshot("main.css");
+  });
+
+  it("should work with mini-css-extract-plugin (svgoMinify)", async () => {
+    const stats = await runWebpack({
+      fileLoaderOff: true,
+      assetResource: true,
+      MCEP: true,
+      entry: path.join(fixturesPath, "entry-with-css.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|png|webp|svg)$/i,
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.sharpGenerate,
+            options: {
+              encodeOptions: {
+                webp: {
+                  lossless: true,
+                },
+              },
+            },
+          },
+        ],
+        minimizer: [
+          {
+            implementation: ImageMinimizerPlugin.sharpMinify,
+            options: {
+              encodeOptions: {
+                jpeg: {
+                  quality: 40,
+                },
+                png: {
+                  quality: 40,
+                },
+              },
+            },
+          },
+          {
+            implementation: ImageMinimizerPlugin.svgoMinify,
+            options: {
+              encodeOptions: {
+                multipass: true,
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
     const cssFile = path.resolve(
       __dirname,
       compilation.options.output.path,
