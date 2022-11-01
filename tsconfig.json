@@ -10,6 +10,11 @@
     "resolveJsonModule": true,
     "newLine": "LF",
     "allowSyntheticDefaultImports": true,
+
+    // `skipLibCheck` only for avoid bug of `svgo` v3.0.0
+    // see: https://github.com/svg/svgo/issues/1700
+    "skipLibCheck": true,
+
     "outDir": "./types"
   },
   "include": ["./src/**/*"]

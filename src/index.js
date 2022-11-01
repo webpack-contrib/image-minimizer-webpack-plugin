@@ -15,6 +15,7 @@ const {
   squooshGenerate,
   sharpMinify,
   sharpGenerate,
+  svgoMinify,
 } = require("./utils.js");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
@@ -604,5 +605,6 @@ ImageMinimizerPlugin.squooshMinify = squooshMinify;
 ImageMinimizerPlugin.squooshGenerate = squooshGenerate;
 ImageMinimizerPlugin.sharpMinify = sharpMinify;
 ImageMinimizerPlugin.sharpGenerate = sharpGenerate;
+ImageMinimizerPlugin.svgoMinify = svgoMinify;
 
 module.exports = ImageMinimizerPlugin;

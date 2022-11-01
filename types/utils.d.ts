@@ -3,6 +3,11 @@ export type SquooshOptions = import("./index").SquooshOptions;
 export type ImageminOptions = import("imagemin").Options;
 export type WebpackError = import("webpack").WebpackError;
 export type Task<T> = () => Promise<T>;
+export type SvgoLib = typeof import("svgo");
+export type SvgoOptions = {
+  encodeOptions?: Omit<import("svgo").Config, "path" | "datauri"> | undefined;
+};
+export type SvgoEncodeOptions = Omit<import("svgo").Config, "path" | "datauri">;
 export type Uint8ArrayUtf8ByteString = (
   array: number[] | Uint8Array,
   start: number,
@@ -129,6 +134,23 @@ export function sharpMinify<T>(
  * @returns {Promise<WorkerResult | null>}
  */
 export function sharpGenerate<T>(
+  original: WorkerResult,
+  minimizerOptions: T
+): Promise<WorkerResult | null>;
+/** @typedef {import("svgo")} SvgoLib */
+/**
+ * @typedef SvgoOptions
+ * @type {object}
+ * @property {SvgoEncodeOptions} [encodeOptions]
+ */
+/** @typedef {Omit<import("svgo").Config, "path" | "datauri">} SvgoEncodeOptions */
+/**
+ * @template T
+ * @param {WorkerResult} original
+ * @param {T} minimizerOptions
+ * @returns {Promise<WorkerResult | null>}
+ */
+export function svgoMinify<T>(
   original: WorkerResult,
   minimizerOptions: T
 ): Promise<WorkerResult | null>;
