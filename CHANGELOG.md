@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.8.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.7.0...v3.8.0) (2022-11-01)
+
+
+### Features
+
+* add `svgo` implementation ([#369](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/369)) ([0701188](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/07011881677f0e4ba3e9ab0d8cbe7e7f3e3b8d59))
+
 ## [3.7.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.6.1...v3.7.0) (2022-10-26)
 
 
