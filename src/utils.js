@@ -1,4 +1,4 @@
-const path = require("path");
+const pathPosix = require("node:path/posix");
 
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").SquooshOptions} SquooshOptions */
@@ -587,7 +587,7 @@ async function imageminGenerate(original, minimizerOptions) {
   }
 
   const { ext: extOutput } = fileTypeFromBuffer(result) || {};
-  const extInput = path.extname(original.filename).slice(1).toLowerCase();
+  const extInput = pathPosix.extname(original.filename).slice(1).toLowerCase();
 
   let newFilename = original.filename;
 
@@ -645,7 +645,10 @@ async function imageminMinify(original, options) {
   }
 
   if (!isAbsoluteURL(original.filename)) {
-    const extInput = path.extname(original.filename).slice(1).toLowerCase();
+    const extInput = pathPosix
+      .extname(original.filename)
+      .slice(1)
+      .toLowerCase();
     const { ext: extOutput } = fileTypeFromBuffer(result) || {};
 
     if (extOutput && extInput !== extOutput) {
@@ -795,8 +798,8 @@ async function squooshGenerate(original, minifyOptions) {
   const { binary, extension } = await Object.values(image.encodedWith)[0];
   const { width, height } = (await image.decoded).bitmap;
 
-  const { dir: fileDir, name: fileName } = path.parse(original.filename);
-  const filename = path.join(fileDir, `${fileName}.${extension}`);
+  const { dir: fileDir, name: fileName } = pathPosix.parse(original.filename);
+  const filename = pathPosix.join(fileDir, `${fileName}.${extension}`);
 
   return {
     filename,
@@ -843,7 +846,7 @@ async function squooshMinify(original, options) {
     targets[extensionNormalized] = codec;
   }
 
-  const ext = path.extname(original.filename).slice(1).toLowerCase();
+  const ext = pathPosix.extname(original.filename).slice(1).toLowerCase();
   const targetCodec = targets[ext];
 
   if (!targetCodec) {
@@ -984,7 +987,7 @@ async function sharpTransform(
   minimizerOptions = {},
   targetFormat = null
 ) {
-  const inputExt = path.extname(original.filename).slice(1).toLowerCase();
+  const inputExt = pathPosix.extname(original.filename).slice(1).toLowerCase();
 
   if (!SHARP_FORMATS.has(inputExt)) {
     if (targetFormat) {
@@ -1040,13 +1043,16 @@ async function sharpTransform(
   // ====== rename ======
 
   const outputExt = targetFormat ? outputFormat : inputExt;
-  const { dir: fileDir, name: fileName } = path.parse(original.filename);
+  const { dir: fileDir, name: fileName } = pathPosix.parse(original.filename);
   const { width, height } = result.info;
   const sizeSuffix =
     typeof minimizerOptions.sizeSuffix === "function"
       ? minimizerOptions.sizeSuffix(width, height)
       : "";
-  const filename = path.join(fileDir, `${fileName}${sizeSuffix}.${outputExt}`);
+  const filename = pathPosix.join(
+    fileDir,
+    `${fileName}${sizeSuffix}.${outputExt}`
+  );
   const processedFlag = targetFormat ? "generated" : "minimized";
   const processedBy = targetFormat ? "generatedBy" : "minimizedBy";
 
@@ -1132,7 +1138,7 @@ function sharpMinify(original, minimizerOptions) {
  */
 // eslint-disable-next-line require-await
 async function svgoMinify(original, minimizerOptions) {
-  if (path.extname(original.filename).toLowerCase() !== ".svg") {
+  if (pathPosix.extname(original.filename).toLowerCase() !== ".svg") {
     return null;
   }
 
