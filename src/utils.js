@@ -1,4 +1,4 @@
-const pathPosix = require("node:path/posix");
+const pathPosix = require("path").posix;
 
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").SquooshOptions} SquooshOptions */
