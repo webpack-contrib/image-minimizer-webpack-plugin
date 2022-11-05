@@ -962,7 +962,7 @@ module.exports = {
             implementation: ImageMinimizerPlugin.sharpMinify,
 
             // exclude SVG if implementation support it. Not required for `sharp`.
-            // test: (source, sourcePath) => !(/\.(svg)$/i.test(sourcePath)),
+            // filter: (source, sourcePath) => !(/\.(svg)$/i.test(sourcePath)),
 
             options: {
               encodeOptions: {
