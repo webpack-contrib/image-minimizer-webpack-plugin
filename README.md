@@ -66,10 +66,10 @@ with option `"markdown.extension.toc.levels": "2..6"`
       - [`options`](#options-1)
       - [`filter`](#filter-1)
       - [`filename`](#filename-1)
-    - [`severityError`](#severityerror)
-    - [`loader`](#loader)
-    - [`concurrency`](#concurrency)
-    - [`deleteOriginalAssets`](#deleteoriginalassets)
+  - [`severityError`](#severityerror)
+  - [`loader`](#loader)
+  - [`concurrency`](#concurrency)
+  - [`deleteOriginalAssets`](#deleteoriginalassets)
 - [Loader Options](#loader-options)
   - [`minimizer`](#minimizer-1)
     - [Loader minimizer example for `imagemin`](#loader-minimizer-example-for-imagemin)
@@ -961,7 +961,8 @@ module.exports = {
             // `sharp` will handle all bitmap formats (JPG, PNG, GIF, ...)
             implementation: ImageMinimizerPlugin.sharpMinify,
 
-            // exclude: /\.(svg)$/i, // exclude SVG if implementation support it. Not required for `sharp`.
+            // exclude SVG if implementation support it. Not required for `sharp`.
+            // test: (source, sourcePath) => !(/\.(svg)$/i.test(sourcePath)),
 
             options: {
               encodeOptions: {
@@ -1872,7 +1873,7 @@ module.exports = {
 };
 ```
 
-#### `severityError`
+### `severityError`
 
 Type:
 
@@ -1918,7 +1919,7 @@ module.exports = {
 };
 ```
 
-#### `loader`
+### `loader`
 
 Type:
 
@@ -1959,7 +1960,7 @@ module.exports = {
 };
 ```
 
-#### `concurrency`
+### `concurrency`
 
 Type:
 
@@ -1999,7 +2000,7 @@ module.exports = {
 };
 ```
 
-#### `deleteOriginalAssets`
+### `deleteOriginalAssets`
 
 Type:
 
