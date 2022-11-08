@@ -250,8 +250,13 @@ async function loader(content) {
     if (this._module && !this._module.matchResource) {
       // eslint-disable-next-line no-console
       console.log(output.filename);
+      // eslint-disable-next-line no-console
+      console.log(this._module.matchResource);
 
       this._module.matchResource = `${output.filename}${query}`;
+
+      // eslint-disable-next-line no-console
+      console.log(this._module.matchResource);
     }
   }
 
