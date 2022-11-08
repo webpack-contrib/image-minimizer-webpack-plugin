@@ -39,7 +39,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
 
   const configs = [];
 
-  maybeMultiCompiler.forEach((options) => {
+  for (const options of maybeMultiCompiler) {
     const config = {
       externals: options.externals,
       experiments: options.experiments,
@@ -179,7 +179,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
           ? options.imageminPlugin || options.imageminPluginOptions
           : [options.imageminPlugin || options.imageminPluginOptions];
 
-      imageminPluginsOptions.forEach((imageminPluginOptions) => {
+      for (const imageminPluginOptions of imageminPluginsOptions) {
         const ImageMinimizerPluginCreated = new ImageMinimizerPlugin(
           typeof imageminPluginOptions === "boolean"
             ? {
@@ -200,7 +200,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
         } else {
           config.plugins = [...config.plugins, ImageMinimizerPluginCreated];
         }
-      });
+      }
     }
 
     if (options.MCEP) {
@@ -235,7 +235,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
     }
 
     configs.push(config);
-  });
+  }
 
   if (getCompiler) {
     return webpack(configs.length === 1 ? configs[0] : configs);
