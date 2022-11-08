@@ -213,7 +213,7 @@ async function loader(content) {
 
   if (output.warnings && output.warnings.length > 0) {
     for (const warning of output.warnings) {
-      this.emitError(warning);
+      this.emitWarning(warning);
     }
   }
 
