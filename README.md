@@ -475,14 +475,14 @@ The plugin supports the following query parameters:
 Examples:
 
 ```js
-const myImage1 = new URL("./image.png?width=150&height=120", import.meta.url);
-const myImage2 = new URL("./image.png?w=150&h=120", import.meta.url);
+const myImage1 = new URL("image.png?width=150&height=120", import.meta.url);
+const myImage2 = new URL("image.png?w=150&h=120", import.meta.url);
 // You can omit one of the parameters to auto-scale
-const myImage3 = new URL("./image.png?w=150", import.meta.url);
+const myImage3 = new URL("image.png?w=150", import.meta.url);
 // It works with the `preset` query parameter
-const myImage4 = new URL("./image.png?as=webp&w=150&h=120", import.meta.url);
+const myImage4 = new URL("image.png?as=webp&w=150&h=120", import.meta.url);
 // You can use `auto` to reset `width` or `height` from the `preset` option
-const myImage5 = new URL("./image.png?as=webp&w=150&h=auto", import.meta.url);
+const myImage5 = new URL("image.png?as=webp&w=150&h=auto", import.meta.url);
 ```
 
 ```css

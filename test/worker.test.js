@@ -25,7 +25,7 @@ function isPromise(obj) {
 
 describe("minify", () => {
   it("minify should be is function", () =>
-    expect(typeof worker === "function").toBe(true));
+    expect(worker).toBeInstanceOf(Function));
 
   it("should return `Promise`", () =>
     expect(

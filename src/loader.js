@@ -202,9 +202,9 @@ async function loader(content) {
   const output = await worker(minifyOptions);
 
   if (output.errors && output.errors.length > 0) {
-    output.errors.forEach((error) => {
+    for (const error of output.errors) {
       this.emitError(error);
-    });
+    }
 
     callback(null, content);
 
@@ -212,9 +212,9 @@ async function loader(content) {
   }
 
   if (output.warnings && output.warnings.length > 0) {
-    output.warnings.forEach((warning) => {
-      this.emitWarning(warning);
-    });
+    for (const warning of output.warnings) {
+      this.emitError(warning);
+    }
   }
 
   // Change content of the data URI after minimizer
@@ -235,9 +235,9 @@ async function loader(content) {
 
     if (parsedQuery) {
       // Remove query param from the bundle due we need that only for bundle purposes
-      ["as", "width", "w", "height", "h"].forEach((key) =>
-        parsedQuery.delete(key)
-      );
+      for (const key of ["as", "width", "w", "height", "h"]) {
+        parsedQuery.delete(key);
+      }
 
       query = parsedQuery.toString();
       query = query.length > 0 ? `?${query}` : "";
