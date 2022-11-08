@@ -13,6 +13,7 @@ const path = require("path");
 /**
  * @param {string} filename file path without query params (e.g. `path/img.png`)
  * @param {string} ext new file extension without `.` (e.g. `webp`)
+ * @returns {string} new filename `path/img.png` -> `path/img.webp`
  */
 function replaceFileExtension(filename, ext) {
   const dotIndex = filename.lastIndexOf(".");
