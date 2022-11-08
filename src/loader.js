@@ -248,6 +248,9 @@ async function loader(content) {
 
     // Change name of assets modules after generator
     if (this._module && !this._module.matchResource) {
+      // eslint-disable-next-line no-console
+      console.log(output.filename);
+
       this._module.matchResource = `${output.filename}${query}`;
     }
   }

@@ -153,7 +153,8 @@ describe("loader generator option", () => {
     expect(errors).toHaveLength(0);
   });
 
-  it("should generate the new webp image with other name using asset modules name", async () => {
+  // eslint-disable-next-line jest/no-focused-tests
+  it.only("should generate the new webp image with other name using asset modules name", async () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "./loader-single.js"),
       fileLoaderOff: true,
