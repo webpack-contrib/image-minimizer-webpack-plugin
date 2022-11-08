@@ -40,14 +40,6 @@ export type SharpOptions = {
   encodeOptions?: SharpEncodeOptions | undefined;
 };
 export type SizeSuffix = (width: number, height: number) => string;
-/** @typedef {import("./index").WorkerResult} WorkerResult */
-/** @typedef {import("./index").SquooshOptions} SquooshOptions */
-/** @typedef {import("imagemin").Options} ImageminOptions */
-/** @typedef {import("webpack").WebpackError} WebpackError */
-/**
- * @template T
- * @typedef {() => Promise<T>} Task
- */
 /**
  * Run tasks with limited concurrency.
  * @template T

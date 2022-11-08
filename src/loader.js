@@ -184,10 +184,12 @@ async function loader(content) {
     }
   }
 
-  const isAbsolute = isAbsoluteURL(this.resourcePath);
+  let isAbsolute = isAbsoluteURL(this.resourcePath);
+
   const filename = isAbsolute
     ? this.resourcePath
     : path.relative(this.rootContext, this.resourcePath);
+
   const minifyOptions =
     /** @type {import("./index").InternalWorkerOptions<T>} */ ({
       input: content,
@@ -243,6 +245,7 @@ async function loader(content) {
       query = query.length > 0 ? `?${query}` : "";
     }
 
+    isAbsolute = isAbsoluteURL(output.filename);
     // Old approach for `file-loader` and other old loaders
     changeResource(this, isAbsolute, output, query);
 

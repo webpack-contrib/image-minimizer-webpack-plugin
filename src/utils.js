@@ -11,6 +11,16 @@ const path = require("path");
  */
 
 /**
+ * @param {string} filename file path without query params (e.g. `path/img.png`)
+ * @param {string} ext new file extension without `.` (e.g. `webp`)
+ */
+function replaceFileExtension(filename, ext) {
+  const dotIndex = filename.lastIndexOf(".");
+
+  return dotIndex > -1 ? `${filename.slice(0, dotIndex)}.${ext}` : filename;
+}
+
+/**
  * Run tasks with limited concurrency.
  * @template T
  * @param {number} limit - Limit of tasks that run at once.
@@ -79,7 +89,7 @@ const WINDOWS_PATH_REGEX = /^[a-zA-Z]:\\/;
  */
 function isAbsoluteURL(url) {
   if (WINDOWS_PATH_REGEX.test(url)) {
-    return false;
+    return true;
   }
 
   return ABSOLUTE_URL_REGEX.test(url);
@@ -592,10 +602,7 @@ async function imageminGenerate(original, minimizerOptions) {
   let newFilename = original.filename;
 
   if (extOutput && extInput !== extOutput) {
-    newFilename = original.filename.replace(
-      new RegExp(`${extInput}$`),
-      `${extOutput}`
-    );
+    newFilename = replaceFileExtension(original.filename, extOutput);
   }
 
   return {
@@ -795,8 +802,7 @@ async function squooshGenerate(original, minifyOptions) {
   const { binary, extension } = await Object.values(image.encodedWith)[0];
   const { width, height } = (await image.decoded).bitmap;
 
-  const { dir: fileDir, name: fileName } = path.parse(original.filename);
-  const filename = path.join(fileDir, `${fileName}.${extension}`);
+  const filename = replaceFileExtension(original.filename, extension);
 
   return {
     filename,
@@ -1040,13 +1046,22 @@ async function sharpTransform(
   // ====== rename ======
 
   const outputExt = targetFormat ? outputFormat : inputExt;
-  const { dir: fileDir, name: fileName } = path.parse(original.filename);
   const { width, height } = result.info;
+
   const sizeSuffix =
     typeof minimizerOptions.sizeSuffix === "function"
       ? minimizerOptions.sizeSuffix(width, height)
       : "";
-  const filename = path.join(fileDir, `${fileName}${sizeSuffix}.${outputExt}`);
+
+  const dotIndex = original.filename.lastIndexOf(".");
+  const filename =
+    dotIndex > -1
+      ? `${original.filename.slice(0, dotIndex)}${sizeSuffix}.${outputExt}`
+      : original.filename;
+
+  // TODO use this then remove `sizeSuffix`
+  // const filename = replaceFileExtension(original.filename, outputExt);
+
   const processedFlag = targetFormat ? "generated" : "minimized";
   const processedBy = targetFormat ? "generatedBy" : "minimizedBy";
 
