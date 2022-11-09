@@ -16,9 +16,26 @@ const path = require("path");
  * @returns {string} new filename `path/img.png` -> `path/img.webp`
  */
 function replaceFileExtension(filename, ext) {
-  const dotIndex = filename.lastIndexOf(".");
+  let dotIndex = -1;
 
-  return dotIndex > -1 ? `${filename.slice(0, dotIndex)}.${ext}` : filename;
+  for (let i = filename.length - 1; i > -1; i--) {
+    const char = filename[i];
+
+    if (char === ".") {
+      dotIndex = i;
+      break;
+    }
+
+    if (char === "/" || char === "\\") {
+      break;
+    }
+  }
+
+  if (dotIndex === -1) {
+    return filename;
+  }
+
+  return `${filename.slice(0, dotIndex)}.${ext}`;
 }
 
 /**
@@ -83,17 +100,18 @@ function throttleAll(limit, tasks) {
 
 const ABSOLUTE_URL_REGEX = /^[a-zA-Z][a-zA-Z\d+\-.]*?:/;
 const WINDOWS_PATH_REGEX = /^[a-zA-Z]:\\/;
+const POSIX_PATH_REGEX = /^\//;
 
 /**
  * @param {string} url
  * @returns {boolean}
  */
 function isAbsoluteURL(url) {
-  if (WINDOWS_PATH_REGEX.test(url)) {
-    return true;
-  }
-
-  return ABSOLUTE_URL_REGEX.test(url);
+  return (
+    WINDOWS_PATH_REGEX.test(url) ||
+    POSIX_PATH_REGEX.test(url) ||
+    ABSOLUTE_URL_REGEX.test(url)
+  );
 }
 
 /**
@@ -1190,6 +1208,7 @@ async function svgoMinify(original, minimizerOptions) {
 module.exports = {
   throttleAll,
   isAbsoluteURL,
+  replaceFileExtension,
   imageminNormalizeConfig,
   imageminMinify,
   imageminGenerate,
