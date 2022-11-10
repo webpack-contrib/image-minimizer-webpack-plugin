@@ -40,14 +40,6 @@ export type SharpOptions = {
   encodeOptions?: SharpEncodeOptions | undefined;
 };
 export type SizeSuffix = (width: number, height: number) => string;
-/** @typedef {import("./index").WorkerResult} WorkerResult */
-/** @typedef {import("./index").SquooshOptions} SquooshOptions */
-/** @typedef {import("imagemin").Options} ImageminOptions */
-/** @typedef {import("webpack").WebpackError} WebpackError */
-/**
- * @template T
- * @typedef {() => Promise<T>} Task
- */
 /**
  * Run tasks with limited concurrency.
  * @template T
@@ -61,6 +53,20 @@ export function throttleAll<T>(limit: number, tasks: Task<T>[]): Promise<T[]>;
  * @returns {boolean}
  */
 export function isAbsoluteURL(url: string): boolean;
+/** @typedef {import("./index").WorkerResult} WorkerResult */
+/** @typedef {import("./index").SquooshOptions} SquooshOptions */
+/** @typedef {import("imagemin").Options} ImageminOptions */
+/** @typedef {import("webpack").WebpackError} WebpackError */
+/**
+ * @template T
+ * @typedef {() => Promise<T>} Task
+ */
+/**
+ * @param {string} filename file path without query params (e.g. `path/img.png`)
+ * @param {string} ext new file extension without `.` (e.g. `webp`)
+ * @returns {string} new filename `path/img.png` -> `path/img.webp`
+ */
+export function replaceFileExtension(filename: string, ext: string): string;
 /**
  * @template T
  * @param {ImageminOptions} imageminConfig

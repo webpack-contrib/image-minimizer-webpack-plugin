@@ -11,6 +11,34 @@ const path = require("path");
  */
 
 /**
+ * @param {string} filename file path without query params (e.g. `path/img.png`)
+ * @param {string} ext new file extension without `.` (e.g. `webp`)
+ * @returns {string} new filename `path/img.png` -> `path/img.webp`
+ */
+function replaceFileExtension(filename, ext) {
+  let dotIndex = -1;
+
+  for (let i = filename.length - 1; i > -1; i--) {
+    const char = filename[i];
+
+    if (char === ".") {
+      dotIndex = i;
+      break;
+    }
+
+    if (char === "/" || char === "\\") {
+      break;
+    }
+  }
+
+  if (dotIndex === -1) {
+    return filename;
+  }
+
+  return `${filename.slice(0, dotIndex)}.${ext}`;
+}
+
+/**
  * Run tasks with limited concurrency.
  * @template T
  * @param {number} limit - Limit of tasks that run at once.
@@ -72,17 +100,18 @@ function throttleAll(limit, tasks) {
 
 const ABSOLUTE_URL_REGEX = /^[a-zA-Z][a-zA-Z\d+\-.]*?:/;
 const WINDOWS_PATH_REGEX = /^[a-zA-Z]:\\/;
+const POSIX_PATH_REGEX = /^\//;
 
 /**
  * @param {string} url
  * @returns {boolean}
  */
 function isAbsoluteURL(url) {
-  if (WINDOWS_PATH_REGEX.test(url)) {
-    return false;
-  }
-
-  return ABSOLUTE_URL_REGEX.test(url);
+  return (
+    WINDOWS_PATH_REGEX.test(url) ||
+    POSIX_PATH_REGEX.test(url) ||
+    ABSOLUTE_URL_REGEX.test(url)
+  );
 }
 
 /**
@@ -592,10 +621,7 @@ async function imageminGenerate(original, minimizerOptions) {
   let newFilename = original.filename;
 
   if (extOutput && extInput !== extOutput) {
-    newFilename = original.filename.replace(
-      new RegExp(`${extInput}$`),
-      `${extOutput}`
-    );
+    newFilename = replaceFileExtension(original.filename, extOutput);
   }
 
   return {
@@ -795,8 +821,7 @@ async function squooshGenerate(original, minifyOptions) {
   const { binary, extension } = await Object.values(image.encodedWith)[0];
   const { width, height } = (await image.decoded).bitmap;
 
-  const { dir: fileDir, name: fileName } = path.parse(original.filename);
-  const filename = path.join(fileDir, `${fileName}.${extension}`);
+  const filename = replaceFileExtension(original.filename, extension);
 
   return {
     filename,
@@ -1040,13 +1065,22 @@ async function sharpTransform(
   // ====== rename ======
 
   const outputExt = targetFormat ? outputFormat : inputExt;
-  const { dir: fileDir, name: fileName } = path.parse(original.filename);
   const { width, height } = result.info;
+
   const sizeSuffix =
     typeof minimizerOptions.sizeSuffix === "function"
       ? minimizerOptions.sizeSuffix(width, height)
       : "";
-  const filename = path.join(fileDir, `${fileName}${sizeSuffix}.${outputExt}`);
+
+  const dotIndex = original.filename.lastIndexOf(".");
+  const filename =
+    dotIndex > -1
+      ? `${original.filename.slice(0, dotIndex)}${sizeSuffix}.${outputExt}`
+      : original.filename;
+
+  // TODO use this then remove `sizeSuffix`
+  // const filename = replaceFileExtension(original.filename, outputExt);
+
   const processedFlag = targetFormat ? "generated" : "minimized";
   const processedBy = targetFormat ? "generatedBy" : "minimizedBy";
 
@@ -1174,6 +1208,7 @@ async function svgoMinify(original, minimizerOptions) {
 module.exports = {
   throttleAll,
   isAbsoluteURL,
+  replaceFileExtension,
   imageminNormalizeConfig,
   imageminMinify,
   imageminGenerate,
