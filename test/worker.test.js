@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 
 import imagemin from "imagemin";
-import { ImagePool } from "@squoosh/lib";
 import imageminMozjpeg from "imagemin-mozjpeg";
 import imageminWebp from "imagemin-webp";
 import imageminSvgo from "imagemin-svgo";
@@ -734,6 +733,7 @@ describe("minify", () => {
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
 
+    const { ImagePool } = await import("@squoosh/lib");
     const imagePool = new ImagePool(1);
     const image = imagePool.ingestImage(new Uint8Array(input));
 
@@ -771,6 +771,7 @@ describe("minify", () => {
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(0);
 
+    const { ImagePool } = await import("@squoosh/lib");
     const imagePool = new ImagePool(1);
     const image = imagePool.ingestImage(new Uint8Array(input));
 
