@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    // "module": "node next",
+    // "module": "nodenext",
     "moduleResolution": "node",
     "allowJs": true,
     "checkJs": true,

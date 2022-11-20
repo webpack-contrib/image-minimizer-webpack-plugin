@@ -42,7 +42,8 @@
     "jpegtran",
     "libvips",
     "hspace",
-    "commitlint"
+    "commitlint",
+    "nodenext"
   ],
 
   "ignorePaths": [
