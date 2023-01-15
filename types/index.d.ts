@@ -227,7 +227,7 @@ type PluginOptions<T, G> = {
    */
   minimizer?:
     | (T extends any[]
-        ? T extends infer T_1
+        ? T extends infer T_1 extends any[]
           ? { [P in keyof T_1]: Minimizer<T[P]> }
           : never
         : Minimizer<T> | Minimizer<T>[])
@@ -237,7 +237,7 @@ type PluginOptions<T, G> = {
    */
   generator?:
     | (G extends any[]
-        ? G extends infer T_2
+        ? G extends infer T_2 extends any[]
           ? { [P_1 in keyof T_2]: Generator<G[P_1]> }
           : never
         : Generator<G>[])

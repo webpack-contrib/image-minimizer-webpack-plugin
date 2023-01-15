@@ -80,6 +80,7 @@
     "@commitlint/config-conventional": "^15.0.0",
     "@squoosh/lib": "^0.4.0",
     "@types/imagemin": "^8.0.0",
+    "@types/node": "^18.11.18",
     "@types/serialize-javascript": "^5.0.2",
     "@types/sharp": "^0.30.4",
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
@@ -122,7 +123,7 @@
     "standard-version": "^9.5.0",
     "svgo": "^3.0.2",
     "tempy": "^1.0.1",
-    "typescript": "^4.7.2",
+    "typescript": "^4.9.4",
     "url-loader": "^4.1.1",
     "webpack": "^5.75.0"
   },
