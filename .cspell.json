@@ -57,6 +57,9 @@
     "/test/outputs",
     "*.webp",
     "*.css",
-    "*.svg"
+    "*.svg",
+    "node_modules",
+    "coverage",
+    "*.log"
   ]
 }
