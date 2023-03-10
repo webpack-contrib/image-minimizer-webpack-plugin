@@ -650,7 +650,7 @@ describe("plugin minify option", () => {
 
   it("should work with 'sharpMinify' minifier and don't rename unsupported asset", async () => {
     const stats = await runWebpack({
-      entry: path.join(fixturesPath, "./svg-and-jpg.js"),
+      entry: path.join(fixturesPath, "./unknown-and-jpg.js"),
       fileLoaderOff: true,
       imageminPluginOptions: {
         minimizer: {
@@ -666,7 +666,7 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const originalAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("loader-test.svg")
+      asset.includes("loader-test.unknown")
     );
     const minifiedAsset = Object.keys(assets).filter((asset) =>
       asset.includes("minified-xxx-loader-test-yyy.jpg")
