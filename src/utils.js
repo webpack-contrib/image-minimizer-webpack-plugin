@@ -996,6 +996,7 @@ const SHARP_FORMATS = new Map([
   ["tif", "tiff"],
   ["tiff", "tiff"],
   ["webp", "webp"],
+  ["svg", "svg"],
 ]);
 
 /**
