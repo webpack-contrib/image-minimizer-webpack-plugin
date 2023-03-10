@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.8.2](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.8.1...v3.8.2) (2023-03-10)
+
+
+### Bug Fixes
+
+* support for generating images from `svg` (`sharp`) ([5076734](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/5076734ef843df125de765e8eb02ecf987ab839c))
+
 ### [3.8.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.8.0...v3.8.1) (2022-11-13)
 
 
