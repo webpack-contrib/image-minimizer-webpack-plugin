@@ -980,7 +980,26 @@ squooshMinify.teardown = squooshImagePoolTeardown;
  */
 
 // https://github.com/lovell/sharp/blob/e40a881ab4a5e7b0e37ba17e31b3b186aef8cbf6/lib/output.js#L7-L23
-const SHARP_FORMATS = new Map([
+const SHARP_GENERATE_FORMATS = new Map([
+  ["avif", "avif"],
+  ["gif", "gif"],
+  ["heic", "heif"],
+  ["heif", "heif"],
+  ["j2c", "jp2"],
+  ["j2k", "jp2"],
+  ["jp2", "jp2"],
+  ["jpeg", "jpeg"],
+  ["jpg", "jpeg"],
+  ["jpx", "jp2"],
+  ["png", "png"],
+  ["raw", "raw"],
+  ["tif", "tiff"],
+  ["tiff", "tiff"],
+  ["webp", "webp"],
+  ["svg", "svg"],
+]);
+
+const SHARP_MINIFY_FORMATS = new Map([
   ["avif", "avif"],
   ["gif", "gif"],
   ["heic", "heif"],
@@ -1011,7 +1030,11 @@ async function sharpTransform(
 ) {
   const inputExt = path.extname(original.filename).slice(1).toLowerCase();
 
-  if (!SHARP_FORMATS.has(inputExt)) {
+  if (
+    !targetFormat
+      ? !SHARP_MINIFY_FORMATS.has(inputExt)
+      : !SHARP_GENERATE_FORMATS.has(inputExt)
+  ) {
     if (targetFormat) {
       const error = new Error(
         `Error with '${original.filename}': Input file has an unsupported format`
