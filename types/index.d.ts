@@ -9,8 +9,7 @@ export = ImageMinimizerPlugin;
 /** @typedef {import("webpack").sources.Source} Source */
 /** @typedef {import("./utils.js").imageminMinify} ImageminMinifyFunction */
 /** @typedef {import("./utils.js").squooshMinify} SquooshMinifyFunction */
-/** @typedef {RegExp | string} Rule */
-/** @typedef {Rule[] | Rule} Rules */
+/** @typedef {string | RegExp | string[] | RegExp[]} Rule */
 /**
  * @callback FilterFn
  * @param {Buffer} source `Buffer` of source file.
@@ -120,9 +119,9 @@ export = ImageMinimizerPlugin;
 /**
  * @template T, G
  * @typedef {Object} PluginOptions
- * @property {Rules} [test] Test to match files against.
- * @property {Rules} [include] Files to include.
- * @property {Rules} [exclude] Files to exclude.
+ * @property {Rule} [test] Test to match files against.
+ * @property {Rule} [include] Files to include.
+ * @property {Rule} [exclude] Files to exclude.
  * @property {T extends any[] ? { [P in keyof T]: Minimizer<T[P]> } : Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
  * @property {G extends any[] ? { [P in keyof G]: Generator<G[P]> } : Generator<G>[]} [generator] Allows to set the generator.
  * @property {boolean} [loader] Automatically adding `imagemin-loader`.
@@ -186,7 +185,6 @@ declare namespace ImageMinimizerPlugin {
     ImageminMinifyFunction,
     SquooshMinifyFunction,
     Rule,
-    Rules,
     FilterFn,
     ImageminOptions,
     SquooshOptions,
@@ -213,15 +211,15 @@ type PluginOptions<T, G> = {
   /**
    * Test to match files against.
    */
-  test?: Rules | undefined;
+  test?: Rule | undefined;
   /**
    * Files to include.
    */
-  include?: Rules | undefined;
+  include?: Rule | undefined;
   /**
    * Files to exclude.
    */
-  exclude?: Rules | undefined;
+  exclude?: Rule | undefined;
   /**
    * Allows to setup the minimizer.
    */
@@ -278,8 +276,7 @@ type AssetInfo = import("webpack").AssetInfo;
 type Source = import("webpack").sources.Source;
 type ImageminMinifyFunction = typeof imageminMinify;
 type SquooshMinifyFunction = typeof squooshMinify;
-type Rule = RegExp | string;
-type Rules = Rule[] | Rule;
+type Rule = string | RegExp | string[] | RegExp[];
 type FilterFn = (source: Buffer, sourcePath: string) => boolean;
 type ImageminOptions = {
   plugins: Array<
