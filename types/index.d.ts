@@ -9,7 +9,8 @@ export = ImageMinimizerPlugin;
 /** @typedef {import("webpack").sources.Source} Source */
 /** @typedef {import("./utils.js").imageminMinify} ImageminMinifyFunction */
 /** @typedef {import("./utils.js").squooshMinify} SquooshMinifyFunction */
-/** @typedef {string | RegExp | string[] | RegExp[]} Rule */
+/** @typedef {RegExp | string} Rule */
+/** @typedef {Rule[] | Rule} Rules */
 /**
  * @callback FilterFn
  * @param {Buffer} source `Buffer` of source file.
@@ -185,6 +186,7 @@ declare namespace ImageMinimizerPlugin {
     ImageminMinifyFunction,
     SquooshMinifyFunction,
     Rule,
+    Rules,
     FilterFn,
     ImageminOptions,
     SquooshOptions,
@@ -276,7 +278,8 @@ type AssetInfo = import("webpack").AssetInfo;
 type Source = import("webpack").sources.Source;
 type ImageminMinifyFunction = typeof imageminMinify;
 type SquooshMinifyFunction = typeof squooshMinify;
-type Rule = string | RegExp | string[] | RegExp[];
+type Rule = RegExp | string;
+type Rules = Rule[] | Rule;
 type FilterFn = (source: Buffer, sourcePath: string) => boolean;
 type ImageminOptions = {
   plugins: Array<

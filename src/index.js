@@ -29,7 +29,8 @@ const {
 /** @typedef {import("./utils.js").imageminMinify} ImageminMinifyFunction */
 /** @typedef {import("./utils.js").squooshMinify} SquooshMinifyFunction */
 
-/** @typedef {string | RegExp | string[] | RegExp[]} Rule */
+/** @typedef {RegExp | string} Rule */
+/** @typedef {Rule[] | Rule} Rules */
 
 /**
  * @callback FilterFn
