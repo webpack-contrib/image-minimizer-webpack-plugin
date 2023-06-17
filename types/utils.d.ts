@@ -69,6 +69,12 @@ export function isAbsoluteURL(url: string): boolean;
 export function replaceFileExtension(filename: string, ext: string): string;
 /**
  * @template T
+ * @param fn {(function(): any) | undefined}
+ * @returns {function(): T}
+ */
+export function memoize<T>(fn: (() => any) | undefined): () => T;
+/**
+ * @template T
  * @param {ImageminOptions} imageminConfig
  * @returns {Promise<ImageminOptions>}
  */

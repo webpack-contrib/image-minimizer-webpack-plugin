@@ -2,12 +2,12 @@ const path = require("path");
 const os = require("os");
 
 const { validate } = require("schema-utils");
-const serialize = require("serialize-javascript");
 
 const worker = require("./worker");
 const schema = require("./plugin-options.json");
 const {
   throttleAll,
+  memoize,
   imageminNormalizeConfig,
   imageminMinify,
   imageminGenerate,
@@ -171,6 +171,8 @@ const {
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  */
 
+const getSerializeJavascript = memoize(() => require("serialize-javascript"));
+
 /**
  * @template T, [G=T]
  * @extends {WebpackPluginInstance}
@@ -276,7 +278,7 @@ class ImageMinimizerPlugin {
              * @returns {Promise<Task<Z>>}
              */
             const getFromCache = async (transformer) => {
-              const cacheName = serialize({ name, transformer });
+              const cacheName = getSerializeJavascript()({ name, transformer });
               const eTag = cache.getLazyHashedEtag(source);
               const cacheItem = cache.getItemCache(cacheName, eTag);
               const output = await cacheItem.getPromise();
