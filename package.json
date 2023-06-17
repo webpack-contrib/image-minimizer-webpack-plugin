@@ -69,7 +69,7 @@
     }
   },
   "dependencies": {
-    "schema-utils": "^4.0.1",
+    "schema-utils": "^4.2.0",
     "serialize-javascript": "^6.0.1"
   },
   "devDependencies": {

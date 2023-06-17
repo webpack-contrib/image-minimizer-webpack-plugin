@@ -477,6 +477,32 @@ function fileTypeFromBuffer(input) {
 }
 
 /**
+ * @template T
+ * @param fn {(function(): any) | undefined}
+ * @returns {function(): T}
+ */
+function memoize(fn) {
+  let cache = false;
+  /** @type {T} */
+  let result;
+
+  return () => {
+    if (cache) {
+      return result;
+    }
+
+    result = /** @type {function(): any} */ (fn)();
+    cache = true;
+    // Allow to clean up memory for fn
+    // and all dependent resources
+    // eslint-disable-next-line no-param-reassign
+    fn = undefined;
+
+    return result;
+  };
+}
+
+/**
  * @typedef {Object} MetaData
  * @property {Array<Error>} warnings
  * @property {Array<Error>} errors
@@ -1232,6 +1258,7 @@ module.exports = {
   throttleAll,
   isAbsoluteURL,
   replaceFileExtension,
+  memoize,
   imageminNormalizeConfig,
   imageminMinify,
   imageminGenerate,
