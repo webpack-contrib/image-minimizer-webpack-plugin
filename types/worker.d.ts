@@ -5,7 +5,7 @@ export = worker;
  * @returns {Promise<WorkerResult>}
  */
 declare function worker<T>(
-  options: import("./index").InternalWorkerOptions<T>
+  options: import("./index").InternalWorkerOptions<T>,
 ): Promise<WorkerResult>;
 declare namespace worker {
   export { WorkerResult, FilenameFn };

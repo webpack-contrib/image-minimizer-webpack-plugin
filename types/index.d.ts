@@ -78,56 +78,6 @@ declare namespace ImageMinimizerPlugin {
     PluginOptions,
   };
 }
-type PluginOptions<T, G> = {
-  /**
-   * Test to match files against.
-   */
-  test?: Rule | undefined;
-  /**
-   * Files to include.
-   */
-  include?: Rule | undefined;
-  /**
-   * Files to exclude.
-   */
-  exclude?: Rule | undefined;
-  /**
-   * Allows to setup the minimizer.
-   */
-  minimizer?:
-    | (T extends any[]
-        ? T extends infer T_1 extends any[]
-          ? { [P in keyof T_1]: Minimizer<T[P]> }
-          : never
-        : Minimizer<T> | Minimizer<T>[])
-    | undefined;
-  /**
-   * Allows to set the generator.
-   */
-  generator?:
-    | (G extends any[]
-        ? G extends infer T_2 extends any[]
-          ? { [P_1 in keyof T_2]: Generator<G[P_1]> }
-          : never
-        : Generator<G>[])
-    | undefined;
-  /**
-   * Automatically adding `imagemin-loader`.
-   */
-  loader?: boolean | undefined;
-  /**
-   * Maximum number of concurrency optimization processes in one time.
-   */
-  concurrency?: number | undefined;
-  /**
-   * Allows to choose how errors are displayed.
-   */
-  severityError?: string | undefined;
-  /**
-   * Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
-   */
-  deleteOriginalAssets?: boolean | undefined;
-};
 declare var loader: string;
 import { imageminNormalizeConfig } from "./utils.js";
 import { imageminMinify } from "./utils.js";
@@ -189,7 +139,7 @@ type ResizeOptions = {
 };
 type BasicTransformerImplementation<T> = (
   original: WorkerResult,
-  options?: BasicTransformerOptions<T>
+  options?: BasicTransformerOptions<T>,
 ) => Promise<WorkerResult | null>;
 type BasicTransformerHelpers = {
   setup?: (() => void) | undefined;
@@ -202,7 +152,7 @@ type PathData = {
 };
 type FilenameFn = (
   pathData: PathData,
-  assetInfo?: import("webpack").AssetInfo | undefined
+  assetInfo?: import("webpack").AssetInfo | undefined,
 ) => string;
 type Transformer<T> = {
   implementation: TransformerFunction<T>;
@@ -223,3 +173,49 @@ type InternalWorkerOptions<T> = {
   generateFilename?: Function | undefined;
 };
 type InternalLoaderOptions<T> = import("./loader").LoaderOptions<T>;
+type PluginOptions<T, G> = {
+  /**
+   * Test to match files against.
+   */
+  test?: Rule | undefined;
+  /**
+   * Files to include.
+   */
+  include?: Rule | undefined;
+  /**
+   * Files to exclude.
+   */
+  exclude?: Rule | undefined;
+  /**
+   * Allows to setup the minimizer.
+   */
+  minimizer?:
+    | (T extends any[]
+        ? { [P in keyof T]: Minimizer<T[P]> }
+        : Minimizer<T> | Minimizer<T>[])
+    | undefined;
+  /**
+   * Allows to set the generator.
+   */
+  generator?:
+    | (G extends any[]
+        ? { [P_1 in keyof G]: Generator<G[P_1]> }
+        : Generator<G>[])
+    | undefined;
+  /**
+   * Automatically adding `imagemin-loader`.
+   */
+  loader?: boolean | undefined;
+  /**
+   * Maximum number of concurrency optimization processes in one time.
+   */
+  concurrency?: number | undefined;
+  /**
+   * Allows to choose how errors are displayed.
+   */
+  severityError?: string | undefined;
+  /**
+   * Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+   */
+  deleteOriginalAssets?: boolean | undefined;
+};
