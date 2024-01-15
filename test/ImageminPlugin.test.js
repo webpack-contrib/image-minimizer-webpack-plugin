@@ -5,7 +5,7 @@ import webpack from "webpack";
 
 import fileType from "file-type";
 
-import tempy from "tempy";
+import { temporaryDirectory } from "tempy";
 import pify from "pify";
 import {
   fixturesPath,
@@ -2225,7 +2225,7 @@ describe("imagemin plugin", () => {
         entry: path.join(fixturesPath, "generator-and-minimizer-4.js"),
         cache: {
           type: "filesystem",
-          cacheLocation: tempy.directory(),
+          cacheLocation: temporaryDirectory(),
         },
         copyPlugin: true,
         imageminPluginOptions: {
