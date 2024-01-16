@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 
 import pify from "pify";
-import { fileTypeFromFile } from "file-type";
+import fileType from "file-type";
 
 import {
   fixturesPath,
@@ -417,7 +417,7 @@ describe("loader", () => {
       compilation.options.output.path,
       "./loader-test.webp",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
@@ -454,7 +454,7 @@ describe("loader", () => {
         compilation.options.output.path,
         "./loader-test.webp",
       );
-      const ext = await fileTypeFromFile(file);
+      const ext = await fileType.fromFile(file);
 
       expect(/image\/webp/i.test(ext.mime)).toBe(true);
     },
@@ -493,7 +493,7 @@ describe("loader", () => {
         compilation.options.output.path,
         "loader-test.webp",
       );
-      const ext = await fileTypeFromFile(file);
+      const ext = await fileType.fromFile(file);
 
       expect(/image\/webp/i.test(ext.mime)).toBe(true);
     },
@@ -530,7 +530,7 @@ describe("loader", () => {
       compilation.options.output.path,
       "loader-test.webp",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });

@@ -7,7 +7,7 @@ import imageminMozjpeg from "imagemin-mozjpeg";
 import imageminPngquant from "imagemin-pngquant";
 import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
-import { temporaryDirectory } from "tempy";
+import tempy from "tempy";
 import webpack from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CopyPlugin from "copy-webpack-plugin";
@@ -134,7 +134,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
         path:
           options.output && options.output.path
             ? options.output.path
-            : temporaryDirectory(),
+            : tempy.directory(),
       },
       plugins: [],
     };

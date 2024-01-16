@@ -1,6 +1,6 @@
 import path from "path";
 import { promisify } from "util";
-import { fileTypeFromFile } from "file-type";
+import fileType from "file-type";
 import imageSize from "image-size";
 import ImageMinimizerPlugin from "../src";
 
@@ -38,7 +38,7 @@ describe("loader generator option", () => {
       "./nested/deep/loader-test.webp",
     );
 
-    const transformedExt = await fileTypeFromFile(transformedAsset);
+    const transformedExt = await fileType.fromFile(transformedAsset);
 
     expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
     expect(warnings).toHaveLength(0);
@@ -146,7 +146,7 @@ describe("loader generator option", () => {
       "foo-loader-test.webp",
     );
 
-    const transformedExt = await fileTypeFromFile(transformedAsset);
+    const transformedExt = await fileType.fromFile(transformedAsset);
 
     expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
     expect(warnings).toHaveLength(0);
@@ -185,7 +185,7 @@ describe("loader generator option", () => {
       "foo-loader-test.webp",
     );
 
-    const transformedExt = await fileTypeFromFile(transformedAsset);
+    const transformedExt = await fileType.fromFile(transformedAsset);
 
     expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
     expect(warnings).toHaveLength(0);
@@ -231,7 +231,7 @@ describe("loader generator option", () => {
         "./nested/deep/loader-test.webp",
       );
 
-      const transformedExt = await fileTypeFromFile(transformedAsset);
+      const transformedExt = await fileType.fromFile(transformedAsset);
       const sizeOf = promisify(imageSize);
       const dimensions = await sizeOf(transformedAsset);
 
@@ -282,7 +282,7 @@ describe("loader generator option", () => {
         "./nested/deep/loader-test.webp",
       );
 
-      const transformedExt = await fileTypeFromFile(transformedAsset);
+      const transformedExt = await fileType.fromFile(transformedAsset);
       const sizeOf = promisify(imageSize);
       const dimensions = await sizeOf(transformedAsset);
 
@@ -328,7 +328,7 @@ describe("loader generator option", () => {
       "./nested/deep/loader-test.webp",
     );
 
-    const transformedExt = await fileTypeFromFile(transformedAsset);
+    const transformedExt = await fileType.fromFile(transformedAsset);
     const sizeOf = promisify(imageSize);
     const dimensions = await sizeOf(transformedAsset);
 
@@ -373,7 +373,7 @@ describe("loader generator option", () => {
       "./nested/deep/loader-test.webp",
     );
 
-    const transformedExt = await fileTypeFromFile(transformedAsset);
+    const transformedExt = await fileType.fromFile(transformedAsset);
     const sizeOf = promisify(imageSize);
     const dimensions = await sizeOf(transformedAsset);
 
@@ -409,7 +409,7 @@ describe("loader generator option", () => {
       "./sharp-minify-loader-test-1x1.jpg",
     );
 
-    const transformedExt = await fileTypeFromFile(transformedAsset);
+    const transformedExt = await fileType.fromFile(transformedAsset);
 
     expect(/image\/jpeg/i.test(transformedExt.mime)).toBe(true);
     expect(warnings).toHaveLength(0);
@@ -451,7 +451,7 @@ describe("loader generator option", () => {
       "./sharp-generate-loader-test-100x50.webp",
     );
 
-    const transformedExt = await fileTypeFromFile(transformedAsset);
+    const transformedExt = await fileType.fromFile(transformedAsset);
     const sizeOf = promisify(imageSize);
     const dimensions = await sizeOf(transformedAsset);
 
@@ -487,7 +487,7 @@ describe("loader generator option", () => {
       "./sharp-minify-loader-test-1x1.jpg",
     );
 
-    const transformedExt = await fileTypeFromFile(transformedAsset);
+    const transformedExt = await fileType.fromFile(transformedAsset);
 
     expect(/image\/jpeg/i.test(transformedExt.mime)).toBe(true);
     expect(warnings).toHaveLength(0);
@@ -529,7 +529,7 @@ describe("loader generator option", () => {
       "./sharp-generate-loader-test-100x50.webp",
     );
 
-    const transformedExt = await fileTypeFromFile(transformedAsset);
+    const transformedExt = await fileType.fromFile(transformedAsset);
     const sizeOf = promisify(imageSize);
     const dimensions = await sizeOf(transformedAsset);
 

@@ -1,6 +1,6 @@
 import path from "path";
 
-import { fileTypeFromFile } from "file-type";
+import fileType from "file-type";
 import ImageMinimizerPlugin from "../src";
 
 import {
@@ -512,7 +512,7 @@ describe("plugin minify option", () => {
       compilation.options.output.path,
       "./nested/deep/plugin-test.png",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
@@ -544,7 +544,7 @@ describe("plugin minify option", () => {
       compilation.options.output.path,
       "plugin-test.png",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
@@ -576,7 +576,7 @@ describe("plugin minify option", () => {
       compilation.options.output.path,
       "./nested/deep/plugin-test.png",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
@@ -608,7 +608,7 @@ describe("plugin minify option", () => {
       compilation.options.output.path,
       "./other/plugin-test.png",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
@@ -640,7 +640,7 @@ describe("plugin minify option", () => {
       compilation.options.output.path,
       "./other/plugin-test.png",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);

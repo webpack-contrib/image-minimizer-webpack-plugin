@@ -1,6 +1,6 @@
 import path from "path";
 import { promisify } from "util";
-import { fileTypeFromFile } from "file-type";
+import fileType from "file-type";
 import imageSize from "image-size";
 import ImageMinimizerPlugin from "../src";
 
@@ -79,7 +79,7 @@ describe("resize query (sharp)", () => {
       );
 
       // eslint-disable-next-line no-await-in-loop
-      const transformedExt = await fileTypeFromFile(transformedAsset);
+      const transformedExt = await fileType.fromFile(transformedAsset);
       // eslint-disable-next-line no-await-in-loop
       const dimensions = await sizeOf(transformedAsset);
 
@@ -153,7 +153,7 @@ describe("resize query (sharp)", () => {
       );
 
       // eslint-disable-next-line no-await-in-loop
-      const transformedExt = await fileTypeFromFile(transformedAsset);
+      const transformedExt = await fileType.fromFile(transformedAsset);
       // eslint-disable-next-line no-await-in-loop
       const dimensions = await sizeOf(transformedAsset);
 
@@ -239,7 +239,7 @@ describe("resize query (squoosh)", () => {
         );
 
         // eslint-disable-next-line no-await-in-loop
-        const transformedExt = await fileTypeFromFile(transformedAsset);
+        const transformedExt = await fileType.fromFile(transformedAsset);
         // eslint-disable-next-line no-await-in-loop
         const dimensions = await sizeOf(transformedAsset);
 
@@ -316,7 +316,7 @@ describe("resize query (squoosh)", () => {
         );
 
         // eslint-disable-next-line no-await-in-loop
-        const transformedExt = await fileTypeFromFile(transformedAsset);
+        const transformedExt = await fileType.fromFile(transformedAsset);
         // eslint-disable-next-line no-await-in-loop
         const dimensions = await sizeOf(transformedAsset);
 

@@ -1,12 +1,10 @@
 import path from "path";
-
 import fs from "fs";
 import webpack from "webpack";
-
-import { fileTypeFromFile } from "file-type";
-
-import { temporaryDirectory } from "tempy";
+import fileType from "file-type";
+import tempy from "tempy";
 import pify from "pify";
+
 import {
   fixturesPath,
   isOptimized,
@@ -769,10 +767,10 @@ describe("imagemin plugin", () => {
     expect(secondWarnings).toHaveLength(0);
     expect(secondErrors).toHaveLength(0);
 
-    const extLoaderWebp = await fileTypeFromFile(
+    const extLoaderWebp = await fileType.fromFile(
       path.resolve(outputDir, "loader-test.webp"),
     );
-    const extLoaderJpg = await fileTypeFromFile(
+    const extLoaderJpg = await fileType.fromFile(
       path.resolve(outputDir, "plugin-test.jpg"),
     );
 
@@ -932,7 +930,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.webp",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
 
@@ -996,7 +994,7 @@ describe("imagemin plugin", () => {
         compilation.options.output.path,
         "./loader-test.webp",
       );
-      const ext = await fileTypeFromFile(file);
+      const ext = await fileType.fromFile(file);
 
       expect(/image\/webp/i.test(ext.mime)).toBe(true);
 
@@ -1175,7 +1173,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.webp",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
 
@@ -1221,7 +1219,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.avif",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/avif/i.test(ext.mime)).toBe(true);
   });
@@ -1253,7 +1251,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.webp",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
@@ -1291,7 +1289,7 @@ describe("imagemin plugin", () => {
         compilation.options.output.path,
         "./loader-test.webp",
       );
-      const ext = await fileTypeFromFile(file);
+      const ext = await fileType.fromFile(file);
 
       expect(/image\/webp/i.test(ext.mime)).toBe(true);
     },
@@ -1438,7 +1436,7 @@ describe("imagemin plugin", () => {
       "./loader-test.webp",
     );
 
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
 
@@ -1516,7 +1514,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./generated-loader-test.webp",
     );
-    const ext = await fileTypeFromFile(webpAsset);
+    const ext = await fileType.fromFile(webpAsset);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
 
@@ -1525,7 +1523,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./generated-PNG_transparency_demonstration_1.webp",
     );
-    const ext1 = await fileTypeFromFile(webpAsset1);
+    const ext1 = await fileType.fromFile(webpAsset1);
 
     expect(/image\/webp/i.test(ext1.mime)).toBe(true);
 
@@ -1534,7 +1532,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./generated-Example.webp",
     );
-    const ext2 = await fileTypeFromFile(webpAsset2);
+    const ext2 = await fileType.fromFile(webpAsset2);
 
     expect(/image\/webp/i.test(ext2.mime)).toBe(true);
 
@@ -1617,7 +1615,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./generated-loader-test.webp",
     );
-    const ext = await fileTypeFromFile(webpAsset);
+    const ext = await fileType.fromFile(webpAsset);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
 
@@ -1679,7 +1677,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.png",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
   });
@@ -1814,7 +1812,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.avif",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/avif/i.test(ext.mime)).toBe(true);
   });
@@ -1848,7 +1846,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.avif",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/avif/i.test(ext.mime)).toBe(true);
   });
@@ -1881,7 +1879,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.avif",
     );
-    const loaderExt = await fileTypeFromFile(loaderFile);
+    const loaderExt = await fileType.fromFile(loaderFile);
 
     expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
   });
@@ -1924,7 +1922,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.avif",
     );
-    const loaderExt = await fileTypeFromFile(loaderFile);
+    const loaderExt = await fileType.fromFile(loaderFile);
 
     expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
 
@@ -1933,7 +1931,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.avif",
     );
-    const pluginExt = await fileTypeFromFile(pluginFile);
+    const pluginExt = await fileType.fromFile(pluginFile);
 
     expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
   });
@@ -1978,7 +1976,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.avif",
     );
-    const loaderExt = await fileTypeFromFile(loaderFile);
+    const loaderExt = await fileType.fromFile(loaderFile);
 
     expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
 
@@ -1987,7 +1985,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.avif",
     );
-    const pluginExt = await fileTypeFromFile(pluginFile);
+    const pluginExt = await fileType.fromFile(pluginFile);
 
     expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
   });
@@ -2038,7 +2036,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.avif",
     );
-    const loaderExt = await fileTypeFromFile(loaderFile);
+    const loaderExt = await fileType.fromFile(loaderFile);
 
     expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
 
@@ -2047,7 +2045,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.avif",
     );
-    const pluginExt = await fileTypeFromFile(pluginFile);
+    const pluginExt = await fileType.fromFile(pluginFile);
 
     expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
 
@@ -2110,7 +2108,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.avif",
     );
-    const loaderExt = await fileTypeFromFile(loaderFile);
+    const loaderExt = await fileType.fromFile(loaderFile);
 
     expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
 
@@ -2119,7 +2117,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.avif",
     );
-    const pluginExt = await fileTypeFromFile(pluginFile);
+    const pluginExt = await fileType.fromFile(pluginFile);
 
     expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
 
@@ -2128,7 +2126,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.webp",
     );
-    const pluginWebExt = await fileTypeFromFile(pluginWebp);
+    const pluginWebExt = await fileType.fromFile(pluginWebp);
 
     expect(/image\/webp/i.test(pluginWebExt.mime)).toBe(true);
 
@@ -2207,7 +2205,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.avif",
     );
-    const loaderExt = await fileTypeFromFile(loaderFile);
+    const loaderExt = await fileType.fromFile(loaderFile);
 
     expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
 
@@ -2216,7 +2214,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.avif",
     );
-    const pluginExt = await fileTypeFromFile(pluginFile);
+    const pluginExt = await fileType.fromFile(pluginFile);
 
     expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
 
@@ -2225,7 +2223,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.webp",
     );
-    const pluginWebExt = await fileTypeFromFile(pluginWebp);
+    const pluginWebExt = await fileType.fromFile(pluginWebp);
 
     expect(/image\/webp/i.test(pluginWebExt.mime)).toBe(true);
 
@@ -2240,7 +2238,7 @@ describe("imagemin plugin", () => {
         entry: path.join(fixturesPath, "generator-and-minimizer-4.js"),
         cache: {
           type: "filesystem",
-          cacheLocation: temporaryDirectory(),
+          cacheLocation: tempy.directory(),
         },
         copyPlugin: true,
         imageminPluginOptions: {
@@ -2296,7 +2294,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.avif",
     );
-    const loaderExt = await fileTypeFromFile(loaderFile);
+    const loaderExt = await fileType.fromFile(loaderFile);
 
     expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
 
@@ -2305,7 +2303,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.avif",
     );
-    const pluginExt = await fileTypeFromFile(pluginFile);
+    const pluginExt = await fileType.fromFile(pluginFile);
 
     expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
 
@@ -2314,7 +2312,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.webp",
     );
-    const pluginWebExt = await fileTypeFromFile(pluginWebp);
+    const pluginWebExt = await fileType.fromFile(pluginWebp);
 
     expect(/image\/webp/i.test(pluginWebExt.mime)).toBe(true);
 
@@ -2367,7 +2365,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.webp",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
@@ -2413,7 +2411,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.webp",
     );
-    const webpExt = await fileTypeFromFile(webpFile);
+    const webpExt = await fileType.fromFile(webpFile);
 
     expect(/image\/webp/i.test(webpExt.mime)).toBe(true);
 
@@ -2422,7 +2420,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./plugin-test.jpg",
     );
-    const extJpg = await fileTypeFromFile(fileJpg);
+    const extJpg = await fileType.fromFile(fileJpg);
 
     expect(/image\/jpeg/i.test(extJpg.mime)).toBe(true);
 
@@ -2484,7 +2482,7 @@ describe("imagemin plugin", () => {
     //   compilation.options.output.path,
     //   "./url.png"
     // );
-    // const pngExt = await fileTypeFromFile(pngFile);
+    // const pngExt = await fileType.fromFile(pngFile);
     //
     // expect(/image\/png/i.test(pngExt.mime)).toBe(true);
     //
@@ -2493,7 +2491,7 @@ describe("imagemin plugin", () => {
     //   compilation.options.output.path,
     //   "./url.webp"
     // );
-    // const webpExt = await fileTypeFromFile(webpFile);
+    // const webpExt = await fileType.fromFile(webpFile);
     //
     // expect(/image\/webp/i.test(webpExt.mime)).toBe(true);
     //
@@ -2603,7 +2601,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./loader-test.webp",
     );
-    const ext = await fileTypeFromFile(file);
+    const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
