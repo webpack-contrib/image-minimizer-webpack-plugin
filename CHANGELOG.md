@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.8.3...v4.0.0) (2024-01-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* minimum supported Node.js version is `18.12.0` ([d3f2531](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/d3f2531241c04e6115dfb7bab3baef1e04da3410))
+
 ### [3.8.3](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.8.2...v3.8.3) (2023-06-17)
 
 
