@@ -548,7 +548,9 @@ async function imageminNormalizeConfig(imageminConfig) {
       const pluginOptions = isPluginArray ? plugin[1] : undefined;
 
       let requiredPlugin = null;
-      let requiredPluginName = `imagemin-${pluginName}`;
+      let requiredPluginName = pluginName.startsWith("imagemin")
+        ? pluginName
+        : `imagemin-${pluginName}`;
 
       try {
         // @ts-ignore
@@ -565,13 +567,14 @@ async function imageminNormalizeConfig(imageminConfig) {
           requiredPlugin = (await import(requiredPluginName)).default(
             pluginOptions,
           );
-        } catch {
+        } catch (error) {
           const pluginNameForError = pluginName.startsWith("imagemin")
             ? pluginName
             : `imagemin-${pluginName}`;
 
           throw new Error(
             `Unknown plugin: ${pluginNameForError}\n\nDid you forget to install the plugin?\nYou can install it with:\n\n$ npm install ${pluginNameForError} --save-dev\n$ yarn add ${pluginNameForError} --dev`,
+            { cause: error },
           );
         }
         // Nothing

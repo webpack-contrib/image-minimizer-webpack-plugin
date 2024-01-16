@@ -109,7 +109,7 @@
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-pngquant": "^9.0.2",
     "imagemin-svgo": "^10.0.1",
-    "imagemin-webp": "^8.0.0",
+    "imagemin-webp": "^6.1.0",
     "jest": "^29.7.0",
     "lint-staged": "^15.2.0",
     "memfs": "^4.6.0",
