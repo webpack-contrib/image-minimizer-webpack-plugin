@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 
 import pify from "pify";
-import fileType from "file-type";
+import { fileTypeFromFile } from "file-type";
 
 import {
   fixturesPath,
@@ -33,16 +33,16 @@ describe("loader", () => {
     expect(errors).toHaveLength(0);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -65,30 +65,30 @@ describe("loader", () => {
     expect(Object.keys(assets)).toHaveLength(7);
 
     const txtBuffer = await pify(fs.readFile)(
-      path.join(compilation.options.output.path, "loader-test.txt")
+      path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await pify(fs.readFile)(
-      path.join(compilation.options.output.path, "loader-test.css")
+      path.join(compilation.options.output.path, "loader-test.css"),
     );
 
     expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
-      "a {\n  color: red;\n}\n"
+      "a {\n  color: red;\n}\n",
     );
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -119,30 +119,30 @@ describe("loader", () => {
     expect(Object.keys(assets)).toContain("loader-test.webp");
 
     const txtBuffer = await pify(fs.readFile)(
-      path.join(compilation.options.output.path, "loader-test.txt")
+      path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await pify(fs.readFile)(
-      path.join(compilation.options.output.path, "loader-test.css")
+      path.join(compilation.options.output.path, "loader-test.css"),
     );
 
     expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
-      "a {\n  color: red;\n}\n"
+      "a {\n  color: red;\n}\n",
     );
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -174,32 +174,32 @@ describe("loader", () => {
       expect(Object.keys(assets)).toHaveLength(7);
 
       const txtBuffer = await pify(fs.readFile)(
-        path.join(compilation.options.output.path, "loader-test.txt")
+        path.join(compilation.options.output.path, "loader-test.txt"),
       );
 
       expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
       const cssBuffer = await pify(fs.readFile)(
-        path.join(compilation.options.output.path, "loader-test.css")
+        path.join(compilation.options.output.path, "loader-test.css"),
       );
 
       expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
-        "a {\n  color: red;\n}\n"
+        "a {\n  color: red;\n}\n",
       );
 
       await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-        false
+        false,
       );
       await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-        false
+        false,
       );
       await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-        false
+        false,
       );
       await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-        false
+        false,
       );
-    }
+    },
   );
 
   ifit(needSquooshTest)(
@@ -246,32 +246,32 @@ describe("loader", () => {
       expect(Object.keys(assets)).toContain("loader-test.webp");
 
       const txtBuffer = await pify(fs.readFile)(
-        path.join(compilation.options.output.path, "loader-test.txt")
+        path.join(compilation.options.output.path, "loader-test.txt"),
       );
 
       expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
       const cssBuffer = await pify(fs.readFile)(
-        path.join(compilation.options.output.path, "loader-test.css")
+        path.join(compilation.options.output.path, "loader-test.css"),
       );
 
       expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
-        "a {\n  color: red;\n}\n"
+        "a {\n  color: red;\n}\n",
       );
 
       await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-        false
+        false,
       );
       await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-        false
+        false,
       );
       await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-        false
+        false,
       );
       await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-        false
+        false,
       );
-    }
+    },
   );
 
   it("should optimizes all images and don't break non images ('sharpMinify')", async () => {
@@ -292,30 +292,30 @@ describe("loader", () => {
     expect(Object.keys(assets)).toHaveLength(7);
 
     const txtBuffer = await pify(fs.readFile)(
-      path.join(compilation.options.output.path, "loader-test.txt")
+      path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await pify(fs.readFile)(
-      path.join(compilation.options.output.path, "loader-test.css")
+      path.join(compilation.options.output.path, "loader-test.css"),
     );
 
     expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
-      "a {\n  color: red;\n}\n"
+      "a {\n  color: red;\n}\n",
     );
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      false
+      false,
     );
   });
 
@@ -361,30 +361,30 @@ describe("loader", () => {
     expect(Object.keys(assets)).toContain("loader-test.webp");
 
     const txtBuffer = await pify(fs.readFile)(
-      path.join(compilation.options.output.path, "loader-test.txt")
+      path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await pify(fs.readFile)(
-      path.join(compilation.options.output.path, "loader-test.css")
+      path.join(compilation.options.output.path, "loader-test.css"),
     );
 
     expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
-      "a {\n  color: red;\n}\n"
+      "a {\n  color: red;\n}\n",
     );
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      false
+      false,
     );
   });
 
@@ -415,9 +415,9 @@ describe("loader", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.webp"
+      "./loader-test.webp",
     );
-    const ext = await fileType.fromFile(file);
+    const ext = await fileTypeFromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
@@ -452,12 +452,12 @@ describe("loader", () => {
       const file = path.resolve(
         __dirname,
         compilation.options.output.path,
-        "./loader-test.webp"
+        "./loader-test.webp",
       );
-      const ext = await fileType.fromFile(file);
+      const ext = await fileTypeFromFile(file);
 
       expect(/image\/webp/i.test(ext.mime)).toBe(true);
-    }
+    },
   );
 
   ifit(needSquooshTest)(
@@ -491,12 +491,12 @@ describe("loader", () => {
       const file = path.resolve(
         __dirname,
         compilation.options.output.path,
-        "loader-test.webp"
+        "loader-test.webp",
       );
-      const ext = await fileType.fromFile(file);
+      const ext = await fileTypeFromFile(file);
 
       expect(/image\/webp/i.test(ext.mime)).toBe(true);
-    }
+    },
   );
 
   it("should optimizes and generate images (sharpGenerate)", async () => {
@@ -528,9 +528,9 @@ describe("loader", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "loader-test.webp"
+      "loader-test.webp",
     );
-    const ext = await fileType.fromFile(file);
+    const ext = await fileTypeFromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
@@ -547,7 +547,7 @@ describe("loader", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(4);
     expect(errors[0].message).toMatch(
-      /Not configured 'minimizer' or 'generator' options, please setup them/
+      /Not configured 'minimizer' or 'generator' options, please setup them/,
     );
   });
 
@@ -563,7 +563,7 @@ describe("loader", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(4);
     expect(errors[0].message).toMatch(
-      /Not configured 'minimizer' or 'generator' options, please setup them/
+      /Not configured 'minimizer' or 'generator' options, please setup them/,
     );
   });
 });

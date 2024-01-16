@@ -24,49 +24,49 @@ describe("utils", () => {
 
     expect(replaceFileExtension("/user/img.jpg", "png")).toBe("/user/img.png");
     expect(replaceFileExtension("file:///user/img.jpg", "png")).toBe(
-      "file:///user/img.png"
+      "file:///user/img.png",
     );
     expect(replaceFileExtension("C:\\user\\img.jpg", "png")).toBe(
-      "C:\\user\\img.png"
+      "C:\\user\\img.png",
     );
 
     expect(replaceFileExtension("user/img.jpg", "png")).toBe("user/img.png");
     expect(replaceFileExtension("user\\img.jpg", "png")).toBe("user\\img.png");
 
     expect(replaceFileExtension("/user/img.jpg.gz", "png")).toBe(
-      "/user/img.jpg.png"
+      "/user/img.jpg.png",
     );
     expect(replaceFileExtension("file:///user/img.jpg.gz", "png")).toBe(
-      "file:///user/img.jpg.png"
+      "file:///user/img.jpg.png",
     );
     expect(replaceFileExtension("C:\\user\\img.jpg.gz", "png")).toBe(
-      "C:\\user\\img.jpg.png"
+      "C:\\user\\img.jpg.png",
     );
 
     expect(replaceFileExtension("/user/img", "png")).toBe("/user/img");
     expect(replaceFileExtension("file:///user/img", "png")).toBe(
-      "file:///user/img"
+      "file:///user/img",
     );
     expect(replaceFileExtension("C:\\user\\img", "png")).toBe("C:\\user\\img");
 
     expect(replaceFileExtension("/user/.img", "png")).toBe("/user/.png");
     expect(replaceFileExtension("file:///user/.img", "png")).toBe(
-      "file:///user/.png"
+      "file:///user/.png",
     );
     expect(replaceFileExtension("C:\\user\\.img", "png")).toBe(
-      "C:\\user\\.png"
+      "C:\\user\\.png",
     );
 
     expect(replaceFileExtension("/use.r/img", "png")).toBe("/use.r/img");
     expect(replaceFileExtension("file:///use.r/img", "png")).toBe(
-      "file:///use.r/img"
+      "file:///use.r/img",
     );
     expect(replaceFileExtension("C:\\use.r\\img", "png")).toBe(
-      "C:\\use.r\\img"
+      "C:\\use.r\\img",
     );
 
     expect(replaceFileExtension("C:\\user/img.jpg", "png")).toBe(
-      "C:\\user/img.png"
+      "C:\\user/img.png",
     );
   });
 });

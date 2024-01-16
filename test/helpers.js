@@ -92,7 +92,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
                   test: /child-compilation\.js$/,
                   loader: path.resolve(
                     __dirname,
-                    "./fixtures/emit-asset-in-child-compilation-loader.js"
+                    "./fixtures/emit-asset-in-child-compilation-loader.js",
                   ),
                 },
               ]
@@ -103,7 +103,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
                   test: /simple-emit\.js$/,
                   loader: path.resolve(
                     __dirname,
-                    "./fixtures/emitAssetLoader.js"
+                    "./fixtures/emitAssetLoader.js",
                   ),
                 },
               ]
@@ -187,7 +187,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
                   plugins,
                 },
               }
-            : imageminPluginOptions
+            : imageminPluginOptions,
         );
 
         if (options.asMinimizer) {
@@ -273,12 +273,12 @@ function isOptimized(originalPath, compilation) {
           imageminPngquant(),
           imageminSvgo(),
         ],
-      })
+      }),
     )
     .then((optimizedBuffer) =>
       Promise.resolve()
         .then(() => pify(fs.readFile)(pathToEmitted))
-        .then((emmitedBuffer) => optimizedBuffer.equals(emmitedBuffer))
+        .then((emmitedBuffer) => optimizedBuffer.equals(emmitedBuffer)),
     );
 }
 
@@ -291,7 +291,7 @@ function hasLoader(id, modules) {
     const { loaders } = module;
 
     return loaders.find(
-      (loader) => loader.loader === ImageMinimizerPlugin.loader
+      (loader) => loader.loader === ImageMinimizerPlugin.loader,
     );
   });
 }
@@ -397,11 +397,11 @@ export default class EmitNewAssetPlugin {
         () => {
           // eslint-disable-next-line node/no-sync
           const file = fs.readFileSync(
-            path.resolve(__dirname, "fixtures", "newImg.png")
+            path.resolve(__dirname, "fixtures", "newImg.png"),
           );
 
           compilation.emitAsset(this.options.name, new RawSource(file));
-        }
+        },
       );
     });
   }

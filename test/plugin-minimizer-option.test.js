@@ -1,6 +1,6 @@
 import path from "path";
 
-import fileType from "file-type";
+import { fileTypeFromFile } from "file-type";
 import ImageMinimizerPlugin from "../src";
 
 import {
@@ -33,7 +33,7 @@ describe("plugin minify option", () => {
     const { warnings, errors } = compilation;
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
 
     expect(warnings).toHaveLength(0);
@@ -56,11 +56,11 @@ describe("plugin minify option", () => {
       const { warnings, errors } = compilation;
 
       expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(
-        353
+        353,
       );
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(0);
-    }
+    },
   );
 
   it('should work with "sharpMinify" minifier', async () => {
@@ -112,7 +112,7 @@ describe("plugin minify option", () => {
     const { warnings, errors } = compilation;
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
 
     expect(warnings).toHaveLength(0);
@@ -148,7 +148,7 @@ describe("plugin minify option", () => {
     const { warnings, errors } = compilation;
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
 
     expect(warnings).toHaveLength(0);
@@ -196,7 +196,7 @@ describe("plugin minify option", () => {
     const { warnings, errors } = compilation;
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
 
     expect(warnings).toHaveLength(0);
@@ -253,11 +253,11 @@ describe("plugin minify option", () => {
       const { warnings, errors } = compilation;
 
       expect(compilation.getAsset("plugin-test.jpg").info.size).toBeLessThan(
-        335
+        335,
       );
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(0);
-    }
+    },
   );
 
   it("should optimizes all images (loader + plugin) exclude filtered", async () => {
@@ -295,19 +295,19 @@ describe("plugin minify option", () => {
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
   });
 
@@ -366,16 +366,16 @@ describe("plugin minify option", () => {
     expect(hasLoader("multiple-loader-test-2.svg", modules)).toBe(true);
 
     await expect(
-      isOptimized("multiple-loader-test-1.svg", compilation)
+      isOptimized("multiple-loader-test-1.svg", compilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-loader-test-2.svg", compilation)
+      isOptimized("multiple-loader-test-2.svg", compilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-plugin-test-1.svg", compilation)
+      isOptimized("multiple-plugin-test-1.svg", compilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-plugin-test-2.svg", compilation)
+      isOptimized("multiple-plugin-test-2.svg", compilation),
     ).resolves.toBe(true);
   });
 
@@ -447,16 +447,16 @@ describe("plugin minify option", () => {
     expect(hasLoader("multiple-loader-test-2.svg", modules)).toBe(true);
 
     await expect(
-      isOptimized("multiple-loader-test-1.svg", firstCompilation)
+      isOptimized("multiple-loader-test-1.svg", firstCompilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-loader-test-2.svg", firstCompilation)
+      isOptimized("multiple-loader-test-2.svg", firstCompilation),
     ).resolves.toBe(false);
     await expect(
-      isOptimized("multiple-plugin-test-1.svg", firstCompilation)
+      isOptimized("multiple-plugin-test-1.svg", firstCompilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-plugin-test-2.svg", firstCompilation)
+      isOptimized("multiple-plugin-test-2.svg", firstCompilation),
     ).resolves.toBe(false);
 
     const [, { compilation: secondCompilation }] = multiStats.stats;
@@ -475,16 +475,16 @@ describe("plugin minify option", () => {
     expect(hasLoader("multiple-loader-test-4.svg", secondModules)).toBe(true);
 
     await expect(
-      isOptimized("multiple-loader-test-3.svg", secondCompilation)
+      isOptimized("multiple-loader-test-3.svg", secondCompilation),
     ).resolves.toBe(false);
     await expect(
-      isOptimized("multiple-loader-test-4.svg", secondCompilation)
+      isOptimized("multiple-loader-test-4.svg", secondCompilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-plugin-test-3.svg", secondCompilation)
+      isOptimized("multiple-plugin-test-3.svg", secondCompilation),
     ).resolves.toBe(false);
     await expect(
-      isOptimized("multiple-plugin-test-4.svg", secondCompilation)
+      isOptimized("multiple-plugin-test-4.svg", secondCompilation),
     ).resolves.toBe(true);
   });
 
@@ -505,14 +505,14 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.png")
+      asset.includes("./nested/deep/plugin-test.png"),
     );
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./nested/deep/plugin-test.png"
+      "./nested/deep/plugin-test.png",
     );
-    const ext = await fileType.fromFile(file);
+    const ext = await fileTypeFromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
@@ -537,14 +537,14 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("plugin-test.png")
+      asset.includes("plugin-test.png"),
     );
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "plugin-test.png"
+      "plugin-test.png",
     );
-    const ext = await fileType.fromFile(file);
+    const ext = await fileTypeFromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
@@ -569,14 +569,14 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.png")
+      asset.includes("./nested/deep/plugin-test.png"),
     );
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./nested/deep/plugin-test.png"
+      "./nested/deep/plugin-test.png",
     );
-    const ext = await fileType.fromFile(file);
+    const ext = await fileTypeFromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
@@ -601,14 +601,14 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./other/plugin-test.png")
+      asset.includes("./other/plugin-test.png"),
     );
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./other/plugin-test.png"
+      "./other/plugin-test.png",
     );
-    const ext = await fileType.fromFile(file);
+    const ext = await fileTypeFromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
@@ -633,14 +633,14 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./other/plugin-test.png")
+      asset.includes("./other/plugin-test.png"),
     );
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./other/plugin-test.png"
+      "./other/plugin-test.png",
     );
-    const ext = await fileType.fromFile(file);
+    const ext = await fileTypeFromFile(file);
 
     expect(/image\/png/i.test(ext.mime)).toBe(true);
     expect(transformedAssets).toHaveLength(1);
@@ -666,10 +666,10 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const originalAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("loader-test.unknown")
+      asset.includes("loader-test.unknown"),
     );
     const minifiedAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("minified-xxx-loader-test-yyy.jpg")
+      asset.includes("minified-xxx-loader-test-yyy.jpg"),
     );
 
     expect(originalAsset).toHaveLength(1);
@@ -719,13 +719,13 @@ describe("plugin minify option", () => {
     const { warnings, errors, assets } = compilation;
 
     const sharpAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("minified-by-sharp-loader-test.jpg")
+      asset.includes("minified-by-sharp-loader-test.jpg"),
     );
     const svgoAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("minified-by-svgo-loader-test.svg")
+      asset.includes("minified-by-svgo-loader-test.svg"),
     );
     const skippedAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("should-be-skipped-loader-test.svg")
+      asset.includes("should-be-skipped-loader-test.svg"),
     );
 
     expect(sharpAsset).toHaveLength(1);

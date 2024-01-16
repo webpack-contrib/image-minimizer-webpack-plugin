@@ -1,6 +1,6 @@
 import path from "path";
 import { promisify } from "util";
-import fileType from "file-type";
+import { fileTypeFromFile } from "file-type";
 import imageSize from "image-size";
 import ImageMinimizerPlugin from "../src";
 
@@ -13,7 +13,7 @@ describe("resize query (sharp)", () => {
     const stats = await runWebpack({
       entry: path.join(
         fixturesPath,
-        "./generator-and-minimizer-resize-query.js"
+        "./generator-and-minimizer-resize-query.js",
       ),
       imageminLoaderOptions: {
         minimizer: {
@@ -75,11 +75,11 @@ describe("resize query (sharp)", () => {
       const transformedAsset = path.resolve(
         __dirname,
         compilation.options.output.path,
-        assetPath
+        assetPath,
       );
 
       // eslint-disable-next-line no-await-in-loop
-      const transformedExt = await fileType.fromFile(transformedAsset);
+      const transformedExt = await fileTypeFromFile(transformedAsset);
       // eslint-disable-next-line no-await-in-loop
       const dimensions = await sizeOf(transformedAsset);
 
@@ -95,7 +95,7 @@ describe("resize query (sharp)", () => {
     const stats = await runWebpack({
       entry: path.join(
         fixturesPath,
-        "./generator-and-minimizer-resize-query.js"
+        "./generator-and-minimizer-resize-query.js",
       ),
       imageminLoaderOptions: {
         minimizer: {
@@ -149,11 +149,11 @@ describe("resize query (sharp)", () => {
       const transformedAsset = path.resolve(
         __dirname,
         compilation.options.output.path,
-        assetPath
+        assetPath,
       );
 
       // eslint-disable-next-line no-await-in-loop
-      const transformedExt = await fileType.fromFile(transformedAsset);
+      const transformedExt = await fileTypeFromFile(transformedAsset);
       // eslint-disable-next-line no-await-in-loop
       const dimensions = await sizeOf(transformedAsset);
 
@@ -173,7 +173,7 @@ describe("resize query (squoosh)", () => {
       const stats = await runWebpack({
         entry: path.join(
           fixturesPath,
-          "./generator-and-minimizer-resize-query.js"
+          "./generator-and-minimizer-resize-query.js",
         ),
         imageminLoaderOptions: {
           minimizer: {
@@ -235,11 +235,11 @@ describe("resize query (squoosh)", () => {
         const transformedAsset = path.resolve(
           __dirname,
           compilation.options.output.path,
-          assetPath
+          assetPath,
         );
 
         // eslint-disable-next-line no-await-in-loop
-        const transformedExt = await fileType.fromFile(transformedAsset);
+        const transformedExt = await fileTypeFromFile(transformedAsset);
         // eslint-disable-next-line no-await-in-loop
         const dimensions = await sizeOf(transformedAsset);
 
@@ -249,7 +249,7 @@ describe("resize query (squoosh)", () => {
         expect(warnings).toHaveLength(0);
         expect(errors).toHaveLength(0);
       }
-    }
+    },
   );
 
   ifit(needSquooshTest)(
@@ -258,7 +258,7 @@ describe("resize query (squoosh)", () => {
       const stats = await runWebpack({
         entry: path.join(
           fixturesPath,
-          "./generator-and-minimizer-resize-query.js"
+          "./generator-and-minimizer-resize-query.js",
         ),
         imageminLoaderOptions: {
           minimizer: {
@@ -312,11 +312,11 @@ describe("resize query (squoosh)", () => {
         const transformedAsset = path.resolve(
           __dirname,
           compilation.options.output.path,
-          assetPath
+          assetPath,
         );
 
         // eslint-disable-next-line no-await-in-loop
-        const transformedExt = await fileType.fromFile(transformedAsset);
+        const transformedExt = await fileTypeFromFile(transformedAsset);
         // eslint-disable-next-line no-await-in-loop
         const dimensions = await sizeOf(transformedAsset);
 
@@ -326,6 +326,6 @@ describe("resize query (squoosh)", () => {
         expect(warnings).toHaveLength(0);
         expect(errors).toHaveLength(0);
       }
-    }
+    },
   );
 });
