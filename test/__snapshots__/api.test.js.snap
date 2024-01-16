@@ -29,32 +29,32 @@ exports[`api normalizeImageminConfig should works 5`] = `"No plugins found for \
 exports[`api normalizeImageminConfig should works 6`] = `"Invalid plugin configuration 'true', plugin configuration should be 'string' or '[string, object]'""`;
 
 exports[`api normalizeImageminConfig should works 7`] = `
-Object {
-  "plugins": Array [
+{
+  "plugins": [
     [Function],
   ],
 }
 `;
 
 exports[`api normalizeImageminConfig should works 8`] = `
-Object {
-  "plugins": Array [
+{
+  "plugins": [
     [Function],
   ],
 }
 `;
 
 exports[`api normalizeImageminConfig should works 9`] = `
-Object {
-  "plugins": Array [
+{
+  "plugins": [
     [Function],
   ],
 }
 `;
 
 exports[`api normalizeImageminConfig should works 10`] = `
-Object {
-  "plugins": Array [
+{
+  "plugins": [
     [Function],
   ],
 }

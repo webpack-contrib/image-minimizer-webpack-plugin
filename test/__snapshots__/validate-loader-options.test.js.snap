@@ -143,7 +143,7 @@ exports[`validate loader options should throw an error on the "minimizer" option
 exports[`validate loader options should throw an error on the "severityError" option with "() => {}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.severityError should be one of these:
-   \\"off\\" | \\"warning\\" | \\"error\\"
+   "off" | "warning" | "error"
    -> Allows to choose how errors are displayed.
    -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror"
 `;
@@ -151,7 +151,7 @@ exports[`validate loader options should throw an error on the "severityError" op
 exports[`validate loader options should throw an error on the "severityError" option with "[]" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.severityError should be one of these:
-   \\"off\\" | \\"warning\\" | \\"error\\"
+   "off" | "warning" | "error"
    -> Allows to choose how errors are displayed.
    -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror"
 `;
@@ -159,7 +159,7 @@ exports[`validate loader options should throw an error on the "severityError" op
 exports[`validate loader options should throw an error on the "severityError" option with "{}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.severityError should be one of these:
-   \\"off\\" | \\"warning\\" | \\"error\\"
+   "off" | "warning" | "error"
    -> Allows to choose how errors are displayed.
    -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror"
 `;
@@ -167,7 +167,7 @@ exports[`validate loader options should throw an error on the "severityError" op
 exports[`validate loader options should throw an error on the "severityError" option with "false" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.severityError should be one of these:
-   \\"off\\" | \\"warning\\" | \\"error\\"
+   "off" | "warning" | "error"
    -> Allows to choose how errors are displayed.
    -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror"
 `;
@@ -175,7 +175,7 @@ exports[`validate loader options should throw an error on the "severityError" op
 exports[`validate loader options should throw an error on the "severityError" option with "true" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options.severityError should be one of these:
-   \\"off\\" | \\"warning\\" | \\"error\\"
+   "off" | "warning" | "error"
    -> Allows to choose how errors are displayed.
    -> Read more at https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror"
 `;
