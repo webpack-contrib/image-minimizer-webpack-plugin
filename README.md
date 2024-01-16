@@ -30,7 +30,7 @@ with option `"markdown.extension.toc.levels": "2..6"`
 - [Getting Started](#getting-started)
   - [Install optimize/generate tool](#install-optimizegenerate-tool)
   - [Optimize with `imagemin`](#optimize-with-imagemin)
-  - [Optimize with `squoosh`](#optimize-with-squoosh)
+  - [[**DEPRECATED**] Optimize with `squoosh`](#optimize-with-squoosh)
   - [Optimize with `sharp`](#optimize-with-sharp)
   - [Optimize with `svgo`](#optimize-with-svgo)
   - [Advanced setup](#advanced-setup)
@@ -44,7 +44,7 @@ with option `"markdown.extension.toc.levels": "2..6"`
   - [`minimizer`](#minimizer)
     - [Available minimizers](#available-minimizers)
     - [Single minimizer example for `imagemin`](#single-minimizer-example-for-imagemin)
-    - [Single minimizer example for `squoosh`](#single-minimizer-example-for-squoosh)
+    - [[**DEPRECATED**] Single minimizer example for `squoosh`](#single-minimizer-example-for-squoosh)
     - [Single minimizer example for `sharp`](#single-minimizer-example-for-sharp)
     - [Single minimizer example for user defined implementation](#single-minimizer-example-for-user-defined-implementation)
     - [Multiple minimizers example](#multiple-minimizers-example)
@@ -56,7 +56,7 @@ with option `"markdown.extension.toc.levels": "2..6"`
   - [`generator`](#generator)
     - [Available generators](#available-generators)
     - [Generator example for `imagemin`](#generator-example-for-imagemin)
-    - [Generator example for `squoosh`](#generator-example-for-squoosh)
+    - [[**DEPRECATED**] Generator example for `squoosh`](#generator-example-for-squoosh)
     - [Generator example for `sharp`](#generator-example-for-sharp)
     - [Generator example for user defined implementation](#generator-example-for-user-defined-implementation)
     - [Generator options](#generator-options)
@@ -90,7 +90,7 @@ with option `"markdown.extension.toc.levels": "2..6"`
 This plugin can use 4 tools to optimize/generate images:
 
 - [`imagemin`](https://github.com/imagemin/imagemin) - optimize your images by default, since it is stable and works with all types of images
-- [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh) - while working in experimental mode with `.jpg`, `.jpeg`, `.png`, `.webp`, `.avif` file types.
+- **DEPRECATED** [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh) - while working in experimental mode with `.jpg`, `.jpeg`, `.png`, `.webp`, `.avif` file types.
 - [`sharp`](https://github.com/lovell/sharp) - High performance Node.js image processing, the fastest module to resize and compress JPEG, PNG, WebP, AVIF and TIFF images. Uses the libvips library.
 - [`svgo`](https://github.com/svg/svgo) - tool for optimizing SVG vector graphics files. Supports only SVG files minification.
 
@@ -112,7 +112,7 @@ npm install image-minimizer-webpack-plugin imagemin --save-dev
 >
 > imagemin uses plugin to optimize/generate images, so you need to install them too
 
-- [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh):
+- **DEPRECATED** [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh):
 
 ```console
 npm install image-minimizer-webpack-plugin @squoosh/lib --save-dev
@@ -217,7 +217,7 @@ module.exports = {
 };
 ```
 
-### Optimize with [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh)
+### **DEPRECATED** Optimize with [`squoosh`](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh)
 
 ```console
 npm install @squoosh/lib --save-dev
@@ -786,7 +786,7 @@ Allows to setup default minify function.
 #### Available minimizers
 
 - `ImageMinimizerPlugin.imageminMinify`
-- `ImageMinimizerPlugin.squooshMinify`
+- **DEPRECATED** `ImageMinimizerPlugin.squooshMinify`
 - `ImageMinimizerPlugin.sharpMinify`
 - `ImageMinimizerPlugin.svgoMinify`
 
@@ -823,7 +823,7 @@ module.exports = {
 
 More information and examples [here](https://github.com/imagemin/imagemin).
 
-#### Single minimizer example for `squoosh`
+#### **DEPRECATED** Single minimizer example for `squoosh`
 
 **webpack.config.js**
 
@@ -1037,7 +1037,15 @@ module.exports = {
       new ImageMinimizerPlugin({
         minimizer: {
           // Implementation
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
+          // Options
+          options: {
+            encodeOptions: {
+              jpeg: {
+                quality: 90,
+              },
+            },
+          },
         },
       }),
     ],
@@ -1070,11 +1078,11 @@ module.exports = {
       "...",
       new ImageMinimizerPlugin({
         minimizer: {
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           // Options
           options: {
             encodeOptions: {
-              mozjpeg: {
+              jpeg: {
                 quality: 90,
               },
             },
@@ -1171,11 +1179,11 @@ module.exports = {
       new ImageMinimizerPlugin({
         minimizer: {
           filename: "optimized-[name][ext]",
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           // Options
           options: {
             encodeOptions: {
-              mozjpeg: {
+              jpeg: {
                 quality: 90,
               },
             },
@@ -1201,11 +1209,11 @@ module.exports = {
       new ImageMinimizerPlugin({
         minimizer: {
           filename: () => "optimized-[name][ext]",
-          implementation: ImageMinimizerPlugin.squooshMinify,
+          implementation: ImageMinimizerPlugin.sharpMinify,
           // Options
           options: {
             encodeOptions: {
-              mozjpeg: {
+              jpeg: {
                 quality: 90,
               },
             },
@@ -1282,7 +1290,7 @@ Useful if you need generate `webp`/`avif`/etc from other formats.
 #### Available generators
 
 - `ImageMinimizerPlugin.imageminGenerate`
-- `ImageMinimizerPlugin.squooshGenerate`
+- **DEPRECATED** `ImageMinimizerPlugin.squooshGenerate`
 - `ImageMinimizerPlugin.sharpGenerate`
 
 #### Generator example for `imagemin`
@@ -1316,7 +1324,7 @@ module.exports = {
 };
 ```
 
-#### Generator example for `squoosh`
+#### **DEPRECATED** Generator example for `squoosh`
 
 **webpack.config.js**
 
@@ -1416,11 +1424,11 @@ module.exports = {
           {
             // You can apply generator using `?as=webp`, you can use any name and provide more options
             preset: "webp",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {
               encodeOptions: {
                 webp: {
-                  quality: 90,
+                  lossless: false,
                 },
               },
             },
@@ -1428,11 +1436,11 @@ module.exports = {
           {
             // You can apply generator using `?as=avif`, you can use any name and provide more options
             preset: "avif",
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {
               encodeOptions: {
                 avif: {
-                  cqLevel: 33,
+                  lossless: false,
                 },
               },
             },
@@ -1460,8 +1468,8 @@ module.exports = {
           {
             // You can apply generator using `?as=webp-100-50`, you can use any name and provide more options
             preset: "webp-100-50",
-            // implementation: ImageMinimizerPlugin.sharpGenerate,
-            implementation: ImageMinimizerPlugin.squooshGenerate,
+            // implementation: ImageMinimizerPlugin.squooshGenerate,
+            implementation: ImageMinimizerPlugin.sharpGenerate,
             options: {
               resize: {
                 enabled: true,
@@ -1628,7 +1636,14 @@ module.exports = {
           {
             preset: "name",
             // Implementation
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
+            options: {
+              encodeOptions: {
+                jpeg: {
+                  quality: 85,
+                },
+              },
+            },
           },
         ],
       }),
@@ -1685,7 +1700,14 @@ module.exports = {
           {
             preset: "name",
             // Implementation
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
+            options: {
+              encodeOptions: {
+                jpeg: {
+                  quality: 85,
+                },
+              },
+            },
           },
         ],
       }),
@@ -1721,11 +1743,11 @@ module.exports = {
         generator: [
           {
             preset: "name",
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
             // Options
             options: {
               encodeOptions: {
-                mozjpeg: {
+                jpeg: {
                   quality: 90,
                 },
               },
@@ -1823,11 +1845,11 @@ module.exports = {
           {
             preset: "name",
             filename: "generated-[name][ext]",
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
             // Options
             options: {
               encodeOptions: {
-                mozjpeg: {
+                jpeg: {
                   quality: 90,
                 },
               },
@@ -1856,11 +1878,11 @@ module.exports = {
           {
             preset: "name",
             filename: () => "generated-[name][ext]",
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.sharpMinify,
             // Options
             options: {
               encodeOptions: {
-                mozjpeg: {
+                jpeg: {
                   quality: 90,
                 },
               },
@@ -2164,9 +2186,14 @@ module.exports = {
         enforce: "pre",
         options: {
           minimizer: {
-            implementation: ImageMinimizerPlugin.squooshMinify,
+            implementation: ImageMinimizerPlugin.imageminMinify,
             options: {
-              // Your options
+              plugins: [
+                "imagemin-gifsicle",
+                "imagemin-mozjpeg",
+                "imagemin-pngquant",
+                "imagemin-svgo",
+              ],
             },
           },
         },
@@ -2414,7 +2441,7 @@ module.exports = {
 };
 ```
 
-- squoosh
+- **DEPRECATED** squoosh
 
 **webpack.config.js**
 
@@ -2526,7 +2553,7 @@ module.exports = {
 };
 ```
 
-- squoosh
+- **DEPRECATED** squoosh
 
 **webpack.config.js**
 
