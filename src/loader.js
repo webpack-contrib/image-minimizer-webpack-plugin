@@ -107,8 +107,8 @@ async function loader(content) {
   if (!minimizer && !generator) {
     callback(
       new Error(
-        "Not configured 'minimizer' or 'generator' options, please setup them"
-      )
+        "Not configured 'minimizer' or 'generator' options, please setup them",
+      ),
     );
 
     return;
@@ -128,8 +128,8 @@ async function loader(content) {
       if (!generator) {
         callback(
           new Error(
-            "Please specify the 'generator' option to use 'as' query param for generation purposes."
-          )
+            "Please specify the 'generator' option to use 'as' query param for generation purposes.",
+          ),
         );
 
         return;
@@ -140,8 +140,8 @@ async function loader(content) {
       if (presets.length > 1) {
         callback(
           new Error(
-            "Found several identical preset names, the 'preset' option should be unique"
-          )
+            "Found several identical preset names, the 'preset' option should be unique",
+          ),
         );
 
         return;
@@ -150,8 +150,8 @@ async function loader(content) {
       if (presets.length === 0) {
         callback(
           new Error(
-            `Can't find '${presetName}' preset in the 'generator' option`
-          )
+            `Can't find '${presetName}' preset in the 'generator' option`,
+          ),
         );
 
         return;
@@ -178,7 +178,7 @@ async function loader(content) {
         [transformer] = processSizeQuery(
           [transformer],
           widthQuery,
-          heightQuery
+          heightQuery,
         );
       }
     }
@@ -222,7 +222,7 @@ async function loader(content) {
   // Change content of the data URI after minimizer
   if (this._module?.resourceResolveData?.encodedContent) {
     const isBase64 = /^base64$/i.test(
-      this._module.resourceResolveData.encoding
+      this._module.resourceResolveData.encoding,
     );
 
     this._module.resourceResolveData.encodedContent = isBase64
@@ -230,7 +230,7 @@ async function loader(content) {
       : encodeURIComponent(output.data.toString("utf-8")).replace(
           /[!'()*]/g,
           (character) =>
-            `%${/** @type {number} */ (character.codePointAt(0)).toString(16)}`
+            `%${/** @type {number} */ (character.codePointAt(0)).toString(16)}`,
         );
   } else {
     let query = this.resourceQuery;

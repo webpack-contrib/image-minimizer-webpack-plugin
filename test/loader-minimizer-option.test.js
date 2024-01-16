@@ -32,16 +32,16 @@ describe("loader minimizer option", () => {
     expect(errors).toHaveLength(0);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -66,16 +66,16 @@ describe("loader minimizer option", () => {
     expect(errors).toHaveLength(0);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -110,16 +110,16 @@ describe("loader minimizer option", () => {
     expect(errors).toHaveLength(0);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -166,16 +166,16 @@ describe("loader minimizer option", () => {
     expect(errors).toHaveLength(0);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -205,16 +205,16 @@ describe("loader minimizer option", () => {
     expect(errors).toHaveLength(0);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      false
+      false,
     );
   });
 
@@ -236,16 +236,16 @@ describe("loader minimizer option", () => {
     expect(warnings).toHaveLength(0);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      false
+      false,
     );
   });
 
@@ -267,7 +267,7 @@ describe("loader minimizer option", () => {
     expect(errors).toHaveLength(0);
     expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(631);
     expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
-      71000
+      71000,
     );
   });
 
@@ -287,12 +287,12 @@ describe("loader minimizer option", () => {
 
       expect(errors).toHaveLength(0);
       expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(
-        631
+        631,
       );
       expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
-        71000
+        71000,
       );
-    }
+    },
   );
 
   it('should work with "sharpMinify" minifier', async () => {
@@ -310,7 +310,7 @@ describe("loader minimizer option", () => {
     expect(errors).toHaveLength(0);
     expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(631);
     expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
-      71000
+      71000,
     );
   });
 
@@ -342,16 +342,16 @@ describe("loader minimizer option", () => {
     expect(Object.keys(assets)).toHaveLength(5);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
   });
 
@@ -385,16 +385,16 @@ describe("loader minimizer option", () => {
     expect(Object.keys(assets)).toHaveLength(5);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
   });
 
@@ -432,16 +432,16 @@ describe("loader minimizer option", () => {
     expect(Object.keys(assets)).toHaveLength(5);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -473,7 +473,7 @@ describe("loader minimizer option", () => {
       const transformedAsset = path.resolve(
         __dirname,
         compilation.options.output.path,
-        "./loader-test.png"
+        "./loader-test.png",
       );
       const dimensions = await sizeOf(transformedAsset);
 
@@ -481,12 +481,12 @@ describe("loader minimizer option", () => {
       expect(dimensions.width).toBe(100);
       expect(errors).toHaveLength(0);
       expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(
-        631
+        631,
       );
       expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
-        71000
+        71000,
       );
-    }
+    },
   );
 
   it('should minimize and resize with "sharpMinify" minifier', async () => {
@@ -515,7 +515,7 @@ describe("loader minimizer option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.png"
+      "./loader-test.png",
     );
     const dimensions = await sizeOf(transformedAsset);
 
@@ -524,7 +524,7 @@ describe("loader minimizer option", () => {
     expect(errors).toHaveLength(0);
     expect(compilation.getAsset("loader-test.jpg").info.size).toBeLessThan(631);
     expect(compilation.getAsset("loader-test.png").info.size).toBeLessThan(
-      71000
+      71000,
     );
   });
 });

@@ -35,7 +35,7 @@ describe("loader generator option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./nested/deep/loader-test.webp"
+      "./nested/deep/loader-test.webp",
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -82,7 +82,7 @@ describe("loader generator option", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /Found several identical preset names, the 'preset' option should be unique/
+      /Found several identical preset names, the 'preset' option should be unique/,
     );
   });
 
@@ -112,7 +112,7 @@ describe("loader generator option", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /Can't find 'webp' preset in the 'generator' option/
+      /Can't find 'webp' preset in the 'generator' option/,
     );
   });
 
@@ -143,7 +143,7 @@ describe("loader generator option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "foo-loader-test.webp"
+      "foo-loader-test.webp",
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -182,7 +182,7 @@ describe("loader generator option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "foo-loader-test.webp"
+      "foo-loader-test.webp",
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -228,7 +228,7 @@ describe("loader generator option", () => {
       const transformedAsset = path.resolve(
         __dirname,
         compilation.options.output.path,
-        "./nested/deep/loader-test.webp"
+        "./nested/deep/loader-test.webp",
       );
 
       const transformedExt = await fileType.fromFile(transformedAsset);
@@ -240,7 +240,7 @@ describe("loader generator option", () => {
       expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(0);
-    }
+    },
   );
 
   ifit(needSquooshTest)(
@@ -279,7 +279,7 @@ describe("loader generator option", () => {
       const transformedAsset = path.resolve(
         __dirname,
         compilation.options.output.path,
-        "./nested/deep/loader-test.webp"
+        "./nested/deep/loader-test.webp",
       );
 
       const transformedExt = await fileType.fromFile(transformedAsset);
@@ -291,7 +291,7 @@ describe("loader generator option", () => {
       expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(0);
-    }
+    },
   );
 
   it("should generate and resize (sharpGenerate)", async () => {
@@ -325,7 +325,7 @@ describe("loader generator option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./nested/deep/loader-test.webp"
+      "./nested/deep/loader-test.webp",
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -370,7 +370,7 @@ describe("loader generator option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./nested/deep/loader-test.webp"
+      "./nested/deep/loader-test.webp",
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -406,7 +406,7 @@ describe("loader generator option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./sharp-minify-loader-test-1x1.jpg"
+      "./sharp-minify-loader-test-1x1.jpg",
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -448,7 +448,7 @@ describe("loader generator option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./sharp-generate-loader-test-100x50.webp"
+      "./sharp-generate-loader-test-100x50.webp",
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -484,7 +484,7 @@ describe("loader generator option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./sharp-minify-loader-test-1x1.jpg"
+      "./sharp-minify-loader-test-1x1.jpg",
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
@@ -526,7 +526,7 @@ describe("loader generator option", () => {
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./sharp-generate-loader-test-100x50.webp"
+      "./sharp-generate-loader-test-100x50.webp",
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);

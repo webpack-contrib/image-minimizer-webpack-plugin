@@ -48,7 +48,7 @@ function replaceFileExtension(filename, ext) {
 function throttleAll(limit, tasks) {
   if (!Number.isInteger(limit) || limit < 1) {
     throw new TypeError(
-      `Expected 'limit' to be a finite number > 0, got \`${limit}\` (${typeof limit})`
+      `Expected 'limit' to be a finite number > 0, got \`${limit}\` (${typeof limit})`,
     );
   }
 
@@ -57,7 +57,7 @@ function throttleAll(limit, tasks) {
     !tasks.every((task) => typeof task === "function")
   ) {
     throw new TypeError(
-      "Expected 'tasks' to be a list of functions returning a promise"
+      "Expected 'tasks' to be a list of functions returning a promise",
     );
   }
 
@@ -150,7 +150,7 @@ function fileTypeFromBuffer(input) {
     )
   ) {
     throw new TypeError(
-      `Expected the \`input\` argument to be of type \`Uint8Array\` or \`Buffer\` or \`ArrayBuffer\`, got \`${typeof input}\``
+      `Expected the \`input\` argument to be of type \`Uint8Array\` or \`Buffer\` or \`ArrayBuffer\`, got \`${typeof input}\``,
     );
   }
 
@@ -216,7 +216,7 @@ function fileTypeFromBuffer(input) {
         buffer[i] === 0x49 &&
         buffer[i + 1] === 0x44 &&
         buffer[i + 2] === 0x41 &&
-        buffer[i + 3] === 0x54
+        buffer[i + 3] === 0x54,
     );
     const sliced = buffer.subarray(startIndex, firstImageDataChunkIndex);
 
@@ -226,7 +226,7 @@ function fileTypeFromBuffer(input) {
           sliced[i] === 0x61 &&
           sliced[i + 1] === 0x63 &&
           sliced[i + 2] === 0x54 &&
-          sliced[i + 3] === 0x4c
+          sliced[i + 3] === 0x4c,
       ) >= 0
     ) {
       return {
@@ -290,7 +290,7 @@ function fileTypeFromBuffer(input) {
         0x00, 0xfe, 0x00, 0x04, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
         0x00, 0x03, 0x01,
       ],
-      { offset: 9 }
+      { offset: 9 },
     )
   ) {
     return {
@@ -531,7 +531,7 @@ async function imageminNormalizeConfig(imageminConfig) {
     (imageminConfig.plugins && imageminConfig.plugins.length === 0)
   ) {
     throw new Error(
-      "No plugins found for `imagemin`, please read documentation"
+      "No plugins found for `imagemin`, please read documentation",
     );
   }
 
@@ -548,13 +548,15 @@ async function imageminNormalizeConfig(imageminConfig) {
       const pluginOptions = isPluginArray ? plugin[1] : undefined;
 
       let requiredPlugin = null;
-      let requiredPluginName = `imagemin-${pluginName}`;
+      let requiredPluginName = pluginName.startsWith("imagemin")
+        ? pluginName
+        : `imagemin-${pluginName}`;
 
       try {
         // @ts-ignore
         // eslint-disable-next-line no-await-in-loop
         requiredPlugin = (await import(requiredPluginName)).default(
-          pluginOptions
+          pluginOptions,
         );
       } catch {
         requiredPluginName = pluginName;
@@ -563,15 +565,16 @@ async function imageminNormalizeConfig(imageminConfig) {
           // @ts-ignore
           // eslint-disable-next-line no-await-in-loop
           requiredPlugin = (await import(requiredPluginName)).default(
-            pluginOptions
+            pluginOptions,
           );
-        } catch {
+        } catch (error) {
           const pluginNameForError = pluginName.startsWith("imagemin")
             ? pluginName
             : `imagemin-${pluginName}`;
 
           throw new Error(
-            `Unknown plugin: ${pluginNameForError}\n\nDid you forget to install the plugin?\nYou can install it with:\n\n$ npm install ${pluginNameForError} --save-dev\n$ yarn add ${pluginNameForError} --dev`
+            `Unknown plugin: ${pluginNameForError}\n\nDid you forget to install the plugin?\nYou can install it with:\n\n$ npm install ${pluginNameForError} --save-dev\n$ yarn add ${pluginNameForError} --dev`,
+            { cause: error },
           );
         }
         // Nothing
@@ -599,8 +602,8 @@ async function imageminNormalizeConfig(imageminConfig) {
     } else {
       throw new InvalidConfigError(
         `Invalid plugin configuration '${JSON.stringify(
-          plugin
-        )}', plugin configuration should be 'string' or '[string, object]'"`
+          plugin,
+        )}', plugin configuration should be 'string' or '[string, object]'"`,
       );
     }
   }
@@ -617,7 +620,9 @@ async function imageminNormalizeConfig(imageminConfig) {
 async function imageminGenerate(original, minimizerOptions) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     await imageminNormalizeConfig(
-      /** @type {ImageminOptions} */ (/** @type {?} */ (minimizerOptions || {}))
+      /** @type {ImageminOptions} */ (
+        /** @type {?} */ (minimizerOptions || {})
+      ),
     )
   );
 
@@ -634,7 +639,7 @@ async function imageminGenerate(original, minimizerOptions) {
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
     const newError = new Error(
-      `Error with '${original.filename}': ${originalError.message}`
+      `Error with '${original.filename}': ${originalError.message}`,
     );
 
     original.errors.push(newError);
@@ -672,7 +677,7 @@ async function imageminGenerate(original, minimizerOptions) {
 async function imageminMinify(original, options) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     await imageminNormalizeConfig(
-      /** @type {ImageminOptions} */ (/** @type {?} */ (options || {}))
+      /** @type {ImageminOptions} */ (/** @type {?} */ (options || {})),
     )
   );
 
@@ -689,7 +694,7 @@ async function imageminMinify(original, options) {
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
     const newError = new Error(
-      `Error with '${original.filename}': ${originalError.message}`
+      `Error with '${original.filename}': ${originalError.message}`,
     );
 
     original.errors.push(newError);
@@ -703,8 +708,8 @@ async function imageminMinify(original, options) {
     if (extOutput && extInput !== extOutput) {
       original.warnings.push(
         new Error(
-          `"imageminMinify" function do not support generate to "${extOutput}" from "${original.filename}". Please use "imageminGenerate" function.`
-        )
+          `"imageminMinify" function do not support generate to "${extOutput}" from "${original.filename}". Please use "imageminGenerate" function.`,
+        ),
       );
 
       return null;
@@ -794,7 +799,7 @@ async function squooshGenerate(original, minifyOptions) {
       }
 
       return typeof squoosh.preprocessors[key] !== "undefined";
-    }
+    },
   );
 
   if (preprocEntries.length > 0) {
@@ -813,7 +818,7 @@ async function squooshGenerate(original, minifyOptions) {
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
     const newError = new Error(
-      `Error with '${original.filename}': ${originalError.message}`
+      `Error with '${original.filename}': ${originalError.message}`,
     );
 
     original.errors.push(newError);
@@ -827,8 +832,8 @@ async function squooshGenerate(original, minifyOptions) {
   if (Object.keys(image.encodedWith).length === 0) {
     original.errors.push(
       new Error(
-        `No result from 'squoosh' for '${original.filename}', please configure the 'encodeOptions' option to generate images`
-      )
+        `No result from 'squoosh' for '${original.filename}', please configure the 'encodeOptions' option to generate images`,
+      ),
     );
 
     return null;
@@ -837,8 +842,8 @@ async function squooshGenerate(original, minifyOptions) {
   if (Object.keys(image.encodedWith).length > 1) {
     original.errors.push(
       new Error(
-        `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`
-      )
+        `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`,
+      ),
     );
 
     return null;
@@ -913,7 +918,7 @@ async function squooshMinify(original, options) {
       }
 
       return typeof squoosh.preprocessors[key] !== "undefined";
-    }
+    },
   );
 
   if (preprocEntries.length > 0) {
@@ -936,7 +941,7 @@ async function squooshMinify(original, options) {
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
     const newError = new Error(
-      `Error with '${original.filename}': ${originalError.message}`
+      `Error with '${original.filename}': ${originalError.message}`,
     );
 
     original.errors.push(newError);
@@ -1052,7 +1057,7 @@ const SHARP_MINIFY_FORMATS = new Map([
 async function sharpTransform(
   original,
   minimizerOptions = {},
-  targetFormat = null
+  targetFormat = null,
 ) {
   const inputExt = path.extname(original.filename).slice(1).toLowerCase();
 
@@ -1063,7 +1068,7 @@ async function sharpTransform(
   ) {
     if (targetFormat) {
       const error = new Error(
-        `Error with '${original.filename}': Input file has an unsupported format`
+        `Error with '${original.filename}': Input file has an unsupported format`,
       );
 
       original.errors.push(error);
@@ -1163,7 +1168,7 @@ function sharpGenerate(original, minimizerOptions) {
 
   if (targetFormats.length === 0) {
     const error = new Error(
-      `No result from 'sharp' for '${original.filename}', please configure the 'encodeOptions' option to generate images`
+      `No result from 'sharp' for '${original.filename}', please configure the 'encodeOptions' option to generate images`,
     );
 
     original.errors.push(error);
@@ -1172,7 +1177,7 @@ function sharpGenerate(original, minimizerOptions) {
 
   if (targetFormats.length > 1) {
     const error = new Error(
-      `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`
+      `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`,
     );
 
     original.errors.push(error);
@@ -1193,7 +1198,7 @@ function sharpGenerate(original, minimizerOptions) {
 function sharpMinify(original, minimizerOptions) {
   return sharpTransform(
     original,
-    /** @type {SharpOptions} */ (minimizerOptions)
+    /** @type {SharpOptions} */ (minimizerOptions),
   );
 }
 
@@ -1234,7 +1239,7 @@ async function svgoMinify(original, minimizerOptions) {
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
     const newError = new Error(
-      `Error with '${original.filename}': ${originalError.message}`
+      `Error with '${original.filename}': ${originalError.message}`,
     );
 
     original.errors.push(newError);

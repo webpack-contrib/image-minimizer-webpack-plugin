@@ -13,7 +13,7 @@ describe("resize query (sharp)", () => {
     const stats = await runWebpack({
       entry: path.join(
         fixturesPath,
-        "./generator-and-minimizer-resize-query.js"
+        "./generator-and-minimizer-resize-query.js",
       ),
       imageminLoaderOptions: {
         minimizer: {
@@ -75,7 +75,7 @@ describe("resize query (sharp)", () => {
       const transformedAsset = path.resolve(
         __dirname,
         compilation.options.output.path,
-        assetPath
+        assetPath,
       );
 
       // eslint-disable-next-line no-await-in-loop
@@ -95,7 +95,7 @@ describe("resize query (sharp)", () => {
     const stats = await runWebpack({
       entry: path.join(
         fixturesPath,
-        "./generator-and-minimizer-resize-query.js"
+        "./generator-and-minimizer-resize-query.js",
       ),
       imageminLoaderOptions: {
         minimizer: {
@@ -149,7 +149,7 @@ describe("resize query (sharp)", () => {
       const transformedAsset = path.resolve(
         __dirname,
         compilation.options.output.path,
-        assetPath
+        assetPath,
       );
 
       // eslint-disable-next-line no-await-in-loop
@@ -173,7 +173,7 @@ describe("resize query (squoosh)", () => {
       const stats = await runWebpack({
         entry: path.join(
           fixturesPath,
-          "./generator-and-minimizer-resize-query.js"
+          "./generator-and-minimizer-resize-query.js",
         ),
         imageminLoaderOptions: {
           minimizer: {
@@ -235,7 +235,7 @@ describe("resize query (squoosh)", () => {
         const transformedAsset = path.resolve(
           __dirname,
           compilation.options.output.path,
-          assetPath
+          assetPath,
         );
 
         // eslint-disable-next-line no-await-in-loop
@@ -249,7 +249,7 @@ describe("resize query (squoosh)", () => {
         expect(warnings).toHaveLength(0);
         expect(errors).toHaveLength(0);
       }
-    }
+    },
   );
 
   ifit(needSquooshTest)(
@@ -258,7 +258,7 @@ describe("resize query (squoosh)", () => {
       const stats = await runWebpack({
         entry: path.join(
           fixturesPath,
-          "./generator-and-minimizer-resize-query.js"
+          "./generator-and-minimizer-resize-query.js",
         ),
         imageminLoaderOptions: {
           minimizer: {
@@ -312,7 +312,7 @@ describe("resize query (squoosh)", () => {
         const transformedAsset = path.resolve(
           __dirname,
           compilation.options.output.path,
-          assetPath
+          assetPath,
         );
 
         // eslint-disable-next-line no-await-in-loop
@@ -326,6 +326,6 @@ describe("resize query (squoosh)", () => {
         expect(warnings).toHaveLength(0);
         expect(errors).toHaveLength(0);
       }
-    }
+    },
   );
 });

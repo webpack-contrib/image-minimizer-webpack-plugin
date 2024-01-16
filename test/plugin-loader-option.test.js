@@ -20,19 +20,19 @@ describe("plugin loader option", () => {
     expect(errors).toHaveLength(0);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 });

@@ -34,8 +34,8 @@ describe("minify", () => {
             implementation: utils.imageminMinify,
             options: { plugins: ["mozjpeg"] },
           },
-        })
-      )
+        }),
+      ),
     ).toBe(true));
 
   it("should optimize", async () => {
@@ -99,7 +99,7 @@ describe("minify", () => {
 
     const filename = path.resolve(
       __dirname,
-      "./fixtures/large-after-optimization.svg"
+      "./fixtures/large-after-optimization.svg",
     );
     const input = await pify(fs.readFile)(filename);
     const result = await worker({
@@ -144,7 +144,7 @@ describe("minify", () => {
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0].toString()).toMatch(
-      /No plugins found for `imagemin`/
+      /No plugins found for `imagemin`/,
     );
     expect(result.filename).toBe(filename);
     expect(result.data.equals(input)).toBe(true);
@@ -165,7 +165,7 @@ describe("minify", () => {
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0].toString()).toMatch(
-      /No plugins found for `imagemin`/
+      /No plugins found for `imagemin`/,
     );
     expect(result.filename).toBe(filename);
     expect(result.data.equals(input)).toBe(true);
@@ -186,7 +186,7 @@ describe("minify", () => {
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0].toString()).toMatch(
-      /No plugins found for `imagemin`/
+      /No plugins found for `imagemin`/,
     );
     expect(result.filename).toBe(filename);
     expect(result.data.equals(input)).toBe(true);
@@ -209,7 +209,7 @@ describe("minify", () => {
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0].toString()).toMatch(
-      /Unknown plugin: imagemin-unknown/
+      /Unknown plugin: imagemin-unknown/,
     );
     expect(result.filename).toBe(filename);
   });
@@ -231,7 +231,7 @@ describe("minify", () => {
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0].toString()).toMatch(
-      /Unknown plugin: imagemin-unknown/
+      /Unknown plugin: imagemin-unknown/,
     );
     expect(result.filename).toBe(filename);
     expect(result.data.equals(input)).toBe(true);
@@ -641,7 +641,7 @@ describe("minify", () => {
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0].toString()).toMatch(
-      /No plugins found for `imagemin`, please read documentation/
+      /No plugins found for `imagemin`, please read documentation/,
     );
   });
 
@@ -708,7 +708,7 @@ describe("minify", () => {
     expect(result.warnings).toHaveLength(0);
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0].toString()).toMatch(
-      /No plugins found for `imagemin`, please read documentation/
+      /No plugins found for `imagemin`, please read documentation/,
     );
   });
 
@@ -805,9 +805,9 @@ describe("minify", () => {
       expect(result.warnings).toHaveLength(0);
       expect(result.errors).toHaveLength(1);
       expect(result.errors[0].message).toMatch(
-        /No result from 'squoosh' for '.+', please configure the 'encodeOptions' option to generate images/
+        /No result from 'squoosh' for '.+', please configure the 'encodeOptions' option to generate images/,
       );
-    }
+    },
   );
 
   it("should work and allow to rename filename", async () => {

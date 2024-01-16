@@ -20,10 +20,10 @@ describe('plugin "deleteOriginalAssets" option', () => {
     const { compilation } = stats;
     const { warnings, errors, assets } = compilation;
     const newAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/minimizer-plugin-test.png")
+      asset.includes("./nested/deep/minimizer-plugin-test.png"),
     );
     const originalAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.png")
+      asset.includes("./nested/deep/plugin-test.png"),
     );
 
     expect(newAsset).toHaveLength(1);
@@ -47,7 +47,7 @@ describe('plugin "deleteOriginalAssets" option', () => {
     const { compilation } = stats;
     const { warnings, errors, assets } = compilation;
     const newAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.png")
+      asset.includes("./nested/deep/plugin-test.png"),
     );
 
     expect(newAsset).toHaveLength(1);
@@ -73,10 +73,10 @@ describe('plugin "deleteOriginalAssets" option', () => {
     const { compilation } = stats;
     const { warnings, errors, assets } = compilation;
     const newAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/minimizer-plugin-test.png")
+      asset.includes("./nested/deep/minimizer-plugin-test.png"),
     );
     const originalAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.png")
+      asset.includes("./nested/deep/plugin-test.png"),
     );
 
     expect(newAsset).toHaveLength(1);
@@ -102,10 +102,10 @@ describe('plugin "deleteOriginalAssets" option', () => {
     const { compilation } = stats;
     const { warnings, errors, assets } = compilation;
     const newAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/minimizer-plugin-test.png")
+      asset.includes("./nested/deep/minimizer-plugin-test.png"),
     );
     const originalAsset = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.png")
+      asset.includes("./nested/deep/plugin-test.png"),
     );
 
     expect(newAsset).toHaveLength(1);
@@ -150,11 +150,11 @@ describe('plugin "deleteOriginalAssets" option', () => {
     const { warnings, errors, assets } = compilation;
 
     const transformedAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/one-minimized-plugin-test.png")
+      asset.includes("./nested/deep/one-minimized-plugin-test.png"),
     );
 
     const originalAssets = Object.keys(assets).filter((asset) =>
-      asset.includes("./nested/deep/plugin-test.png")
+      asset.includes("./nested/deep/plugin-test.png"),
     );
 
     const { warnings: secondWarnings, errors: secondErrors } =

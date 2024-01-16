@@ -63,8 +63,8 @@ async function worker(options) {
         typeof options.info.sourceFilename === "string"
           ? options.info.sourceFilename
           : typeof options.filename === "string"
-          ? options.filename
-          : undefined,
+            ? options.filename
+            : undefined,
     },
   };
 
@@ -95,13 +95,13 @@ async function worker(options) {
       // eslint-disable-next-line no-await-in-loop
       processedResult = await transformer.implementation(
         result,
-        transformer.options
+        transformer.options,
       );
     } catch (error) {
       result.errors.push(
         error instanceof Error
           ? error
-          : new Error(/** @type {string} */ (error))
+          : new Error(/** @type {string} */ (error)),
       );
 
       return result;
@@ -110,8 +110,8 @@ async function worker(options) {
     if (processedResult && !Buffer.isBuffer(processedResult.data)) {
       result.errors.push(
         new Error(
-          "minimizer function doesn't return the 'data' property or result is not a 'Buffer' value"
-        )
+          "minimizer function doesn't return the 'data' property or result is not a 'Buffer' value",
+        ),
       );
 
       return result;

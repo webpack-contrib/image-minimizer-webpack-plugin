@@ -710,7 +710,7 @@ type minimizer =
           | {
               [key: string]: any;
             }
-          | undefined
+          | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
@@ -733,7 +733,7 @@ type minimizer =
             pathData: {
               filename?: string | undefined;
             },
-            assetInfo?: import("webpack").AssetInfo | undefined
+            assetInfo?: import("webpack").AssetInfo | undefined,
           ) => string)
         | undefined;
     }
@@ -750,7 +750,7 @@ type minimizer =
           | {
               [key: string]: any;
             }
-          | undefined
+          | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
@@ -773,7 +773,7 @@ type minimizer =
             pathData: {
               filename?: string | undefined;
             },
-            assetInfo?: import("webpack").AssetInfo | undefined
+            assetInfo?: import("webpack").AssetInfo | undefined,
           ) => string)
         | undefined;
     }>;
@@ -1008,7 +1008,7 @@ type implementation = (
     errors: Array<Error>;
     info: import("webpack").AssetInfo;
   },
-  options?: BasicTransformerOptions<T>
+  options?: BasicTransformerOptions<T>,
 ) => Promise<{
   filename: string;
   data: Buffer;
@@ -1147,7 +1147,7 @@ type filename =
       pathData: {
         filename?: string | undefined;
       },
-      assetInfo?: import("webpack").AssetInfo | undefined
+      assetInfo?: import("webpack").AssetInfo | undefined,
     ) => string)
   | undefined;
 ```
@@ -1235,7 +1235,7 @@ type generator = Array<{
       | {
           [key: string]: any;
         }
-      | undefined
+      | undefined,
   ) => Promise<{
     filename: string;
     data: Buffer;
@@ -1258,7 +1258,7 @@ type generator = Array<{
         pathData: {
           filename?: string | undefined;
         },
-        assetInfo?: import("webpack").AssetInfo | undefined
+        assetInfo?: import("webpack").AssetInfo | undefined,
       ) => string)
     | undefined;
   preset?: string | undefined;
@@ -1654,7 +1654,7 @@ type implementation = (
     | {
         [key: string]: any;
       }
-    | undefined
+    | undefined,
 ) => Promise<{
   filename: string;
   data: Buffer;
@@ -1800,7 +1800,7 @@ type filename =
   | string
   | ((
       pathData: PathData,
-      assetInfo?: import("webpack").AssetInfo | undefined
+      assetInfo?: import("webpack").AssetInfo | undefined,
     ) => string);
 ```
 
@@ -2071,7 +2071,7 @@ type minimizer =
           | {
               [key: string]: any;
             }
-          | undefined
+          | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
@@ -2094,7 +2094,7 @@ type minimizer =
             pathData: {
               filename?: string | undefined;
             },
-            assetInfo?: import("webpack").AssetInfo | undefined
+            assetInfo?: import("webpack").AssetInfo | undefined,
           ) => string)
         | undefined;
     }
@@ -2111,7 +2111,7 @@ type minimizer =
           | {
               [key: string]: any;
             }
-          | undefined
+          | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
@@ -2134,7 +2134,7 @@ type minimizer =
             pathData: {
               filename?: string | undefined;
             },
-            assetInfo?: import("webpack").AssetInfo | undefined
+            assetInfo?: import("webpack").AssetInfo | undefined,
           ) => string)
         | undefined;
     }>;

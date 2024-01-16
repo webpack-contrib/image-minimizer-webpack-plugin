@@ -201,7 +201,7 @@ class ImageMinimizerPlugin {
 
     if (!minimizer && !generator) {
       throw new Error(
-        "Not configured 'minimizer' or 'generator' options, please setup them"
+        "Not configured 'minimizer' or 'generator' options, please setup them",
       );
     }
 
@@ -259,7 +259,7 @@ class ImageMinimizerPlugin {
             if (
               !compiler.webpack.ModuleFilenameHelpers.matchObject(
                 this.options,
-                name
+                name,
               )
             ) {
               return false;
@@ -301,8 +301,8 @@ class ImageMinimizerPlugin {
             if (generators.length > 0) {
               tasks.push(
                 ...(await Promise.all(
-                  generators.map((generator) => getFromCache(generator))
-                ))
+                  generators.map((generator) => getFromCache(generator)),
+                )),
               );
             }
 
@@ -310,13 +310,13 @@ class ImageMinimizerPlugin {
               tasks.push(
                 await getFromCache(
                   /** @type {Minimizer<T>[]} */
-                  (minimizers)
-                )
+                  (minimizers),
+                ),
               );
             }
 
             return tasks;
-          })
+          }),
       )
     ).flat();
 
@@ -324,7 +324,7 @@ class ImageMinimizerPlugin {
     // https://github.com/nodejs/node/issues/19022
     const limit = Math.max(
       1,
-      this.options.concurrency ?? os.cpus()?.length ?? 1
+      this.options.concurrency ?? os.cpus()?.length ?? 1,
     );
     const { RawSource } = compiler.webpack.sources;
 
@@ -380,13 +380,13 @@ class ImageMinimizerPlugin {
         compilation.updateAsset(
           output.filename,
           /** @type {Source} */ (output.source),
-          output.info
+          output.info,
         );
       } else {
         compilation.emitAsset(
           output.filename,
           /** @type {Source} */ (output.source),
-          output.info
+          output.info,
         );
 
         if (this.options.deleteOriginalAssets) {
@@ -475,7 +475,7 @@ class ImageMinimizerPlugin {
 
               compilation.updateAsset(file, asset.source, newInfo);
             }
-          }
+          },
         );
 
         // Collect asset modules and update info for asset modules
@@ -490,7 +490,7 @@ class ImageMinimizerPlugin {
             }
 
             return filename;
-          }
+          },
         );
       });
 
@@ -503,7 +503,8 @@ class ImageMinimizerPlugin {
 
         if (Array.isArray(generatorForLoader)) {
           const importGenerators = generatorForLoader.filter(
-            (item) => typeof item.type === "undefined" || item.type === "import"
+            (item) =>
+              typeof item.type === "undefined" || item.type === "import",
           );
 
           generatorForLoader =
@@ -566,7 +567,7 @@ class ImageMinimizerPlugin {
         },
         async (assets) => {
           await this.optimize(compiler, compilation, assets);
-        }
+        },
       );
 
       compilation.hooks.statsPrinter.tap(pluginName, (stats) => {
@@ -577,9 +578,9 @@ class ImageMinimizerPlugin {
             (minimized, { green, formatFlag }) =>
               minimized
                 ? /** @type {Function} */ (green)(
-                    /** @type {Function} */ (formatFlag)("minimized")
+                    /** @type {Function} */ (formatFlag)("minimized"),
                   )
-                : ""
+                : "",
           );
 
         stats.hooks.print
@@ -589,9 +590,9 @@ class ImageMinimizerPlugin {
             (generated, { green, formatFlag }) =>
               generated
                 ? /** @type {Function} */ (green)(
-                    /** @type {Function} */ (formatFlag)("generated")
+                    /** @type {Function} */ (formatFlag)("generated"),
                   )
-                : ""
+                : "",
           );
       });
     });

@@ -1,12 +1,10 @@
 import path from "path";
-
 import fs from "fs";
 import webpack from "webpack";
-
 import fileType from "file-type";
-
 import tempy from "tempy";
 import pify from "pify";
+
 import {
   fixturesPath,
   isOptimized,
@@ -47,19 +45,19 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -86,19 +84,19 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -142,13 +140,13 @@ describe("imagemin plugin", () => {
     expect(hasLoader("multiple-loader-test-2.svg", modules)).toBe(true);
 
     await expect(
-      isOptimized("multiple-loader-test-1.svg", firstCompilation)
+      isOptimized("multiple-loader-test-1.svg", firstCompilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-loader-test-2.svg", firstCompilation)
+      isOptimized("multiple-loader-test-2.svg", firstCompilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-plugin-test-1.svg", firstCompilation)
+      isOptimized("multiple-plugin-test-1.svg", firstCompilation),
     ).resolves.toBe(true);
 
     const [, { compilation: secondCompilation }] = multiStats.stats;
@@ -165,13 +163,13 @@ describe("imagemin plugin", () => {
     expect(hasLoader("multiple-loader-test-4.svg", secondModules)).toBe(true);
 
     await expect(
-      isOptimized("multiple-loader-test-3.svg", secondCompilation)
+      isOptimized("multiple-loader-test-3.svg", secondCompilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-loader-test-4.svg", secondCompilation)
+      isOptimized("multiple-loader-test-4.svg", secondCompilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("multiple-plugin-test-2.svg", secondCompilation)
+      isOptimized("multiple-plugin-test-2.svg", secondCompilation),
     ).resolves.toBe(true);
   });
 
@@ -211,7 +209,7 @@ describe("imagemin plugin", () => {
     expect(errors[0].toString()).toMatch(/No plugins found for `imagemin`/);
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
   });
 
@@ -236,7 +234,7 @@ describe("imagemin plugin", () => {
     expect(errors[0].toString()).toMatch(/No plugins found for `imagemin`/);
 
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
   });
 
@@ -265,19 +263,19 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("plugin-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -307,19 +305,19 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
     await expect(
-      isOptimized("nested/deep/loader-test.gif", compilation)
+      isOptimized("nested/deep/loader-test.gif", compilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("nested/deep/loader-test.jpg", compilation)
+      isOptimized("nested/deep/loader-test.jpg", compilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("nested/deep/loader-test.png", compilation)
+      isOptimized("nested/deep/loader-test.png", compilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("nested/deep/loader-test.svg", compilation)
+      isOptimized("nested/deep/loader-test.svg", compilation),
     ).resolves.toBe(true);
     await expect(
-      isOptimized("nested/deep/plugin-test.png", compilation)
+      isOptimized("nested/deep/plugin-test.png", compilation),
     ).resolves.toBe(true);
   });
 
@@ -347,22 +345,22 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(
-      isOptimized("child-compilation-image.png", compilation)
+      isOptimized("child-compilation-image.png", compilation),
     ).resolves.toBe(true);
   });
 
@@ -382,7 +380,7 @@ describe("imagemin plugin", () => {
           },
         },
       },
-      true
+      true,
     );
 
     const stats = await compile(compiler);
@@ -434,7 +432,7 @@ describe("imagemin plugin", () => {
           },
         },
       },
-      true
+      true,
     );
 
     const stats = await compile(compiler);
@@ -450,20 +448,20 @@ describe("imagemin plugin", () => {
     expect(hasLoader("loader-test.svg", modules)).toBe(true);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     // Todo resolve png minification
     // await expect(isOptimized('loader-test.png', compilation)).resolves.toBe(
     //   true
     // );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -487,7 +485,7 @@ describe("imagemin plugin", () => {
           },
         },
       },
-      true
+      true,
     );
 
     const stats = await compile(compiler);
@@ -538,7 +536,7 @@ describe("imagemin plugin", () => {
           },
         },
       },
-      true
+      true,
     );
 
     const stats = await compile(compiler);
@@ -549,7 +547,7 @@ describe("imagemin plugin", () => {
 
     const isInlineSvg =
       /data:image\/svg\+xml;base64,PHN2ZyBoZWlnaHQ9IjEwMCIgd2lkdGg9IjEwMCI\+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIHN0eWxlPSJzdHJva2U6IzAwMDtzdHJva2Utd2l0aDozO2ZpbGw6cmVkIi8\+PC9zdmc\+/.test(
-        result
+        result,
       );
 
     expect(isInlineSvg).toBe(true);
@@ -575,7 +573,7 @@ describe("imagemin plugin", () => {
           },
         },
       },
-      true
+      true,
     );
 
     const stats = await compile(compiler);
@@ -586,7 +584,7 @@ describe("imagemin plugin", () => {
 
     const isInlineSvg =
       /data:image\/svg\+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI\+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIHN0eWxlPSJzdHJva2U6IzAwMDtzdHJva2Utd2l0aDozO2ZpbGw6cmVkIi8\+PC9zdmc\+/.test(
-        result
+        result,
       );
 
     expect(isInlineSvg).toBe(true);
@@ -608,7 +606,7 @@ describe("imagemin plugin", () => {
           },
         },
       },
-      true
+      true,
     );
 
     const stats = await compile(compiler);
@@ -646,7 +644,7 @@ describe("imagemin plugin", () => {
           },
         },
       },
-      true
+      true,
     );
 
     const stats = await compile(compiler);
@@ -684,7 +682,7 @@ describe("imagemin plugin", () => {
           },
         },
       },
-      true
+      true,
     );
 
     const stats = await compile(compiler);
@@ -746,7 +744,7 @@ describe("imagemin plugin", () => {
           },
         ],
       },
-      true
+      true,
     );
 
     clearDirectory(outputDir);
@@ -770,10 +768,10 @@ describe("imagemin plugin", () => {
     expect(secondErrors).toHaveLength(0);
 
     const extLoaderWebp = await fileType.fromFile(
-      path.resolve(outputDir, "loader-test.webp")
+      path.resolve(outputDir, "loader-test.webp"),
     );
     const extLoaderJpg = await fileType.fromFile(
-      path.resolve(outputDir, "plugin-test.jpg")
+      path.resolve(outputDir, "plugin-test.jpg"),
     );
 
     expect(/image\/webp/i.test(extLoaderWebp.mime)).toBe(true);
@@ -799,7 +797,7 @@ describe("imagemin plugin", () => {
     expect(errors).toHaveLength(0);
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("newImg.png", compilation)).resolves.toBe(true);
   });
@@ -816,7 +814,7 @@ describe("imagemin plugin", () => {
           },
         },
       },
-      true
+      true,
     );
 
     const stats = await compile(compiler);
@@ -859,7 +857,7 @@ describe("imagemin plugin", () => {
 
     expect(stringStats).toMatch(
       //  /asset minimized-plugin-test.jpg.+\[from: plugin-test.jpg\] \[minimized\]/
-      /asset plugin-test.jpg.+\[minimized\]/
+      /asset plugin-test.jpg.+\[minimized\]/,
     );
   });
 
@@ -891,7 +889,7 @@ describe("imagemin plugin", () => {
     const stringStats = stats.toString({ relatedAssets: true });
 
     expect(stringStats).toMatch(
-      /asset loader-test.webp.+\[from: .+loader-test.png\] \[generated\]/
+      /asset loader-test.webp.+\[from: .+loader-test.png\] \[generated\]/,
     );
   });
 
@@ -930,23 +928,23 @@ describe("imagemin plugin", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.webp"
+      "./loader-test.webp",
     );
     const ext = await fileType.fromFile(file);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      true
+      true,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -994,7 +992,7 @@ describe("imagemin plugin", () => {
       const file = path.resolve(
         __dirname,
         compilation.options.output.path,
-        "./loader-test.webp"
+        "./loader-test.webp",
       );
       const ext = await fileType.fromFile(file);
 
@@ -1002,18 +1000,18 @@ describe("imagemin plugin", () => {
 
       // TODO fix me
       await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-        false
+        false,
       );
       await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-        false
+        false,
       );
       await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-        false
+        false,
       );
       await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-        false
+        false,
       );
-    }
+    },
   );
 
   it("should optimizes and generate animated images (sharpGenerate)", async () => {
@@ -1084,13 +1082,13 @@ describe("imagemin plugin", () => {
     expect(errors).toHaveLength(0);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      false
+      false,
     );
 
     const svgAsset = compilation.getAsset("loader-test.svg");
@@ -1129,7 +1127,7 @@ describe("imagemin plugin", () => {
         imageminPluginOptions: { minimizer: undefined },
       });
     }).rejects.toThrow(
-      /Not configured 'minimizer' or 'generator' options, please setup them/
+      /Not configured 'minimizer' or 'generator' options, please setup them/,
     );
   });
 
@@ -1140,7 +1138,7 @@ describe("imagemin plugin", () => {
         imageminPluginOptions: { generator: undefined },
       });
     }).rejects.toThrow(
-      /Not configured 'minimizer' or 'generator' options, please setup them/
+      /Not configured 'minimizer' or 'generator' options, please setup them/,
     );
   });
 
@@ -1173,7 +1171,7 @@ describe("imagemin plugin", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.webp"
+      "./loader-test.webp",
     );
     const ext = await fileType.fromFile(file);
 
@@ -1181,16 +1179,16 @@ describe("imagemin plugin", () => {
 
     // TODO fix me
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      false
+      false,
     );
   });
 
@@ -1219,7 +1217,7 @@ describe("imagemin plugin", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.avif"
+      "./loader-test.avif",
     );
     const ext = await fileType.fromFile(file);
 
@@ -1251,7 +1249,7 @@ describe("imagemin plugin", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.webp"
+      "./loader-test.webp",
     );
     const ext = await fileType.fromFile(file);
 
@@ -1289,12 +1287,12 @@ describe("imagemin plugin", () => {
       const file = path.resolve(
         __dirname,
         compilation.options.output.path,
-        "./loader-test.webp"
+        "./loader-test.webp",
       );
       const ext = await fileType.fromFile(file);
 
       expect(/image\/webp/i.test(ext.mime)).toBe(true);
-    }
+    },
   );
 
   ifit(needSquooshTest)(
@@ -1326,9 +1324,9 @@ describe("imagemin plugin", () => {
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toMatch(
-        /Multiple values for the 'encodeOptions' option is not supported for 'loader-test.png', specify only one codec for the generator/
+        /Multiple values for the 'encodeOptions' option is not supported for 'loader-test.png', specify only one codec for the generator/,
       );
-    }
+    },
   );
 
   it("should generate throw an error on multiple 'encodeOptions' options using 'sharpGenerate'", async () => {
@@ -1358,7 +1356,7 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /Multiple values for the 'encodeOptions' option is not supported for '.+loader-test.png', specify only one codec for the generator/
+      /Multiple values for the 'encodeOptions' option is not supported for '.+loader-test.png', specify only one codec for the generator/,
     );
   });
 
@@ -1384,7 +1382,7 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /No result from 'sharp' for '.+', please configure the 'encodeOptions' option to generate images/
+      /No result from 'sharp' for '.+', please configure the 'encodeOptions' option to generate images/,
     );
   });
 
@@ -1435,7 +1433,7 @@ describe("imagemin plugin", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.webp"
+      "./loader-test.webp",
     );
 
     const ext = await fileType.fromFile(file);
@@ -1449,16 +1447,16 @@ describe("imagemin plugin", () => {
 
     // TODO fix me
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.jpg", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.png", compilation)).resolves.toBe(
-      false
+      false,
     );
     await expect(isOptimized("loader-test.svg", compilation)).resolves.toBe(
-      false
+      false,
     );
   });
 
@@ -1472,7 +1470,7 @@ describe("imagemin plugin", () => {
           cacheLocation: path.resolve(fixturesPath, "./cache/absolute-url"),
           lockfileLocation: path.resolve(
             fixturesPath,
-            "./cache/absolute-url/lock.json"
+            "./cache/absolute-url/lock.json",
           ),
         },
       },
@@ -1503,10 +1501,10 @@ describe("imagemin plugin", () => {
     expect(errors).toHaveLength(0);
 
     expect(Object.keys(compilation.assets)).toContain(
-      "generated-loader-test.webp"
+      "generated-loader-test.webp",
     );
     expect(Object.keys(compilation.assets)).toContain(
-      "generated-PNG_transparency_demonstration_1.webp"
+      "generated-PNG_transparency_demonstration_1.webp",
     );
     expect(Object.keys(compilation.assets)).toContain("generated-Example.webp");
     expect(Object.keys(compilation.assets)).toContain("minimized-icon.svg");
@@ -1514,7 +1512,7 @@ describe("imagemin plugin", () => {
     const webpAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./generated-loader-test.webp"
+      "./generated-loader-test.webp",
     );
     const ext = await fileType.fromFile(webpAsset);
 
@@ -1523,7 +1521,7 @@ describe("imagemin plugin", () => {
     const webpAsset1 = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./generated-PNG_transparency_demonstration_1.webp"
+      "./generated-PNG_transparency_demonstration_1.webp",
     );
     const ext1 = await fileType.fromFile(webpAsset1);
 
@@ -1532,20 +1530,23 @@ describe("imagemin plugin", () => {
     const webpAsset2 = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./generated-Example.webp"
+      "./generated-Example.webp",
     );
     const ext2 = await fileType.fromFile(webpAsset2);
 
     expect(/image\/webp/i.test(ext2.mime)).toBe(true);
 
     await expect(
-      isOptimized(["minimized-loader-test.jpg", "loader-test.jpg"], compilation)
+      isOptimized(
+        ["minimized-loader-test.jpg", "loader-test.jpg"],
+        compilation,
+      ),
     ).resolves.toBe(true);
 
     const bundleFilename = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./bundle.js"
+      "./bundle.js",
     );
     const bundle = await pify(fs.readFile)(bundleFilename);
     const URIRegEx = /"(data:([^;,]+)?((?:;[^;,]+)*?)(?:;(base64))?,(.*))"/gi;
@@ -1563,7 +1564,7 @@ describe("imagemin plugin", () => {
           cacheLocation: path.resolve(fixturesPath, "./cache/absolute-url"),
           lockfileLocation: path.resolve(
             fixturesPath,
-            "./cache/absolute-url/lock.json"
+            "./cache/absolute-url/lock.json",
           ),
         },
       },
@@ -1594,41 +1595,53 @@ describe("imagemin plugin", () => {
     expect(errors).toHaveLength(0);
 
     expect(Object.keys(compilation.assets)).toContain(
-      "minimized-loader-test.gif"
+      "minimized-loader-test.gif",
     );
     expect(Object.keys(compilation.assets)).toContain(
-      "minimized-loader-test.jpg"
+      "minimized-loader-test.jpg",
     );
     expect(Object.keys(compilation.assets)).toContain(
-      "minimized-loader-test.png"
+      "minimized-loader-test.png",
     );
     expect(Object.keys(compilation.assets)).toContain(
-      "generated-loader-test.webp"
+      "generated-loader-test.webp",
     );
     expect(Object.keys(compilation.assets)).toContain(
-      "minimized-loader-test.svg"
+      "minimized-loader-test.svg",
     );
 
     const webpAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./generated-loader-test.webp"
+      "./generated-loader-test.webp",
     );
     const ext = await fileType.fromFile(webpAsset);
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
 
     await expect(
-      isOptimized(["minimized-loader-test.gif", "loader-test.gif"], compilation)
+      isOptimized(
+        ["minimized-loader-test.gif", "loader-test.gif"],
+        compilation,
+      ),
     ).resolves.toBe(true);
     await expect(
-      isOptimized(["minimized-loader-test.jpg", "loader-test.jpg"], compilation)
+      isOptimized(
+        ["minimized-loader-test.jpg", "loader-test.jpg"],
+        compilation,
+      ),
     ).resolves.toBe(true);
     await expect(
-      isOptimized(["minimized-loader-test.png", "loader-test.png"], compilation)
+      isOptimized(
+        ["minimized-loader-test.png", "loader-test.png"],
+        compilation,
+      ),
     ).resolves.toBe(true);
     await expect(
-      isOptimized(["minimized-loader-test.svg", "loader-test.svg"], compilation)
+      isOptimized(
+        ["minimized-loader-test.svg", "loader-test.svg"],
+        compilation,
+      ),
     ).resolves.toBe(true);
   });
 
@@ -1662,7 +1675,7 @@ describe("imagemin plugin", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.png"
+      "./loader-test.png",
     );
     const ext = await fileType.fromFile(file);
 
@@ -1697,9 +1710,9 @@ describe("imagemin plugin", () => {
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toMatch(
-        /Error with 'loader-test.txt': Binary blob has an unsupported format/g
+        /Error with 'loader-test.txt': Binary blob has an unsupported format/g,
       );
-    }
+    },
   );
 
   it("should throw an error on unknown format (sharpGenerate)", async () => {
@@ -1728,7 +1741,7 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /Error with '.+loader-test.txt': Input file has an unsupported format/g
+      /Error with '.+loader-test.txt': Input file has an unsupported format/g,
     );
   });
 
@@ -1762,7 +1775,7 @@ describe("imagemin plugin", () => {
     const bundleFilename = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./bundle.js"
+      "./bundle.js",
     );
     const bundle = await pify(fs.readFile)(bundleFilename);
     const URIRegEx = /"(data:([^;,]+)?((?:;[^;,]+)*?)(?:;(base64))?,(.*))"/gi;
@@ -1797,7 +1810,7 @@ describe("imagemin plugin", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.avif"
+      "./loader-test.avif",
     );
     const ext = await fileType.fromFile(file);
 
@@ -1831,7 +1844,7 @@ describe("imagemin plugin", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.avif"
+      "./plugin-test.avif",
     );
     const ext = await fileType.fromFile(file);
 
@@ -1864,7 +1877,7 @@ describe("imagemin plugin", () => {
     const loaderFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.avif"
+      "./loader-test.avif",
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
@@ -1907,7 +1920,7 @@ describe("imagemin plugin", () => {
     const loaderFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.avif"
+      "./loader-test.avif",
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
@@ -1916,7 +1929,7 @@ describe("imagemin plugin", () => {
     const pluginFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.avif"
+      "./plugin-test.avif",
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
@@ -1961,7 +1974,7 @@ describe("imagemin plugin", () => {
     const loaderFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.avif"
+      "./loader-test.avif",
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
@@ -1970,7 +1983,7 @@ describe("imagemin plugin", () => {
     const pluginFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.avif"
+      "./plugin-test.avif",
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
@@ -2021,7 +2034,7 @@ describe("imagemin plugin", () => {
     const loaderFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.avif"
+      "./loader-test.avif",
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
@@ -2030,14 +2043,14 @@ describe("imagemin plugin", () => {
     const pluginFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.avif"
+      "./plugin-test.avif",
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
     expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -2093,7 +2106,7 @@ describe("imagemin plugin", () => {
     const loaderFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.avif"
+      "./loader-test.avif",
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
@@ -2102,7 +2115,7 @@ describe("imagemin plugin", () => {
     const pluginFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.avif"
+      "./plugin-test.avif",
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
@@ -2111,14 +2124,14 @@ describe("imagemin plugin", () => {
     const pluginWebp = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.webp"
+      "./plugin-test.webp",
     );
     const pluginWebExt = await fileType.fromFile(pluginWebp);
 
     expect(/image\/webp/i.test(pluginWebExt.mime)).toBe(true);
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -2190,7 +2203,7 @@ describe("imagemin plugin", () => {
     const loaderFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.avif"
+      "./loader-test.avif",
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
@@ -2199,7 +2212,7 @@ describe("imagemin plugin", () => {
     const pluginFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.avif"
+      "./plugin-test.avif",
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
@@ -2208,7 +2221,7 @@ describe("imagemin plugin", () => {
     const pluginWebp = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.webp"
+      "./plugin-test.webp",
     );
     const pluginWebExt = await fileType.fromFile(pluginWebp);
 
@@ -2263,7 +2276,7 @@ describe("imagemin plugin", () => {
           ],
         },
       },
-      true
+      true,
     );
     const stats = await compile(compiler);
     const { compilation } = stats;
@@ -2279,7 +2292,7 @@ describe("imagemin plugin", () => {
     const loaderFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.avif"
+      "./loader-test.avif",
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
@@ -2288,7 +2301,7 @@ describe("imagemin plugin", () => {
     const pluginFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.avif"
+      "./plugin-test.avif",
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
@@ -2297,14 +2310,14 @@ describe("imagemin plugin", () => {
     const pluginWebp = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.webp"
+      "./plugin-test.webp",
     );
     const pluginWebExt = await fileType.fromFile(pluginWebp);
 
     expect(/image\/webp/i.test(pluginWebExt.mime)).toBe(true);
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
 
     expect(stats.compilation.emittedAssets.size).toBe(5);
@@ -2350,7 +2363,7 @@ describe("imagemin plugin", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.webp"
+      "./plugin-test.webp",
     );
     const ext = await fileType.fromFile(file);
 
@@ -2396,7 +2409,7 @@ describe("imagemin plugin", () => {
     const webpFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.webp"
+      "./plugin-test.webp",
     );
     const webpExt = await fileType.fromFile(webpFile);
 
@@ -2405,14 +2418,14 @@ describe("imagemin plugin", () => {
     const fileJpg = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./plugin-test.jpg"
+      "./plugin-test.jpg",
     );
     const extJpg = await fileType.fromFile(fileJpg);
 
     expect(/image\/jpeg/i.test(extJpg.mime)).toBe(true);
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
-      true
+      true,
     );
   });
 
@@ -2485,7 +2498,7 @@ describe("imagemin plugin", () => {
     const cssFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./main.css"
+      "./main.css",
     );
 
     const cssContent = await fs.promises.readFile(cssFile, "utf-8");
@@ -2549,7 +2562,7 @@ describe("imagemin plugin", () => {
     const cssFile = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./main.css"
+      "./main.css",
     );
 
     const cssContent = await fs.promises.readFile(cssFile, "utf-8");
@@ -2586,7 +2599,7 @@ describe("imagemin plugin", () => {
     const file = path.resolve(
       __dirname,
       compilation.options.output.path,
-      "./loader-test.webp"
+      "./loader-test.webp",
     );
     const ext = await fileType.fromFile(file);
 

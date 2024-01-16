@@ -11,7 +11,7 @@ export type SvgoEncodeOptions = Omit<import("svgo").Config, "path" | "datauri">;
 export type Uint8ArrayUtf8ByteString = (
   array: number[] | Uint8Array,
   start: number,
-  end: number
+  end: number,
 ) => string;
 export type StringToBytes = (string: string) => number[];
 export type MetaData = {
@@ -79,7 +79,7 @@ export function memoize<T>(fn: (() => any) | undefined): () => T;
  * @returns {Promise<ImageminOptions>}
  */
 export function imageminNormalizeConfig<T>(
-  imageminConfig: ImageminOptions
+  imageminConfig: ImageminOptions,
 ): Promise<ImageminOptions>;
 /**
  * @template T
@@ -89,7 +89,7 @@ export function imageminNormalizeConfig<T>(
  */
 export function imageminMinify<T>(
   original: WorkerResult,
-  options: T
+  options: T,
 ): Promise<WorkerResult | null>;
 /**
  * @template T
@@ -99,7 +99,7 @@ export function imageminMinify<T>(
  */
 export function imageminGenerate<T>(
   original: WorkerResult,
-  minimizerOptions: T
+  minimizerOptions: T,
 ): Promise<WorkerResult | null>;
 /**
  * @template T
@@ -109,7 +109,7 @@ export function imageminGenerate<T>(
  */
 export function squooshMinify<T>(
   original: WorkerResult,
-  options: T
+  options: T,
 ): Promise<WorkerResult | null>;
 export namespace squooshMinify {
   export { squooshImagePoolSetup as setup };
@@ -123,7 +123,7 @@ export namespace squooshMinify {
  */
 export function squooshGenerate<T>(
   original: WorkerResult,
-  minifyOptions: T
+  minifyOptions: T,
 ): Promise<WorkerResult | null>;
 export namespace squooshGenerate {
   export { squooshImagePoolSetup as setup };
@@ -137,7 +137,7 @@ export namespace squooshGenerate {
  */
 export function sharpMinify<T>(
   original: WorkerResult,
-  minimizerOptions: T
+  minimizerOptions: T,
 ): Promise<WorkerResult | null>;
 /**
  * @template T
@@ -147,7 +147,7 @@ export function sharpMinify<T>(
  */
 export function sharpGenerate<T>(
   original: WorkerResult,
-  minimizerOptions: T
+  minimizerOptions: T,
 ): Promise<WorkerResult | null>;
 /** @typedef {import("svgo")} SvgoLib */
 /**
@@ -164,7 +164,7 @@ export function sharpGenerate<T>(
  */
 export function svgoMinify<T>(
   original: WorkerResult,
-  minimizerOptions: T
+  minimizerOptions: T,
 ): Promise<WorkerResult | null>;
 declare function squooshImagePoolSetup(): void;
 declare function squooshImagePoolTeardown(): Promise<void>;
