@@ -1228,13 +1228,16 @@ async function svgoMinify(original, minimizerOptions) {
   // eslint-disable-next-line node/no-unpublished-require
   const { optimize } = require("svgo");
 
-  const { encodeOptions } = /** @type {SvgoOptions} */ (minimizerOptions);
+  const { encodeOptions = {} } = /** @type {SvgoOptions} */ (minimizerOptions);
 
   /** @type {import("svgo").Output} */
   let result;
 
   try {
-    result = optimize(original.data.toString(), encodeOptions);
+    result = optimize(original.data.toString(), {
+      path: original.filename,
+      ...encodeOptions,
+    });
   } catch (error) {
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
