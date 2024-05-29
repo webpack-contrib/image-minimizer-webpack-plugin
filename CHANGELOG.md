@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.0.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v4.0.0...v4.0.1) (2024-05-29)
+
+
+### Bug Fixes
+
+* pass the original image path to svgo ([#441](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/441)) ([d5522a6](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/d5522a6326b52184b663b0c02035ce9464144307))
+
 ## [4.0.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v3.8.3...v4.0.0) (2024-01-16)
 
 
