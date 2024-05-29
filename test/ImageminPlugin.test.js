@@ -2605,4 +2605,37 @@ describe("imagemin plugin", () => {
 
     expect(/image\/webp/i.test(ext.mime)).toBe(true);
   });
+
+  it("should optimizes images svg image and prefix id (svgoMinify)", async () => {
+    const stats = await runWebpack({
+      name: "minified-[name].[ext]",
+      assetResource: true,
+      entry: path.join(fixturesPath, "svgo-prefix-id.js"),
+      imageminPluginOptions: {
+        test: /\.(jpe?g|png|webp|svg)$/i,
+        minimizer: {
+          implementation: ImageMinimizerPlugin.svgoMinify,
+          options: {
+            encodeOptions: {
+              plugins: ["prefixIds"],
+            },
+          },
+        },
+      },
+    });
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+
+    const file = path.resolve(
+      __dirname,
+      compilation.options.output.path,
+      "./minified-svgo-id.svg",
+    );
+    const content = await fs.promises.readFile(file, "utf-8");
+
+    expect(content).toContain("svgo-id_svg__test");
+  });
 });
