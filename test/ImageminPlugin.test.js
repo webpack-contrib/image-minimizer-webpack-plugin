@@ -592,6 +592,38 @@ describe("imagemin plugin", () => {
     expect(errors).toHaveLength(0);
   });
 
+  it("should work with asset/inline (svgoMinify) without options", async () => {
+    const compiler = await runWebpack(
+      {
+        fileLoaderOff: true,
+        assetInline: true,
+        entry: path.join(fixturesPath, "./asset-inline.js"),
+        emitPlugin: true,
+        imageminPluginOptions: {
+          minimizer: {
+            implementation: ImageMinimizerPlugin.svgoMinify,
+          },
+        },
+      },
+      true,
+    );
+
+    const stats = await compile(compiler);
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+
+    const result = readAsset("bundle.js", compiler, stats).toString();
+
+    const isInlineSvg =
+      /data:image\/svg\+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI\+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIHN0eWxlPSJzdHJva2U6IzAwMDtzdHJva2Utd2l0aDozO2ZpbGw6cmVkIi8\+PC9zdmc\+/.test(
+        result,
+      );
+
+    expect(isInlineSvg).toBe(true);
+    expect(warnings).toHaveLength(0);
+    expect(errors).toHaveLength(0);
+  });
+
   it("should work and use the persistent cache by default (loader + plugin)", async () => {
     const compiler = await runWebpack(
       {
