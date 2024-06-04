@@ -621,7 +621,7 @@ async function imageminGenerate(original, minimizerOptions) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     await imageminNormalizeConfig(
       /** @type {ImageminOptions} */ (
-        /** @type {?} */ (minimizerOptions || {})
+        /** @type {?} */ (minimizerOptions ?? {})
       ),
     )
   );
@@ -657,7 +657,8 @@ async function imageminGenerate(original, minimizerOptions) {
 
   return {
     filename: newFilename,
-    data: result,
+    // imagemin@8 returns buffer, but imagemin@9 returns uint8array
+    data: !Buffer.isBuffer(result) ? Buffer.from(result) : result,
     warnings: [...original.warnings],
     errors: [...original.errors],
     info: {
@@ -677,7 +678,7 @@ async function imageminGenerate(original, minimizerOptions) {
 async function imageminMinify(original, options) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     await imageminNormalizeConfig(
-      /** @type {ImageminOptions} */ (/** @type {?} */ (options || {})),
+      /** @type {ImageminOptions} */ (/** @type {?} */ (options ?? {})),
     )
   );
 
@@ -718,7 +719,8 @@ async function imageminMinify(original, options) {
 
   return {
     filename: original.filename,
-    data: result,
+    // imagemin@8 returns buffer, but imagemin@9 returns uint8array
+    data: !Buffer.isBuffer(result) ? Buffer.from(result) : result,
     warnings: [...original.warnings],
     errors: [...original.errors],
     info: {
@@ -790,7 +792,7 @@ async function squooshGenerate(original, minifyOptions) {
   const imagePool = pool || squooshImagePoolCreate();
   const image = imagePool.ingestImage(new Uint8Array(original.data));
 
-  const squooshOptions = /** @type {SquooshOptions} */ (minifyOptions || {});
+  const squooshOptions = /** @type {SquooshOptions} */ (minifyOptions ?? {});
 
   const preprocEntries = Object.entries(squooshOptions).filter(
     ([key, value]) => {
@@ -909,7 +911,7 @@ async function squooshMinify(original, options) {
   const isReusePool = Boolean(pool);
   const imagePool = pool || squooshImagePoolCreate();
   const image = imagePool.ingestImage(new Uint8Array(original.data));
-  const squooshOptions = /** @type {SquooshOptions} */ (options || {});
+  const squooshOptions = /** @type {SquooshOptions} */ (options ?? {});
 
   const preprocEntries = Object.entries(squooshOptions).filter(
     ([key, value]) => {
@@ -1227,8 +1229,7 @@ async function svgoMinify(original, minimizerOptions) {
   /** @type {SvgoLib} */
   // eslint-disable-next-line node/no-unpublished-require
   const { optimize } = require("svgo");
-
-  const { encodeOptions } = /** @type {SvgoOptions} */ (minimizerOptions);
+  const { encodeOptions } = /** @type {SvgoOptions} */ (minimizerOptions ?? {});
 
   /** @type {import("svgo").Output} */
   let result;

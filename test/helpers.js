@@ -266,14 +266,16 @@ function isOptimized(originalPath, compilation) {
   return Promise.resolve()
     .then(() => pify(fs.readFile)(pathToOriginal))
     .then((data) =>
-      imagemin.buffer(data, {
-        plugins: [
-          imageminGifsicle(),
-          imageminMozjpeg(),
-          imageminPngquant(),
-          imageminSvgo(),
-        ],
-      }),
+      imagemin
+        .buffer(data, {
+          plugins: [
+            imageminGifsicle(),
+            imageminMozjpeg(),
+            imageminPngquant(),
+            imageminSvgo(),
+          ],
+        })
+        .then((result) => Buffer.from(result)),
     )
     .then((optimizedBuffer) =>
       Promise.resolve()
