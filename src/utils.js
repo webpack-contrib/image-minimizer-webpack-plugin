@@ -657,7 +657,8 @@ async function imageminGenerate(original, minimizerOptions) {
 
   return {
     filename: newFilename,
-    data: result,
+    // imagemin@8 returns buffer, but imagemin@9 returns uint8array
+    data: !Buffer.isBuffer(result) ? Buffer.from(result) : result,
     warnings: [...original.warnings],
     errors: [...original.errors],
     info: {
@@ -718,6 +719,7 @@ async function imageminMinify(original, options) {
 
   return {
     filename: original.filename,
+    // imagemin@8 returns buffer, but imagemin@9 returns uint8array
     data: !Buffer.isBuffer(result) ? Buffer.from(result) : result,
     warnings: [...original.warnings],
     errors: [...original.errors],
