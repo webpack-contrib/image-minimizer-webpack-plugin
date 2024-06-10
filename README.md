@@ -94,7 +94,7 @@ This plugin can use 4 tools to optimize/generate images:
 - [`sharp`](https://github.com/lovell/sharp) - High performance Node.js image processing, the fastest module to resize and compress JPEG, PNG, WebP, AVIF and TIFF images. Uses the libvips library.
 - [`svgo`](https://github.com/svg/svgo) - tool for optimizing SVG vector graphics files. Supports only SVG files minification.
 
-> **Warning**
+> [!WARNING]
 >
 > By default we don't install anything
 
@@ -108,7 +108,7 @@ To begin, you'll need to install `image-minimizer-webpack-plugin` and image mini
 npm install image-minimizer-webpack-plugin imagemin --save-dev
 ```
 
-> **Warning**
+> [!WARNING]
 >
 > imagemin uses plugin to optimize/generate images, so you need to install them too
 
@@ -137,7 +137,7 @@ Images can be optimized in two modes:
 
 ### Optimize with [`imagemin`](https://github.com/imagemin/imagemin)
 
-> **Note**
+> [!NOTE]
 >
 > - [imagemin-mozjpeg](https://github.com/imagemin/imagemin-mozjpeg) can be configured in lossless and lossy mode.
 > - [imagemin-svgo](https://github.com/imagemin/imagemin-svgo) can be configured in lossless and lossy mode.
@@ -499,7 +499,9 @@ const myImage5 = new URL("image.png?as=webp&w=150&h=auto", import.meta.url);
 </picture>
 ```
 
-**NOTE**: you need to setup `avif` and `webp` presets, [example for webp](#optimize-and-generate-webp-images)
+> [!NOTE]
+>
+> You need to setup `avif` and `webp` presets, [example for webp](#optimize-and-generate-webp-images).
 
 #### Standalone Loader
 
@@ -1279,11 +1281,11 @@ Default: `undefined`
 Allow to setup default generators.
 Useful if you need generate `webp`/`avif`/etc from other formats.
 
-> **Warning**
+> [!WARNING]
 >
 > If no generator was found for the image (i.e. no `?as=webp` was found in query params), the `minimizer` option will be used. Therefore, it is recommended to configure generator outputs optimized image.
 
-> **Warning**
+> [!WARNING]
 >
 > The option will not work if you disable `loader` (i.e. set the `loader` option to `false`).
 
