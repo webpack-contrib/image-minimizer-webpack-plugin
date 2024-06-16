@@ -2461,6 +2461,7 @@ module.exports = {
         generator: [
           {
             // You can apply generator using `?as=webp`, you can use any name and provide more options
+            type: 'asset',
             preset: "webp",
             implementation: ImageMinimizerPlugin.squooshGenerate,
             options: {
