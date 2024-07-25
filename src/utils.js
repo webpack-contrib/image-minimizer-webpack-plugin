@@ -978,7 +978,7 @@ squooshMinify.teardown = squooshImagePoolTeardown;
 
 /** @typedef {import("sharp")} SharpLib */
 /** @typedef {import("sharp").Sharp} Sharp */
-/** @typedef {import("sharp").ResizeOptions & { enabled?: boolean }} ResizeOptions */
+/** @typedef {import("sharp").ResizeOptions & { enabled?: boolean; unit?: "px" | "percent" }} ResizeOptions */
 
 /**
  * @typedef SharpEncodeOptions
@@ -1095,12 +1095,38 @@ async function sharpTransform(
   // ====== resize ======
 
   if (minimizerOptions.resize) {
-    const { enabled = true, ...params } = minimizerOptions.resize;
+    const { enabled = true, unit = "px", ...params } = minimizerOptions.resize;
 
     if (
       enabled &&
       (typeof params.width === "number" || typeof params.height === "number")
     ) {
+      if (unit === "percent") {
+        const originalMetadata = await sharp(original.data).metadata();
+
+        if (
+          typeof params.width === "number" &&
+          originalMetadata.width &&
+          Number.isFinite(originalMetadata.width) &&
+          originalMetadata.width > 0
+        ) {
+          params.width = Math.ceil(
+            (originalMetadata.width * params.width) / 100,
+          );
+        }
+
+        if (
+          typeof params.height === "number" &&
+          originalMetadata.height &&
+          Number.isFinite(originalMetadata.height) &&
+          originalMetadata.height > 0
+        ) {
+          params.height = Math.ceil(
+            (originalMetadata.height * params.height) / 100,
+          );
+        }
+      }
+
       imagePipeline.resize(params);
     }
   }

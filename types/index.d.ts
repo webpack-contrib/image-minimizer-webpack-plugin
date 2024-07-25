@@ -135,6 +135,7 @@ type BasicTransformerOptions<T> = InferDefaultType<T> | undefined;
 type ResizeOptions = {
   width?: number | undefined;
   height?: number | undefined;
+  unit?: "px" | "percent" | undefined;
   enabled?: boolean | undefined;
 };
 type BasicTransformerImplementation<T> = (

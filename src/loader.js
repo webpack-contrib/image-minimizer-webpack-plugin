@@ -46,9 +46,10 @@ function changeResource(loaderContext, isAbsolute, output, query) {
  * @param {Minimizer<T>[]} transformers
  * @param {string | null} widthQuery
  * @param {string | null} heightQuery
+ * @param {string | null} unitQuery
  * @return {Minimizer<T>[]}
  */
-function processSizeQuery(transformers, widthQuery, heightQuery) {
+function processSizeQuery(transformers, widthQuery, heightQuery, unitQuery) {
   return transformers.map((transformer) => {
     const minimizer = { ...transformer };
 
@@ -78,6 +79,10 @@ function processSizeQuery(transformers, widthQuery, heightQuery) {
       if (Number.isFinite(height) && height > 0) {
         minimizerOptions.resize.height = height;
       }
+    }
+
+    if (unitQuery === "px" || unitQuery === "percent") {
+      minimizerOptions.resize.unit = unitQuery;
     }
 
     return minimizer;
@@ -170,15 +175,22 @@ async function loader(content) {
   if (parsedQuery) {
     const widthQuery = parsedQuery.get("width") ?? parsedQuery.get("w");
     const heightQuery = parsedQuery.get("height") ?? parsedQuery.get("h");
+    const unitQuery = parsedQuery.get("unit") ?? parsedQuery.get("u");
 
-    if (widthQuery || heightQuery) {
+    if (widthQuery || heightQuery || unitQuery) {
       if (Array.isArray(transformer)) {
-        transformer = processSizeQuery(transformer, widthQuery, heightQuery);
+        transformer = processSizeQuery(
+          transformer,
+          widthQuery,
+          heightQuery,
+          unitQuery,
+        );
       } else {
         [transformer] = processSizeQuery(
           [transformer],
           widthQuery,
           heightQuery,
+          unitQuery,
         );
       }
     }
