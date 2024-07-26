@@ -5,7 +5,6 @@ import pify from "pify";
 import tempy from "tempy";
 import webpack from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import CopyPlugin from "copy-webpack-plugin";
 
 import ImageMinimizerPlugin from "../src/index";
 
@@ -27,12 +26,13 @@ function compile(compiler) {
   });
 }
 
-function runWebpack(maybeOptions, getCompiler = false) {
+async function runWebpack(maybeOptions, getCompiler = false) {
   const maybeMultiCompiler = Array.isArray(maybeOptions)
     ? maybeOptions
     : [maybeOptions];
 
   const configs = [];
+  const CopyPlugin = (await import("copy-webpack-plugin")).default;
 
   for (const options of maybeMultiCompiler) {
     const config = {
