@@ -1,11 +1,9 @@
 import fs from "fs";
 import path from "path";
 
-import imagemin from "imagemin";
 import imageminGifsicle from "imagemin-gifsicle";
 import imageminMozjpeg from "imagemin-mozjpeg";
 import imageminPngquant from "imagemin-pngquant";
-import imageminSvgo from "imagemin-svgo";
 import pify from "pify";
 import tempy from "tempy";
 import webpack from "webpack";
@@ -244,7 +242,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
   return pify(webpack)(configs.length === 1 ? configs[0] : configs);
 }
 
-function isOptimized(originalPath, compilation) {
+async function isOptimized(originalPath, compilation) {
   const { assets } = compilation;
   let name = originalPath;
   let realName = originalPath;
@@ -262,6 +260,9 @@ function isOptimized(originalPath, compilation) {
   const { path: outputPath } = compilation.options.output;
   const pathToOriginal = path.join(fixturesPath, realName);
   const pathToEmitted = path.join(outputPath, name);
+
+  const imagemin = (await import("imagemin")).default;
+  const imageminSvgo = (await import("imagemin-svgo")).default;
 
   return Promise.resolve()
     .then(() => pify(fs.readFile)(pathToOriginal))
