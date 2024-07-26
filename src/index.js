@@ -86,6 +86,7 @@ const {
  * @typedef {Object} ResizeOptions
  * @property {number} [width]
  * @property {number} [height]
+ * @property {"px" | "percent"} [unit]
  * @property {boolean} [enabled]
  */
 

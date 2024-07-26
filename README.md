@@ -472,6 +472,10 @@ The plugin supports the following query parameters:
 - `height`/`h` - allows you to set the image height
 - `as` - to specify the [preset](#preset) option
 
+  **Only supported for `sharp` currently:**
+
+- `unit`/`u` - can be `px` or `percent` and allows you to resize by a percentage of the image's size.
+
 Examples:
 
 ```js
@@ -483,6 +487,8 @@ const myImage3 = new URL("image.png?w=150", import.meta.url);
 const myImage4 = new URL("image.png?as=webp&w=150&h=120", import.meta.url);
 // You can use `auto` to reset `width` or `height` from the `preset` option
 const myImage5 = new URL("image.png?as=webp&w=150&h=auto", import.meta.url);
+// You can use `unit` to get the non-retina resize of images that are retina sized
+const myImage1 = new URL("image.png?width=50&unit=percent", import.meta.url);
 ```
 
 ```css
@@ -1493,6 +1499,43 @@ module.exports = {
 ```
 
 You can find more information [here](https://github.com/GoogleChromeLabs/squoosh/tree/dev/libsquoosh).
+
+For only `sharp` currently, you can even generate the non-retina resizes of images:
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        generator: [
+          {
+            // You can apply generator using `?as=webp-1x`, you can use any name and provide more options
+            preset: "webp-1x",
+            implementation: ImageMinimizerPlugin.sharpGenerate,
+            options: {
+              resize: {
+                enabled: true,
+                width: 50,
+                unit: "percent",
+              },
+              encodeOptions: {
+                webp: {
+                  quality: 90,
+                },
+              },
+            },
+          },
+        ],
+      }),
+    ],
+  },
+};
+```
 
 #### Generator example for user defined implementation
 

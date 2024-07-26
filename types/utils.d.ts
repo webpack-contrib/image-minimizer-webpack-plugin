@@ -22,6 +22,7 @@ export type SharpLib = typeof import("sharp");
 export type Sharp = import("sharp").Sharp;
 export type ResizeOptions = import("sharp").ResizeOptions & {
   enabled?: boolean;
+  unit?: "px" | "percent";
 };
 export type SharpEncodeOptions = {
   avif?: import("sharp").AvifOptions | undefined;

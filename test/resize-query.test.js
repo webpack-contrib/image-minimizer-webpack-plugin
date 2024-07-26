@@ -164,6 +164,164 @@ describe("resize query (sharp)", () => {
       expect(errors).toHaveLength(0);
     }
   });
+
+  it("should generate and resize with percent unit resize options", async () => {
+    const stats = await runWebpack({
+      entry: path.join(
+        fixturesPath,
+        "./generator-and-minimizer-resize-query.js",
+      ),
+      imageminLoaderOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.sharpMinify,
+          filename: "[name]-[width]x[height][ext]",
+          options: {
+            resize: {
+              width: 400,
+              height: 400,
+              unit: "percent",
+            },
+            encodeOptions: {
+              png: {},
+            },
+          },
+        },
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.sharpGenerate,
+            filename: "[name]-[width]x[height][ext]",
+            options: {
+              resize: {
+                width: 400,
+                height: 400,
+                unit: "percent",
+              },
+              encodeOptions: {
+                webp: {},
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+    const sizeOf = promisify(imageSize);
+
+    const assetsList = [
+      // asset path, width, height, mime regExp
+      ["./loader-test-500x2000.png", 500, 2000, /image\/png/i],
+      ["./loader-test-750x2000.png", 750, 2000, /image\/png/i],
+      ["./loader-test-2000x1000.png", 2000, 1000, /image\/png/i],
+      ["./loader-test-2000x1250.png", 2000, 1250, /image\/png/i],
+      ["./loader-test-1500x1500.png", 1500, 1500, /image\/png/i],
+      ["./loader-test-1600x1600.png", 1600, 1600, /image\/png/i],
+      ["./loader-test-1750x1750.png", 1750, 1750, /image\/png/i],
+
+      ["./loader-test-500x2000.webp", 500, 2000, /image\/webp/i],
+      ["./loader-test-750x2000.webp", 750, 2000, /image\/webp/i],
+      ["./loader-test-2000x1000.webp", 2000, 1000, /image\/webp/i],
+      ["./loader-test-2000x1250.webp", 2000, 1250, /image\/webp/i],
+      ["./loader-test-1500x1500.webp", 1500, 1500, /image\/webp/i],
+      ["./loader-test-1600x1600.webp", 1600, 1600, /image\/webp/i],
+      ["./loader-test-1750x1750.webp", 1750, 1750, /image\/webp/i],
+    ];
+
+    for (const [assetPath, width, height, mimeRegExp] of assetsList) {
+      const transformedAsset = path.resolve(
+        __dirname,
+        compilation.options.output.path,
+        assetPath,
+      );
+
+      // eslint-disable-next-line no-await-in-loop
+      const transformedExt = await fileType.fromFile(transformedAsset);
+      // eslint-disable-next-line no-await-in-loop
+      const dimensions = await sizeOf(transformedAsset);
+
+      expect(dimensions.width).toBe(width);
+      expect(dimensions.height).toBe(height);
+      expect(mimeRegExp.test(transformedExt.mime)).toBe(true);
+      expect(warnings).toHaveLength(0);
+      expect(errors).toHaveLength(0);
+    }
+  });
+
+  it("should generate and resize with percent unit query without resize options", async () => {
+    const stats = await runWebpack({
+      entry: path.join(
+        fixturesPath,
+        "./generator-and-minimizer-percent-resize-query.js",
+      ),
+      imageminLoaderOptions: {
+        minimizer: {
+          implementation: ImageMinimizerPlugin.sharpMinify,
+          filename: "[name]-[width]x[height][ext]",
+          options: {
+            encodeOptions: {
+              png: {},
+            },
+          },
+        },
+        generator: [
+          {
+            preset: "webp",
+            implementation: ImageMinimizerPlugin.sharpGenerate,
+            filename: "[name]-[width]x[height][ext]",
+            options: {
+              encodeOptions: {
+                webp: {},
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    const { compilation } = stats;
+    const { warnings, errors } = compilation;
+    const sizeOf = promisify(imageSize);
+
+    const assetsList = [
+      // asset path, width, height, mime regExp
+      ["./loader-test-500x500.png", 500, 500, /image\/png/i],
+      ["./loader-test-750x750.png", 750, 750, /image\/png/i],
+      ["./loader-test-1000x1000.png", 1000, 1000, /image\/png/i],
+      ["./loader-test-1250x1250.png", 1250, 1250, /image\/png/i],
+      ["./loader-test-1500x1500.png", 1500, 1500, /image\/png/i],
+      ["./loader-test-1600x1600.png", 1600, 1600, /image\/png/i],
+      ["./loader-test-1750x1750.png", 1750, 1750, /image\/png/i],
+
+      ["./loader-test-500x500.webp", 500, 500, /image\/webp/i],
+      ["./loader-test-750x750.webp", 750, 750, /image\/webp/i],
+      ["./loader-test-1000x1000.webp", 1000, 1000, /image\/webp/i],
+      ["./loader-test-1250x1250.webp", 1250, 1250, /image\/webp/i],
+      ["./loader-test-1500x1500.webp", 1500, 1500, /image\/webp/i],
+      ["./loader-test-1600x1600.webp", 1600, 1600, /image\/webp/i],
+      ["./loader-test-1750x1750.webp", 1750, 1750, /image\/webp/i],
+    ];
+
+    for (const [assetPath, width, height, mimeRegExp] of assetsList) {
+      const transformedAsset = path.resolve(
+        __dirname,
+        compilation.options.output.path,
+        assetPath,
+      );
+
+      // eslint-disable-next-line no-await-in-loop
+      const transformedExt = await fileType.fromFile(transformedAsset);
+      // eslint-disable-next-line no-await-in-loop
+      const dimensions = await sizeOf(transformedAsset);
+
+      expect(dimensions.width).toBe(width);
+      expect(dimensions.height).toBe(height);
+      expect(mimeRegExp.test(transformedExt.mime)).toBe(true);
+      expect(warnings).toHaveLength(0);
+      expect(errors).toHaveLength(0);
+    }
+  });
 });
 
 describe("resize query (squoosh)", () => {
