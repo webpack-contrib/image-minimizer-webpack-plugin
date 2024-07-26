@@ -1,8 +1,6 @@
 import fs from "fs";
 import path from "path";
 
-import imageminMozjpeg from "imagemin-mozjpeg";
-import imageminWebp from "imagemin-webp";
 import pify from "pify";
 import sharp from "sharp";
 import { ifit, needSquooshTest } from "./helpers";
@@ -22,11 +20,15 @@ function isPromise(obj) {
 
 let imagemin;
 let imageminSvgo;
+let imageminMozjpeg;
+let imageminWebp;
 
 describe("minify", () => {
   beforeAll(async () => {
     imagemin = (await import("imagemin")).default;
     imageminSvgo = (await import("imagemin-svgo")).default;
+    imageminMozjpeg = (await import("imagemin-mozjpeg")).default;
+    imageminWebp = (await import("imagemin-webp")).default;
   });
 
   it("minify should be is function", () =>

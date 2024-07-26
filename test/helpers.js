@@ -1,9 +1,6 @@
 import fs from "fs";
 import path from "path";
 
-import imageminGifsicle from "imagemin-gifsicle";
-import imageminMozjpeg from "imagemin-mozjpeg";
-import imageminPngquant from "imagemin-pngquant";
 import pify from "pify";
 import tempy from "tempy";
 import webpack from "webpack";
@@ -263,26 +260,23 @@ async function isOptimized(originalPath, compilation) {
 
   const imagemin = (await import("imagemin")).default;
   const imageminSvgo = (await import("imagemin-svgo")).default;
+  const imageminGifsicle = (await import("imagemin-gifsicle")).default;
+  const imageminMozjpeg = (await import("imagemin-mozjpeg")).default;
+  const imageminPngquant = (await import("imagemin-pngquant")).default;
+  const data = await pify(fs.readFile)(pathToOriginal);
+  const optimizedBuffer = Buffer.from(
+    await imagemin.buffer(data, {
+      plugins: [
+        imageminGifsicle(),
+        imageminMozjpeg(),
+        imageminPngquant(),
+        imageminSvgo(),
+      ],
+    }),
+  );
+  const generatedBuffer = await pify(fs.readFile)(pathToEmitted);
 
-  return Promise.resolve()
-    .then(() => pify(fs.readFile)(pathToOriginal))
-    .then((data) =>
-      imagemin
-        .buffer(data, {
-          plugins: [
-            imageminGifsicle(),
-            imageminMozjpeg(),
-            imageminPngquant(),
-            imageminSvgo(),
-          ],
-        })
-        .then((result) => Buffer.from(result)),
-    )
-    .then((optimizedBuffer) =>
-      Promise.resolve()
-        .then(() => pify(fs.readFile)(pathToEmitted))
-        .then((emmitedBuffer) => optimizedBuffer.equals(emmitedBuffer)),
-    );
+  return optimizedBuffer.equals(generatedBuffer);
 }
 
 function hasLoader(id, modules) {
