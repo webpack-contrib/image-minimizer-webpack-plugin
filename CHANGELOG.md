@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v4.0.2...v4.1.0) (2024-07-26)
+
+
+### Features
+
+* add unit for percentage resize with sharp ([a83f491](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/a83f4919bec28804fe3e8a03a453a30d3537aff6))
+
 ### [4.0.2](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v4.0.1...v4.0.2) (2024-06-04)
 
 
