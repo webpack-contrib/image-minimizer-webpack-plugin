@@ -2,7 +2,6 @@ import path from "path";
 import fs from "fs";
 import webpack from "webpack";
 import fileType from "file-type";
-import tempy from "tempy";
 import pify from "pify";
 
 import {
@@ -2265,12 +2264,13 @@ describe("imagemin plugin", () => {
   });
 
   it("should generate image for 'import' and 'asset' types, minimizer original asset, keep and cache result", async () => {
+    const { temporaryDirectory } = await import("tempy");
     const compiler = await runWebpack(
       {
         entry: path.join(fixturesPath, "generator-and-minimizer-4.js"),
         cache: {
           type: "filesystem",
-          cacheLocation: tempy.directory(),
+          cacheLocation: temporaryDirectory(),
         },
         copyPlugin: true,
         imageminPluginOptions: {

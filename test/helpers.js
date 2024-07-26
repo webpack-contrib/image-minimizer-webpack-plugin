@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 
 import pify from "pify";
-import tempy from "tempy";
 import webpack from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
@@ -33,6 +32,7 @@ async function runWebpack(maybeOptions, getCompiler = false) {
 
   const configs = [];
   const CopyPlugin = (await import("copy-webpack-plugin")).default;
+  const { temporaryDirectory } = await import("tempy");
 
   for (const options of maybeMultiCompiler) {
     const config = {
@@ -129,7 +129,7 @@ async function runWebpack(maybeOptions, getCompiler = false) {
         path:
           options.output && options.output.path
             ? options.output.path
-            : tempy.directory(),
+            : temporaryDirectory(),
       },
       plugins: [],
     };
