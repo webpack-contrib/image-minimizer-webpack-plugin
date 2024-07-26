@@ -1,9 +1,7 @@
 import path from "path";
-import fs from "fs";
+import fs from "fs/promises";
 import webpack from "webpack";
 import fileType from "file-type";
-import tempy from "tempy";
-import pify from "pify";
 
 import {
   fixturesPath,
@@ -546,7 +544,7 @@ describe("imagemin plugin", () => {
     const result = readAsset("bundle.js", compiler, stats).toString();
 
     const isInlineSvg =
-      /data:image\/svg\+xml;base64,PHN2ZyBoZWlnaHQ9IjEwMCIgd2lkdGg9IjEwMCI\+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIHN0eWxlPSJzdHJva2U6IzAwMDtzdHJva2Utd2l0aDozO2ZpbGw6cmVkIi8\+PC9zdmc\+/.test(
+      /data:image\/svg\+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI\+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDAiIHN0eWxlPSJzdHJva2U6IzAwMDtzdHJva2Utd2l0aDozO2ZpbGw6cmVkIi8\+PC9zdmc\+/.test(
         result,
       );
 
@@ -1125,7 +1123,7 @@ describe("imagemin plugin", () => {
 
     const svgAsset = compilation.getAsset("loader-test.svg");
     const svgFilePath = path.join(fixturesPath, "loader-test.svg");
-    const { size } = await fs.promises.stat(svgFilePath);
+    const { size } = await fs.stat(svgFilePath);
 
     expect(svgAsset.info.size).toBeLessThan(size);
   });
@@ -1580,9 +1578,9 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./bundle.js",
     );
-    const bundle = await pify(fs.readFile)(bundleFilename);
+    const bundle = await fs.readFile(bundleFilename, "utf-8");
     const URIRegEx = /"(data:([^;,]+)?((?:;[^;,]+)*?)(?:;(base64))?,(.*))"/gi;
-    const extractedDataURI = bundle.toString().match(URIRegEx);
+    const extractedDataURI = bundle.match(URIRegEx);
 
     expect(extractedDataURI[1].length).toBeLessThan(95801);
   });
@@ -1809,9 +1807,9 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./bundle.js",
     );
-    const bundle = await pify(fs.readFile)(bundleFilename);
+    const bundle = await fs.readFile(bundleFilename, "utf-8");
     const URIRegEx = /"(data:([^;,]+)?((?:;[^;,]+)*?)(?:;(base64))?,(.*))"/gi;
-    const extractedDataURI = bundle.toString().match(URIRegEx);
+    const extractedDataURI = bundle.match(URIRegEx);
 
     expect(extractedDataURI[1].length).toBeLessThan(95801);
   });
@@ -2265,12 +2263,13 @@ describe("imagemin plugin", () => {
   });
 
   it("should generate image for 'import' and 'asset' types, minimizer original asset, keep and cache result", async () => {
+    const { temporaryDirectory } = await import("tempy");
     const compiler = await runWebpack(
       {
         entry: path.join(fixturesPath, "generator-and-minimizer-4.js"),
         cache: {
           type: "filesystem",
-          cacheLocation: tempy.directory(),
+          cacheLocation: temporaryDirectory(),
         },
         copyPlugin: true,
         imageminPluginOptions: {
@@ -2533,7 +2532,7 @@ describe("imagemin plugin", () => {
       "./main.css",
     );
 
-    const cssContent = await fs.promises.readFile(cssFile, "utf-8");
+    const cssContent = await fs.readFile(cssFile, "utf-8");
 
     expect(cssContent).toMatchSnapshot("main.css");
   });
@@ -2597,7 +2596,7 @@ describe("imagemin plugin", () => {
       "./main.css",
     );
 
-    const cssContent = await fs.promises.readFile(cssFile, "utf-8");
+    const cssContent = await fs.readFile(cssFile, "utf-8");
 
     expect(cssContent).toMatchSnapshot("main.css");
   });
@@ -2666,7 +2665,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./minified-svgo-id.svg",
     );
-    const content = await fs.promises.readFile(file, "utf-8");
+    const content = await fs.readFile(file, "utf-8");
 
     expect(content).toContain("svgo-id_svg__test");
   });

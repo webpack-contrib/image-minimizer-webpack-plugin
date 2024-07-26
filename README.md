@@ -488,7 +488,7 @@ const myImage4 = new URL("image.png?as=webp&w=150&h=120", import.meta.url);
 // You can use `auto` to reset `width` or `height` from the `preset` option
 const myImage5 = new URL("image.png?as=webp&w=150&h=auto", import.meta.url);
 // You can use `unit` to get the non-retina resize of images that are retina sized
-const myImage1 = new URL("image.png?width=50&unit=percent", import.meta.url);
+const myImage6 = new URL("image.png?width=50&unit=percent", import.meta.url);
 ```
 
 ```css

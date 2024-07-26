@@ -1,16 +1,8 @@
 import fs from "fs";
 import path from "path";
 
-import imagemin from "imagemin";
-import imageminGifsicle from "imagemin-gifsicle";
-import imageminMozjpeg from "imagemin-mozjpeg";
-import imageminPngquant from "imagemin-pngquant";
-import imageminSvgo from "imagemin-svgo";
-import pify from "pify";
-import tempy from "tempy";
 import webpack from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import CopyPlugin from "copy-webpack-plugin";
 
 import ImageMinimizerPlugin from "../src/index";
 
@@ -32,12 +24,14 @@ function compile(compiler) {
   });
 }
 
-function runWebpack(maybeOptions, getCompiler = false) {
+async function runWebpack(maybeOptions, getCompiler = false) {
   const maybeMultiCompiler = Array.isArray(maybeOptions)
     ? maybeOptions
     : [maybeOptions];
 
   const configs = [];
+  const CopyPlugin = (await import("copy-webpack-plugin")).default;
+  const { temporaryDirectory } = await import("tempy");
 
   for (const options of maybeMultiCompiler) {
     const config = {
@@ -134,7 +128,7 @@ function runWebpack(maybeOptions, getCompiler = false) {
         path:
           options.output && options.output.path
             ? options.output.path
-            : tempy.directory(),
+            : temporaryDirectory(),
       },
       plugins: [],
     };
@@ -241,10 +235,19 @@ function runWebpack(maybeOptions, getCompiler = false) {
     return webpack(configs.length === 1 ? configs[0] : configs);
   }
 
-  return pify(webpack)(configs.length === 1 ? configs[0] : configs);
+  return new Promise((resolve, reject) => {
+    webpack(configs.length === 1 ? configs[0] : configs, (err, stats) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve(stats);
+    });
+  });
 }
 
-function isOptimized(originalPath, compilation) {
+async function isOptimized(originalPath, compilation) {
   const { assets } = compilation;
   let name = originalPath;
   let realName = originalPath;
@@ -263,25 +266,25 @@ function isOptimized(originalPath, compilation) {
   const pathToOriginal = path.join(fixturesPath, realName);
   const pathToEmitted = path.join(outputPath, name);
 
-  return Promise.resolve()
-    .then(() => pify(fs.readFile)(pathToOriginal))
-    .then((data) =>
-      imagemin
-        .buffer(data, {
-          plugins: [
-            imageminGifsicle(),
-            imageminMozjpeg(),
-            imageminPngquant(),
-            imageminSvgo(),
-          ],
-        })
-        .then((result) => Buffer.from(result)),
-    )
-    .then((optimizedBuffer) =>
-      Promise.resolve()
-        .then(() => pify(fs.readFile)(pathToEmitted))
-        .then((emmitedBuffer) => optimizedBuffer.equals(emmitedBuffer)),
-    );
+  const imagemin = (await import("imagemin")).default;
+  const imageminSvgo = (await import("imagemin-svgo")).default;
+  const imageminGifsicle = (await import("imagemin-gifsicle")).default;
+  const imageminMozjpeg = (await import("imagemin-mozjpeg")).default;
+  const imageminPngquant = (await import("imagemin-pngquant")).default;
+  const data = await fs.promises.readFile(pathToOriginal);
+  const optimizedBuffer = Buffer.from(
+    await imagemin.buffer(data, {
+      plugins: [
+        imageminGifsicle(),
+        imageminMozjpeg(),
+        imageminPngquant(),
+        imageminSvgo(),
+      ],
+    }),
+  );
+  const generatedBuffer = await fs.promises.readFile(pathToEmitted);
+
+  return optimizedBuffer.equals(generatedBuffer);
 }
 
 function hasLoader(id, modules) {

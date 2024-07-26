@@ -1,6 +1,5 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
-import pify from "pify";
 
 export default class EmitWepbackPlugin {
   constructor(options = {}) {
@@ -25,7 +24,7 @@ export default class EmitWepbackPlugin {
         return Promise.all(
           fileNames.map(async (fileName) => {
             const filePath = path.join(__dirname, fileName);
-            const data = await pify(fs.readFile)(filePath);
+            const data = await fs.readFile(filePath);
 
             let source = mapCache.get(fileName);
 
