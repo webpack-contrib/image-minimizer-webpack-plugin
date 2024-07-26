@@ -1,8 +1,7 @@
 import path from "path";
-import fs from "fs";
+import fs from "fs/promises";
 import webpack from "webpack";
 import fileType from "file-type";
-import pify from "pify";
 
 import {
   fixturesPath,
@@ -1124,7 +1123,7 @@ describe("imagemin plugin", () => {
 
     const svgAsset = compilation.getAsset("loader-test.svg");
     const svgFilePath = path.join(fixturesPath, "loader-test.svg");
-    const { size } = await fs.promises.stat(svgFilePath);
+    const { size } = await fs.stat(svgFilePath);
 
     expect(svgAsset.info.size).toBeLessThan(size);
   });
@@ -1579,9 +1578,9 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./bundle.js",
     );
-    const bundle = await pify(fs.readFile)(bundleFilename);
+    const bundle = await fs.readFile(bundleFilename, "utf-8");
     const URIRegEx = /"(data:([^;,]+)?((?:;[^;,]+)*?)(?:;(base64))?,(.*))"/gi;
-    const extractedDataURI = bundle.toString().match(URIRegEx);
+    const extractedDataURI = bundle.match(URIRegEx);
 
     expect(extractedDataURI[1].length).toBeLessThan(95801);
   });
@@ -1808,9 +1807,9 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./bundle.js",
     );
-    const bundle = await pify(fs.readFile)(bundleFilename);
+    const bundle = await fs.readFile(bundleFilename, "utf-8");
     const URIRegEx = /"(data:([^;,]+)?((?:;[^;,]+)*?)(?:;(base64))?,(.*))"/gi;
-    const extractedDataURI = bundle.toString().match(URIRegEx);
+    const extractedDataURI = bundle.match(URIRegEx);
 
     expect(extractedDataURI[1].length).toBeLessThan(95801);
   });
@@ -2533,7 +2532,7 @@ describe("imagemin plugin", () => {
       "./main.css",
     );
 
-    const cssContent = await fs.promises.readFile(cssFile, "utf-8");
+    const cssContent = await fs.readFile(cssFile, "utf-8");
 
     expect(cssContent).toMatchSnapshot("main.css");
   });
@@ -2597,7 +2596,7 @@ describe("imagemin plugin", () => {
       "./main.css",
     );
 
-    const cssContent = await fs.promises.readFile(cssFile, "utf-8");
+    const cssContent = await fs.readFile(cssFile, "utf-8");
 
     expect(cssContent).toMatchSnapshot("main.css");
   });
@@ -2666,7 +2665,7 @@ describe("imagemin plugin", () => {
       compilation.options.output.path,
       "./minified-svgo-id.svg",
     );
-    const content = await fs.promises.readFile(file, "utf-8");
+    const content = await fs.readFile(file, "utf-8");
 
     expect(content).toContain("svgo-id_svg__test");
   });

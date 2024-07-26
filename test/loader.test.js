@@ -1,7 +1,6 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 
-import pify from "pify";
 import fileType from "file-type";
 
 import {
@@ -64,13 +63,13 @@ describe("loader", () => {
     expect(errors).toHaveLength(0);
     expect(Object.keys(assets)).toHaveLength(7);
 
-    const txtBuffer = await pify(fs.readFile)(
+    const txtBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
-    const cssBuffer = await pify(fs.readFile)(
+    const cssBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.css"),
     );
 
@@ -118,13 +117,13 @@ describe("loader", () => {
     expect(Object.keys(assets)).toHaveLength(8);
     expect(Object.keys(assets)).toContain("loader-test.webp");
 
-    const txtBuffer = await pify(fs.readFile)(
+    const txtBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
-    const cssBuffer = await pify(fs.readFile)(
+    const cssBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.css"),
     );
 
@@ -173,13 +172,13 @@ describe("loader", () => {
       expect(errors).toHaveLength(0);
       expect(Object.keys(assets)).toHaveLength(7);
 
-      const txtBuffer = await pify(fs.readFile)(
+      const txtBuffer = await fs.readFile(
         path.join(compilation.options.output.path, "loader-test.txt"),
       );
 
       expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
-      const cssBuffer = await pify(fs.readFile)(
+      const cssBuffer = await fs.readFile(
         path.join(compilation.options.output.path, "loader-test.css"),
       );
 
@@ -245,13 +244,13 @@ describe("loader", () => {
       expect(Object.keys(assets)).toHaveLength(8);
       expect(Object.keys(assets)).toContain("loader-test.webp");
 
-      const txtBuffer = await pify(fs.readFile)(
+      const txtBuffer = await fs.readFile(
         path.join(compilation.options.output.path, "loader-test.txt"),
       );
 
       expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
-      const cssBuffer = await pify(fs.readFile)(
+      const cssBuffer = await fs.readFile(
         path.join(compilation.options.output.path, "loader-test.css"),
       );
 
@@ -291,13 +290,13 @@ describe("loader", () => {
     expect(errors).toHaveLength(0);
     expect(Object.keys(assets)).toHaveLength(7);
 
-    const txtBuffer = await pify(fs.readFile)(
+    const txtBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
-    const cssBuffer = await pify(fs.readFile)(
+    const cssBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.css"),
     );
 
@@ -360,13 +359,13 @@ describe("loader", () => {
     expect(Object.keys(assets)).toHaveLength(8);
     expect(Object.keys(assets)).toContain("loader-test.webp");
 
-    const txtBuffer = await pify(fs.readFile)(
+    const txtBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
     expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
-    const cssBuffer = await pify(fs.readFile)(
+    const cssBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.css"),
     );
 

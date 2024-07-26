@@ -115,7 +115,6 @@
     "memfs": "^4.9.3",
     "mini-css-extract-plugin": "^2.9.0",
     "npm-run-all": "^4.1.5",
-    "pify": "^5.0.0",
     "prettier": "^3.3.2",
     "remark-cli": "^12.0.1",
     "remark-preset-lint-itgalaxy": "^16.0.0",

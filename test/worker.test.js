@@ -1,7 +1,6 @@
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 
-import pify from "pify";
 import sharp from "sharp";
 import { ifit, needSquooshTest } from "./helpers";
 
@@ -48,7 +47,7 @@ describe("minify", () => {
 
   it("should optimize", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -71,7 +70,7 @@ describe("minify", () => {
 
   it("should optimize (relative filename)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename: path.relative(process.cwd(), filename),
@@ -109,7 +108,7 @@ describe("minify", () => {
       __dirname,
       "./fixtures/large-after-optimization.svg",
     );
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -202,7 +201,7 @@ describe("minify", () => {
 
   it("should throw error on unknown plugin (configuration using `string`)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -224,7 +223,7 @@ describe("minify", () => {
 
   it("should throw error on unknown plugin (starting with `imagemin`)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -265,7 +264,7 @@ describe("minify", () => {
 
   it("should optimize (configuration using `function`)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -290,7 +289,7 @@ describe("minify", () => {
 
   it("should optimize (configuration using `string`)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -315,7 +314,7 @@ describe("minify", () => {
 
   it("should optimize (configuration using `array`)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -340,7 +339,7 @@ describe("minify", () => {
 
   it("should optimize (configuration using `array` without options)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -365,7 +364,7 @@ describe("minify", () => {
 
   it("should optimize (configuration using `string` with full name)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       minify: utils.imageminMinify,
       input,
@@ -391,7 +390,7 @@ describe("minify", () => {
 
   it("should optimize (configuration using `array` with full name)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       minify: utils.imageminMinify,
       input,
@@ -417,7 +416,7 @@ describe("minify", () => {
 
   it("should optimize (configuration using `array` with full name and without options)", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -442,7 +441,7 @@ describe("minify", () => {
 
   it("should optimize and throw warning on using `Function` configuration", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -474,7 +473,7 @@ describe("minify", () => {
     };
 
     const filename = path.resolve(__dirname, "./fixtures/svg-with-id.svg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -498,7 +497,7 @@ describe("minify", () => {
 
   it("should return two errors", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -525,7 +524,7 @@ describe("minify", () => {
 
   it("should respect error happened before", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -567,7 +566,7 @@ describe("minify", () => {
 
   it("should respect error happened after", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -609,7 +608,7 @@ describe("minify", () => {
 
   it("should work with 'imageminMinify'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -633,7 +632,7 @@ describe("minify", () => {
 
   it("should return error on empty plugin with 'imageminMinify'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       minify: utils.imageminMinify,
       input,
@@ -655,7 +654,7 @@ describe("minify", () => {
 
   it("should work with 'imageminGenerate'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -679,7 +678,7 @@ describe("minify", () => {
 
   it("should work with 'imageminGenerate' #2", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -703,7 +702,7 @@ describe("minify", () => {
 
   it("should return error on empty plugin with 'imageminGenerate'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -722,7 +721,7 @@ describe("minify", () => {
 
   ifit(needSquooshTest)("should work with 'squooshMinify'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -760,7 +759,7 @@ describe("minify", () => {
 
   ifit(needSquooshTest)("should work with 'squooshGenerate'", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -800,7 +799,7 @@ describe("minify", () => {
     "should return error on empty plugin with 'squooshGenerate'",
     async () => {
       const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-      const input = await pify(fs.readFile)(filename);
+      const input = await fs.readFile(filename);
       const result = await worker({
         input,
         filename,
@@ -820,7 +819,7 @@ describe("minify", () => {
 
   it("should work and allow to rename filename", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,
@@ -855,7 +854,7 @@ describe("minify", () => {
 
   it("should work and allow to rename filename #2", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename: "image.jpg",
@@ -903,7 +902,7 @@ describe("minify", () => {
 
   it("should work and allow to filter", async () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
-    const input = await pify(fs.readFile)(filename);
+    const input = await fs.readFile(filename);
     const result = await worker({
       input,
       filename,

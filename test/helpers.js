@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 
-import pify from "pify";
 import webpack from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
@@ -236,7 +235,16 @@ async function runWebpack(maybeOptions, getCompiler = false) {
     return webpack(configs.length === 1 ? configs[0] : configs);
   }
 
-  return pify(webpack)(configs.length === 1 ? configs[0] : configs);
+  return new Promise((resolve, reject) => {
+    webpack(configs.length === 1 ? configs[0] : configs, (err, stats) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+
+      resolve(stats);
+    });
+  });
 }
 
 async function isOptimized(originalPath, compilation) {
@@ -263,7 +271,7 @@ async function isOptimized(originalPath, compilation) {
   const imageminGifsicle = (await import("imagemin-gifsicle")).default;
   const imageminMozjpeg = (await import("imagemin-mozjpeg")).default;
   const imageminPngquant = (await import("imagemin-pngquant")).default;
-  const data = await pify(fs.readFile)(pathToOriginal);
+  const data = await fs.promises.readFile(pathToOriginal);
   const optimizedBuffer = Buffer.from(
     await imagemin.buffer(data, {
       plugins: [
@@ -274,7 +282,7 @@ async function isOptimized(originalPath, compilation) {
       ],
     }),
   );
-  const generatedBuffer = await pify(fs.readFile)(pathToEmitted);
+  const generatedBuffer = await fs.promises.readFile(pathToEmitted);
 
   return optimizedBuffer.equals(generatedBuffer);
 }
