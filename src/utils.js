@@ -1289,6 +1289,8 @@ async function svgoMinify(original, minimizerOptions) {
   };
 }
 
+const IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS = new WeakMap();
+
 module.exports = {
   throttleAll,
   isAbsoluteURL,
@@ -1302,4 +1304,5 @@ module.exports = {
   sharpMinify,
   sharpGenerate,
   svgoMinify,
+  IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
 };

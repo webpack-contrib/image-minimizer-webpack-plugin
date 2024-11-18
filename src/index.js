@@ -16,6 +16,7 @@ const {
   sharpMinify,
   sharpGenerate,
   svgoMinify,
+  IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
 } = require("./utils.js");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
@@ -469,7 +470,7 @@ class ImageMinimizerPlugin {
         compilation.hooks.moduleAsset.tap(
           { name: pluginName },
           (module, file) => {
-            const newInfo = module?.buildMeta?.imageMinimizerPluginInfo;
+            const newInfo = IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS.get(module);
 
             if (newInfo) {
               const asset = /** @type {Asset} */ (compilation.getAsset(file));
@@ -484,7 +485,7 @@ class ImageMinimizerPlugin {
           { name: pluginName },
           (filename, data, info) => {
             // @ts-ignore
-            const newInfo = data?.module?.buildMeta?.imageMinimizerPluginInfo;
+            const newInfo = data?.module ? IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS.get(data.module) : undefined;
 
             if (info && newInfo) {
               Object.assign(info, newInfo);
