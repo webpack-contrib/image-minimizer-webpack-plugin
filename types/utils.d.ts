@@ -2,6 +2,8 @@ export type WorkerResult = import("./index").WorkerResult;
 export type SquooshOptions = import("./index").SquooshOptions;
 export type ImageminOptions = import("imagemin").Options;
 export type WebpackError = import("webpack").WebpackError;
+export type Module = import("webpack").Module;
+export type AssetInfo = import("webpack").AssetInfo;
 export type Task<T> = () => Promise<T>;
 export type SvgoLib = typeof import("svgo");
 export type SvgoOptions = {
@@ -58,6 +60,8 @@ export function isAbsoluteURL(url: string): boolean;
 /** @typedef {import("./index").SquooshOptions} SquooshOptions */
 /** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("webpack").WebpackError} WebpackError */
+/** @typedef {import("webpack").Module} Module */
+/** @typedef {import("webpack").AssetInfo} AssetInfo */
 /**
  * @template T
  * @typedef {() => Promise<T>} Task
@@ -167,6 +171,8 @@ export function svgoMinify<T>(
   original: WorkerResult,
   minimizerOptions: T,
 ): Promise<WorkerResult | null>;
+/** @type {WeakMap<Module, AssetInfo>} */
+export const IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS: WeakMap<Module, AssetInfo>;
 declare function squooshImagePoolSetup(): void;
 declare function squooshImagePoolTeardown(): Promise<void>;
 export {};

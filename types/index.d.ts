@@ -52,6 +52,7 @@ declare namespace ImageMinimizerPlugin {
     Asset,
     AssetInfo,
     Source,
+    Module,
     ImageminMinifyFunction,
     SquooshMinifyFunction,
     Rule,
@@ -95,6 +96,7 @@ type WebpackError = import("webpack").WebpackError;
 type Asset = import("webpack").Asset;
 type AssetInfo = import("webpack").AssetInfo;
 type Source = import("webpack").sources.Source;
+type Module = import("webpack").Module;
 type ImageminMinifyFunction = typeof imageminMinify;
 type SquooshMinifyFunction = typeof squooshMinify;
 type Rule = RegExp | string;

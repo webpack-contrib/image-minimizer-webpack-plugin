@@ -2,7 +2,10 @@ const path = require("path");
 
 const worker = require("./worker");
 const schema = require("./loader-options.json");
-const { isAbsoluteURL } = require("./utils.js");
+const {
+  isAbsoluteURL,
+  IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
+} = require("./utils.js");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -97,9 +100,13 @@ function processSizeQuery(transformers, widthQuery, heightQuery, unitQuery) {
  */
 async function loader(content) {
   // Avoid optimize twice
+  const imageMinimizerPluginInfo = this._module
+    ? IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS.get(this._module)
+    : undefined;
+
   if (
-    this._module?.buildMeta?.imageMinimizerPluginInfo?.minimized ||
-    this._module?.buildMeta?.imageMinimizerPluginInfo?.generated
+    imageMinimizerPluginInfo?.minimized ||
+    imageMinimizerPluginInfo?.generated
   ) {
     return content;
   }
@@ -267,12 +274,8 @@ async function loader(content) {
     }
   }
 
-  // TODO: search better API
   if (this._module) {
-    this._module.buildMeta = {
-      ...this._module.buildMeta,
-      imageMinimizerPluginInfo: output.info,
-    };
+    IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS.set(this._module, output.info);
   }
 
   callback(null, output.data);
