@@ -4,6 +4,8 @@ const path = require("path");
 /** @typedef {import("./index").SquooshOptions} SquooshOptions */
 /** @typedef {import("imagemin").Options} ImageminOptions */
 /** @typedef {import("webpack").WebpackError} WebpackError */
+/** @typedef {import("webpack").Module} Module */
+/** @typedef {import("webpack").AssetInfo} AssetInfo */
 
 /**
  * @template T
@@ -1289,6 +1291,7 @@ async function svgoMinify(original, minimizerOptions) {
   };
 }
 
+/** @type {WeakMap<Module, AssetInfo>} */
 const IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS = new WeakMap();
 
 module.exports = {

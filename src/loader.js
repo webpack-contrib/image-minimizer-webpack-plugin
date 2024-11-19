@@ -2,7 +2,10 @@ const path = require("path");
 
 const worker = require("./worker");
 const schema = require("./loader-options.json");
-const { isAbsoluteURL, IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS } = require("./utils.js");
+const {
+  isAbsoluteURL,
+  IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
+} = require("./utils.js");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -97,7 +100,9 @@ function processSizeQuery(transformers, widthQuery, heightQuery, unitQuery) {
  */
 async function loader(content) {
   // Avoid optimize twice
-  const imageMinimizerPluginInfo = this._module ? IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS.get(this._module) : undefined;
+  const imageMinimizerPluginInfo = this._module
+    ? IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS.get(this._module)
+    : undefined;
 
   if (
     imageMinimizerPluginInfo?.minimized ||
