@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.1.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v4.1.0...v4.1.1) (2024-11-19)
+
+
+### Bug Fixes
+
+* better way to avoid optimize twice ([#457](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/457)) ([1b2d40e](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/1b2d40ed143a6c3ed1ef9db188dd48655de2e97b))
+
 ## [4.1.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v4.0.2...v4.1.0) (2024-07-26)
 
 
