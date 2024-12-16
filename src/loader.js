@@ -204,10 +204,12 @@ async function loader(content) {
   }
 
   let isAbsolute = isAbsoluteURL(this.resourcePath);
+  const isData = this.resourcePath.startsWith("DATA:");
+  const shouldMakeRelative = !isData && isAbsolute;
 
-  const filename = isAbsolute
-    ? this.resourcePath
-    : path.relative(this.rootContext, this.resourcePath);
+  const filename = shouldMakeRelative
+    ? path.relative(this.rootContext, this.resourcePath)
+    : this.resourcePath;
 
   const minifyOptions =
     /** @type {import("./index").InternalWorkerOptions<T>} */ ({

@@ -919,7 +919,7 @@ describe("imagemin plugin", () => {
     const stringStats = stats.toString({ relatedAssets: true });
 
     expect(stringStats).toMatch(
-      /asset loader-test.webp.+\[from: .+loader-test.png\] \[generated\]/,
+      /asset loader-test.webp.+\[from: .*loader-test.png\] \[generated\]/,
     );
   });
 
@@ -1386,7 +1386,7 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /Multiple values for the 'encodeOptions' option is not supported for '.+loader-test.png', specify only one codec for the generator/,
+      /Multiple values for the 'encodeOptions' option is not supported for '.*loader-test.png', specify only one codec for the generator/,
     );
   });
 
@@ -1771,7 +1771,7 @@ describe("imagemin plugin", () => {
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toMatch(
-      /Error with '.+loader-test.txt': Input file has an unsupported format/g,
+      /Error with '.*loader-test.txt': Input file has an unsupported format/g,
     );
   });
 
