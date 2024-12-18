@@ -5,6 +5,7 @@ const schema = require("./loader-options.json");
 const {
   IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
   ABSOLUTE_URL_REGEX,
+  WINDOWS_PATH_REGEX,
 } = require("./utils.js");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
@@ -203,9 +204,11 @@ async function loader(content) {
     }
   }
 
-  const filename = ABSOLUTE_URL_REGEX.test(this.resourcePath)
-    ? this.resourcePath
-    : this.utils.contextify(this.rootContext, this.resourcePath);
+  const filename =
+    ABSOLUTE_URL_REGEX.test(this.resourcePath) &&
+    !WINDOWS_PATH_REGEX.test(this.resourcePath)
+      ? this.resourcePath
+      : this.utils.contextify(this.rootContext, this.resourcePath);
 
   const minifyOptions =
     /** @type {import("./index").InternalWorkerOptions<T>} */ ({
