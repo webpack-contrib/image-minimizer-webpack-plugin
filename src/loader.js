@@ -3,8 +3,9 @@ const path = require("path");
 const worker = require("./worker");
 const schema = require("./loader-options.json");
 const {
-  isAbsoluteURL,
   IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
+  ABSOLUTE_URL_REGEX,
+  WINDOWS_PATH_REGEX,
 } = require("./utils.js");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
@@ -33,14 +34,14 @@ const {
 /**
  * @template T
  * @param {import("webpack").LoaderContext<LoaderOptions<T>>} loaderContext
- * @param {boolean} isAbsolute
  * @param {WorkerResult} output
  * @param {string} query
  */
-function changeResource(loaderContext, isAbsolute, output, query) {
-  loaderContext.resourcePath = isAbsolute
-    ? output.filename
-    : path.join(loaderContext.rootContext, output.filename);
+function changeResource(loaderContext, output, query) {
+  loaderContext.resourcePath = path.join(
+    loaderContext.rootContext,
+    output.filename,
+  );
   loaderContext.resourceQuery = query;
 }
 
@@ -203,11 +204,11 @@ async function loader(content) {
     }
   }
 
-  let isAbsolute = isAbsoluteURL(this.resourcePath);
-
-  const filename = isAbsolute
-    ? this.resourcePath
-    : path.relative(this.rootContext, this.resourcePath);
+  const filename =
+    ABSOLUTE_URL_REGEX.test(this.resourcePath) &&
+    !WINDOWS_PATH_REGEX.test(this.resourcePath)
+      ? this.resourcePath
+      : this.utils.contextify(this.rootContext, this.resourcePath);
 
   const minifyOptions =
     /** @type {import("./index").InternalWorkerOptions<T>} */ ({
@@ -264,9 +265,8 @@ async function loader(content) {
       query = query.length > 0 ? `?${query}` : "";
     }
 
-    isAbsolute = isAbsoluteURL(output.filename);
     // Old approach for `file-loader` and other old loaders
-    changeResource(this, isAbsolute, output, query);
+    changeResource(this, output, query);
 
     // Change name of assets modules after generator
     if (this._module && !this._module.matchResource) {

@@ -1308,4 +1308,6 @@ module.exports = {
   sharpGenerate,
   svgoMinify,
   IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
+  ABSOLUTE_URL_REGEX,
+  WINDOWS_PATH_REGEX,
 };
