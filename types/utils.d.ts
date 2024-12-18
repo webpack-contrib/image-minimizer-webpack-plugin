@@ -173,6 +173,7 @@ export function svgoMinify<T>(
 ): Promise<WorkerResult | null>;
 /** @type {WeakMap<Module, AssetInfo>} */
 export const IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS: WeakMap<Module, AssetInfo>;
+export const ABSOLUTE_URL_REGEX: RegExp;
 declare function squooshImagePoolSetup(): void;
 declare function squooshImagePoolTeardown(): Promise<void>;
 export {};
