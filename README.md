@@ -531,10 +531,10 @@ module.exports = {
       // We recommend using only for the "production" mode
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
+        enforce: "pre",
         use: [
           {
             loader: ImageMinimizerPlugin.loader,
-            enforce: "pre",
             options: {
               minimizer: {
                 implementation: ImageMinimizerPlugin.imageminMinify,
