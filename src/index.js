@@ -246,6 +246,7 @@ class ImageMinimizerPlugin {
     }
 
     const cache = compilation.getCache("ImageMinimizerWebpackPlugin");
+
     const assetsForTransformers = (
       await Promise.all(
         Object.keys(assets)
@@ -327,7 +328,7 @@ class ImageMinimizerPlugin {
       1,
       this.options.concurrency ?? os.cpus()?.length ?? 1,
     );
-    const { RawSource } = compiler.webpack.sources;
+    const { RawSource, CachedSource } = compiler.webpack.sources;
 
     const scheduledTasks = assetsForTransformers.map((asset) => async () => {
       const { name, info, inputSource, cacheItem, transformer } = asset;
@@ -336,7 +337,11 @@ class ImageMinimizerPlugin {
 
       const sourceFromInputSource = inputSource.source();
 
+      const pluginName = this.constructor.name;
+      const logger = compilation.getLogger(pluginName);
+
       if (!output) {
+        logger.log(`cache miss: ${name}`);
         input = sourceFromInputSource;
 
         if (!Buffer.isBuffer(input)) {
@@ -356,7 +361,7 @@ class ImageMinimizerPlugin {
 
         output = await worker(minifyOptions);
 
-        output.source = new RawSource(output.data);
+        output.source = new CachedSource(new RawSource(output.data));
 
         await cacheItem.storePromise({
           source: output.source,
@@ -365,6 +370,8 @@ class ImageMinimizerPlugin {
           warnings: output.warnings,
           errors: output.errors,
         });
+      } else {
+        logger.log(`cache miss: ${name}`);
       }
 
       compilation.warnings = [

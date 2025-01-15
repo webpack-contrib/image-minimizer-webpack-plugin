@@ -2,7 +2,9 @@ const path = require("path");
 
 const worker = require("./worker");
 const schema = require("./loader-options.json");
-const { isAbsoluteURL } = require("./utils.js");
+const { isAbsoluteURL, memoize } = require("./utils.js");
+
+const getSerializeJavascript = memoize(() => require("serialize-javascript"));
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -202,18 +204,48 @@ async function loader(content) {
     ? this.resourcePath
     : path.relative(this.rootContext, this.resourcePath);
 
-  const minifyOptions =
-    /** @type {import("./index").InternalWorkerOptions<T>} */ ({
-      input: content,
-      filename,
-      severityError,
-      transformer,
-      generateFilename:
-        /** @type {Compilation} */
-        (this._compilation).getAssetPath.bind(this._compilation),
-    });
+  if (!this._compilation || !this._compiler) {
+    callback(new Error("_compilation and/or _compiler unavailable"));
+    return;
+  }
 
-  const output = await worker(minifyOptions);
+  const logger = this._compilation.getLogger("ImageMinimizerPlugin");
+  const cache = this._compilation.getCache("ImageMinimizerWebpackPlugin");
+
+  const cacheName = getSerializeJavascript()({
+    name: this.resourcePath,
+    transformer,
+  });
+  const { RawSource, CachedSource } = this._compiler.webpack.sources;
+  const eTag = cache.getLazyHashedEtag(
+    new CachedSource(new RawSource(content)),
+  );
+  const cacheItem = cache.getItemCache(cacheName, eTag);
+  const output = await cacheItem.providePromise(async () => {
+    const minifyOptions =
+      /** @type {import("./index").InternalWorkerOptions<T>} */ ({
+        input: content,
+        filename,
+        severityError,
+        transformer,
+        generateFilename:
+          /** @type {Compilation} */
+          (this._compilation).getAssetPath.bind(this._compilation),
+      });
+
+    logger.warn(`Cache miss: ${filename}`);
+    this.emitWarning(new Error(`Cache miss: ${filename}`));
+
+    const { data, info, warnings, errors } = await worker(minifyOptions);
+
+    return {
+      source: new CachedSource(new RawSource(data)),
+      info,
+      filename,
+      warnings,
+      errors,
+    };
+  });
 
   if (output.errors && output.errors.length > 0) {
     for (const error of output.errors) {
@@ -238,8 +270,8 @@ async function loader(content) {
     );
 
     this._module.resourceResolveData.encodedContent = isBase64
-      ? output.data.toString("base64")
-      : encodeURIComponent(output.data.toString("utf-8")).replace(
+      ? output.source.buffer().toString("base64")
+      : encodeURIComponent(output.source.buffer().toString("utf-8")).replace(
           /[!'()*]/g,
           (character) =>
             `%${/** @type {number} */ (character.codePointAt(0)).toString(16)}`,
@@ -259,7 +291,18 @@ async function loader(content) {
 
     isAbsolute = isAbsoluteURL(output.filename);
     // Old approach for `file-loader` and other old loaders
-    changeResource(this, isAbsolute, output, query);
+    changeResource(
+      this,
+      isAbsolute,
+      {
+        data: output.source.buffer(),
+        info: output.info,
+        filename: output.filename,
+        errors: output.errors,
+        warnings: output.warnings,
+      },
+      query,
+    );
 
     // Change name of assets modules after generator
     if (this._module && !this._module.matchResource) {
@@ -275,7 +318,7 @@ async function loader(content) {
     };
   }
 
-  callback(null, output.data);
+  callback(null, output.source.buffer());
 }
 
 loader.raw = true;
