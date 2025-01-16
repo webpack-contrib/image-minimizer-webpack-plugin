@@ -2,8 +2,12 @@ const path = require("path");
 
 const worker = require("./worker");
 const schema = require("./loader-options.json");
-const { isAbsoluteURL, memoize } = require("./utils.js");
-
+const {
+  IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
+  ABSOLUTE_URL_REGEX,
+  WINDOWS_PATH_REGEX,
+  memoize,
+} = require("./utils.js");
 const getSerializeJavascript = memoize(() => require("serialize-javascript"));
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
@@ -32,14 +36,14 @@ const getSerializeJavascript = memoize(() => require("serialize-javascript"));
 /**
  * @template T
  * @param {import("webpack").LoaderContext<LoaderOptions<T>>} loaderContext
- * @param {boolean} isAbsolute
  * @param {WorkerResult} output
  * @param {string} query
  */
-function changeResource(loaderContext, isAbsolute, output, query) {
-  loaderContext.resourcePath = isAbsolute
-    ? output.filename
-    : path.join(loaderContext.rootContext, output.filename);
+function changeResource(loaderContext, output, query) {
+  loaderContext.resourcePath = path.join(
+    loaderContext.rootContext,
+    output.filename,
+  );
   loaderContext.resourceQuery = query;
 }
 
@@ -99,9 +103,13 @@ function processSizeQuery(transformers, widthQuery, heightQuery, unitQuery) {
  */
 async function loader(content) {
   // Avoid optimize twice
+  const imageMinimizerPluginInfo = this._module
+    ? IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS.get(this._module)
+    : undefined;
+
   if (
-    this._module?.buildMeta?.imageMinimizerPluginInfo?.minimized ||
-    this._module?.buildMeta?.imageMinimizerPluginInfo?.generated
+    imageMinimizerPluginInfo?.minimized ||
+    imageMinimizerPluginInfo?.generated
   ) {
     return content;
   }
@@ -198,11 +206,11 @@ async function loader(content) {
     }
   }
 
-  let isAbsolute = isAbsoluteURL(this.resourcePath);
-
-  const filename = isAbsolute
-    ? this.resourcePath
-    : path.relative(this.rootContext, this.resourcePath);
+  const filename =
+    ABSOLUTE_URL_REGEX.test(this.resourcePath) &&
+    !WINDOWS_PATH_REGEX.test(this.resourcePath)
+      ? this.resourcePath
+      : path.relative(this.rootContext, this.resourcePath);
 
   if (!this._compilation || !this._compiler) {
     callback(new Error("_compilation and/or _compiler unavailable"));
@@ -289,20 +297,9 @@ async function loader(content) {
       query = query.length > 0 ? `?${query}` : "";
     }
 
-    isAbsolute = isAbsoluteURL(output.filename);
     // Old approach for `file-loader` and other old loaders
-    changeResource(
-      this,
-      isAbsolute,
-      {
-        data: output.source.buffer(),
-        info: output.info,
-        filename: output.filename,
-        errors: output.errors,
-        warnings: output.warnings,
-      },
-      query,
-    );
+    // @ts-ignore
+    changeResource(this, output, query);
 
     // Change name of assets modules after generator
     if (this._module && !this._module.matchResource) {
@@ -310,12 +307,8 @@ async function loader(content) {
     }
   }
 
-  // TODO: search better API
   if (this._module) {
-    this._module.buildMeta = {
-      ...this._module.buildMeta,
-      imageMinimizerPluginInfo: output.info,
-    };
+    IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS.set(this._module, output.info);
   }
 
   callback(null, output.source.buffer());

@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.1.3](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v4.1.2...v4.1.3) (2024-12-18)
+
+
+### Bug Fixes
+
+* crash when using filesystem cache ([#461](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/461)) ([383d3d3](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/383d3d3262b9bc44dcd7af527c8b82da4ecbd4aa))
+
+### [4.1.2](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v4.1.1...v4.1.2) (2024-12-18)
+
+
+### Bug Fixes
+
+* crash when using filesystem cache ([#460](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/460)) ([7627f0e](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/7627f0ea2142440ad8c8f29fbbd2649fbf20b382))
+
+### [4.1.1](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v4.1.0...v4.1.1) (2024-11-19)
+
+
+### Bug Fixes
+
+* better way to avoid optimize twice ([#457](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/457)) ([1b2d40e](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/1b2d40ed143a6c3ed1ef9db188dd48655de2e97b))
+
 ## [4.1.0](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v4.0.2...v4.1.0) (2024-07-26)
 
 
