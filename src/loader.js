@@ -220,15 +220,20 @@ async function loader(content) {
   const logger = this._compilation.getLogger("ImageMinimizerPlugin");
   const cache = this._compilation.getCache("ImageMinimizerWebpackPlugin");
 
-  const cacheName = getSerializeJavascript()({
-    name: this.resourcePath,
-    transformer,
-  });
   const { RawSource, CachedSource } = this._compiler.webpack.sources;
   const eTag = cache.getLazyHashedEtag(
     new CachedSource(new RawSource(content)),
   );
-  const cacheItem = cache.getItemCache(cacheName, eTag);
+  const cacheName = getSerializeJavascript()({
+    eTag: eTag.toString(),
+    transformer: (Array.isArray(transformer) ? transformer : [transformer]).map(
+      (each) => ({
+        implementation: each.implementation,
+        options: each.options,
+      }),
+    ),
+  });
+  const cacheItem = cache.getItemCache(cacheName, null);
   const output = await cacheItem.providePromise(async () => {
     const minifyOptions =
       /** @type {import("./index").InternalWorkerOptions<T>} */ ({
@@ -241,12 +246,12 @@ async function loader(content) {
           (this._compilation).getAssetPath.bind(this._compilation),
       });
 
-    logger.warn(`Cache miss: ${filename}`);
-    this.emitWarning(new Error(`Cache miss: ${filename}`));
+    logger.debug(`loader cache miss: ${filename}`);
 
     const { data, info, warnings, errors } = await worker(minifyOptions);
 
     return {
+      data,
       source: new CachedSource(new RawSource(data)),
       info,
       filename,

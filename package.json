@@ -17,12 +17,15 @@
     "node": ">= 18.12.0"
   },
   "scripts": {
-    "start": "npm run build -- -w",
+    "start": "npm-run-all -p \"watch:**\"",
     "clean": "del-cli dist types",
     "prebuild": "npm run clean",
     "build:types": "tsc --declaration --emitDeclarationOnly && prettier \"types/**/*.ts\" --write",
+    "postbuild:types": "prettier \"types/**/*.ts\" --write",
     "build:code": "cross-env NODE_ENV=production babel src -d dist --copy-files",
     "build": "npm-run-all -p \"build:**\"",
+    "watch:types": "npm run build:types -- -w",
+    "watch:code": "npm run build:code -- -w",
     "commitlint": "commitlint --from=master",
     "security": "npm audit --production",
     "lint:prettier": "prettier --cache --list-different .",

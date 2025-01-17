@@ -282,9 +282,19 @@ class ImageMinimizerPlugin {
              * @returns {Promise<Task<Z>>}
              */
             const getFromCache = async (transformer) => {
-              const cacheName = getSerializeJavascript()({ name, transformer });
               const eTag = cache.getLazyHashedEtag(source);
-              const cacheItem = cache.getItemCache(cacheName, eTag);
+              const cacheName = getSerializeJavascript()({
+                eTag: eTag.toString(),
+                transformer: (Array.isArray(transformer)
+                  ? transformer
+                  : [transformer]
+                ).map(({ implementation, options }) => ({
+                  implementation,
+                  options,
+                })),
+              });
+
+              const cacheItem = cache.getItemCache(cacheName, null);
               const output = await cacheItem.getPromise();
 
               return {
@@ -343,7 +353,6 @@ class ImageMinimizerPlugin {
       const logger = compilation.getLogger(pluginName);
 
       if (!output) {
-        logger.log(`cache miss: ${name}`);
         input = sourceFromInputSource;
 
         if (!Buffer.isBuffer(input)) {
@@ -361,19 +370,20 @@ class ImageMinimizerPlugin {
             generateFilename: compilation.getAssetPath.bind(compilation),
           });
 
-        output = await worker(minifyOptions);
+        output = await cacheItem.providePromise(async () => {
+          logger.debug(`optimize cache miss: ${name}`);
 
-        output.source = new CachedSource(new RawSource(output.data));
+          const result = await worker(minifyOptions);
 
-        await cacheItem.storePromise({
-          source: output.source,
-          info: output.info,
-          filename: output.filename,
-          warnings: output.warnings,
-          errors: output.errors,
+          return {
+            data: result.data,
+            source: new CachedSource(new RawSource(result.data)),
+            info: result.info,
+            filename: result.filename,
+            warnings: result.warnings,
+            errors: result.errors,
+          };
         });
-      } else {
-        logger.log(`cache miss: ${name}`);
       }
 
       compilation.warnings = [
