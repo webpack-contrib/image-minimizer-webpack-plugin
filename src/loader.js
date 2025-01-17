@@ -220,10 +220,8 @@ async function loader(content) {
   const logger = this._compilation.getLogger("ImageMinimizerPlugin");
   const cache = this._compilation.getCache("ImageMinimizerWebpackPlugin");
 
-  const { RawSource, CachedSource } = this._compiler.webpack.sources;
-  const eTag = cache.getLazyHashedEtag(
-    new CachedSource(new RawSource(content)),
-  );
+  const { RawSource } = this._compiler.webpack.sources;
+  const eTag = cache.getLazyHashedEtag(new RawSource(content));
   const cacheName = getSerializeJavascript()({
     eTag: eTag.toString(),
     transformer: (Array.isArray(transformer) ? transformer : [transformer]).map(
@@ -233,8 +231,8 @@ async function loader(content) {
       }),
     ),
   });
-  const cacheItem = cache.getItemCache(cacheName, null);
-  const output = await cacheItem.providePromise(async () => {
+  const cacheItem = cache.getItemCache(cacheName, eTag);
+  const output = await cacheItem.providePromise(() => {
     const minifyOptions =
       /** @type {import("./index").InternalWorkerOptions<T>} */ ({
         input: content,
@@ -248,16 +246,7 @@ async function loader(content) {
 
     logger.debug(`loader cache miss: ${filename}`);
 
-    const { data, info, warnings, errors } = await worker(minifyOptions);
-
-    return {
-      data,
-      source: new CachedSource(new RawSource(data)),
-      info,
-      filename,
-      warnings,
-      errors,
-    };
+    return worker(minifyOptions);
   });
 
   if (output.errors && output.errors.length > 0) {
@@ -283,8 +272,8 @@ async function loader(content) {
     );
 
     this._module.resourceResolveData.encodedContent = isBase64
-      ? output.source.buffer().toString("base64")
-      : encodeURIComponent(output.source.buffer().toString("utf-8")).replace(
+      ? output.data.toString("base64")
+      : encodeURIComponent(output.data.toString("utf-8")).replace(
           /[!'()*]/g,
           (character) =>
             `%${/** @type {number} */ (character.codePointAt(0)).toString(16)}`,
@@ -303,7 +292,6 @@ async function loader(content) {
     }
 
     // Old approach for `file-loader` and other old loaders
-    // @ts-ignore
     changeResource(this, output, query);
 
     // Change name of assets modules after generator
@@ -316,7 +304,7 @@ async function loader(content) {
     IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS.set(this._module, output.info);
   }
 
-  callback(null, output.source.buffer());
+  callback(null, output.data);
 }
 
 loader.raw = true;
