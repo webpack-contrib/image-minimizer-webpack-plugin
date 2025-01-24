@@ -755,6 +755,7 @@ describe("imagemin plugin", () => {
                 preset: "webp",
                 implementation: ImageMinimizerPlugin.sharpGenerate,
                 options: {
+                  cacheDir: ".cache/image-minimizer",
                   encodeOptions: {
                     webp: {
                       lossless: true,
@@ -804,8 +805,8 @@ describe("imagemin plugin", () => {
       path.resolve(outputDir, "plugin-test.jpg"),
     );
 
-    expect(/image\/webp/i.test(extLoaderWebp.mime)).toBe(true);
-    expect(/image\/jpeg/i.test(extLoaderJpg.mime)).toBe(true);
+    expect(extLoaderWebp.mime).toMatch(/image\/webp/i);
+    expect(extLoaderJpg.mime).toMatch(/image\/jpeg/i);
     expect(secondStats.compilation.emittedAssets.size).toBe(0);
   });
 
@@ -816,7 +817,10 @@ describe("imagemin plugin", () => {
       imageminPluginOptions: {
         minimizer: {
           implementation: ImageMinimizerPlugin.imageminMinify,
-          options: { plugins },
+          options: {
+            cacheDir: ".cache/image-minimizer",
+            plugins,
+          },
         },
       },
     });
@@ -842,6 +846,7 @@ describe("imagemin plugin", () => {
             implementation: ImageMinimizerPlugin.imageminMinify,
             options: { plugins },
           },
+          cacheDir: ".cache/image-minimizer",
         },
       },
       true,
@@ -962,7 +967,7 @@ describe("imagemin plugin", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/webp/i);
 
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
       true,
@@ -1026,7 +1031,7 @@ describe("imagemin plugin", () => {
       );
       const ext = await fileType.fromFile(file);
 
-      expect(/image\/webp/i.test(ext.mime)).toBe(true);
+      expect(ext.mime).toMatch(/image\/webp/i);
 
       // TODO fix me
       await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
@@ -1205,7 +1210,7 @@ describe("imagemin plugin", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/webp/i);
 
     // TODO fix me
     await expect(isOptimized("loader-test.gif", compilation)).resolves.toBe(
@@ -1251,7 +1256,7 @@ describe("imagemin plugin", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/avif/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/avif/i);
   });
 
   it("should generate and allow to use any name in the 'preset' option using 'imageminGenerate'", async () => {
@@ -1283,7 +1288,7 @@ describe("imagemin plugin", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/webp/i);
   });
 
   ifit(needSquooshTest)(
@@ -1321,7 +1326,7 @@ describe("imagemin plugin", () => {
       );
       const ext = await fileType.fromFile(file);
 
-      expect(/image\/webp/i.test(ext.mime)).toBe(true);
+      expect(ext.mime).toMatch(/image\/webp/i);
     },
   );
 
@@ -1468,7 +1473,7 @@ describe("imagemin plugin", () => {
 
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/webp/i);
 
     const webpAsset = compilation.getAsset("loader-test.webp");
 
@@ -1546,7 +1551,7 @@ describe("imagemin plugin", () => {
     );
     const ext = await fileType.fromFile(webpAsset);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/webp/i);
 
     const webpAsset1 = path.resolve(
       __dirname,
@@ -1555,7 +1560,7 @@ describe("imagemin plugin", () => {
     );
     const ext1 = await fileType.fromFile(webpAsset1);
 
-    expect(/image\/webp/i.test(ext1.mime)).toBe(true);
+    expect(ext1.mime).toMatch(/image\/webp/i);
 
     const webpAsset2 = path.resolve(
       __dirname,
@@ -1564,7 +1569,7 @@ describe("imagemin plugin", () => {
     );
     const ext2 = await fileType.fromFile(webpAsset2);
 
-    expect(/image\/webp/i.test(ext2.mime)).toBe(true);
+    expect(ext2.mime).toMatch(/image\/webp/i);
 
     await expect(
       isOptimized(
@@ -1647,7 +1652,7 @@ describe("imagemin plugin", () => {
     );
     const ext = await fileType.fromFile(webpAsset);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/webp/i);
 
     await expect(
       isOptimized(
@@ -1709,7 +1714,7 @@ describe("imagemin plugin", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/png/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/png/i);
   });
 
   ifit(needSquooshTest)(
@@ -1844,7 +1849,7 @@ describe("imagemin plugin", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/avif/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/avif/i);
   });
 
   it("should generate image for 'asset' type", async () => {
@@ -1878,7 +1883,7 @@ describe("imagemin plugin", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/avif/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/avif/i);
   });
 
   it("should not throw an error when no presets found using the `asset` type", async () => {
@@ -1911,7 +1916,7 @@ describe("imagemin plugin", () => {
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
-    expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
+    expect(loaderExt.mime).toMatch(/image\/avif/i);
   });
 
   it("should generate image for 'import' and 'asset' types", async () => {
@@ -1954,7 +1959,7 @@ describe("imagemin plugin", () => {
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
-    expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
+    expect(loaderExt.mime).toMatch(/image\/avif/i);
 
     const pluginFile = path.resolve(
       __dirname,
@@ -1963,7 +1968,7 @@ describe("imagemin plugin", () => {
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
-    expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
+    expect(pluginExt.mime).toMatch(/image\/avif/i);
   });
 
   it("should generate images for 'import' and 'asset' types and keep original assets", async () => {
@@ -2008,7 +2013,7 @@ describe("imagemin plugin", () => {
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
-    expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
+    expect(loaderExt.mime).toMatch(/image\/avif/i);
 
     const pluginFile = path.resolve(
       __dirname,
@@ -2017,7 +2022,7 @@ describe("imagemin plugin", () => {
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
-    expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
+    expect(pluginExt.mime).toMatch(/image\/avif/i);
   });
 
   it("should generate image for 'import' and 'asset' types, minimizer original asset and keep", async () => {
@@ -2068,7 +2073,7 @@ describe("imagemin plugin", () => {
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
-    expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
+    expect(loaderExt.mime).toMatch(/image\/avif/i);
 
     const pluginFile = path.resolve(
       __dirname,
@@ -2077,7 +2082,7 @@ describe("imagemin plugin", () => {
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
-    expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
+    expect(pluginExt.mime).toMatch(/image\/avif/i);
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
       true,
@@ -2140,7 +2145,7 @@ describe("imagemin plugin", () => {
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
-    expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
+    expect(loaderExt.mime).toMatch(/image\/avif/i);
 
     const pluginFile = path.resolve(
       __dirname,
@@ -2149,7 +2154,7 @@ describe("imagemin plugin", () => {
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
-    expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
+    expect(pluginExt.mime).toMatch(/image\/avif/i);
 
     const pluginWebp = path.resolve(
       __dirname,
@@ -2158,7 +2163,7 @@ describe("imagemin plugin", () => {
     );
     const pluginWebExt = await fileType.fromFile(pluginWebp);
 
-    expect(/image\/webp/i.test(pluginWebExt.mime)).toBe(true);
+    expect(pluginWebExt.mime).toMatch(/image\/webp/i);
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
       true,
@@ -2237,7 +2242,7 @@ describe("imagemin plugin", () => {
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
-    expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
+    expect(loaderExt.mime).toMatch(/image\/avif/);
 
     const pluginFile = path.resolve(
       __dirname,
@@ -2246,7 +2251,7 @@ describe("imagemin plugin", () => {
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
-    expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
+    expect(pluginExt.mime).toMatch(/image\/avif/i);
 
     const pluginWebp = path.resolve(
       __dirname,
@@ -2255,7 +2260,7 @@ describe("imagemin plugin", () => {
     );
     const pluginWebExt = await fileType.fromFile(pluginWebp);
 
-    expect(/image\/webp/i.test(pluginWebExt.mime)).toBe(true);
+    expect(pluginWebExt.mime).toMatch(/image\/webp/i);
 
     // await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
     //     true
@@ -2327,7 +2332,7 @@ describe("imagemin plugin", () => {
     );
     const loaderExt = await fileType.fromFile(loaderFile);
 
-    expect(/image\/avif/i.test(loaderExt.mime)).toBe(true);
+    expect(loaderExt.mime).toMatch(/image\/avif/i);
 
     const pluginFile = path.resolve(
       __dirname,
@@ -2336,7 +2341,7 @@ describe("imagemin plugin", () => {
     );
     const pluginExt = await fileType.fromFile(pluginFile);
 
-    expect(/image\/avif/i.test(pluginExt.mime)).toBe(true);
+    expect(pluginExt.mime).toMatch(/image\/avif/i);
 
     const pluginWebp = path.resolve(
       __dirname,
@@ -2345,7 +2350,7 @@ describe("imagemin plugin", () => {
     );
     const pluginWebExt = await fileType.fromFile(pluginWebp);
 
-    expect(/image\/webp/i.test(pluginWebExt.mime)).toBe(true);
+    expect(pluginWebExt.mime).toMatch(/image\/webp/i);
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
       true,
@@ -2398,7 +2403,7 @@ describe("imagemin plugin", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/webp/i);
   });
 
   it("should generate image from copied assets, minimize and keep original", async () => {
@@ -2444,7 +2449,7 @@ describe("imagemin plugin", () => {
     );
     const webpExt = await fileType.fromFile(webpFile);
 
-    expect(/image\/webp/i.test(webpExt.mime)).toBe(true);
+    expect(webpExt.mime).toMatch(/image\/webp/i);
 
     const fileJpg = path.resolve(
       __dirname,
@@ -2453,7 +2458,7 @@ describe("imagemin plugin", () => {
     );
     const extJpg = await fileType.fromFile(fileJpg);
 
-    expect(/image\/jpeg/i.test(extJpg.mime)).toBe(true);
+    expect(extJpg.mime).toMatch(/image\/jpeg/i);
 
     await expect(isOptimized("plugin-test.jpg", compilation)).resolves.toBe(
       true,
@@ -2515,7 +2520,7 @@ describe("imagemin plugin", () => {
     // );
     // const pngExt = await fileType.fromFile(pngFile);
     //
-    // expect(/image\/png/i.test(pngExt.mime)).toBe(true);
+    // expect(pngExt.mime).toMatch(/image\/png/i);
     //
     // const webpFile = path.resolve(
     //   __dirname,
@@ -2524,7 +2529,7 @@ describe("imagemin plugin", () => {
     // );
     // const webpExt = await fileType.fromFile(webpFile);
     //
-    // expect(/image\/webp/i.test(webpExt.mime)).toBe(true);
+    // expect(webpExt.mime).toMatch(/image\/webp/i);
     //
     const cssFile = path.resolve(
       __dirname,
@@ -2634,7 +2639,7 @@ describe("imagemin plugin", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/webp/i);
   });
 
   it("should optimizes images svg image and prefix id (svgoMinify)", async () => {

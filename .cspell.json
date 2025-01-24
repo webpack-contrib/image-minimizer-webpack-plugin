@@ -43,7 +43,8 @@
     "libvips",
     "hspace",
     "commitlint",
-    "nodenext"
+    "nodenext",
+    "eslintcache"
   ],
 
   "ignorePaths": [

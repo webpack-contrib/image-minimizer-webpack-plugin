@@ -40,6 +40,7 @@ with option `"markdown.extension.toc.levels": "2..6"`
 - [Plugin Options](#plugin-options)
   - [`test`](#test)
   - [`include`](#include)
+  - [`cacheDir`](#cachedir)
   - [`exclude`](#exclude)
   - [`minimizer`](#minimizer)
     - [Available minimizers](#available-minimizers)
@@ -76,6 +77,7 @@ with option `"markdown.extension.toc.levels": "2..6"`
   - [`generator`](#generator-1)
     - [Loader generator example for `imagemin`](#loader-generator-example-for-imagemin)
   - [`severityError`](#severityerror-1)
+  - [`cacheDir`](#cachedir-1)
 - [Additional API](#additional-api)
   - [`imageminNormalizeConfig(config)`](#imageminnormalizeconfigconfig)
 - [Examples](#examples)
@@ -693,6 +695,35 @@ module.exports = {
       "...",
       new ImageMinimizerPlugin({
         exclude: /\/excludes/,
+      }),
+    ],
+  },
+};
+```
+
+### `cacheDir`
+
+Type:
+
+```ts
+type cacheDir = string;
+```
+
+Default: `undefined`
+
+If provided, ensures all image transformations are done only once and cached within this folder. (Sharp only)
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        cacheDir: ".cache/image-minimizer",
       }),
     ],
   },
@@ -2344,6 +2375,49 @@ module.exports = {
             loader: ImageMinimizerPlugin.loader,
             options: {
               severityError: "warning",
+              minimizerOptions: {
+                plugins: ["gifsicle"],
+              },
+            },
+          },
+        ],
+      },
+    ],
+  },
+};
+```
+
+### `cacheDir`
+
+Type:
+
+```ts
+type cacheDir = string;
+```
+
+Default: `undefined`
+
+If provided, ensures all image transformations are done only once and cached within this folder. (Sharp only)
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        type: "asset",
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          {
+            loader: ImageMinimizerPlugin.loader,
+            options: {
+              cacheDir: ".cache/image-minimizer",
               minimizerOptions: {
                 plugins: ["gifsicle"],
               },

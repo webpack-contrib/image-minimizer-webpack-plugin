@@ -45,4 +45,8 @@ type LoaderOptions<T> = {
     | import("./index").Minimizer<T>[]
     | undefined;
   generator?: import("./index").Generator<T>[] | undefined;
+  /**
+   * If provided, ensures all image transformations are done only once and cached within this folder. (Sharp only)
+   */
+  cacheDir?: string | undefined;
 };

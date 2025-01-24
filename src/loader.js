@@ -30,6 +30,7 @@ const getSerializeJavascript = memoize(() => require("serialize-javascript"));
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {Minimizer<T> | Minimizer<T>[]} [minimizer]
  * @property {Generator<T>[]} [generator]
+ * @property {string} [cacheDir] If provided, ensures all image transformations are done only once and cached within this folder. (Sharp only)
  */
 
 // Workaround - https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/341
@@ -117,7 +118,7 @@ async function loader(content) {
   // @ts-ignore
   const options = this.getOptions(/** @type {Schema} */ (schema));
   const callback = this.async();
-  const { generator, minimizer, severityError } = options;
+  const { generator, minimizer, severityError, cacheDir } = options;
 
   if (!minimizer && !generator) {
     callback(
@@ -238,7 +239,21 @@ async function loader(content) {
         input: content,
         filename,
         severityError,
-        transformer,
+        transformer: (Array.isArray(transformer)
+          ? transformer
+          : [transformer]
+        ).map((each) => ({
+          ...each,
+          ...(cacheDir || each.options
+            ? {
+                options: {
+                  cacheDir,
+                  // eslint-disable-next-line unicorn/no-useless-fallback-in-spread
+                  ...(each.options || {}),
+                },
+              }
+            : {}),
+        })),
         generateFilename:
           /** @type {Compilation} */
           (this._compilation).getAssetPath.bind(this._compilation),

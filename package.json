@@ -72,8 +72,12 @@
     }
   },
   "dependencies": {
+    "graceful-fs": "^4.2.11",
+    "mkdirp": "^3.0.1",
+    "proper-lockfile": "^4.1.2",
     "schema-utils": "^4.2.0",
-    "serialize-javascript": "^6.0.2"
+    "serialize-javascript": "^6.0.2",
+    "stream-buffers": "^3.0.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.7",
@@ -82,10 +86,13 @@
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@squoosh/lib": "^0.5.3",
+    "@types/graceful-fs": "^4.1.9",
     "@types/imagemin": "^9.0.0",
     "@types/node": "^20.14.9",
+    "@types/proper-lockfile": "^4.1.4",
     "@types/serialize-javascript": "^5.0.4",
     "@types/sharp": "^0.32.0",
+    "@types/stream-buffers": "^3.0.7",
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
     "babel-jest": "^29.7.0",
     "copy-webpack-plugin": "^12.0.2",

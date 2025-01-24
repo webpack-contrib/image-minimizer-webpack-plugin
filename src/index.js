@@ -172,6 +172,7 @@ const {
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+ * @property {string} [cacheDir] If provided, ensures all image transformations are done only once and cached within this folder. (Sharp only)
  */
 
 const getSerializeJavascript = memoize(() => require("serialize-javascript"));
@@ -200,6 +201,7 @@ class ImageMinimizerPlugin {
       loader = true,
       concurrency,
       deleteOriginalAssets = true,
+      cacheDir,
     } = options;
 
     if (!minimizer && !generator) {
@@ -221,6 +223,7 @@ class ImageMinimizerPlugin {
       concurrency,
       test,
       deleteOriginalAssets,
+      cacheDir,
     };
   }
 
@@ -232,16 +235,41 @@ class ImageMinimizerPlugin {
    * @returns {Promise<void>}
    */
   async optimize(compiler, compilation, assets) {
-    const minimizers =
+    const minimizers = /** @type {Minimizer<T>[]} */ (
       typeof this.options.minimizer !== "undefined"
         ? Array.isArray(this.options.minimizer)
           ? this.options.minimizer
           : [this.options.minimizer]
-        : [];
+        : []
+    ).map((each) => ({
+      ...each,
+      ...(this.options.cacheDir || each.options
+        ? {
+            options: {
+              cacheDir: this.options.cacheDir,
+              // eslint-disable-next-line unicorn/no-useless-fallback-in-spread
+              ...(each.options || {}),
+            },
+          }
+        : {}),
+    }));
 
-    const generators = Array.isArray(this.options.generator)
-      ? this.options.generator.filter((item) => item.type === "asset")
-      : [];
+    const generators = /** @type {Generator<G>[]} */ (
+      Array.isArray(this.options.generator)
+        ? this.options.generator.filter((item) => item.type === "asset")
+        : []
+    ).map((each) => ({
+      ...each,
+      ...(this.options.cacheDir || each.options
+        ? {
+            options: {
+              cacheDir: this.options.cacheDir,
+              // eslint-disable-next-line unicorn/no-useless-fallback-in-spread
+              ...(each.options || {}),
+            },
+          }
+        : {}),
+    }));
 
     if (minimizers.length === 0 && generators.length === 0) {
       return;
@@ -314,7 +342,9 @@ class ImageMinimizerPlugin {
             if (generators.length > 0) {
               tasks.push(
                 ...(await Promise.all(
-                  generators.map((generator) => getFromCache(generator)),
+                  generators.map((generator) =>
+                    getFromCache(/** @type {Generator<G>} */ (generator)),
+                  ),
                 )),
               );
             }
@@ -520,8 +550,15 @@ class ImageMinimizerPlugin {
       });
 
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
-        const { minimizer, generator, test, include, exclude, severityError } =
-          this.options;
+        const {
+          minimizer,
+          generator,
+          test,
+          include,
+          exclude,
+          severityError,
+          cacheDir,
+        } = this.options;
 
         const minimizerForLoader = minimizer;
         let generatorForLoader = generator;
@@ -555,6 +592,7 @@ class ImageMinimizerPlugin {
               generator: generatorForLoader,
               minimizer: minimizerForLoader,
               severityError,
+              cacheDir,
             }),
         });
         const dataURILoader = /** @type {InternalLoaderOptions<T>} */ ({
@@ -568,6 +606,7 @@ class ImageMinimizerPlugin {
               generator: generatorForLoader,
               minimizer: minimizerForLoader,
               severityError,
+              cacheDir,
             }),
         });
 

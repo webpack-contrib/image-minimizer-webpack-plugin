@@ -40,7 +40,7 @@ describe("loader generator option", () => {
 
     const transformedExt = await fileType.fromFile(transformedAsset);
 
-    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+    expect(transformedExt.mime).toMatch(/image\/webp/i);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
@@ -148,7 +148,7 @@ describe("loader generator option", () => {
 
     const transformedExt = await fileType.fromFile(transformedAsset);
 
-    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+    expect(transformedExt.mime).toMatch(/image\/webp/i);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
@@ -187,7 +187,7 @@ describe("loader generator option", () => {
 
     const transformedExt = await fileType.fromFile(transformedAsset);
 
-    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+    expect(transformedExt.mime).toMatch(/image\/webp/i);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
@@ -237,7 +237,7 @@ describe("loader generator option", () => {
 
       expect(dimensions.height).toBe(50);
       expect(dimensions.width).toBe(100);
-      expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+      expect(transformedExt.mime).toMatch(/image\/webp/i);
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(0);
     },
@@ -288,7 +288,7 @@ describe("loader generator option", () => {
 
       expect(dimensions.height).toBe(1);
       expect(dimensions.width).toBe(1);
-      expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+      expect(transformedExt.mime).toMatch(/image\/webp/i);
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(0);
     },
@@ -334,7 +334,7 @@ describe("loader generator option", () => {
 
     expect(dimensions.height).toBe(50);
     expect(dimensions.width).toBe(100);
-    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+    expect(transformedExt.mime).toMatch(/image\/webp/i);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
@@ -379,7 +379,7 @@ describe("loader generator option", () => {
 
     expect(dimensions.height).toBe(1);
     expect(dimensions.width).toBe(1);
-    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+    expect(transformedExt.mime).toMatch(/image\/webp/i);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
@@ -411,7 +411,7 @@ describe("loader generator option", () => {
 
     const transformedExt = await fileType.fromFile(transformedAsset);
 
-    expect(/image\/jpeg/i.test(transformedExt.mime)).toBe(true);
+    expect(transformedExt.mime).toMatch(/image\/jpeg/i);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
@@ -457,7 +457,7 @@ describe("loader generator option", () => {
 
     expect(dimensions.height).toBe(50);
     expect(dimensions.width).toBe(100);
-    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+    expect(transformedExt.mime).toMatch(/image\/webp/i);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
@@ -489,7 +489,7 @@ describe("loader generator option", () => {
 
     const transformedExt = await fileType.fromFile(transformedAsset);
 
-    expect(/image\/jpeg/i.test(transformedExt.mime)).toBe(true);
+    expect(transformedExt.mime).toMatch(/image\/jpeg/i);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
@@ -535,7 +535,7 @@ describe("loader generator option", () => {
 
     expect(dimensions.height).toBe(50);
     expect(dimensions.width).toBe(100);
-    expect(/image\/webp/i.test(transformedExt.mime)).toBe(true);
+    expect(transformedExt.mime).toMatch(/image\/webp/i);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
   });
