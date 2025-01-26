@@ -225,4 +225,8 @@ type PluginOptions<T, G> = {
    * If provided, ensures all image transformations are done only once and cached within this folder. (Sharp only)
    */
   cacheDir?: string | undefined;
+  /**
+   * If true, skips using Webpack's cache.
+   */
+  bypassWebpackCache?: boolean | undefined;
 };

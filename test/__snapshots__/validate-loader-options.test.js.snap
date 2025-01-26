@@ -183,47 +183,47 @@ exports[`validate loader options should throw an error on the "severityError" op
 exports[`validate loader options should throw an error on the "unknown" option with "/test/" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizer?, generator?, severityError?, cacheDir? }"
+   object { minimizer?, generator?, severityError?, cacheDir?, bypassWebpackCache? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "[]" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizer?, generator?, severityError?, cacheDir? }"
+   object { minimizer?, generator?, severityError?, cacheDir?, bypassWebpackCache? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "{"foo":"bar"}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizer?, generator?, severityError?, cacheDir? }"
+   object { minimizer?, generator?, severityError?, cacheDir?, bypassWebpackCache? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "{}" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizer?, generator?, severityError?, cacheDir? }"
+   object { minimizer?, generator?, severityError?, cacheDir?, bypassWebpackCache? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "1" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizer?, generator?, severityError?, cacheDir? }"
+   object { minimizer?, generator?, severityError?, cacheDir?, bypassWebpackCache? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "false" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizer?, generator?, severityError?, cacheDir? }"
+   object { minimizer?, generator?, severityError?, cacheDir?, bypassWebpackCache? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "test" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizer?, generator?, severityError?, cacheDir? }"
+   object { minimizer?, generator?, severityError?, cacheDir?, bypassWebpackCache? }"
 `;
 
 exports[`validate loader options should throw an error on the "unknown" option with "true" value 1`] = `
 "Invalid options object. Image Minimizer Plugin Loader has been initialized using an options object that does not match the API schema.
  - options has an unknown property 'unknown'. These properties are valid:
-   object { minimizer?, generator?, severityError?, cacheDir? }"
+   object { minimizer?, generator?, severityError?, cacheDir?, bypassWebpackCache? }"
 `;

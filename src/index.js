@@ -173,6 +173,7 @@ const {
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  * @property {string} [cacheDir] If provided, ensures all image transformations are done only once and cached within this folder. (Sharp only)
+ * @property {boolean} [bypassWebpackCache] If true, skips using Webpack's cache.
  */
 
 const getSerializeJavascript = memoize(() => require("serialize-javascript"));
@@ -202,6 +203,7 @@ class ImageMinimizerPlugin {
       concurrency,
       deleteOriginalAssets = true,
       cacheDir,
+      bypassWebpackCache,
     } = options;
 
     if (!minimizer && !generator) {
@@ -224,6 +226,7 @@ class ImageMinimizerPlugin {
       test,
       deleteOriginalAssets,
       cacheDir,
+      bypassWebpackCache,
     };
   }
 
@@ -276,6 +279,7 @@ class ImageMinimizerPlugin {
     }
 
     const cache = compilation.getCache("ImageMinimizerWebpackPlugin");
+
     const assetsForTransformers = (
       await Promise.all(
         Object.keys(assets)
@@ -298,7 +302,7 @@ class ImageMinimizerPlugin {
 
             return true;
           })
-          .map(async (name) => {
+          .map((name) => {
             const { info, source } = /** @type {Asset} */ (
               compilation.getAsset(name)
             );
@@ -306,9 +310,9 @@ class ImageMinimizerPlugin {
             /**
              * @template Z
              * @param {Transformer<Z> | Array<Transformer<Z>>} transformer
-             * @returns {Promise<Task<Z>>}
+             * @returns {Task<Z>}
              */
-            const getFromCache = async (transformer) => {
+            const getFromCache = (transformer) => {
               const eTag = cache.getLazyHashedEtag(source);
               const cacheName = getSerializeJavascript()({
                 eTag: eTag.toString(),
@@ -322,13 +326,12 @@ class ImageMinimizerPlugin {
               });
 
               const cacheItem = cache.getItemCache(cacheName, eTag);
-              const output = await cacheItem.getPromise();
 
               return {
                 name,
                 info,
                 inputSource: source,
-                output,
+                output: undefined,
                 cacheItem,
                 transformer,
               };
@@ -341,17 +344,15 @@ class ImageMinimizerPlugin {
 
             if (generators.length > 0) {
               tasks.push(
-                ...(await Promise.all(
-                  generators.map((generator) =>
-                    getFromCache(/** @type {Generator<G>} */ (generator)),
-                  ),
-                )),
+                ...generators.map((generator) =>
+                  getFromCache(/** @type {Generator<G>} */ (generator)),
+                ),
               );
             }
 
             if (minimizers.length > 0) {
               tasks.push(
-                await getFromCache(
+                getFromCache(
                   /** @type {Minimizer<T>[]} */
                   (minimizers),
                 ),
@@ -399,20 +400,22 @@ class ImageMinimizerPlugin {
             generateFilename: compilation.getAssetPath.bind(compilation),
           });
 
-        output = await cacheItem.providePromise(async () => {
-          logger.debug(`optimize cache miss: ${name}`);
+        output = this.options.bypassWebpackCache
+          ? await worker(minifyOptions)
+          : await cacheItem.providePromise(async () => {
+              logger.debug(`optimize cache miss: ${name}`);
 
-          const result = await worker(minifyOptions);
+              const result = await worker(minifyOptions);
 
-          return {
-            data: result.data,
-            source: new RawSource(result.data),
-            info: result.info,
-            filename: result.filename,
-            warnings: result.warnings,
-            errors: result.errors,
-          };
-        });
+              return {
+                data: result.data,
+                source: new RawSource(result.data),
+                info: result.info,
+                filename: result.filename,
+                warnings: result.warnings,
+                errors: result.errors,
+              };
+            });
       }
 
       compilation.warnings = [

@@ -730,6 +730,35 @@ module.exports = {
 };
 ```
 
+### `bypassWebpackCache`
+
+Type:
+
+```ts
+type bypassWebpackCache = string;
+```
+
+Default: `undefined`
+
+If `true`, skips using Webpack's cache. (Typically useful if you're using the `cacheDir` and therefore don't need to double-up on caching with Webpack's cache.)
+
+**webpack.config.js**
+
+```js
+const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+
+module.exports = {
+  optimization: {
+    minimizer: [
+      "...",
+      new ImageMinimizerPlugin({
+        bypassWebpackCache: true,
+      }),
+    ],
+  },
+};
+```
+
 ### `minimizer`
 
 Type:

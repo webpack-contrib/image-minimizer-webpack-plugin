@@ -846,7 +846,6 @@ describe("imagemin plugin", () => {
             implementation: ImageMinimizerPlugin.imageminMinify,
             options: { plugins },
           },
-          cacheDir: ".cache/image-minimizer",
         },
       },
       true,
@@ -1054,6 +1053,8 @@ describe("imagemin plugin", () => {
       entry: path.join(fixturesPath, "generator-and-minimizer-animation.js"),
       imageminPluginOptions: {
         test: /\.(jpe?g|png|webp|gif)$/i,
+        cacheDir: ".cache/image-minimizer",
+        bypassWebpackCache: true,
         generator: [
           {
             preset: "webp",
