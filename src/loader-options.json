@@ -106,6 +106,16 @@
       "description": "Allows to choose how errors are displayed.",
       "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#severityerror",
       "enum": ["off", "warning", "error"]
+    },
+    "cacheDir": {
+      "description": "If provided, ensures all image transformations are done only once and cached within this folder. (Sharp only)",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#cachedir",
+      "type": "string"
+    },
+    "bypassWebpackCache": {
+      "description": "If true, skips using Webpack's cache.",
+      "link": "https://github.com/webpack-contrib/image-minimizer-webpack-plugin#bypasswebpackcache",
+      "type": "boolean"
     }
   }
 }

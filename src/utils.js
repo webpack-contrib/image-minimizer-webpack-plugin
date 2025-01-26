@@ -1,4 +1,5 @@
 const path = require("path");
+const { processAndMaybeCacheContent, hashContent } = require("./cache");
 
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").SquooshOptions} SquooshOptions */
@@ -1007,6 +1008,7 @@ squooshMinify.teardown = squooshImagePoolTeardown;
  * @property {number | 'auto'} [rotate]
  * @property {SizeSuffix} [sizeSuffix]
  * @property {SharpEncodeOptions} [encodeOptions]
+ * @property {string} [cacheDir]
  */
 
 /**
@@ -1084,76 +1086,111 @@ async function sharpTransform(
   /** @type {SharpLib} */
   // eslint-disable-next-line node/no-unpublished-require
   const sharp = require("sharp");
-  const imagePipeline = sharp(original.data, { animated: true });
+  const { format } = await sharp(original.data, { animated: true }).metadata();
 
-  // ====== rotate ======
+  const hashedOptions = {};
+  const { rotate, resize, cacheDir } = minimizerOptions;
 
-  if (typeof minimizerOptions.rotate === "number") {
-    imagePipeline.rotate(minimizerOptions.rotate);
-  } else if (minimizerOptions.rotate === "auto") {
-    imagePipeline.rotate();
-  }
+  Object.assign(hashedOptions, { rotate, resize });
 
-  // ====== resize ======
-
-  if (minimizerOptions.resize) {
-    const { enabled = true, unit = "px", ...params } = minimizerOptions.resize;
-
-    if (
-      enabled &&
-      (typeof params.width === "number" || typeof params.height === "number")
-    ) {
-      if (unit === "percent") {
-        const originalMetadata = await sharp(original.data).metadata();
-
-        if (
-          typeof params.width === "number" &&
-          originalMetadata.width &&
-          Number.isFinite(originalMetadata.width) &&
-          originalMetadata.width > 0
-        ) {
-          params.width = Math.ceil(
-            (originalMetadata.width * params.width) / 100,
-          );
-        }
-
-        if (
-          typeof params.height === "number" &&
-          originalMetadata.height &&
-          Number.isFinite(originalMetadata.height) &&
-          originalMetadata.height > 0
-        ) {
-          params.height = Math.ceil(
-            (originalMetadata.height * params.height) / 100,
-          );
-        }
-      }
-
-      imagePipeline.resize(params);
-    }
-  }
-
-  // ====== convert ======
-
-  const imageMetadata = await imagePipeline.metadata();
-
-  const outputFormat =
-    targetFormat ?? /** @type {SharpFormat} */ (imageMetadata.format);
-
+  const outputFormat = targetFormat ?? /** @type {SharpFormat} */ (format);
   const encodeOptions = minimizerOptions.encodeOptions?.[outputFormat];
 
-  imagePipeline.toFormat(outputFormat, encodeOptions);
+  Object.assign(hashedOptions, { outputFormat, ...encodeOptions });
 
-  const result = await imagePipeline.toBuffer({ resolveWithObject: true });
+  async function doTransformation() {
+    const imagePipeline = sharp(original.data, { animated: true });
+
+    // ====== rotate ======
+
+    if (typeof rotate === "number") {
+      imagePipeline.rotate(rotate);
+    } else if (rotate === "auto") {
+      imagePipeline.rotate();
+    }
+
+    // ====== resize ======
+
+    if (resize) {
+      const { enabled = true, unit = "px", ...params } = resize;
+
+      if (
+        enabled &&
+        (typeof params.width === "number" || typeof params.height === "number")
+      ) {
+        if (unit === "percent") {
+          const originalMetadata = await sharp(original.data).metadata();
+
+          if (
+            typeof params.width === "number" &&
+            originalMetadata.width &&
+            Number.isFinite(originalMetadata.width) &&
+            originalMetadata.width > 0
+          ) {
+            params.width = Math.ceil(
+              (originalMetadata.width * params.width) / 100,
+            );
+          }
+
+          if (
+            typeof params.height === "number" &&
+            originalMetadata.height &&
+            Number.isFinite(originalMetadata.height) &&
+            originalMetadata.height > 0
+          ) {
+            params.height = Math.ceil(
+              (originalMetadata.height * params.height) / 100,
+            );
+          }
+        }
+
+        imagePipeline.resize(params);
+      }
+    }
+
+    // ====== convert ======
+
+    imagePipeline.toFormat(outputFormat, encodeOptions);
+
+    return imagePipeline;
+  }
+
+  const data = await processAndMaybeCacheContent(
+    original.data,
+    (resultWriteable) =>
+      doTransformation().then(
+        (imagePipeline) =>
+          /** @type {Promise<void>} */ (
+            new Promise((resolve, reject) => {
+              imagePipeline
+                .pipe(resultWriteable)
+                .on("finish", () => resolve())
+                .on("error", (err) => reject(err));
+            })
+          ),
+      ),
+    cacheDir && path.join(cacheDir, hashContent(JSON.stringify(hashedOptions))),
+  );
+
+  if (!data) {
+    throw new Error("Unknown error: cannot do sharp transform");
+  }
 
   // ====== rename ======
 
   const outputExt = targetFormat ? outputFormat : inputExt;
-  const { width, height } = result.info;
+  const { width, height } = await sharp(data).metadata();
+
+  if (!width || !height) {
+    throw new Error("Unknown error: cannot read size metadata");
+  }
 
   const sizeSuffix =
     typeof minimizerOptions.sizeSuffix === "function"
-      ? minimizerOptions.sizeSuffix(width, height)
+      ? minimizerOptions.sizeSuffix(
+          /** @type {number} */ (width),
+          /** @type {number} */ (height),
+        )
       : "";
 
   const dotIndex = original.filename.lastIndexOf(".");
@@ -1170,7 +1207,7 @@ async function sharpTransform(
 
   return {
     filename,
-    data: result.data,
+    data,
     warnings: [...original.warnings],
     errors: [...original.errors],
     info: {
