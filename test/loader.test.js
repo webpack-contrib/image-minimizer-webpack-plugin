@@ -418,7 +418,7 @@ describe("loader", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/webp/i);
   });
 
   ifit(needSquooshTest)(
@@ -455,7 +455,7 @@ describe("loader", () => {
       );
       const ext = await fileType.fromFile(file);
 
-      expect(/image\/webp/i.test(ext.mime)).toBe(true);
+      expect(ext.mime).toMatch(/image\/webp/i);
     },
   );
 
@@ -494,7 +494,7 @@ describe("loader", () => {
       );
       const ext = await fileType.fromFile(file);
 
-      expect(/image\/webp/i.test(ext.mime)).toBe(true);
+      expect(ext.mime).toMatch(/image\/webp/i);
     },
   );
 
@@ -531,7 +531,7 @@ describe("loader", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/webp/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/webp/i);
   });
 
   it("should throw an error on empty minimizer", async () => {

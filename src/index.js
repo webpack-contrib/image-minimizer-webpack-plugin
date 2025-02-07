@@ -172,6 +172,8 @@ const {
  * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+ * @property {string} [cacheDir] If provided, ensures all image transformations are done only once and cached within this folder. (Sharp only)
+ * @property {boolean} [bypassWebpackCache] If true, skips using Webpack's cache.
  */
 
 const getSerializeJavascript = memoize(() => require("serialize-javascript"));
@@ -200,6 +202,8 @@ class ImageMinimizerPlugin {
       loader = true,
       concurrency,
       deleteOriginalAssets = true,
+      cacheDir,
+      bypassWebpackCache,
     } = options;
 
     if (!minimizer && !generator) {
@@ -221,6 +225,8 @@ class ImageMinimizerPlugin {
       concurrency,
       test,
       deleteOriginalAssets,
+      cacheDir,
+      bypassWebpackCache,
     };
   }
 
@@ -232,22 +238,48 @@ class ImageMinimizerPlugin {
    * @returns {Promise<void>}
    */
   async optimize(compiler, compilation, assets) {
-    const minimizers =
+    const minimizers = /** @type {Minimizer<T>[]} */ (
       typeof this.options.minimizer !== "undefined"
         ? Array.isArray(this.options.minimizer)
           ? this.options.minimizer
           : [this.options.minimizer]
-        : [];
+        : []
+    ).map((each) => ({
+      ...each,
+      ...(this.options.cacheDir || each.options
+        ? {
+            options: {
+              cacheDir: this.options.cacheDir,
+              // eslint-disable-next-line unicorn/no-useless-fallback-in-spread
+              ...(each.options || {}),
+            },
+          }
+        : {}),
+    }));
 
-    const generators = Array.isArray(this.options.generator)
-      ? this.options.generator.filter((item) => item.type === "asset")
-      : [];
+    const generators = /** @type {Generator<G>[]} */ (
+      Array.isArray(this.options.generator)
+        ? this.options.generator.filter((item) => item.type === "asset")
+        : []
+    ).map((each) => ({
+      ...each,
+      ...(this.options.cacheDir || each.options
+        ? {
+            options: {
+              cacheDir: this.options.cacheDir,
+              // eslint-disable-next-line unicorn/no-useless-fallback-in-spread
+              ...(each.options || {}),
+            },
+          }
+        : {}),
+    }));
 
     if (minimizers.length === 0 && generators.length === 0) {
       return;
     }
 
     const cache = compilation.getCache("ImageMinimizerWebpackPlugin");
+
     const assetsForTransformers = (
       await Promise.all(
         Object.keys(assets)
@@ -270,7 +302,7 @@ class ImageMinimizerPlugin {
 
             return true;
           })
-          .map(async (name) => {
+          .map((name) => {
             const { info, source } = /** @type {Asset} */ (
               compilation.getAsset(name)
             );
@@ -278,19 +310,28 @@ class ImageMinimizerPlugin {
             /**
              * @template Z
              * @param {Transformer<Z> | Array<Transformer<Z>>} transformer
-             * @returns {Promise<Task<Z>>}
+             * @returns {Task<Z>}
              */
-            const getFromCache = async (transformer) => {
-              const cacheName = getSerializeJavascript()({ name, transformer });
+            const getFromCache = (transformer) => {
               const eTag = cache.getLazyHashedEtag(source);
+              const cacheName = getSerializeJavascript()({
+                eTag: eTag.toString(),
+                transformer: (Array.isArray(transformer)
+                  ? transformer
+                  : [transformer]
+                ).map(({ implementation, options }) => ({
+                  implementation,
+                  options,
+                })),
+              });
+
               const cacheItem = cache.getItemCache(cacheName, eTag);
-              const output = await cacheItem.getPromise();
 
               return {
                 name,
                 info,
                 inputSource: source,
-                output,
+                output: undefined,
                 cacheItem,
                 transformer,
               };
@@ -303,15 +344,15 @@ class ImageMinimizerPlugin {
 
             if (generators.length > 0) {
               tasks.push(
-                ...(await Promise.all(
-                  generators.map((generator) => getFromCache(generator)),
-                )),
+                ...generators.map((generator) =>
+                  getFromCache(/** @type {Generator<G>} */ (generator)),
+                ),
               );
             }
 
             if (minimizers.length > 0) {
               tasks.push(
-                await getFromCache(
+                getFromCache(
                   /** @type {Minimizer<T>[]} */
                   (minimizers),
                 ),
@@ -338,6 +379,9 @@ class ImageMinimizerPlugin {
 
       const sourceFromInputSource = inputSource.source();
 
+      const pluginName = this.constructor.name;
+      const logger = compilation.getLogger(pluginName);
+
       if (!output) {
         input = sourceFromInputSource;
 
@@ -356,17 +400,22 @@ class ImageMinimizerPlugin {
             generateFilename: compilation.getAssetPath.bind(compilation),
           });
 
-        output = await worker(minifyOptions);
+        output = this.options.bypassWebpackCache
+          ? await worker(minifyOptions)
+          : await cacheItem.providePromise(async () => {
+              logger.debug(`optimize cache miss: ${name}`);
 
-        output.source = new RawSource(output.data);
+              const result = await worker(minifyOptions);
 
-        await cacheItem.storePromise({
-          source: output.source,
-          info: output.info,
-          filename: output.filename,
-          warnings: output.warnings,
-          errors: output.errors,
-        });
+              return {
+                data: result.data,
+                source: new RawSource(result.data),
+                info: result.info,
+                filename: result.filename,
+                warnings: result.warnings,
+                errors: result.errors,
+              };
+            });
       }
 
       compilation.warnings = [
@@ -504,8 +553,15 @@ class ImageMinimizerPlugin {
       });
 
       compiler.hooks.afterPlugins.tap({ name: pluginName }, () => {
-        const { minimizer, generator, test, include, exclude, severityError } =
-          this.options;
+        const {
+          minimizer,
+          generator,
+          test,
+          include,
+          exclude,
+          severityError,
+          cacheDir,
+        } = this.options;
 
         const minimizerForLoader = minimizer;
         let generatorForLoader = generator;
@@ -539,6 +595,7 @@ class ImageMinimizerPlugin {
               generator: generatorForLoader,
               minimizer: minimizerForLoader,
               severityError,
+              cacheDir,
             }),
         });
         const dataURILoader = /** @type {InternalLoaderOptions<T>} */ ({
@@ -552,6 +609,7 @@ class ImageMinimizerPlugin {
               generator: generatorForLoader,
               minimizer: minimizerForLoader,
               severityError,
+              cacheDir,
             }),
         });
 

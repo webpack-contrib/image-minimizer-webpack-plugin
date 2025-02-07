@@ -41,6 +41,7 @@ export type SharpOptions = {
   rotate?: number | "auto" | undefined;
   sizeSuffix?: SizeSuffix | undefined;
   encodeOptions?: SharpEncodeOptions | undefined;
+  cacheDir?: string | undefined;
 };
 export type SizeSuffix = (width: number, height: number) => string;
 /**
