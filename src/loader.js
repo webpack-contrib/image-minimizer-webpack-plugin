@@ -269,7 +269,7 @@ async function loader(content) {
     changeResource(this, output, query);
 
     // Change name of assets modules after generator
-    if (this._module && !this._module.matchResource) {
+    if (this._module && !("matchResource" in this._module)) {
       this._module.matchResource = `${output.filename}${query}`;
     }
   }
