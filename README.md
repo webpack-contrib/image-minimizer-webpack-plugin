@@ -28,7 +28,7 @@ with option `"markdown.extension.toc.levels": "2..6"`
 -->
 
 - [Getting Started](#getting-started)
-  - [Install optimize/generate tool](#install-optimizegenerate-tool)
+  - [Install optimize/generate tool](#install-an-optimizationgeneration-tool)
   - [Optimize with `imagemin`](#optimize-with-imagemin)
   - [[**DEPRECATED**] Optimize with `squoosh`](#deprecated-optimize-with-squoosh)
   - [Optimize with `sharp`](#optimize-with-sharp)
