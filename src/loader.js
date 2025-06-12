@@ -6,7 +6,9 @@ const {
   IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
   ABSOLUTE_URL_REGEX,
   WINDOWS_PATH_REGEX,
+  memoize,
 } = require("./utils.js");
+const getSerializeJavascript = memoize(() => require("serialize-javascript"));
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -28,6 +30,8 @@ const {
  * @property {string} [severityError] Allows to choose how errors are displayed.
  * @property {Minimizer<T> | Minimizer<T>[]} [minimizer]
  * @property {Generator<T>[]} [generator]
+ * @property {string} [cacheDir] If provided, ensures all image transformations are done only once and cached within this folder. (Sharp only)
+ * @property {boolean} [bypassWebpackCache] If true, skips using Webpack's cache.
  */
 
 // Workaround - https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/341
@@ -115,7 +119,8 @@ async function loader(content) {
   // @ts-ignore
   const options = this.getOptions(/** @type {Schema} */ (schema));
   const callback = this.async();
-  const { generator, minimizer, severityError } = options;
+  const { generator, minimizer, severityError, cacheDir, bypassWebpackCache } =
+    options;
 
   if (!minimizer && !generator) {
     callback(
@@ -210,18 +215,56 @@ async function loader(content) {
       ? this.resourcePath
       : path.relative(this.rootContext, this.resourcePath);
 
+  if (!this._compilation || !this._compiler) {
+    callback(new Error("_compilation and/or _compiler unavailable"));
+    return;
+  }
+
+  const logger = this._compilation.getLogger("ImageMinimizerPlugin");
+  const cache = this._compilation.getCache("ImageMinimizerWebpackPlugin");
+
+  const { RawSource } = this._compiler.webpack.sources;
+  const eTag = cache.getLazyHashedEtag(new RawSource(content));
+  const cacheName = getSerializeJavascript()({
+    eTag: eTag.toString(),
+    transformer: (Array.isArray(transformer) ? transformer : [transformer]).map(
+      (each) => ({
+        implementation: each.implementation,
+        options: each.options,
+      }),
+    ),
+  });
   const minifyOptions =
     /** @type {import("./index").InternalWorkerOptions<T>} */ ({
       input: content,
       filename,
       severityError,
-      transformer,
+      transformer: (Array.isArray(transformer)
+        ? transformer
+        : [transformer]
+      ).map((each) => ({
+        ...each,
+        ...(cacheDir || each.options
+          ? {
+              options: {
+                cacheDir,
+                // eslint-disable-next-line unicorn/no-useless-fallback-in-spread
+                ...(each.options || {}),
+              },
+            }
+          : {}),
+      })),
       generateFilename:
         /** @type {Compilation} */
         (this._compilation).getAssetPath.bind(this._compilation),
     });
+  const output = bypassWebpackCache
+    ? await worker(minifyOptions)
+    : await cache.getItemCache(cacheName, eTag).providePromise(() => {
+        logger.debug(`loader cache miss: ${filename}`);
 
-  const output = await worker(minifyOptions);
+        return worker(minifyOptions);
+      });
 
   if (output.errors && output.errors.length > 0) {
     for (const error of output.errors) {

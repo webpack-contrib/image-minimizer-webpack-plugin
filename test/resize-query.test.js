@@ -85,7 +85,7 @@ describe("resize query (sharp)", () => {
 
       expect(dimensions.width).toBe(width);
       expect(dimensions.height).toBe(height);
-      expect(mimeRegExp.test(transformedExt.mime)).toBe(true);
+      expect(transformedExt.mime).toMatch(mimeRegExp);
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(0);
     }
@@ -159,7 +159,7 @@ describe("resize query (sharp)", () => {
 
       expect(dimensions.width).toBe(width);
       expect(dimensions.height).toBe(height);
-      expect(mimeRegExp.test(transformedExt.mime)).toBe(true);
+      expect(transformedExt.mime).toMatch(mimeRegExp);
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(0);
     }
@@ -243,7 +243,7 @@ describe("resize query (sharp)", () => {
 
       expect(dimensions.width).toBe(width);
       expect(dimensions.height).toBe(height);
-      expect(mimeRegExp.test(transformedExt.mime)).toBe(true);
+      expect(transformedExt.mime).toMatch(mimeRegExp);
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(0);
     }
@@ -317,7 +317,7 @@ describe("resize query (sharp)", () => {
 
       expect(dimensions.width).toBe(width);
       expect(dimensions.height).toBe(height);
-      expect(mimeRegExp.test(transformedExt.mime)).toBe(true);
+      expect(transformedExt.mime).toMatch(mimeRegExp);
       expect(warnings).toHaveLength(0);
       expect(errors).toHaveLength(0);
     }
@@ -403,7 +403,7 @@ describe("resize query (squoosh)", () => {
 
         expect(dimensions.width).toBe(width);
         expect(dimensions.height).toBe(height);
-        expect(mimeRegExp.test(transformedExt.mime)).toBe(true);
+        expect(transformedExt.mime).toMatch(mimeRegExp);
         expect(warnings).toHaveLength(0);
         expect(errors).toHaveLength(0);
       }
@@ -480,7 +480,7 @@ describe("resize query (squoosh)", () => {
 
         expect(dimensions.width).toBe(width);
         expect(dimensions.height).toBe(height);
-        expect(mimeRegExp.test(transformedExt.mime)).toBe(true);
+        expect(transformedExt.mime).toMatch(mimeRegExp);
         expect(warnings).toHaveLength(0);
         expect(errors).toHaveLength(0);
       }
