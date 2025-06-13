@@ -242,7 +242,8 @@ async function loader(content) {
   // Change content of the data URI after minimizer
   if (this._module?.resourceResolveData?.encodedContent) {
     const isBase64 = /^base64$/i.test(
-      this._module.resourceResolveData.encoding,
+      /** @type string */
+      (this._module.resourceResolveData.encoding),
     );
 
     this._module.resourceResolveData.encodedContent = isBase64
