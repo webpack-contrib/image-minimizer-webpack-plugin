@@ -7,7 +7,7 @@ declare class ImageMinimizerPlugin<T, G = T> {
   /**
    * @param {PluginOptions<T, G>} [options={}] Plugin options.
    */
-  constructor(options?: PluginOptions<T, G> | undefined);
+  constructor(options?: PluginOptions<T, G>);
   /**
    * @private
    */
