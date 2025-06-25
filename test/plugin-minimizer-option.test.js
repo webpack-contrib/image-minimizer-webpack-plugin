@@ -514,7 +514,7 @@ describe("plugin minify option", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/png/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/png/i);
     expect(transformedAssets).toHaveLength(1);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -546,7 +546,7 @@ describe("plugin minify option", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/png/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/png/i);
     expect(transformedAssets).toHaveLength(1);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -578,7 +578,7 @@ describe("plugin minify option", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/png/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/png/i);
     expect(transformedAssets).toHaveLength(1);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -610,7 +610,7 @@ describe("plugin minify option", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/png/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/png/i);
     expect(transformedAssets).toHaveLength(1);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
@@ -642,7 +642,7 @@ describe("plugin minify option", () => {
     );
     const ext = await fileType.fromFile(file);
 
-    expect(/image\/png/i.test(ext.mime)).toBe(true);
+    expect(ext.mime).toMatch(/image\/png/i);
     expect(transformedAssets).toHaveLength(1);
     expect(warnings).toHaveLength(0);
     expect(errors).toHaveLength(0);
