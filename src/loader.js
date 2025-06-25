@@ -6,7 +6,9 @@ const {
   IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
   ABSOLUTE_URL_REGEX,
   WINDOWS_PATH_REGEX,
+  memoize,
 } = require("./utils.js");
+const getSerializeJavascript = memoize(() => require("serialize-javascript"));
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -210,18 +212,42 @@ async function loader(content) {
       ? this.resourcePath
       : path.relative(this.rootContext, this.resourcePath);
 
-  const minifyOptions =
-    /** @type {import("./index").InternalWorkerOptions<T>} */ ({
-      input: content,
-      filename,
-      severityError,
-      transformer,
-      generateFilename:
-        /** @type {Compilation} */
-        (this._compilation).getAssetPath.bind(this._compilation),
-    });
+  if (!this._compilation || !this._compiler) {
+    callback(new Error("_compilation and/or _compiler unavailable"));
+    return;
+  }
 
-  const output = await worker(minifyOptions);
+  const logger = this._compilation.getLogger("ImageMinimizerPlugin");
+  const cache = this._compilation.getCache("ImageMinimizerWebpackPlugin");
+
+  const { RawSource } = this._compiler.webpack.sources;
+  const eTag = cache.getLazyHashedEtag(new RawSource(content));
+  const cacheName = getSerializeJavascript()({
+    eTag: eTag.toString(),
+    transformer: (Array.isArray(transformer) ? transformer : [transformer]).map(
+      (each) => ({
+        implementation: each.implementation,
+        options: each.options,
+      }),
+    ),
+  });
+  const cacheItem = cache.getItemCache(cacheName, eTag);
+  const output = await cacheItem.providePromise(() => {
+    const minifyOptions =
+      /** @type {import("./index").InternalWorkerOptions<T>} */ ({
+        input: content,
+        filename,
+        severityError,
+        transformer,
+        generateFilename:
+          /** @type {Compilation} */
+          (this._compilation).getAssetPath.bind(this._compilation),
+      });
+
+    logger.debug(`loader cache miss: ${filename}`);
+
+    return worker(minifyOptions);
+  });
 
   if (output.errors && output.errors.length > 0) {
     for (const error of output.errors) {
