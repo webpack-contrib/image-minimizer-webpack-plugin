@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`api normalizeImageminConfig should works 1`] = `"No plugins found for \`imagemin\`, please read documentation"`;
 
@@ -11,7 +11,8 @@ Did you forget to install the plugin?
 You can install it with:
 
 $ npm install imagemin-unknown --save-dev
-$ yarn add imagemin-unknown --dev"
+$ yarn add imagemin-unknown --dev
+Cause: Cannot find module 'unknown' from 'src/utils.js'"
 `;
 
 exports[`api normalizeImageminConfig should works 4`] = `
@@ -21,7 +22,8 @@ Did you forget to install the plugin?
 You can install it with:
 
 $ npm install imagemin-unknown --save-dev
-$ yarn add imagemin-unknown --dev"
+$ yarn add imagemin-unknown --dev
+Cause: Cannot find module 'imagemin-unknown' from 'src/utils.js'"
 `;
 
 exports[`api normalizeImageminConfig should works 5`] = `"No plugins found for \`imagemin\`, please read documentation"`;
