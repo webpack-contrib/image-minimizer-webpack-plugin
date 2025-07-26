@@ -1,23 +1,23 @@
-const path = require("path");
-const os = require("os");
+const os = require("node:os");
+const path = require("node:path");
 
 const { validate } = require("schema-utils");
 
-const worker = require("./worker");
 const schema = require("./plugin-options.json");
 const {
-  throttleAll,
-  memoize,
-  imageminNormalizeConfig,
-  imageminMinify,
-  imageminGenerate,
-  squooshMinify,
-  squooshGenerate,
-  sharpMinify,
-  sharpGenerate,
-  svgoMinify,
   IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
+  imageminGenerate,
+  imageminMinify,
+  imageminNormalizeConfig,
+  memoize,
+  sharpGenerate,
+  sharpMinify,
+  squooshGenerate,
+  squooshMinify,
+  svgoMinify,
+  throttleAll,
 } = require("./utils.js");
+const worker = require("./worker");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
@@ -42,36 +42,36 @@ const {
  */
 
 /**
- * @typedef {Object} ImageminOptions
- * @property {Array<string | [string, Record<string, any>?] | import("imagemin").Plugin>} plugins
+ * @typedef {object} ImageminOptions
+ * @property {Array<string | [string, Record<string, unknown>?] | import("imagemin").Plugin>} plugins The plugins array
  */
 
 /**
- * @typedef {Object.<string, any>} SquooshOptions
+ * @typedef {Record<string, unknown>} SquooshOptions
  */
 
 /**
- * @typedef {Object} WorkerResult
- * @property {string} filename
- * @property {Buffer} data
- * @property {Array<Error>} warnings
- * @property {Array<Error>} errors
- * @property {AssetInfo} info
+ * @typedef {object} WorkerResult
+ * @property {string} filename The filename
+ * @property {Buffer} data The data buffer
+ * @property {Array<Error>} warnings The warnings array
+ * @property {Array<Error>} errors The errors array
+ * @property {AssetInfo} info The asset info
  */
 
 /**
  * @template T
- * @typedef {Object} Task
- * @property {string} name
- * @property {AssetInfo} info
- * @property {Source} inputSource
- * @property {WorkerResult & { source?: Source } | undefined} output
- * @property {ReturnType<ReturnType<Compilation["getCache"]>["getItemCache"]>} cacheItem
- * @property {Transformer<T> | Transformer<T>[]} transformer
+ * @typedef {object} Task
+ * @property {string} name The task name
+ * @property {AssetInfo} info The asset info
+ * @property {Source} inputSource The input source
+ * @property {WorkerResult & { source?: Source } | undefined} output The output
+ * @property {ReturnType<ReturnType<Compilation["getCache"]>["getItemCache"]>} cacheItem The cache item
+ * @property {Transformer<T> | Transformer<T>[]} transformer The transformer
  */
 
 /**
- * @typedef {{ [key: string]: any }} CustomOptions
+ * @typedef {Record<string, unknown>} CustomOptions
  */
 
 /**
@@ -85,25 +85,25 @@ const {
  */
 
 /**
- * @typedef {Object} ResizeOptions
- * @property {number} [width]
- * @property {number} [height]
- * @property {"px" | "percent"} [unit]
- * @property {boolean} [enabled]
+ * @typedef {object} ResizeOptions
+ * @property {number=} width The width
+ * @property {number=} height The height
+ * @property {"px" | "percent"=} unit The unit
+ * @property {boolean=} enabled Whether enabled
  */
 
 /**
  * @template T
  * @callback BasicTransformerImplementation
- * @param {WorkerResult} original
- * @param {BasicTransformerOptions<T>} [options]
- * @returns {Promise<WorkerResult | null>}
+ * @param {WorkerResult} original The original result
+ * @param {BasicTransformerOptions<T>=} options The options
+ * @returns {Promise<WorkerResult | null>} The transformed result
  */
 
 /**
- * @typedef {Object} BasicTransformerHelpers
- * @property {() => void} [setup]
- * @property {() => void} [teardown]
+ * @typedef {object} BasicTransformerHelpers
+ * @property {() => void=} setup The setup function
+ * @property {() => void=} teardown The teardown function
  */
 
 /**
@@ -112,26 +112,26 @@ const {
  */
 
 /**
- * @typedef {Object} PathData
- * @property {string} [filename]
+ * @typedef {object} PathData
+ * @property {string=} filename The filename
  */
 
 /**
  * @callback FilenameFn
- * @param {PathData} pathData
- * @param {AssetInfo} [assetInfo]
- * @returns {string}
+ * @param {PathData} pathData The path data
+ * @param {AssetInfo=} assetInfo The asset info
+ * @returns {string} The filename
  */
 
 /**
  * @template T
- * @typedef {Object} Transformer
- * @property {TransformerFunction<T>} implementation
- * @property {BasicTransformerOptions<T>} [options]
- * @property {FilterFn} [filter]
- * @property {string | FilenameFn} [filename]
- * @property {string} [preset]
- * @property {"import" | "asset"} [type]
+ * @typedef {object} Transformer
+ * @property {TransformerFunction<T>} implementation The implementation
+ * @property {BasicTransformerOptions<T>=} options The options
+ * @property {FilterFn=} filter The filter
+ * @property {string | FilenameFn=} filename The filename
+ * @property {string=} preset The preset
+ * @property {"import" | "asset"=} type The type
  */
 
 /**
@@ -146,32 +146,27 @@ const {
 
 /**
  * @template T
- * @typedef {Object} InternalWorkerOptions
- * @property {string} filename
- * @property {AssetInfo=} info
- * @property {Buffer} input
- * @property {Transformer<T> | Transformer<T>[]} transformer
- * @property {string} [severityError]
- * @property {Function} [generateFilename]
- */
-
-/**
- * @template T
- * @typedef {import("./loader").LoaderOptions<T>} InternalLoaderOptions
+ * @typedef {object} InternalWorkerOptions
+ * @property {string} filename The filename
+ * @property {AssetInfo=} info The asset info
+ * @property {Buffer} input The input buffer
+ * @property {Transformer<T> | Transformer<T>[]} transformer The transformer
+ * @property {string=} severityError The severity error setting
+ * @property {(filenameTemplate: string, options: { filename: string }) => string=} generateFilename The filename generator function
  */
 
 /**
  * @template T, G
- * @typedef {Object} PluginOptions
- * @property {Rule} [test] Test to match files against.
- * @property {Rule} [include] Files to include.
- * @property {Rule} [exclude] Files to exclude.
- * @property {T extends any[] ? { [P in keyof T]: Minimizer<T[P]> } : Minimizer<T> | Minimizer<T>[]} [minimizer] Allows to setup the minimizer.
- * @property {G extends any[] ? { [P in keyof G]: Generator<G[P]> } : Generator<G>[]} [generator] Allows to set the generator.
- * @property {boolean} [loader] Automatically adding `imagemin-loader`.
- * @property {number} [concurrency] Maximum number of concurrency optimization processes in one time.
- * @property {string} [severityError] Allows to choose how errors are displayed.
- * @property {boolean} [deleteOriginalAssets] Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+ * @typedef {object} PluginOptions
+ * @property {Rule=} test Test to match files against.
+ * @property {Rule=} include Files to include.
+ * @property {Rule=} exclude Files to exclude.
+ * @property {T extends any[] ? { [P in keyof T]: Minimizer<T[P]> } : Minimizer<T> | Minimizer<T>[]=} minimizer Allows to setup the minimizer.
+ * @property {G extends any[] ? { [P in keyof G]: Generator<G[P]> } : Generator<G>[]=} generator Allows to set the generator.
+ * @property {boolean=} loader Automatically adding `imagemin-loader`.
+ * @property {number=} concurrency Maximum number of concurrency optimization processes in one time.
+ * @property {string=} severityError Allows to choose how errors are displayed.
+ * @property {boolean=} deleteOriginalAssets Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
  */
 
 const getSerializeJavascript = memoize(() => require("serialize-javascript"));
@@ -182,7 +177,7 @@ const getSerializeJavascript = memoize(() => require("serialize-javascript"));
  */
 class ImageMinimizerPlugin {
   /**
-   * @param {PluginOptions<T, G>} [options={}] Plugin options.
+   * @param {PluginOptions<T, G>=} options Plugin options.
    */
   constructor(options = {}) {
     validate(/** @type {Schema} */ (schema), options, {
@@ -226,10 +221,10 @@ class ImageMinimizerPlugin {
 
   /**
    * @private
-   * @param {Compiler} compiler
-   * @param {Compilation} compilation
-   * @param {Record<string, Source>} assets
-   * @returns {Promise<void>}
+   * @param {Compiler} compiler The webpack compiler
+   * @param {Compilation} compilation The webpack compilation
+   * @param {Record<string, Source>} assets The assets to optimize
+   * @returns {Promise<void>} Promise that resolves when optimization is complete
    */
   async optimize(compiler, compilation, assets) {
     const minimizers =
@@ -277,8 +272,8 @@ class ImageMinimizerPlugin {
 
             /**
              * @template Z
-             * @param {Transformer<Z> | Array<Transformer<Z>>} transformer
-             * @returns {Promise<Task<Z>>}
+             * @param {Transformer<Z> | Array<Transformer<Z>>} transformer The transformer to use
+             * @returns {Promise<Task<Z>>} Promise that resolves to the task
              */
             const getFromCache = async (transformer) => {
               const cacheName = getSerializeJavascript()({ name, transformer });
@@ -437,7 +432,6 @@ class ImageMinimizerPlugin {
 
       for (const item of generator) {
         if (typeof item.implementation.teardown === "function") {
-          // eslint-disable-next-line no-await-in-loop
           await item.implementation.teardown();
         }
       }
@@ -450,7 +444,6 @@ class ImageMinimizerPlugin {
 
       for (const item of minimizers) {
         if (typeof item.implementation.teardown === "function") {
-          // eslint-disable-next-line no-await-in-loop
           await item.implementation.teardown();
         }
       }
@@ -458,7 +451,7 @@ class ImageMinimizerPlugin {
   }
 
   /**
-   * @param {import("webpack").Compiler} compiler
+   * @param {import("webpack").Compiler} compiler The webpack compiler instance
    */
   apply(compiler) {
     const pluginName = this.constructor.name;
@@ -527,7 +520,7 @@ class ImageMinimizerPlugin {
           return;
         }
 
-        const loader = /** @type {InternalLoaderOptions<T>} */ ({
+        const loader = /** @type {import("webpack").RuleSetRule} */ ({
           test,
           include,
           exclude,
@@ -541,7 +534,7 @@ class ImageMinimizerPlugin {
               severityError,
             }),
         });
-        const dataURILoader = /** @type {InternalLoaderOptions<T>} */ ({
+        const dataURILoader = /** @type {import("webpack").RuleSetRule} */ ({
           scheme: /^data$/,
           mimetype: /^image\/.+/i,
           enforce: "pre",
@@ -586,8 +579,10 @@ class ImageMinimizerPlugin {
             "image-minimizer-webpack-plugin",
             (minimized, { green, formatFlag }) =>
               minimized
-                ? /** @type {Function} */ (green)(
-                    /** @type {Function} */ (formatFlag)("minimized"),
+                ? /** @type {(text: string) => string} */ (green)(
+                    /** @type {(flag: string) => string} */ (formatFlag)(
+                      "minimized",
+                    ),
                   )
                 : "",
           );
@@ -598,8 +593,10 @@ class ImageMinimizerPlugin {
             "image-minimizer-webpack-plugin",
             (generated, { green, formatFlag }) =>
               generated
-                ? /** @type {Function} */ (green)(
-                    /** @type {Function} */ (formatFlag)("generated"),
+                ? /** @type {(text: string) => string} */ (green)(
+                    /** @type {(flag: string) => string} */ (formatFlag)(
+                      "generated",
+                    ),
                   )
                 : "",
           );

@@ -1,17 +1,17 @@
-import fs from "fs/promises";
-import path from "path";
+import fs from "node:fs/promises";
+import path from "node:path";
 
 import fileType from "file-type";
 
+import ImageMinimizerPlugin from "../src/index.js";
 import {
   fixturesPath,
   ifit,
-  needSquooshTest,
   isOptimized,
+  needSquooshTest,
   plugins,
   runWebpack,
 } from "./helpers";
-import ImageMinimizerPlugin from "../src/index.js";
 
 jest.setTimeout(20000);
 
@@ -67,13 +67,13 @@ describe("loader", () => {
       path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
-    expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
+    expect(txtBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.css"),
     );
 
-    expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
+    expect(cssBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe(
       "a {\n  color: red;\n}\n",
     );
 
@@ -121,13 +121,13 @@ describe("loader", () => {
       path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
-    expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
+    expect(txtBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.css"),
     );
 
-    expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
+    expect(cssBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe(
       "a {\n  color: red;\n}\n",
     );
 
@@ -176,13 +176,13 @@ describe("loader", () => {
         path.join(compilation.options.output.path, "loader-test.txt"),
       );
 
-      expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
+      expect(txtBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
       const cssBuffer = await fs.readFile(
         path.join(compilation.options.output.path, "loader-test.css"),
       );
 
-      expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
+      expect(cssBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe(
         "a {\n  color: red;\n}\n",
       );
 
@@ -248,13 +248,13 @@ describe("loader", () => {
         path.join(compilation.options.output.path, "loader-test.txt"),
       );
 
-      expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
+      expect(txtBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
       const cssBuffer = await fs.readFile(
         path.join(compilation.options.output.path, "loader-test.css"),
       );
 
-      expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
+      expect(cssBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe(
         "a {\n  color: red;\n}\n",
       );
 
@@ -294,13 +294,13 @@ describe("loader", () => {
       path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
-    expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
+    expect(txtBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.css"),
     );
 
-    expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
+    expect(cssBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe(
       "a {\n  color: red;\n}\n",
     );
 
@@ -363,13 +363,13 @@ describe("loader", () => {
       path.join(compilation.options.output.path, "loader-test.txt"),
     );
 
-    expect(txtBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe("TEXT\n");
+    expect(txtBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe("TEXT\n");
 
     const cssBuffer = await fs.readFile(
       path.join(compilation.options.output.path, "loader-test.css"),
     );
 
-    expect(cssBuffer.toString().replace(/\r\n|\r/g, "\n")).toBe(
+    expect(cssBuffer.toString().replaceAll(/\r\n|\r/g, "\n")).toBe(
       "a {\n  color: red;\n}\n",
     );
 

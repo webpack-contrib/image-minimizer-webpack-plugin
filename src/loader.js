@@ -1,12 +1,12 @@
-const path = require("path");
+const path = require("node:path");
 
-const worker = require("./worker");
 const schema = require("./loader-options.json");
 const {
-  IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
   ABSOLUTE_URL_REGEX,
+  IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
   WINDOWS_PATH_REGEX,
 } = require("./utils.js");
+const worker = require("./worker");
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -24,18 +24,18 @@ const {
 
 /**
  * @template T
- * @typedef {Object} LoaderOptions<T>
- * @property {string} [severityError] Allows to choose how errors are displayed.
- * @property {Minimizer<T> | Minimizer<T>[]} [minimizer]
- * @property {Generator<T>[]} [generator]
+ * @typedef {object} LoaderOptions<T>
+ * @property {string=} severityError Allows to choose how errors are displayed.
+ * @property {Minimizer<T> | Minimizer<T>[]=} minimizer The minimizer configuration
+ * @property {Generator<T>[]=} generator The generator configuration
  */
 
 // Workaround - https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/341
 /**
  * @template T
- * @param {import("webpack").LoaderContext<LoaderOptions<T>>} loaderContext
- * @param {WorkerResult} output
- * @param {string} query
+ * @param {import("webpack").LoaderContext<LoaderOptions<T>>} loaderContext The loader context
+ * @param {WorkerResult} output The worker result
+ * @param {string} query The query string
  */
 function changeResource(loaderContext, output, query) {
   loaderContext.resourcePath = path.join(
@@ -47,11 +47,11 @@ function changeResource(loaderContext, output, query) {
 
 /**
  * @template T
- * @param {Minimizer<T>[]} transformers
- * @param {string | null} widthQuery
- * @param {string | null} heightQuery
- * @param {string | null} unitQuery
- * @return {Minimizer<T>[]}
+ * @param {Minimizer<T>[]} transformers The transformers array
+ * @param {string | null} widthQuery The width query
+ * @param {string | null} heightQuery The height query
+ * @param {string | null} unitQuery The unit query
+ * @returns {Minimizer<T>[]} The processed transformers
  */
 function processSizeQuery(transformers, widthQuery, heightQuery, unitQuery) {
   return transformers.map((transformer) => {
@@ -59,8 +59,9 @@ function processSizeQuery(transformers, widthQuery, heightQuery, unitQuery) {
 
     const minimizerOptions =
       /** @type { import("./index").BasicTransformerOptions<T> & { resize?: import("./index").ResizeOptions }} */
-      // @ts-ignore
-      ({ ...minimizer.options });
+      // eslint-disable-next-line no-warning-comments
+      // @ts-ignore minimizer.options might be undefined but we handle it safely
+      { ...minimizer.options };
 
     minimizerOptions.resize = { ...minimizerOptions?.resize };
     minimizer.options = minimizerOptions;
@@ -96,8 +97,8 @@ function processSizeQuery(transformers, widthQuery, heightQuery, unitQuery) {
 /**
  * @template T
  * @this {import("webpack").LoaderContext<LoaderOptions<T>>}
- * @param {Buffer} content
- * @returns {Promise<Buffer | undefined>}
+ * @param {Buffer} content The content buffer
+ * @returns {Promise<Buffer | undefined>} The processed content
  */
 async function loader(content) {
   // Avoid optimize twice
@@ -112,7 +113,8 @@ async function loader(content) {
     return content;
   }
 
-  // @ts-ignore
+  // eslint-disable-next-line no-warning-comments
+  // @ts-ignore getOptions type is complex and handled by schema validation
   const options = this.getOptions(/** @type {Schema} */ (schema));
   const callback = this.async();
   const { generator, minimizer, severityError } = options;
@@ -248,7 +250,7 @@ async function loader(content) {
 
     this._module.resourceResolveData.encodedContent = isBase64
       ? output.data.toString("base64")
-      : encodeURIComponent(output.data.toString("utf-8")).replace(
+      : encodeURIComponent(output.data.toString("utf8")).replaceAll(
           /[!'()*]/g,
           (character) =>
             `%${/** @type {number} */ (character.codePointAt(0)).toString(16)}`,

@@ -5,19 +5,19 @@ export = ImageMinimizerPlugin;
  */
 declare class ImageMinimizerPlugin<T, G = T> {
   /**
-   * @param {PluginOptions<T, G>} [options={}] Plugin options.
+   * @param {PluginOptions<T, G>=} options Plugin options.
    */
-  constructor(options?: PluginOptions<T, G>);
+  constructor(options?: PluginOptions<T, G> | undefined);
   /**
    * @private
    */
   private options;
   /**
    * @private
-   * @param {Compiler} compiler
-   * @param {Compilation} compilation
-   * @param {Record<string, Source>} assets
-   * @returns {Promise<void>}
+   * @param {Compiler} compiler The webpack compiler
+   * @param {Compilation} compilation The webpack compilation
+   * @param {Record<string, Source>} assets The assets to optimize
+   * @returns {Promise<void>} Promise that resolves when optimization is complete
    */
   private optimize;
   /**
@@ -29,7 +29,7 @@ declare class ImageMinimizerPlugin<T, G = T> {
    */
   private teardownAll;
   /**
-   * @param {import("webpack").Compiler} compiler
+   * @param {import("webpack").Compiler} compiler The webpack compiler instance
    */
   apply(compiler: import("webpack").Compiler): void;
 }
@@ -75,7 +75,6 @@ declare namespace ImageMinimizerPlugin {
     Minimizer,
     Generator,
     InternalWorkerOptions,
-    InternalLoaderOptions,
     PluginOptions,
   };
 }
@@ -103,79 +102,174 @@ type Rule = RegExp | string;
 type Rules = Rule[] | Rule;
 type FilterFn = (source: Buffer, sourcePath: string) => boolean;
 type ImageminOptions = {
+  /**
+   * The plugins array
+   */
   plugins: Array<
-    string | [string, Record<string, any>?] | import("imagemin").Plugin
+    string | [string, Record<string, unknown>?] | import("imagemin").Plugin
   >;
 };
-type SquooshOptions = {
-  [x: string]: any;
-};
+type SquooshOptions = Record<string, unknown>;
 type WorkerResult = {
+  /**
+   * The filename
+   */
   filename: string;
+  /**
+   * The data buffer
+   */
   data: Buffer;
+  /**
+   * The warnings array
+   */
   warnings: Array<Error>;
+  /**
+   * The errors array
+   */
   errors: Array<Error>;
+  /**
+   * The asset info
+   */
   info: AssetInfo;
 };
 type Task<T> = {
+  /**
+   * The task name
+   */
   name: string;
+  /**
+   * The asset info
+   */
   info: AssetInfo;
+  /**
+   * The input source
+   */
   inputSource: Source;
+  /**
+   * The output
+   */
   output:
     | (WorkerResult & {
         source?: Source;
       })
     | undefined;
+  /**
+   * The cache item
+   */
   cacheItem: ReturnType<ReturnType<Compilation["getCache"]>["getItemCache"]>;
+  /**
+   * The transformer
+   */
   transformer: Transformer<T> | Transformer<T>[];
 };
-type CustomOptions = {
-  [key: string]: any;
-};
+type CustomOptions = Record<string, unknown>;
 type InferDefaultType<T> = T extends infer U ? U : CustomOptions;
 type BasicTransformerOptions<T> = InferDefaultType<T> | undefined;
 type ResizeOptions = {
+  /**
+   * The width
+   */
   width?: number | undefined;
+  /**
+   * The height
+   */
   height?: number | undefined;
-  unit?: "px" | "percent" | undefined;
+  /**
+   * The unit
+   */
+  unit?: ("px" | "percent") | undefined;
+  /**
+   * Whether enabled
+   */
   enabled?: boolean | undefined;
 };
 type BasicTransformerImplementation<T> = (
   original: WorkerResult,
-  options?: BasicTransformerOptions<T>,
+  options?: BasicTransformerOptions<T> | undefined,
 ) => Promise<WorkerResult | null>;
 type BasicTransformerHelpers = {
+  /**
+   * The setup function
+   */
   setup?: (() => void) | undefined;
+  /**
+   * The teardown function
+   */
   teardown?: (() => void) | undefined;
 };
 type TransformerFunction<T> = BasicTransformerImplementation<T> &
   BasicTransformerHelpers;
 type PathData = {
+  /**
+   * The filename
+   */
   filename?: string | undefined;
 };
 type FilenameFn = (
   pathData: PathData,
-  assetInfo?: import("webpack").AssetInfo | undefined,
+  assetInfo?: AssetInfo | undefined,
 ) => string;
 type Transformer<T> = {
+  /**
+   * The implementation
+   */
   implementation: TransformerFunction<T>;
-  options?: BasicTransformerOptions<T>;
+  /**
+   * The options
+   */
+  options?: BasicTransformerOptions<T> | undefined;
+  /**
+   * The filter
+   */
   filter?: FilterFn | undefined;
-  filename?: string | FilenameFn | undefined;
+  /**
+   * The filename
+   */
+  filename?: (string | FilenameFn) | undefined;
+  /**
+   * The preset
+   */
   preset?: string | undefined;
-  type?: "import" | "asset" | undefined;
+  /**
+   * The type
+   */
+  type?: ("import" | "asset") | undefined;
 };
 type Minimizer<T> = Omit<Transformer<T>, "preset" | "type">;
 type Generator<T> = Transformer<T>;
 type InternalWorkerOptions<T> = {
+  /**
+   * The filename
+   */
   filename: string;
+  /**
+   * The asset info
+   */
   info?: AssetInfo | undefined;
+  /**
+   * The input buffer
+   */
   input: Buffer;
+  /**
+   * The transformer
+   */
   transformer: Transformer<T> | Transformer<T>[];
+  /**
+   * The severity error setting
+   */
   severityError?: string | undefined;
-  generateFilename?: Function | undefined;
+  /**
+   * The filename generator function
+   */
+  generateFilename?:
+    | ((
+        filenameTemplate: string,
+        options: {
+          filename: string;
+        },
+      ) => string)
+    | undefined;
 };
-type InternalLoaderOptions<T> = import("./loader").LoaderOptions<T>;
 type PluginOptions<T, G> = {
   /**
    * Test to match files against.
@@ -201,9 +295,7 @@ type PluginOptions<T, G> = {
    * Allows to set the generator.
    */
   generator?:
-    | (G extends any[]
-        ? { [P_1 in keyof G]: Generator<G[P_1]> }
-        : Generator<G>[])
+    | (G extends any[] ? { [P in keyof G]: Generator<G[P]> } : Generator<G>[])
     | undefined;
   /**
    * Automatically adding `imagemin-loader`.

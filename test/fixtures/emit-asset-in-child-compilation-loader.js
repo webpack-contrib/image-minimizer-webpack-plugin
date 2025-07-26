@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 
-// eslint-disable-next-line node/no-sync
 const imageContent = fs.readFileSync(
   path.resolve(__dirname, "./child-compilation-image.png")
 );

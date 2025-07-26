@@ -2,8 +2,8 @@ export = loader;
 /**
  * @template T
  * @this {import("webpack").LoaderContext<LoaderOptions<T>>}
- * @param {Buffer} content
- * @returns {Promise<Buffer | undefined>}
+ * @param {Buffer} content The content buffer
+ * @returns {Promise<Buffer | undefined>} The processed content
  */
 declare function loader<T>(
   this: import("webpack").LoaderContext<LoaderOptions<T>>,
@@ -40,9 +40,12 @@ type LoaderOptions<T> = {
    * Allows to choose how errors are displayed.
    */
   severityError?: string | undefined;
-  minimizer?:
-    | import("./index").Minimizer<T>
-    | import("./index").Minimizer<T>[]
-    | undefined;
-  generator?: import("./index").Generator<T>[] | undefined;
+  /**
+   * The minimizer configuration
+   */
+  minimizer?: (Minimizer<T> | Minimizer<T>[]) | undefined;
+  /**
+   * The generator configuration
+   */
+  generator?: Generator<T>[] | undefined;
 };

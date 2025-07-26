@@ -5,34 +5,38 @@ const isFilenameProcessed = Symbol("isFilenameProcessed");
 
 /**
  * @template T
- * @param {WorkerResult} result
- * @param {import("./index").InternalWorkerOptions<T>} options
- * @param {undefined | string | FilenameFn} filenameTemplate
+ * @param {WorkerResult} result The worker result
+ * @param {import("./index").InternalWorkerOptions<T>} options The worker options
+ * @param {undefined | string | FilenameFn} filenameTemplate The filename template
  */
 function processFilenameTemplate(result, options, filenameTemplate) {
   if (
-    // @ts-ignore
+    // eslint-disable-next-line no-warning-comments
+    // @ts-ignore isFilenameProcessed is a symbol property that TypeScript can't infer
     !result.info[isFilenameProcessed] &&
     typeof filenameTemplate !== "undefined" &&
     typeof options.generateFilename === "function"
   ) {
+    // eslint-disable-next-line no-warning-comments
+    // @ts-ignore
     result.filename = options.generateFilename(filenameTemplate, {
       filename: result.filename,
     });
 
     result.filename = result.filename
-      .replace(/\[width\]/gi, result.info.width)
-      .replace(/\[height\]/gi, result.info.height);
+      .replaceAll(/\[width\]/gi, result.info.width)
+      .replaceAll(/\[height\]/gi, result.info.height);
 
-    // @ts-ignore
+    // eslint-disable-next-line no-warning-comments
+    // @ts-ignore isFilenameProcessed is a symbol property that TypeScript can't infer
     result.info[isFilenameProcessed] = true;
   }
 }
 
 /**
  * @template T
- * @param {WorkerResult} result
- * @param {import("./index").InternalWorkerOptions<T>} options
+ * @param {WorkerResult} result The worker result
+ * @param {import("./index").InternalWorkerOptions<T>} options The worker options
  */
 function processSeverityError(result, options) {
   if (options.severityError === "off") {
@@ -46,8 +50,8 @@ function processSeverityError(result, options) {
 
 /**
  * @template T
- * @param {import("./index").InternalWorkerOptions<T>} options
- * @returns {Promise<WorkerResult>}
+ * @param {import("./index").InternalWorkerOptions<T>} options The worker options
+ * @returns {Promise<WorkerResult>} The worker result
  */
 async function worker(options) {
   /** @type {WorkerResult} */
@@ -83,6 +87,7 @@ async function worker(options) {
   for (const transformer of transformers) {
     if (
       typeof transformer.filter === "function" &&
+      // eslint-disable-next-line unicorn/no-array-method-this-argument
       !transformer.filter(options.input, options.filename)
     ) {
       continue;
@@ -92,7 +97,6 @@ async function worker(options) {
     let processedResult;
 
     try {
-      // eslint-disable-next-line no-await-in-loop
       processedResult = await transformer.implementation(
         result,
         transformer.options,

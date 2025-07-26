@@ -1,5 +1,5 @@
-import { isOptimized, plugins, runWebpack } from "./helpers";
 import ImageMinimizerPlugin from "../src/index.js";
+import { isOptimized, plugins, runWebpack } from "./helpers";
 
 describe("plugin loader option", () => {
   it("should optimizes all images (plugin standalone)", async () => {

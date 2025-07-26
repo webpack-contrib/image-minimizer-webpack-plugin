@@ -1,10 +1,10 @@
-import path from "path";
-import { promisify } from "util";
+import path from "node:path";
+import { promisify } from "node:util";
 import fileType from "file-type";
 import imageSize from "image-size";
 import ImageMinimizerPlugin from "../src";
 
-import { runWebpack, fixturesPath, ifit, needSquooshTest } from "./helpers";
+import { fixturesPath, ifit, needSquooshTest, runWebpack } from "./helpers";
 
 jest.setTimeout(10000);
 

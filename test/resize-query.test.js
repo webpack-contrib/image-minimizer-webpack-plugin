@@ -1,10 +1,10 @@
-import path from "path";
-import { promisify } from "util";
+import path from "node:path";
+import { promisify } from "node:util";
 import fileType from "file-type";
 import imageSize from "image-size";
 import ImageMinimizerPlugin from "../src";
 
-import { runWebpack, fixturesPath, ifit, needSquooshTest } from "./helpers";
+import { fixturesPath, ifit, needSquooshTest, runWebpack } from "./helpers";
 
 jest.setTimeout(20000);
 
@@ -78,9 +78,8 @@ describe("resize query (sharp)", () => {
         assetPath,
       );
 
-      // eslint-disable-next-line no-await-in-loop
       const transformedExt = await fileType.fromFile(transformedAsset);
-      // eslint-disable-next-line no-await-in-loop
+
       const dimensions = await sizeOf(transformedAsset);
 
       expect(dimensions.width).toBe(width);
@@ -152,9 +151,8 @@ describe("resize query (sharp)", () => {
         assetPath,
       );
 
-      // eslint-disable-next-line no-await-in-loop
       const transformedExt = await fileType.fromFile(transformedAsset);
-      // eslint-disable-next-line no-await-in-loop
+
       const dimensions = await sizeOf(transformedAsset);
 
       expect(dimensions.width).toBe(width);
@@ -236,9 +234,8 @@ describe("resize query (sharp)", () => {
         assetPath,
       );
 
-      // eslint-disable-next-line no-await-in-loop
       const transformedExt = await fileType.fromFile(transformedAsset);
-      // eslint-disable-next-line no-await-in-loop
+
       const dimensions = await sizeOf(transformedAsset);
 
       expect(dimensions.width).toBe(width);
@@ -310,9 +307,8 @@ describe("resize query (sharp)", () => {
         assetPath,
       );
 
-      // eslint-disable-next-line no-await-in-loop
       const transformedExt = await fileType.fromFile(transformedAsset);
-      // eslint-disable-next-line no-await-in-loop
+
       const dimensions = await sizeOf(transformedAsset);
 
       expect(dimensions.width).toBe(width);
@@ -396,9 +392,8 @@ describe("resize query (squoosh)", () => {
           assetPath,
         );
 
-        // eslint-disable-next-line no-await-in-loop
         const transformedExt = await fileType.fromFile(transformedAsset);
-        // eslint-disable-next-line no-await-in-loop
+
         const dimensions = await sizeOf(transformedAsset);
 
         expect(dimensions.width).toBe(width);
@@ -473,9 +468,8 @@ describe("resize query (squoosh)", () => {
           assetPath,
         );
 
-        // eslint-disable-next-line no-await-in-loop
         const transformedExt = await fileType.fromFile(transformedAsset);
-        // eslint-disable-next-line no-await-in-loop
+
         const dimensions = await sizeOf(transformedAsset);
 
         expect(dimensions.width).toBe(width);
