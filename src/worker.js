@@ -61,6 +61,7 @@ async function worker(options) {
     warnings: [],
     errors: [],
     info: {
+      ...options.info,
       sourceFilename:
         options.info &&
         typeof options.info === "object" &&

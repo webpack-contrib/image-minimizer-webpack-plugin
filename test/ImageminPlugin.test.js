@@ -214,6 +214,7 @@ describe("imagemin plugin", () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "single-image-loader.js"),
       imageminPluginOptions: {
+        loader: false,
         generator: [
           {
             preset: "webp",
@@ -749,6 +750,7 @@ describe("imagemin plugin", () => {
         emitAssetPlugin: true,
         imageminPluginOptions: [
           {
+            loader: false,
             generator: [
               {
                 preset: "webp",
@@ -800,11 +802,11 @@ describe("imagemin plugin", () => {
       path.resolve(outputDir, "loader-test.webp"),
     );
     const extLoaderJpg = await fileType.fromFile(
-      path.resolve(outputDir, "plugin-test.jpg"),
+      path.resolve(outputDir, "plugin-test.webp"),
     );
 
     expect(/image\/webp/i.test(extLoaderWebp.mime)).toBe(true);
-    expect(/image\/jpeg/i.test(extLoaderJpg.mime)).toBe(true);
+    expect(/image\/webp/i.test(extLoaderJpg.mime)).toBe(true);
     expect(secondStats.compilation.emittedAssets.size).toBe(0);
   });
 
@@ -1362,6 +1364,7 @@ describe("imagemin plugin", () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
       imageminPluginOptions: {
+        loader: false,
         test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
         generator: [
           {
@@ -1393,6 +1396,7 @@ describe("imagemin plugin", () => {
     const stats = await runWebpack({
       entry: path.join(fixturesPath, "generator-and-minimizer-3.js"),
       imageminPluginOptions: {
+        loader: false,
         test: /\.(jpe?g|gif|json|svg|png|webp)$/i,
         generator: [
           {

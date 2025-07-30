@@ -235,7 +235,9 @@ class ImageMinimizerPlugin {
         : [];
 
     const generators = Array.isArray(this.options.generator)
-      ? this.options.generator.filter((item) => item.type === "asset")
+      ? this.options.generator.filter(
+          (item) => !item.type || item.type === "asset",
+        )
       : [];
 
     if (minimizers.length === 0 && generators.length === 0) {
