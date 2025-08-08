@@ -739,9 +739,10 @@ let pool;
  * @typedef {Record<string, Record<string, unknown>>} SquooshEncodeOptions
  */
 
+/* eslint-disable jsdoc/check-indentation */
 /**
  * @typedef {{
- *   ingestImage(data: Uint8Array): {
+ * ingestImage(data: Uint8Array): {
  *     preprocess(options: Record<string, unknown>): Promise<void>,
  *     encode(options: Record<string, unknown>): Promise<void>,
  *     encodedWith: Record<string, {binary: Uint8Array, extension: string}>,
@@ -750,6 +751,7 @@ let pool;
  *   close(): Promise<void>
  * }} SquooshImagePool
  */
+/* eslint-enable jsdoc/check-indentation */
 
 /**
  * @param {number} threads The number of threads
@@ -773,11 +775,21 @@ function squooshImagePoolCreate(threads = 1) {
  * Sets up the squoosh image pool
  */
 function squooshImagePoolSetup() {
-  // workarounds for https://github.com/GoogleChromeLabs/squoosh/issues/1152
-  // eslint-disable-next-line no-warning-comments
-  // @ts-ignore - navigator property deletion for squoosh compatibility
-  // eslint-disable-next-line n/no-unsupported-features/node-builtins
-  delete globalThis.navigator;
+  if (!pool) {
+    const os = require("node:os");
+
+    // In some cases cpus() returns undefined
+    // https://github.com/nodejs/node/issues/19022
+    const threads = os.cpus()?.length ?? 1;
+
+    pool = squooshImagePoolCreate(threads);
+
+    // workarounds for https://github.com/GoogleChromeLabs/squoosh/issues/1152
+    // eslint-disable-next-line no-warning-comments
+    // @ts-ignore - workaround for squoosh compatibility
+    // eslint-disable-next-line n/no-unsupported-features/node-builtins
+    delete globalThis.navigator;
+  }
 }
 
 /**
