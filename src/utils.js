@@ -247,10 +247,7 @@ function fileTypeFromBuffer(input) {
     };
   }
 
-  if (
-    check([0x52, 0x49, 0x46, 0x46]) &&
-    check([0x57, 0x45, 0x42, 0x50], { offset: 8 })
-  ) {
+  if (check([0x57, 0x45, 0x42, 0x50], { offset: 8 })) {
     return {
       ext: "webp",
       mime: "image/webp",
@@ -734,13 +731,29 @@ async function imageminMinify(original, options) {
 }
 
 /**
- * @type {unknown}
+ * @type {any}
  */
 let pool;
 
 /**
+ * @typedef {Record<string, Record<string, unknown>>} SquooshEncodeOptions
+ */
+
+/**
+ * @typedef {{
+ *   ingestImage(data: Uint8Array): {
+ *     preprocess(options: Record<string, unknown>): Promise<void>,
+ *     encode(options: Record<string, unknown>): Promise<void>,
+ *     encodedWith: Record<string, {binary: Uint8Array, extension: string}>,
+ *     decoded: {bitmap: {width: number, height: number}}
+ *   },
+ *   close(): Promise<void>
+ * }} SquooshImagePool
+ */
+
+/**
  * @param {number} threads The number of threads
- * @returns {unknown} The image pool
+ * @returns {SquooshImagePool} The image pool
  */
 function squooshImagePoolCreate(threads = 1) {
   const { ImagePool } = require("@squoosh/lib");
@@ -760,32 +773,18 @@ function squooshImagePoolCreate(threads = 1) {
  * Sets up the squoosh image pool
  */
 function squooshImagePoolSetup() {
-  if (!pool) {
-    const os = require("node:os");
-
-    // In some cases cpus() returns undefined
-    // https://github.com/nodejs/node/issues/19022
-    const threads = os.cpus()?.length ?? 1;
-
-    pool = squooshImagePoolCreate(threads);
-
-    // workarounds for https://github.com/GoogleChromeLabs/squoosh/issues/1152
-    // eslint-disable-next-line no-warning-comments
-    // @ts-ignore - navigator property deletion for squoosh compatibility
-    // eslint-disable-next-line n/no-unsupported-features/node-builtins
-    delete globalThis.navigator;
-  }
+  // workarounds for https://github.com/GoogleChromeLabs/squoosh/issues/1152
+  // eslint-disable-next-line no-warning-comments
+  // @ts-ignore - navigator property deletion for squoosh compatibility
+  // eslint-disable-next-line n/no-unsupported-features/node-builtins
+  delete globalThis.navigator;
 }
 
 /**
  * Tears down the squoosh image pool
  */
 async function squooshImagePoolTeardown() {
-  if (pool) {
-    await /** @type {{close(): Promise<void>}} */ (pool).close();
-
-    pool = undefined;
-  }
+  // No shared pool to teardown
 }
 
 /**
@@ -797,11 +796,7 @@ async function squooshImagePoolTeardown() {
 async function squooshGenerate(original, minifyOptions) {
   const squoosh = require("@squoosh/lib");
 
-  const isReusePool = Boolean(pool);
-  const imagePool =
-    /** @type {{ingestImage(data: Uint8Array): {preprocess(options: Record<string, unknown>): Promise<void>, encode(options: Record<string, unknown>): Promise<void>, encodedWith: Record<string, {binary: Uint8Array, extension: string}>, decoded: {bitmap: {width: number, height: number}}}, close(): Promise<void>}} */ (
-      pool || squooshImagePoolCreate()
-    );
+  const imagePool = squooshImagePoolCreate();
   const image = imagePool.ingestImage(new Uint8Array(original.data));
 
   const squooshOptions = /** @type {SquooshOptions} */ (minifyOptions ?? {});
@@ -826,11 +821,9 @@ async function squooshGenerate(original, minifyOptions) {
   const { encodeOptions } = squooshOptions;
 
   try {
-    await image.encode(/** @type {Record<string, unknown>} */ (encodeOptions));
+    await image.encode(/** @type {SquooshEncodeOptions} */ (encodeOptions));
   } catch (error) {
-    if (!isReusePool) {
-      await imagePool.close();
-    }
+    await imagePool.close();
 
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
@@ -842,31 +835,21 @@ async function squooshGenerate(original, minifyOptions) {
     return null;
   }
 
-  if (!isReusePool) {
-    await imagePool.close();
-  }
-
   if (Object.keys(image.encodedWith).length === 0) {
-    original.errors.push(
-      new Error(
-        `No result from 'squoosh' for '${original.filename}', please configure the 'encodeOptions' option to generate images`,
-      ),
+    await imagePool.close();
+
+    const originalError = new Error(
+      `Error with '${original.filename}': No encoded images found`,
     );
 
+    original.errors.push(originalError);
     return null;
   }
 
-  if (Object.keys(image.encodedWith).length > 1) {
-    original.errors.push(
-      new Error(
-        `Multiple values for the 'encodeOptions' option is not supported for '${original.filename}', specify only one codec for the generator`,
-      ),
-    );
+  await imagePool.close();
 
-    return null;
-  }
-
-  const { binary, extension } = await Object.values(image.encodedWith)[0];
+  const { binary, extension } =
+    await image.encodedWith[Object.keys(image.encodedWith)[0]];
   const { width, height } = (await image.decoded).bitmap;
 
   const filename = replaceFileExtension(original.filename, extension);
@@ -923,11 +906,7 @@ async function squooshMinify(original, options) {
     return null;
   }
 
-  const isReusePool = Boolean(pool);
-  const imagePool =
-    /** @type {{ingestImage(data: Uint8Array): {preprocess(options: Record<string, unknown>): Promise<void>, encode(options: Record<string, unknown>): Promise<void>, encodedWith: Record<string, {binary: Uint8Array, extension: string}>, decoded: {bitmap: {width: number, height: number}}}, close(): Promise<void>}} */ (
-      pool || squooshImagePoolCreate()
-    );
+  const imagePool = pool || squooshImagePoolCreate();
   const image = imagePool.ingestImage(new Uint8Array(original.data));
   const squooshOptions = /** @type {SquooshOptions} */ (options ?? {});
 
@@ -950,20 +929,18 @@ async function squooshMinify(original, options) {
 
   const { encodeOptions = {} } = squooshOptions;
 
-  if (!(/** @type {Record<string, unknown>} */ (encodeOptions)[targetCodec])) {
-    /** @type {Record<string, unknown>} */ (encodeOptions)[targetCodec] = {};
+  if (!(/** @type {SquooshEncodeOptions} */ (encodeOptions)[targetCodec])) {
+    /** @type {SquooshEncodeOptions} */ (encodeOptions)[targetCodec] = {};
   }
 
   try {
     await image.encode({
-      [targetCodec]: /** @type {Record<string, unknown>} */ (encodeOptions)[
+      [targetCodec]: (encodeOptions)[
         targetCodec
       ],
     });
   } catch (error) {
-    if (!isReusePool) {
-      await imagePool.close();
-    }
+    await imagePool.close();
 
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
@@ -975,12 +952,10 @@ async function squooshMinify(original, options) {
     return null;
   }
 
-  if (!isReusePool) {
-    await imagePool.close();
-  }
-
   const { binary } = await image.encodedWith[targets[ext]];
   const { width, height } = (await image.decoded).bitmap;
+
+  await imagePool.close();
 
   return {
     filename: original.filename,
