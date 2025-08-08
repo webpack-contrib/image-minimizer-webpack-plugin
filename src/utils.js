@@ -929,15 +929,13 @@ async function squooshMinify(original, options) {
 
   const { encodeOptions = {} } = squooshOptions;
 
-  if (!(/** @type {SquooshEncodeOptions} */ (encodeOptions)[targetCodec])) {
-    /** @type {SquooshEncodeOptions} */ (encodeOptions)[targetCodec] = {};
+  if (!encodeOptions[targetCodec]) {
+    encodeOptions[targetCodec] = {};
   }
 
   try {
     await image.encode({
-      [targetCodec]: (encodeOptions)[
-        targetCodec
-      ],
+      [targetCodec]: encodeOptions[targetCodec],
     });
   } catch (error) {
     await imagePool.close();
