@@ -713,9 +713,7 @@ type minimizer =
           errors: Error[];
           info: import("webpack").AssetInfo;
         },
-        options?:
-          | Record<string, any>
-          | undefined,
+        options?: Record<string, any> | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
@@ -726,9 +724,7 @@ type minimizer =
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
-      options?:
-        | Record<string, any>
-        | undefined;
+      options?: Record<string, any> | undefined;
       filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
       filename?:
         | string
@@ -749,9 +745,7 @@ type minimizer =
           errors: Error[];
           info: import("webpack").AssetInfo;
         },
-        options?:
-          | Record<string, any>
-          | undefined,
+        options?: Record<string, any> | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
@@ -762,9 +756,7 @@ type minimizer =
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
-      options?:
-        | Record<string, any>
-        | undefined;
+      options?: Record<string, any> | undefined;
       filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
       filename?:
         | string
@@ -1236,9 +1228,7 @@ type generator = {
       errors: Error[];
       info: import("webpack").AssetInfo;
     },
-    options?:
-      | Record<string, any>
-      | undefined,
+    options?: Record<string, any> | undefined,
   ) => Promise<{
     filename: string;
     data: Buffer;
@@ -1249,9 +1239,7 @@ type generator = {
     setup?: (() => void) | undefined;
     teardown?: (() => void) | undefined;
   };
-  options?:
-    | Record<string, any>
-    | undefined;
+  options?: Record<string, any> | undefined;
   filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
   filename?:
     | string
@@ -1698,9 +1686,7 @@ type implementation = (
     errors: Error[];
     info: import("webpack").AssetInfo;
   },
-  options?:
-    | Record<string, any>
-    | undefined,
+  options?: Record<string, any> | undefined,
 ) => Promise<{
   filename: string;
   data: Buffer;
@@ -2118,9 +2104,7 @@ type minimizer =
           errors: Error[];
           info: import("webpack").AssetInfo;
         },
-        options?:
-          | Record<string, any>
-          | undefined,
+        options?: Record<string, any> | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
@@ -2131,9 +2115,7 @@ type minimizer =
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
-      options?:
-        | Record<string, any>
-        | undefined;
+      options?: Record<string, any> | undefined;
       filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
       filename?:
         | string
@@ -2154,9 +2136,7 @@ type minimizer =
           errors: Error[];
           info: import("webpack").AssetInfo;
         },
-        options?:
-          | Record<string, any>
-          | undefined,
+        options?: Record<string, any> | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
@@ -2167,9 +2147,7 @@ type minimizer =
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
-      options?:
-        | Record<string, any>
-        | undefined;
+      options?: Record<string, any> | undefined;
       filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
       filename?:
         | string
