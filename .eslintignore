@@ -1,7 +1,0 @@
-/coverage
-/dist
-/node_modules
-/test/fixtures
-/test/outputs
-/test/bundled
-/types/**/*

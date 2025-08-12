@@ -1,16 +1,16 @@
-import path from "path";
+import path from "node:path";
 
 import fileType from "file-type";
 import ImageMinimizerPlugin from "../src";
 
 import {
   fixturesPath,
-  runWebpack,
-  isOptimized,
-  plugins,
   hasLoader,
   ifit,
+  isOptimized,
   needSquooshTest,
+  plugins,
+  runWebpack,
 } from "./helpers";
 
 jest.setTimeout(10000);

@@ -1,8 +1,8 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
-import webpack from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import webpack from "webpack";
 
 import ImageMinimizerPlugin from "../src/index";
 
@@ -12,6 +12,10 @@ const plugins = ["gifsicle", "mozjpeg", "pngquant", "svgo"];
 
 const fixturesPath = path.join(__dirname, "./fixtures");
 
+/**
+ * @param {import("webpack").Compiler} compiler The webpack compiler
+ * @returns {Promise<import("webpack").Stats>} The compilation stats
+ */
 function compile(compiler) {
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
@@ -24,6 +28,11 @@ function compile(compiler) {
   });
 }
 
+/**
+ * @param {unknown} maybeOptions The webpack options
+ * @param {boolean} getCompiler Whether to get compiler
+ * @returns {Promise<import("webpack").Stats | import("webpack").Compiler>} The compilation result
+ */
 async function runWebpack(maybeOptions, getCompiler = false) {
   const maybeMultiCompiler = Array.isArray(maybeOptions)
     ? maybeOptions
@@ -40,9 +49,7 @@ async function runWebpack(maybeOptions, getCompiler = false) {
       devtool: false,
       bail: options.bail,
       context: fixturesPath,
-      entry: options.entry
-        ? options.entry
-        : path.join(fixturesPath, "./loader.js"),
+      entry: options.entry || path.join(fixturesPath, "./loader.js"),
       mode: options.mode || "development",
       optimization: options.optimization,
       cache: options.cache,
@@ -51,16 +58,12 @@ async function runWebpack(maybeOptions, getCompiler = false) {
           ...(!options.fileLoaderOff
             ? [
                 {
-                  test: options.test
-                    ? options.test
-                    : /\.(jpe?g|png|gif|svg|webp)$/i,
+                  test: options.test || /\.(jpe?g|png|gif|svg|webp)$/i,
                   use: [
                     {
                       loader: "file-loader",
                       options: {
-                        name: options.name
-                          ? options.name
-                          : "[path][name].[ext]",
+                        name: options.name || "[path][name].[ext]",
                       },
                     },
                   ],
@@ -247,6 +250,11 @@ async function runWebpack(maybeOptions, getCompiler = false) {
   });
 }
 
+/**
+ * @param {string | string[]} originalPath The original path
+ * @param {import("webpack").Compilation} compilation The compilation
+ * @returns {Promise<boolean>} Whether the asset is optimized
+ */
 async function isOptimized(originalPath, compilation) {
   const { assets } = compilation;
   let name = originalPath;
@@ -287,6 +295,11 @@ async function isOptimized(originalPath, compilation) {
   return optimizedBuffer.equals(generatedBuffer);
 }
 
+/**
+ * @param {string} id The module id
+ * @param {import("webpack").Module[]} modules The modules
+ * @returns {boolean} Whether the module has the loader
+ */
 function hasLoader(id, modules) {
   return [...modules].some((module) => {
     if (!module.id.endsWith(id)) {
@@ -301,6 +314,12 @@ function hasLoader(id, modules) {
   });
 }
 
+/**
+ * @param {string} asset The asset name
+ * @param {import("webpack").Compiler} compiler The compiler
+ * @param {import("webpack").Stats} stats The stats
+ * @returns {string} The asset content
+ */
 function readAsset(asset, compiler, stats) {
   const usedFs = compiler.outputFileSystem;
   const outputPath = stats.compilation.outputOptions.path;
@@ -315,7 +334,6 @@ function readAsset(asset, compiler, stats) {
   }
 
   try {
-    // eslint-disable-next-line node/no-sync
     data = usedFs.readFileSync(path.join(outputPath, targetFile));
   } catch (error) {
     data = error.toString();
@@ -324,21 +342,28 @@ function readAsset(asset, compiler, stats) {
   return data;
 }
 
+/**
+ * @param {string} string The string to normalize
+ * @returns {string} The normalized path
+ */
 function normalizePath(string) {
   const isWin = process.platform === "win32";
 
   if (isWin) {
-    return string.replace(/\\/g, "/");
+    return string.replaceAll("\\", "/");
   }
 
   return string;
 }
 
+/**
+ * @param {string} dirPath The directory path
+ * @returns {void}
+ */
 function clearDirectory(dirPath) {
   let files;
 
   try {
-    // eslint-disable-next-line node/no-sync
     files = fs.readdirSync(dirPath);
   } catch {
     return;
@@ -347,10 +372,7 @@ function clearDirectory(dirPath) {
   if (files.length > 0) {
     for (let i = 0; i < files.length; i++) {
       const filePath = `${dirPath}/${files[i]}`;
-
-      // eslint-disable-next-line node/no-sync
       if (fs.statSync(filePath).isFile()) {
-        // eslint-disable-next-line node/no-sync
         fs.unlinkSync(filePath);
       } else {
         clearDirectory(filePath);
@@ -358,22 +380,21 @@ function clearDirectory(dirPath) {
     }
   }
 
-  // eslint-disable-next-line node/no-sync
   fs.rmdirSync(dirPath);
 }
 
 /**
- * @param {boolean | () => boolean} predicate
- * @returns {import("@jest/globals").it | import("@jest/globals").xit}
+ * @param {boolean | () => boolean} predicate The predicate condition
+ * @returns {import("@jest/globals").it | import("@jest/globals").xit} The test function
  */
 function ifit(predicate) {
   const cond = typeof predicate === "function" ? predicate() : predicate;
-
+  /* global it */
   return cond ? it : it.skip;
 }
 
 /**
- * @returns {boolean}
+ * @returns {boolean} Whether squoosh tests should be run
  */
 function needSquooshTest() {
   const needTest = typeof process.env.SQUOOSH_TEST !== "undefined";
@@ -400,7 +421,6 @@ export default class EmitNewAssetPlugin {
           stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT,
         },
         () => {
-          // eslint-disable-next-line node/no-sync
           const file = fs.readFileSync(
             path.resolve(__dirname, "fixtures", "newImg.png"),
           );
@@ -413,16 +433,16 @@ export default class EmitNewAssetPlugin {
 }
 
 export {
-  runWebpack,
+  EmitNewAssetPlugin,
+  clearDirectory,
   compile,
-  isOptimized,
-  plugins,
   fixturesPath,
   hasLoader,
-  readAsset,
-  normalizePath,
-  clearDirectory,
-  EmitNewAssetPlugin,
   ifit,
+  isOptimized,
   needSquooshTest,
+  normalizePath,
+  plugins,
+  readAsset,
+  runWebpack,
 };

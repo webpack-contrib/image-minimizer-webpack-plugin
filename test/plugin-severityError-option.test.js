@@ -1,7 +1,7 @@
-import path from "path";
+import path from "node:path";
 
-import { fixturesPath, isOptimized, plugins, runWebpack } from "./helpers";
 import ImageMinimizerPlugin from "../src/index.js";
+import { fixturesPath, isOptimized, plugins, runWebpack } from "./helpers";
 
 describe("plugin severityError option", () => {
   it("should optimizes images and throws error on corrupted images using `plugin.severityError` option with `error` value (by plugin)", async () => {
