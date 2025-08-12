@@ -315,10 +315,21 @@ class ImageMinimizerPlugin {
 
     // In some cases cpus() returns undefined
     // https://github.com/nodejs/node/issues/19022
-    // TODO fix me
     const limit = Math.max(
       1,
-      this.options.concurrency ?? os.cpus()?.length ?? 1,
+      this.options.concurrency ||
+        // eslint-disable-next-line n/no-unsupported-features/node-builtins
+        (typeof os.availableParallelism === "function"
+          ? {
+              // eslint-disable-next-line n/no-unsupported-features/node-builtins
+              length: os.availableParallelism(),
+            }
+          : os.cpus() || {
+              // In some cases cpus() returns undefined
+              // https://github.com/nodejs/node/issues/19022
+              length: 1,
+            }
+        ).length - 1,
     );
     const { RawSource } = compiler.webpack.sources;
 
