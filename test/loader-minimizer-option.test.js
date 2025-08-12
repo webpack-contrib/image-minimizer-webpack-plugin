@@ -1,15 +1,15 @@
-import { promisify } from "util";
-import path from "path";
+import path from "node:path";
+import { promisify } from "node:util";
 import imageSize from "image-size";
 
 import ImageMinimizerPlugin from "../src";
 
 import {
-  runWebpack,
-  isOptimized,
-  plugins,
   ifit,
+  isOptimized,
   needSquooshTest,
+  plugins,
+  runWebpack,
 } from "./helpers";
 
 describe("loader minimizer option", () => {

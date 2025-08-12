@@ -616,7 +616,7 @@ module.exports = {
 Type:
 
 ```ts
-type test = string | RegExp | Array<string | RegExp>;
+type test = string | RegExp | (string | RegExp)[];
 ```
 
 Default: `/\.(jpe?g\|png\|gif\|tif\|webp\|svg\|avif)\$/i`
@@ -645,7 +645,7 @@ module.exports = {
 Type:
 
 ```ts
-type include = string | RegExp | Array<string | RegExp>;
+type include = string | RegExp | (string | RegExp)[];
 ```
 
 Default: `undefined`
@@ -674,7 +674,7 @@ module.exports = {
 Type:
 
 ```ts
-type exclude = string | RegExp | Array<string | RegExp>;
+type exclude = string | RegExp | (string | RegExp)[];
 ```
 
 Default: `undefined`
@@ -709,30 +709,22 @@ type minimizer =
         original: {
           filename: string;
           data: Buffer;
-          warnings: Array<Error>;
-          errors: Array<Error>;
+          warnings: Error[];
+          errors: Error[];
           info: import("webpack").AssetInfo;
         },
-        options?:
-          | {
-              [key: string]: any;
-            }
-          | undefined,
+        options?: Record<string, any> | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
-        warnings: Array<Error>;
-        errors: Array<Error>;
+        warnings: Error[];
+        errors: Error[];
         info: import("webpack").AssetInfo;
       }> & {
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
-      options?:
-        | {
-            [key: string]: any;
-          }
-        | undefined;
+      options?: Record<string, any> | undefined;
       filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
       filename?:
         | string
@@ -744,35 +736,27 @@ type minimizer =
           ) => string)
         | undefined;
     }
-  | Array<{
+  | {
       implementation: (
         original: {
           filename: string;
           data: Buffer;
-          warnings: Array<Error>;
-          errors: Array<Error>;
+          warnings: Error[];
+          errors: Error[];
           info: import("webpack").AssetInfo;
         },
-        options?:
-          | {
-              [key: string]: any;
-            }
-          | undefined,
+        options?: Record<string, any> | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
-        warnings: Array<Error>;
-        errors: Array<Error>;
+        warnings: Error[];
+        errors: Error[];
         info: import("webpack").AssetInfo;
       }> & {
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
-      options?:
-        | {
-            [key: string]: any;
-          }
-        | undefined;
+      options?: Record<string, any> | undefined;
       filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
       filename?:
         | string
@@ -783,7 +767,7 @@ type minimizer =
             assetInfo?: import("webpack").AssetInfo | undefined,
           ) => string)
         | undefined;
-    }>;
+    }[];
 ```
 
 Default: `undefined`
@@ -1011,16 +995,16 @@ type implementation = (
   original: {
     filename: string;
     data: Buffer;
-    warnings: Array<Error>;
-    errors: Array<Error>;
+    warnings: Error[];
+    errors: Error[];
     info: import("webpack").AssetInfo;
   },
   options?: BasicTransformerOptions<T>,
 ) => Promise<{
   filename: string;
   data: Buffer;
-  warnings: Array<Error>;
-  errors: Array<Error>;
+  warnings: Error[];
+  errors: Error[];
   info: import("webpack").AssetInfo;
 }> & {
   setup?: (() => void) | undefined;
@@ -1065,9 +1049,7 @@ module.exports = {
 Type:
 
 ```ts
-type options = {
-  [key: string]: any;
-};
+type options = Record<string, any>;
 ```
 
 Default: `undefined`
@@ -1237,35 +1219,27 @@ module.exports = {
 Type:
 
 ```ts
-type generator = Array<{
+type generator = {
   implementation: (
     original: {
       filename: string;
       data: Buffer;
-      warnings: Array<Error>;
-      errors: Array<Error>;
+      warnings: Error[];
+      errors: Error[];
       info: import("webpack").AssetInfo;
     },
-    options?:
-      | {
-          [key: string]: any;
-        }
-      | undefined,
+    options?: Record<string, any> | undefined,
   ) => Promise<{
     filename: string;
     data: Buffer;
-    warnings: Array<Error>;
-    errors: Array<Error>;
+    warnings: Error[];
+    errors: Error[];
     info: import("webpack").AssetInfo;
   }> & {
     setup?: (() => void) | undefined;
     teardown?: (() => void) | undefined;
   };
-  options?:
-    | {
-        [key: string]: any;
-      }
-    | undefined;
+  options?: Record<string, any> | undefined;
   filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
   filename?:
     | string
@@ -1278,7 +1252,7 @@ type generator = Array<{
     | undefined;
   preset?: string | undefined;
   type?: "import" | "asset" | undefined;
-}>;
+}[];
 ```
 
 Default: `undefined`
@@ -1708,20 +1682,16 @@ type implementation = (
   original: {
     filename: string;
     data: Buffer;
-    warnings: Array<Error>;
-    errors: Array<Error>;
+    warnings: Error[];
+    errors: Error[];
     info: import("webpack").AssetInfo;
   },
-  options?:
-    | {
-        [key: string]: any;
-      }
-    | undefined,
+  options?: Record<string, any> | undefined,
 ) => Promise<{
   filename: string;
   data: Buffer;
-  warnings: Array<Error>;
-  errors: Array<Error>;
+  warnings: Error[];
+  errors: Error[];
   info: import("webpack").AssetInfo;
 }> & {
   setup?: (() => void) | undefined;
@@ -1768,9 +1738,7 @@ module.exports = {
 Type:
 
 ```ts
-type options = {
-  [key: string]: any;
-};
+type options = Record<string, any>;
 ```
 
 Default: `undefined`
@@ -2132,30 +2100,22 @@ type minimizer =
         original: {
           filename: string;
           data: Buffer;
-          warnings: Array<Error>;
-          errors: Array<Error>;
+          warnings: Error[];
+          errors: Error[];
           info: import("webpack").AssetInfo;
         },
-        options?:
-          | {
-              [key: string]: any;
-            }
-          | undefined,
+        options?: Record<string, any> | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
-        warnings: Array<Error>;
-        errors: Array<Error>;
+        warnings: Error[];
+        errors: Error[];
         info: import("webpack").AssetInfo;
       }> & {
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
-      options?:
-        | {
-            [key: string]: any;
-          }
-        | undefined;
+      options?: Record<string, any> | undefined;
       filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
       filename?:
         | string
@@ -2167,35 +2127,27 @@ type minimizer =
           ) => string)
         | undefined;
     }
-  | Array<{
+  | {
       implementation: (
         original: {
           filename: string;
           data: Buffer;
-          warnings: Array<Error>;
-          errors: Array<Error>;
+          warnings: Error[];
+          errors: Error[];
           info: import("webpack").AssetInfo;
         },
-        options?:
-          | {
-              [key: string]: any;
-            }
-          | undefined,
+        options?: Record<string, any> | undefined,
       ) => Promise<{
         filename: string;
         data: Buffer;
-        warnings: Array<Error>;
-        errors: Array<Error>;
+        warnings: Error[];
+        errors: Error[];
         info: import("webpack").AssetInfo;
       }> & {
         setup?: (() => void) | undefined;
         teardown?: (() => void) | undefined;
       };
-      options?:
-        | {
-            [key: string]: any;
-          }
-        | undefined;
+      options?: Record<string, any> | undefined;
       filter?: (source: Buffer, sourcePath: string) => boolean | undefined;
       filename?:
         | string
@@ -2206,7 +2158,7 @@ type minimizer =
             assetInfo?: import("webpack").AssetInfo | undefined,
           ) => string)
         | undefined;
-    }>;
+    }[];
 ```
 
 Default: `undefined`
@@ -2259,14 +2211,14 @@ For more information and supported options please read [here](#minimizer).
 Type:
 
 ```ts
-type generator = Array<{
+type generator = {
   implementation: TransformerFunction<T>;
   options?: BasicTransformerOptions<T>;
   filter?: FilterFn | undefined;
   filename?: string | FilenameFn | undefined;
   preset?: string | undefined;
   type?: "import" | "asset" | undefined;
-}>;
+}[];
 ```
 
 Default: `undefined`
@@ -2370,8 +2322,8 @@ module.exports = {
 The function normalizes configuration (converts plugins names and options to `Function`s) for using in `imagemin` package directly.
 
 ```js
-const imagemin = require("imagemin");
 const { imageminNormalizeConfig } = require("image-minimizer-webpack-plugin");
+const imagemin = require("imagemin");
 
 /*
   console.log(imageminConfig);
@@ -2385,18 +2337,17 @@ const { imageminNormalizeConfig } = require("image-minimizer-webpack-plugin");
   }
 */
 
-(async () => {
-  const imageminConfig = await imageminNormalizeConfig({
-    plugins: ["jpegtran", ["pngquant", { quality: [0.6, 0.8] }]],
-  });
-  const files = await imagemin(["images/*.{jpg,png}"], {
-    destination: "build/images",
-    plugins: imageminConfig.plugins,
-  });
+const imageminConfig = await imageminNormalizeConfig({
+  plugins: ["jpegtran", ["pngquant", { quality: [0.6, 0.8] }]],
+});
 
-  console.log(files);
-  // => [{data: <Buffer 89 50 4e …>, path: 'build/images/foo.jpg'}, …]
-})();
+const files = await imagemin(["images/*.{jpg,png}"], {
+  destination: "build/images",
+  plugins: imageminConfig.plugins,
+});
+
+console.log(files);
+// => [{data: <Buffer 89 50 4e …>, path: 'build/images/foo.jpg'}, …]
 ```
 
 ## Examples

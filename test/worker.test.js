@@ -1,13 +1,16 @@
-import fs from "fs/promises";
-import path from "path";
+import fs from "node:fs/promises";
+import path from "node:path";
 
 import sharp from "sharp";
-import { ifit, needSquooshTest } from "./helpers";
-
+import {
+  imageminGenerate,
+  imageminMinify,
+  sharpMinify,
+  squooshGenerate,
+  squooshMinify,
+} from "../src/utils";
 import worker from "../src/worker";
-
-// eslint-disable-next-line import/default
-import utils from "../src/utils.js";
+import { ifit, needSquooshTest } from "./helpers";
 
 function isPromise(obj) {
   return (
@@ -38,7 +41,7 @@ describe("minify", () => {
       isPromise(
         worker({
           transformer: {
-            implementation: utils.imageminMinify,
+            implementation: imageminMinify,
             options: { plugins: ["mozjpeg"] },
           },
         }),
@@ -52,7 +55,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: { plugins: ["mozjpeg"] },
       },
     });
@@ -75,7 +78,7 @@ describe("minify", () => {
       input,
       filename: path.relative(process.cwd(), filename),
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: { plugins: ["mozjpeg"] },
       },
     });
@@ -113,7 +116,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: { plugins: [["svgo", svgoOptions]] },
       },
     });
@@ -145,7 +148,7 @@ describe("minify", () => {
     const result = await worker({
       input,
       filename,
-      transformer: { implementation: utils.imageminMinify },
+      transformer: { implementation: imageminMinify },
     });
 
     expect(result.warnings).toHaveLength(0);
@@ -164,7 +167,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: { plugins: [] },
       },
     });
@@ -185,7 +188,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: { plugins: false },
       },
     });
@@ -206,7 +209,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: ["imagemin-mozjpeg", "unknown"],
         },
@@ -228,7 +231,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: ["imagemin-unknown"],
         },
@@ -250,7 +253,7 @@ describe("minify", () => {
       input,
       filename: "foo.jpg",
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: ["mozjpeg"],
         },
@@ -269,7 +272,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: ["mozjpeg"],
         },
@@ -294,7 +297,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: ["mozjpeg"],
         },
@@ -319,7 +322,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: [["mozjpeg", { quality: 0 }]],
         },
@@ -344,7 +347,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: [["mozjpeg"]],
         },
@@ -366,11 +369,11 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await fs.readFile(filename);
     const result = await worker({
-      minify: utils.imageminMinify,
+      minify: imageminMinify,
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: ["imagemin-mozjpeg"],
         },
@@ -392,11 +395,11 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await fs.readFile(filename);
     const result = await worker({
-      minify: utils.imageminMinify,
+      minify: imageminMinify,
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: [["imagemin-mozjpeg", { quality: 0 }]],
         },
@@ -421,7 +424,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: [["imagemin-mozjpeg"]],
         },
@@ -446,7 +449,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: [imageminMozjpeg()],
         },
@@ -478,7 +481,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: [["svgo", svgoOptions]],
         },
@@ -537,7 +540,7 @@ describe("minify", () => {
           },
         },
         {
-          implementation: utils.sharpMinify,
+          implementation: sharpMinify,
           options: {
             encodeOptions: {
               jpeg: {
@@ -572,7 +575,7 @@ describe("minify", () => {
       filename,
       transformer: [
         {
-          implementation: utils.sharpMinify,
+          implementation: sharpMinify,
           options: {
             encodeOptions: {
               jpeg: {
@@ -613,7 +616,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: ["imagemin-mozjpeg"],
         },
@@ -634,11 +637,11 @@ describe("minify", () => {
     const filename = path.resolve(__dirname, "./fixtures/loader-test.jpg");
     const input = await fs.readFile(filename);
     const result = await worker({
-      minify: utils.imageminMinify,
+      minify: imageminMinify,
       input,
       filename,
       transformer: {
-        implementation: utils.imageminMinify,
+        implementation: imageminMinify,
         options: {
           plugins: [],
         },
@@ -659,7 +662,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminGenerate,
+        implementation: imageminGenerate,
         options: {
           plugins: ["imagemin-webp"],
         },
@@ -683,7 +686,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminGenerate,
+        implementation: imageminGenerate,
         options: {
           plugins: [["imagemin-webp", { quality: 90 }]],
         },
@@ -707,7 +710,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.imageminGenerate,
+        implementation: imageminGenerate,
         options: { plugins: [] },
       },
     });
@@ -726,7 +729,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.squooshMinify,
+        implementation: squooshMinify,
         options: {
           encodeOptions: {
             mozjpeg: {
@@ -764,7 +767,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.squooshGenerate,
+        implementation: squooshGenerate,
         options: {
           encodeOptions: {
             webp: {
@@ -804,7 +807,7 @@ describe("minify", () => {
         input,
         filename,
         transformer: {
-          implementation: utils.squooshGenerate,
+          implementation: squooshGenerate,
           options: {},
         },
       });
@@ -825,7 +828,7 @@ describe("minify", () => {
       filename,
       generateFilename: () => "generated-image.png",
       transformer: {
-        implementation: utils.sharpMinify,
+        implementation: sharpMinify,
         filename: "generated-image.png",
         options: {
           encodeOptions: {
@@ -861,7 +864,7 @@ describe("minify", () => {
       generateFilename: (_, info) => `generated-${info.filename}`,
       transformer: [
         {
-          implementation: utils.sharpMinify,
+          implementation: sharpMinify,
           filename: "image.jpg",
           options: {
             encodeOptions: {
@@ -872,7 +875,7 @@ describe("minify", () => {
           },
         },
         {
-          implementation: utils.sharpMinify,
+          implementation: sharpMinify,
           filename: "image.jpg",
           options: {
             encodeOptions: {
@@ -907,7 +910,7 @@ describe("minify", () => {
       input,
       filename,
       transformer: {
-        implementation: utils.sharpMinify,
+        implementation: sharpMinify,
         filter: () => false,
         options: {
           encodeOptions: {

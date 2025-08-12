@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 
 import ImageMinimizerPlugin from "../src";
 import { fixturesPath, isOptimized, plugins, runWebpack } from "./helpers";

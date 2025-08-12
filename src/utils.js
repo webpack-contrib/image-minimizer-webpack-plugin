@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require("node:path");
 
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").SquooshOptions} SquooshOptions */
@@ -43,17 +43,11 @@ function replaceFileExtension(filename, ext) {
 /**
  * Run tasks with limited concurrency.
  * @template T
- * @param {number} limit - Limit of tasks that run at once.
- * @param {Task<T>[]} tasks - List of tasks to run.
+ * @param {number} limit Limit of tasks that run at once.
+ * @param {Task<T>[]} tasks List of tasks to run.
  * @returns {Promise<T[]>} A promise that fulfills to an array of the results
  */
 function throttleAll(limit, tasks) {
-  if (!Number.isInteger(limit) || limit < 1) {
-    throw new TypeError(
-      `Expected 'limit' to be a finite number > 0, got \`${limit}\` (${typeof limit})`,
-    );
-  }
-
   if (
     !Array.isArray(tasks) ||
     !tasks.every((task) => typeof task === "function")
@@ -83,7 +77,7 @@ function throttleAll(limit, tasks) {
       const [index, task] = value;
 
       /**
-       * @param {T} taskResult
+       * @param {T} taskResult task result
        */
       const onFulfilled = (taskResult) => {
         result[index] = taskResult;
@@ -105,8 +99,8 @@ const WINDOWS_PATH_REGEX = /^[a-zA-Z]:\\/;
 const POSIX_PATH_REGEX = /^\//;
 
 /**
- * @param {string} url
- * @returns {boolean}
+ * @param {string} url URL
+ * @returns {boolean} true when URL is absolute, otherwise false
  */
 function isAbsoluteURL(url) {
   return (
@@ -136,12 +130,11 @@ const uint8ArrayUtf8ByteString = (array, start, end) =>
 
 /** @type {StringToBytes} */
 const stringToBytes = (string) =>
-  // eslint-disable-next-line unicorn/prefer-code-point
   [...string].map((character) => character.charCodeAt(0));
 
 /**
- * @param {ArrayBuffer | ArrayLike<number>} input
- * @returns {{ext: string, mime: string} | undefined}
+ * @param {ArrayBuffer | ArrayLike<number>} input input buffer
+ * @returns {{ext: string, mime: string} | undefined} file type info
  */
 function fileTypeFromBuffer(input) {
   if (
@@ -163,12 +156,11 @@ function fileTypeFromBuffer(input) {
   }
 
   /**
-   * @param {number[]} header
-   * @param {{offset: number, mask?: number[]}} [options]
-   * @returns {boolean}
+   * @param {number[]} header header bytes
+   * @param {{offset: number, mask?: number[]}=} options options
+   * @returns {boolean} whether the header matches
    */
   const check = (header, options) => {
-    // eslint-disable-next-line no-param-reassign
     options = {
       offset: 0,
       ...options,
@@ -176,7 +168,6 @@ function fileTypeFromBuffer(input) {
 
     for (let i = 0; i < header.length; i++) {
       if (options.mask) {
-        // eslint-disable-next-line no-bitwise
         if (header[i] !== (options.mask[i] & buffer[i + options.offset])) {
           return false;
         }
@@ -189,9 +180,9 @@ function fileTypeFromBuffer(input) {
   };
 
   /**
-   * @param {string} header
-   * @param {{offset: number, mask?: number[]}} [options]
-   * @returns {boolean}
+   * @param {string} header header string
+   * @param {{offset: number, mask?: number[]}=} options options
+   * @returns {boolean} whether the header matches
    */
   const checkString = (header, options) =>
     check(stringToBytes(header), options);
@@ -223,13 +214,13 @@ function fileTypeFromBuffer(input) {
     const sliced = buffer.subarray(startIndex, firstImageDataChunkIndex);
 
     if (
-      sliced.findIndex(
+      sliced.some(
         (el, i) =>
           sliced[i] === 0x61 &&
           sliced[i + 1] === 0x63 &&
           sliced[i + 2] === 0x54 &&
           sliced[i + 3] === 0x4c,
-      ) >= 0
+      )
     ) {
       return {
         ext: "apng",
@@ -371,7 +362,6 @@ function fileTypeFromBuffer(input) {
 
   if (
     checkString("ftyp", { offset: 4 }) &&
-    // eslint-disable-next-line no-bitwise
     (buffer[8] & 0x60) !== 0x00 // Brand major, first character ASCII?
   ) {
     // They all can have MIME `video/mp4` except `application/mp4` special-case which is hard to detect.
@@ -380,7 +370,6 @@ function fileTypeFromBuffer(input) {
       .replace("\0", " ")
       .trim();
 
-    // eslint-disable-next-line default-case
     switch (brandMajor) {
       case "avif":
         return { ext: "avif", mime: "image/avif" };
@@ -477,11 +466,15 @@ function fileTypeFromBuffer(input) {
     };
   }
 }
+/**
+ * @template T
+ * @typedef {() => T} FunctionReturning
+ */
 
 /**
  * @template T
- * @param fn {(function(): any) | undefined}
- * @returns {function(): T}
+ * @param {FunctionReturning<T>} fn memorized function
+ * @returns {FunctionReturning<T>} new function
  */
 function memoize(fn) {
   let cache = false;
@@ -493,26 +486,26 @@ function memoize(fn) {
       return result;
     }
 
-    result = /** @type {function(): any} */ (fn)();
+    result = fn();
     cache = true;
     // Allow to clean up memory for fn
     // and all dependent resources
-    // eslint-disable-next-line no-param-reassign
-    fn = undefined;
+    /** @type {FunctionReturning<T> | undefined} */
+    (fn) = undefined;
 
     return result;
   };
 }
 
 /**
- * @typedef {Object} MetaData
- * @property {Array<Error>} warnings
- * @property {Array<Error>} errors
+ * @typedef {object} MetaData
+ * @property {Array<Error>} warnings warnings
+ * @property {Array<Error>} errors errors
  */
 
 class InvalidConfigError extends Error {
   /**
-   * @param {string | undefined} message
+   * @param {string | undefined} message message
    */
   constructor(message) {
     super(message);
@@ -523,8 +516,8 @@ class InvalidConfigError extends Error {
 
 /**
  * @template T
- * @param {ImageminOptions} imageminConfig
- * @returns {Promise<ImageminOptions>}
+ * @param {ImageminOptions} imageminConfig imagemin configuration
+ * @returns {Promise<ImageminOptions>} normalized imagemin configuration
  */
 async function imageminNormalizeConfig(imageminConfig) {
   if (
@@ -555,8 +548,6 @@ async function imageminNormalizeConfig(imageminConfig) {
         : `imagemin-${pluginName}`;
 
       try {
-        // @ts-ignore
-        // eslint-disable-next-line no-await-in-loop
         requiredPlugin = (await import(requiredPluginName)).default(
           pluginOptions,
         );
@@ -564,8 +555,6 @@ async function imageminNormalizeConfig(imageminConfig) {
         requiredPluginName = pluginName;
 
         try {
-          // @ts-ignore
-          // eslint-disable-next-line no-await-in-loop
           requiredPlugin = (await import(requiredPluginName)).default(
             pluginOptions,
           );
@@ -615,27 +604,22 @@ async function imageminNormalizeConfig(imageminConfig) {
 
 /**
  * @template T
- * @param {WorkerResult} original
- * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult | null>}
+ * @param {WorkerResult} original original worker result
+ * @param {T} minimizerOptions minimizer options
+ * @returns {Promise<WorkerResult | null>} generated result
  */
 async function imageminGenerate(original, minimizerOptions) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     await imageminNormalizeConfig(
-      /** @type {ImageminOptions} */ (
-        /** @type {?} */ (minimizerOptions ?? {})
-      ),
+      /** @type {ImageminOptions} */ (minimizerOptions ?? {}),
     )
   );
 
-  // @ts-ignore
-  // eslint-disable-next-line node/no-unpublished-import
   const imagemin = (await import("imagemin")).default;
 
   let result;
 
   try {
-    // @ts-ignore
     result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
   } catch (error) {
     const originalError =
@@ -673,25 +657,22 @@ async function imageminGenerate(original, minimizerOptions) {
 
 /**
  * @template T
- * @param {WorkerResult} original
- * @param {T} options
- * @returns {Promise<WorkerResult | null>}
+ * @param {WorkerResult} original original worker result
+ * @param {T} options options
+ * @returns {Promise<WorkerResult | null>} minified result
  */
 async function imageminMinify(original, options) {
   const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
     await imageminNormalizeConfig(
-      /** @type {ImageminOptions} */ (/** @type {?} */ (options ?? {})),
+      /** @type {ImageminOptions} */ (options ?? {}),
     )
   );
 
-  // @ts-ignore
-  // eslint-disable-next-line node/no-unpublished-import
   const imagemin = (await import("imagemin")).default;
 
   let result;
 
   try {
-    // @ts-ignore
     result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
   } catch (error) {
     const originalError =
@@ -734,16 +715,29 @@ async function imageminMinify(original, options) {
 }
 
 /**
- * @type {any}
+ * @typedef {object} SquooshImage
+ * @property {(options: Record<string, unknown>) => Promise<void>} preprocess preprocess
+ * @property {(options: Record<string, unknown>) => Promise<void>} encode encode
+ * @property {Record<string, {binary: Uint8Array, extension: string}>} encodedWith encoded with
+ * @property {{ bitmap: {width: number, height: number}} } decoded decoded
+ */
+
+/**
+ * @typedef {object} SquooshImagePool
+ * @property {(data: Uint8Array) => SquooshImage} ingestImage ingest image function
+ * @property {() => Promise<void>} close close function
+ */
+
+/**
+ * @type {SquooshImagePool | undefined}
  */
 let pool;
 
 /**
- * @param {number} threads
- * @returns {any}
+ * @param {number} threads The number of threads
+ * @returns {SquooshImagePool} The image pool
  */
 function squooshImagePoolCreate(threads = 1) {
-  // eslint-disable-next-line node/no-unpublished-require
   const { ImagePool } = require("@squoosh/lib");
 
   // TODO https://github.com/GoogleChromeLabs/squoosh/issues/1111,
@@ -757,9 +751,13 @@ function squooshImagePoolCreate(threads = 1) {
   return new ImagePool(threads);
 }
 
+/**
+ * @returns {void}
+ */
 function squooshImagePoolSetup() {
   if (!pool) {
-    const os = require("os");
+    const os = require("node:os");
+
     // In some cases cpus() returns undefined
     // https://github.com/nodejs/node/issues/19022
     const threads = os.cpus()?.length ?? 1;
@@ -767,29 +765,32 @@ function squooshImagePoolSetup() {
     pool = squooshImagePoolCreate(threads);
 
     // workarounds for https://github.com/GoogleChromeLabs/squoosh/issues/1152
-    // @ts-ignore
+    // @ts-expect-error - workaround for squoosh compatibility
+    // eslint-disable-next-line n/no-unsupported-features/node-builtins
     delete globalThis.navigator;
   }
 }
 
+/**
+ * @returns {Promise<void>}
+ */
 async function squooshImagePoolTeardown() {
   if (pool) {
     await pool.close();
 
-    // eslint-disable-next-line require-atomic-updates
     pool = undefined;
   }
 }
 
 /**
  * @template T
- * @param {WorkerResult} original
- * @param {T} minifyOptions
- * @returns {Promise<WorkerResult | null>}
+ * @param {WorkerResult} original original worker result
+ * @param {T} minifyOptions minify options
+ * @returns {Promise<WorkerResult | null>} generated result
  */
 async function squooshGenerate(original, minifyOptions) {
-  // eslint-disable-next-line node/no-unpublished-require
   const squoosh = require("@squoosh/lib");
+
   const isReusePool = Boolean(pool);
   const imagePool = pool || squooshImagePoolCreate();
   const image = imagePool.ingestImage(new Uint8Array(original.data));
@@ -879,13 +880,13 @@ squooshGenerate.teardown = squooshImagePoolTeardown;
 
 /**
  * @template T
- * @param {WorkerResult} original
- * @param {T} options
- * @returns {Promise<WorkerResult | null>}
+ * @param {WorkerResult} original original worker result
+ * @param {T} options minify options
+ * @returns {Promise<WorkerResult | null>} minified result
  */
 async function squooshMinify(original, options) {
-  // eslint-disable-next-line node/no-unpublished-require
   const squoosh = require("@squoosh/lib");
+
   const { encoders } = squoosh;
 
   /**
@@ -983,15 +984,14 @@ squooshMinify.teardown = squooshImagePoolTeardown;
 /** @typedef {import("sharp").ResizeOptions & { enabled?: boolean; unit?: "px" | "percent" }} ResizeOptions */
 
 /**
- * @typedef SharpEncodeOptions
- * @type {object}
- * @property {import("sharp").AvifOptions} [avif]
- * @property {import("sharp").GifOptions} [gif]
- * @property {import("sharp").HeifOptions} [heif]
- * @property {import("sharp").JpegOptions} [jpeg]
- * @property {import("sharp").JpegOptions} [jpg]
- * @property {import("sharp").PngOptions} [png]
- * @property {import("sharp").WebpOptions} [webp]
+ * @typedef {object} SharpEncodeOptions
+ * @property {import("sharp").AvifOptions=} avif AVIF options
+ * @property {import("sharp").GifOptions=} gif GIF options
+ * @property {import("sharp").HeifOptions=} heif HEIF options
+ * @property {import("sharp").JpegOptions=} jpeg JPEG options
+ * @property {import("sharp").JpegOptions=} jpg JPG options
+ * @property {import("sharp").PngOptions=} png PNG options
+ * @property {import("sharp").WebpOptions=} webp WebP options
  */
 
 /**
@@ -1001,12 +1001,11 @@ squooshMinify.teardown = squooshImagePoolTeardown;
 
 // TODO remove the `SizeSuffix` option in the next major release, because we support `[width]` and `[height]`
 /**
- * @typedef SharpOptions
- * @type {object}
- * @property {ResizeOptions} [resize]
- * @property {number | 'auto'} [rotate]
- * @property {SizeSuffix} [sizeSuffix]
- * @property {SharpEncodeOptions} [encodeOptions]
+ * @typedef {object} SharpOptions
+ * @property {ResizeOptions=} resize resize options
+ * @property {number | 'auto'=} rotate rotate options
+ * @property {SizeSuffix=} sizeSuffix size suffix
+ * @property {SharpEncodeOptions=} encodeOptions encode options
  */
 
 /**
@@ -1053,10 +1052,10 @@ const SHARP_MINIFY_FORMATS = new Map([
 ]);
 
 /**
- * @param {WorkerResult} original
- * @param {SharpOptions} minimizerOptions
- * @param {SharpFormat | null} targetFormat
- * @returns {Promise<WorkerResult | null>}
+ * @param {WorkerResult} original original original worker result
+ * @param {SharpOptions} minimizerOptions minify options
+ * @param {SharpFormat | null} targetFormat target format
+ * @returns {Promise<WorkerResult | null>} transformed result
  */
 async function sharpTransform(
   original,
@@ -1082,8 +1081,8 @@ async function sharpTransform(
   }
 
   /** @type {SharpLib} */
-  // eslint-disable-next-line node/no-unpublished-require
   const sharp = require("sharp");
+
   const imagePipeline = sharp(original.data, { animated: true });
 
   // ====== rotate ======
@@ -1185,9 +1184,9 @@ async function sharpTransform(
 
 /**
  * @template T
- * @param {WorkerResult} original
- * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult | null>}
+ * @param {WorkerResult} original original worker result
+ * @param {T} minimizerOptions minify options
+ * @returns {Promise<WorkerResult | null>} generated result
  */
 function sharpGenerate(original, minimizerOptions) {
   const sharpOptions = /** @type {SharpOptions} */ (minimizerOptions ?? {});
@@ -1221,9 +1220,9 @@ function sharpGenerate(original, minimizerOptions) {
 
 /**
  * @template T
- * @param {WorkerResult} original
- * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult | null>}
+ * @param {WorkerResult} original original worker result
+ * @param {T} minimizerOptions minify options
+ * @returns {Promise<WorkerResult | null>} minified result
  */
 function sharpMinify(original, minimizerOptions) {
   return sharpTransform(
@@ -1233,30 +1232,27 @@ function sharpMinify(original, minimizerOptions) {
 }
 
 /** @typedef {import("svgo")} SvgoLib */
-
-/**
- * @typedef SvgoOptions
- * @type {object}
- * @property {SvgoEncodeOptions} [encodeOptions]
- */
-
 /** @typedef {Omit<import("svgo").Config, "path" | "datauri">} SvgoEncodeOptions */
 
 /**
- * @template T
- * @param {WorkerResult} original
- * @param {T} minimizerOptions
- * @returns {Promise<WorkerResult | null>}
+ * @typedef {object} SvgoOptions
+ * @property {SvgoEncodeOptions=} encodeOptions encode options
  */
-// eslint-disable-next-line require-await
+
+/**
+ * @template T
+ * @param {WorkerResult} original original worker result
+ * @param {T} minimizerOptions minify options
+ * @returns {Promise<WorkerResult | null>} minified result
+ */
 async function svgoMinify(original, minimizerOptions) {
   if (path.extname(original.filename).toLowerCase() !== ".svg") {
     return null;
   }
 
   /** @type {SvgoLib} */
-  // eslint-disable-next-line node/no-unpublished-require
   const { optimize } = require("svgo");
+
   const { encodeOptions } = /** @type {SvgoOptions} */ (minimizerOptions ?? {});
 
   /** @type {import("svgo").Output} */
@@ -1295,19 +1291,19 @@ async function svgoMinify(original, minimizerOptions) {
 const IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS = new WeakMap();
 
 module.exports = {
-  throttleAll,
-  isAbsoluteURL,
-  replaceFileExtension,
-  memoize,
-  imageminNormalizeConfig,
-  imageminMinify,
-  imageminGenerate,
-  squooshMinify,
-  squooshGenerate,
-  sharpMinify,
-  sharpGenerate,
-  svgoMinify,
-  IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
   ABSOLUTE_URL_REGEX,
+  IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS,
   WINDOWS_PATH_REGEX,
+  imageminGenerate,
+  imageminMinify,
+  imageminNormalizeConfig,
+  isAbsoluteURL,
+  memoize,
+  replaceFileExtension,
+  sharpGenerate,
+  sharpMinify,
+  squooshGenerate,
+  squooshMinify,
+  svgoMinify,
+  throttleAll,
 };

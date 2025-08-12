@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 
 import ImageMinimizerPlugin from "../src";
 
@@ -210,7 +210,6 @@ describe("validate loader options", () => {
         expect(errors).toHaveLength(shouldSuccess ? 0 : 1);
 
         if (!shouldSuccess) {
-          // eslint-disable-next-line jest/no-conditional-expect
           expect(() => {
             throw new Error(errors[0].error.message);
           }).toThrowErrorMatchingSnapshot();

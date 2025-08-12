@@ -1,7 +1,7 @@
-import path from "path";
+import path from "node:path";
 
-import { fixturesPath, runWebpack, plugins } from "./helpers";
 import ImageMinimizerPlugin from "../src/index.js";
+import { fixturesPath, plugins, runWebpack } from "./helpers";
 
 describe('plugin "deleteOriginalAssets" option', () => {
   it("should minimize asset and delete original asset (default behavior)", async () => {
