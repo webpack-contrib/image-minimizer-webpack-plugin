@@ -360,9 +360,8 @@ class ImageMinimizerPlugin {
         });
       }
 
-      compilation.warnings = [...compilation.warnings, ...output.warnings];
-
-      compilation.errors = [...compilation.errors, ...output.errors];
+      compilation.warnings.push(...output.warnings);
+      compilation.errors.push(...output.errors);
 
       if (compilation.getAsset(output.filename)) {
         compilation.updateAsset(
