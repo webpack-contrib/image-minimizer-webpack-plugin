@@ -499,7 +499,7 @@ function memoize(fn) {
 
 /**
  * @typedef {object} MetaData
- * @property {Array<Error>} warnings warnigns
+ * @property {Array<Error>} warnings warnings
  * @property {Array<Error>} errors errors
  */
 
