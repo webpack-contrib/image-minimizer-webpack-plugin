@@ -5,18 +5,18 @@ export = ImageMinimizerPlugin;
  */
 declare class ImageMinimizerPlugin<T, G = T> {
   /**
-   * @param {PluginOptions<T, G>} [options={}] Plugin options.
+   * @param {PluginOptions<T, G>=} options Plugin options.
    */
-  constructor(options?: PluginOptions<T, G>);
+  constructor(options?: PluginOptions<T, G> | undefined);
   /**
    * @private
    */
   private options;
   /**
    * @private
-   * @param {Compiler} compiler
-   * @param {Compilation} compilation
-   * @param {Record<string, Source>} assets
+   * @param {Compiler} compiler compiler
+   * @param {Compilation} compilation compilation
+   * @param {Record<string, Source>} assets assets
    * @returns {Promise<void>}
    */
   private optimize;
@@ -29,7 +29,7 @@ declare class ImageMinimizerPlugin<T, G = T> {
    */
   private teardownAll;
   /**
-   * @param {import("webpack").Compiler} compiler
+   * @param {import("webpack").Compiler} compiler compiler
    */
   apply(compiler: import("webpack").Compiler): void;
 }
@@ -103,30 +103,66 @@ type Rule = RegExp | string;
 type Rules = Rule[] | Rule;
 type FilterFn = (source: Buffer, sourcePath: string) => boolean;
 type ImageminOptions = {
+  /**
+   * plugins
+   */
   plugins: Array<
     string | [string, Record<string, any>?] | import("imagemin").Plugin
   >;
 };
 type SquooshOptions = {
-  [x: string]: any;
+  [key: string]: any;
 };
 type WorkerResult = {
+  /**
+   * filename
+   */
   filename: string;
+  /**
+   * data buffer
+   */
   data: Buffer;
+  /**
+   * warnings
+   */
   warnings: Array<Error>;
+  /**
+   * errors
+   */
   errors: Array<Error>;
+  /**
+   * asset info
+   */
   info: AssetInfo;
 };
 type Task<T> = {
+  /**
+   * task name
+   */
   name: string;
+  /**
+   * asset info
+   */
   info: AssetInfo;
+  /**
+   * input source
+   */
   inputSource: Source;
+  /**
+   * output
+   */
   output:
     | (WorkerResult & {
         source?: Source;
       })
     | undefined;
+  /**
+   * cache item
+   */
   cacheItem: ReturnType<ReturnType<Compilation["getCache"]>["getItemCache"]>;
+  /**
+   * transformer
+   */
   transformer: Transformer<T> | Transformer<T>[];
 };
 type CustomOptions = {
@@ -135,62 +171,126 @@ type CustomOptions = {
 type InferDefaultType<T> = T extends infer U ? U : CustomOptions;
 type BasicTransformerOptions<T> = InferDefaultType<T> | undefined;
 type ResizeOptions = {
+  /**
+   * width
+   */
   width?: number | undefined;
+  /**
+   * height
+   */
   height?: number | undefined;
-  unit?: "px" | "percent" | undefined;
+  /**
+   * unit
+   */
+  unit?: ("px" | "percent") | undefined;
+  /**
+   * true when enabled, otherwise false
+   */
   enabled?: boolean | undefined;
 };
 type BasicTransformerImplementation<T> = (
   original: WorkerResult,
-  options?: BasicTransformerOptions<T>,
+  options?: BasicTransformerOptions<T> | undefined,
 ) => Promise<WorkerResult | null>;
 type BasicTransformerHelpers = {
+  /**
+   * setup function
+   */
   setup?: (() => void) | undefined;
+  /**
+   * teardown function
+   */
   teardown?: (() => void) | undefined;
 };
 type TransformerFunction<T> = BasicTransformerImplementation<T> &
   BasicTransformerHelpers;
 type PathData = {
+  /**
+   * filename
+   */
   filename?: string | undefined;
 };
 type FilenameFn = (
   pathData: PathData,
-  assetInfo?: import("webpack").AssetInfo | undefined,
+  assetInfo?: AssetInfo | undefined,
 ) => string;
 type Transformer<T> = {
+  /**
+   * implementation
+   */
   implementation: TransformerFunction<T>;
-  options?: BasicTransformerOptions<T>;
+  /**
+   * options
+   */
+  options?: BasicTransformerOptions<T> | undefined;
+  /**
+   * filter
+   */
   filter?: FilterFn | undefined;
-  filename?: string | FilenameFn | undefined;
+  /**
+   * filename
+   */
+  filename?: (string | FilenameFn) | undefined;
+  /**
+   * preset
+   */
   preset?: string | undefined;
-  type?: "import" | "asset" | undefined;
+  /**
+   * type
+   */
+  type?: ("import" | "asset") | undefined;
 };
 type Minimizer<T> = Omit<Transformer<T>, "preset" | "type">;
 type Generator<T> = Transformer<T>;
 type InternalWorkerOptions<T> = {
+  /**
+   * filename
+   */
   filename: string;
+  /**
+   * asset info
+   */
   info?: AssetInfo | undefined;
+  /**
+   * input buffer
+   */
   input: Buffer;
+  /**
+   * transformer
+   */
   transformer: Transformer<T> | Transformer<T>[];
+  /**
+   * severity error setting
+   */
   severityError?: string | undefined;
-  generateFilename?: Function | undefined;
+  /**
+   * filename generator function
+   */
+  generateFilename?:
+    | ((
+        filenameTemplate: string,
+        options: {
+          filename: string;
+        },
+      ) => string)
+    | undefined;
 };
 type InternalLoaderOptions<T> = import("./loader").LoaderOptions<T>;
 type PluginOptions<T, G> = {
   /**
-   * Test to match files against.
+   * test to match files against
    */
   test?: Rule | undefined;
   /**
-   * Files to include.
+   * files to include
    */
   include?: Rule | undefined;
   /**
-   * Files to exclude.
+   * files to exclude
    */
   exclude?: Rule | undefined;
   /**
-   * Allows to setup the minimizer.
+   * allows to setup the minimizer
    */
   minimizer?:
     | (T extends any[]
@@ -198,27 +298,25 @@ type PluginOptions<T, G> = {
         : Minimizer<T> | Minimizer<T>[])
     | undefined;
   /**
-   * Allows to set the generator.
+   * allows to set the generator
    */
   generator?:
-    | (G extends any[]
-        ? { [P_1 in keyof G]: Generator<G[P_1]> }
-        : Generator<G>[])
+    | (G extends any[] ? { [P in keyof G]: Generator<G[P]> } : Generator<G>[])
     | undefined;
   /**
-   * Automatically adding `imagemin-loader`.
+   * automatically adding `image-loader`.
    */
   loader?: boolean | undefined;
   /**
-   * Maximum number of concurrency optimization processes in one time.
+   * maximum number of concurrency optimization processes in one time
    */
   concurrency?: number | undefined;
   /**
-   * Allows to choose how errors are displayed.
+   * allows to choose how errors are displayed
    */
   severityError?: string | undefined;
   /**
-   * Allows to remove original assets. Useful for converting to a `webp` and remove original assets.
+   * allows to remove original assets, useful for converting to a `webp` and remove original assets
    */
   deleteOriginalAssets?: boolean | undefined;
 };
