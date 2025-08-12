@@ -1,6 +1,7 @@
 /** @typedef {import("./index").WorkerResult} WorkerResult */
 /** @typedef {import("./index").FilenameFn} FilenameFn */
 
+/** @type {unique symbol} */
 const isFilenameProcessed = Symbol("isFilenameProcessed");
 
 /**
@@ -11,12 +12,10 @@ const isFilenameProcessed = Symbol("isFilenameProcessed");
  */
 function processFilenameTemplate(result, options, filenameTemplate) {
   if (
-    // @ts-expect-error need to fix
     !result.info[isFilenameProcessed] &&
     typeof filenameTemplate !== "undefined" &&
     typeof options.generateFilename === "function"
   ) {
-    // @ts-expect-error need to fix
     result.filename = options.generateFilename(filenameTemplate, {
       filename: result.filename,
     });
@@ -25,7 +24,6 @@ function processFilenameTemplate(result, options, filenameTemplate) {
       .replaceAll(/\[width\]/gi, result.info.width)
       .replaceAll(/\[height\]/gi, result.info.height);
 
-    // @ts-expect-error need to fix
     result.info[isFilenameProcessed] = true;
   }
 }
@@ -136,3 +134,4 @@ async function worker(options) {
 }
 
 module.exports = worker;
+module.exports.isFilenameProcessed = isFilenameProcessed;

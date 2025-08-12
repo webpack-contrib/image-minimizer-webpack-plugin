@@ -29,9 +29,9 @@ declare class ImageMinimizerPlugin<T, G = T> {
    */
   private teardownAll;
   /**
-   * @param {import("webpack").Compiler} compiler compiler
+   * @param {Compiler} compiler compiler
    */
-  apply(compiler: import("webpack").Compiler): void;
+  apply(compiler: Compiler): void;
 }
 declare namespace ImageMinimizerPlugin {
   export {
@@ -48,18 +48,18 @@ declare namespace ImageMinimizerPlugin {
     WebpackPluginInstance,
     Compiler,
     Compilation,
-    WebpackError,
     Asset,
     AssetInfo,
     Source,
     Module,
+    TemplatePath,
+    PathData,
     ImageminMinifyFunction,
     SquooshMinifyFunction,
     Rule,
     Rules,
     FilterFn,
-    ImageminOptions,
-    SquooshOptions,
+    IsFilenameProcessed,
     WorkerResult,
     Task,
     CustomOptions,
@@ -69,7 +69,6 @@ declare namespace ImageMinimizerPlugin {
     BasicTransformerImplementation,
     BasicTransformerHelpers,
     TransformerFunction,
-    PathData,
     FilenameFn,
     Transformer,
     Minimizer,
@@ -88,31 +87,22 @@ import { squooshGenerate } from "./utils.js";
 import { sharpMinify } from "./utils.js";
 import { sharpGenerate } from "./utils.js";
 import { svgoMinify } from "./utils.js";
-type Schema = import("schema-utils/declarations/validate").Schema;
+type Schema = import("schema-utils").Schema;
 type WebpackPluginInstance = import("webpack").WebpackPluginInstance;
 type Compiler = import("webpack").Compiler;
 type Compilation = import("webpack").Compilation;
-type WebpackError = import("webpack").WebpackError;
 type Asset = import("webpack").Asset;
 type AssetInfo = import("webpack").AssetInfo;
 type Source = import("webpack").sources.Source;
 type Module = import("webpack").Module;
+type TemplatePath = import("webpack").TemplatePath;
+type PathData = import("webpack").PathData;
 type ImageminMinifyFunction = typeof imageminMinify;
 type SquooshMinifyFunction = typeof squooshMinify;
 type Rule = RegExp | string;
 type Rules = Rule[] | Rule;
 type FilterFn = (source: Buffer, sourcePath: string) => boolean;
-type ImageminOptions = {
-  /**
-   * plugins
-   */
-  plugins: Array<
-    string | [string, Record<string, any>?] | import("imagemin").Plugin
-  >;
-};
-type SquooshOptions = {
-  [key: string]: any;
-};
+type IsFilenameProcessed = typeof import("./worker").isFilenameProcessed;
 type WorkerResult = {
   /**
    * filename
@@ -133,7 +123,9 @@ type WorkerResult = {
   /**
    * asset info
    */
-  info: AssetInfo;
+  info: AssetInfo & {
+    [worker.isFilenameProcessed]?: boolean;
+  };
 };
 type Task<T> = {
   /**
@@ -204,12 +196,6 @@ type BasicTransformerHelpers = {
 };
 type TransformerFunction<T> = BasicTransformerImplementation<T> &
   BasicTransformerHelpers;
-type PathData = {
-  /**
-   * filename
-   */
-  filename?: string | undefined;
-};
 type FilenameFn = (
   pathData: PathData,
   assetInfo?: AssetInfo | undefined,
@@ -266,14 +252,7 @@ type InternalWorkerOptions<T> = {
   /**
    * filename generator function
    */
-  generateFilename?:
-    | ((
-        filenameTemplate: string,
-        options: {
-          filename: string;
-        },
-      ) => string)
-    | undefined;
+  generateFilename: (filename: TemplatePath, data: PathData) => string;
 };
 type InternalLoaderOptions<T> = import("./loader").LoaderOptions<T>;
 type PluginOptions<T, G> = {
@@ -290,7 +269,7 @@ type PluginOptions<T, G> = {
    */
   exclude?: Rule | undefined;
   /**
-   * allows to setup the minimizer
+   * allows to set the minimizer
    */
   minimizer?:
     | (T extends any[]
@@ -320,3 +299,4 @@ type PluginOptions<T, G> = {
    */
   deleteOriginalAssets?: boolean | undefined;
 };
+import worker = require("./worker");

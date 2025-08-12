@@ -19,15 +19,16 @@ const {
 } = require("./utils.js");
 const worker = require("./worker");
 
-/** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
+/** @typedef {import("schema-utils").Schema} Schema */
 /** @typedef {import("webpack").WebpackPluginInstance} WebpackPluginInstance */
 /** @typedef {import("webpack").Compiler} Compiler */
 /** @typedef {import("webpack").Compilation} Compilation */
-/** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
 /** @typedef {import("webpack").sources.Source} Source */
 /** @typedef {import("webpack").Module} Module */
+/** @typedef {import("webpack").TemplatePath} TemplatePath */
+/** @typedef {import("webpack").PathData} PathData */
 /** @typedef {import("./utils.js").imageminMinify} ImageminMinifyFunction */
 /** @typedef {import("./utils.js").squooshMinify} SquooshMinifyFunction */
 
@@ -41,16 +42,7 @@ const worker = require("./worker");
  * @returns {boolean}
  */
 
-// eslint-disable-next-line jsdoc/no-restricted-syntax
-/**
- * @typedef {object} ImageminOptions
- * @property {Array<string | [string, Record<string, any>?] | import("imagemin").Plugin>} plugins plugins
- */
-
-// eslint-disable-next-line jsdoc/no-restricted-syntax
-/**
- * @typedef {{ [key: string]: any }} SquooshOptions
- */
+/** @typedef {typeof import("./worker").isFilenameProcessed} IsFilenameProcessed */
 
 /**
  * @typedef {object} WorkerResult
@@ -58,7 +50,7 @@ const worker = require("./worker");
  * @property {Buffer} data data buffer
  * @property {Array<Error>} warnings warnings
  * @property {Array<Error>} errors errors
- * @property {AssetInfo} info asset info
+ * @property {AssetInfo & { [worker.isFilenameProcessed]?: boolean }} info asset info
  */
 
 /**
@@ -115,11 +107,6 @@ const worker = require("./worker");
  */
 
 /**
- * @typedef {object} PathData
- * @property {string=} filename filename
- */
-
-/**
  * @callback FilenameFn
  * @param {PathData} pathData path data
  * @param {AssetInfo=} assetInfo asset info
@@ -155,7 +142,7 @@ const worker = require("./worker");
  * @property {Buffer} input input buffer
  * @property {Transformer<T> | Transformer<T>[]} transformer transformer
  * @property {string=} severityError severity error setting
- * @property {(filenameTemplate: string, options: { filename: string }) => string=} generateFilename filename generator function
+ * @property {(filename: TemplatePath, data: PathData) => string} generateFilename filename generator function
  */
 
 /**
@@ -169,7 +156,7 @@ const worker = require("./worker");
  * @property {Rule=} test test to match files against
  * @property {Rule=} include files to include
  * @property {Rule=} exclude files to exclude
- * @property {T extends any[] ? { [P in keyof T]: Minimizer<T[P]> } : Minimizer<T> | Minimizer<T>[]=} minimizer allows to setup the minimizer
+ * @property {T extends any[] ? { [P in keyof T]: Minimizer<T[P]> } : Minimizer<T> | Minimizer<T>[]=} minimizer allows to set the minimizer
  * @property {G extends any[] ? { [P in keyof G]: Generator<G[P]> } : Generator<G>[]=} generator allows to set the generator
  * @property {boolean=} loader automatically adding `image-loader`.
  * @property {number=} concurrency maximum number of concurrency optimization processes in one time
@@ -328,6 +315,7 @@ class ImageMinimizerPlugin {
 
     // In some cases cpus() returns undefined
     // https://github.com/nodejs/node/issues/19022
+    // TODO fix me
     const limit = Math.max(
       1,
       this.options.concurrency ?? os.cpus()?.length ?? 1,
@@ -372,15 +360,9 @@ class ImageMinimizerPlugin {
         });
       }
 
-      compilation.warnings = [
-        ...compilation.warnings,
-        .../** @type {[WebpackError]} */ (output.warnings),
-      ];
+      compilation.warnings = [...compilation.warnings, ...output.warnings];
 
-      compilation.errors = [
-        ...compilation.errors,
-        .../** @type {[WebpackError]} */ (output.errors),
-      ];
+      compilation.errors = [...compilation.errors, ...output.errors];
 
       if (compilation.getAsset(output.filename)) {
         compilation.updateAsset(
@@ -459,7 +441,7 @@ class ImageMinimizerPlugin {
   }
 
   /**
-   * @param {import("webpack").Compiler} compiler compiler
+   * @param {Compiler} compiler compiler
    */
   apply(compiler) {
     const pluginName = this.constructor.name;
