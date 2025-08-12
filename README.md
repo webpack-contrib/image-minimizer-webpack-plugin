@@ -2005,7 +2005,7 @@ Type:
 type concurrency = number;
 ```
 
-Default: `Math.max(1, os.cpus().length - 1)`
+Default: `Math.max(1, os.availableParallelism() - 1)`
 
 Maximum number of concurrency optimization processes in one time.
 
