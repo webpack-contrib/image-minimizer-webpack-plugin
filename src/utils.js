@@ -1,11 +1,13 @@
 const path = require("node:path");
 
 /** @typedef {import("./index").WorkerResult} WorkerResult */
-/** @typedef {import("./index").SquooshOptions} SquooshOptions */
-/** @typedef {import("imagemin").Options} ImageminOptions */
+/** @typedef {import("./index").CustomOptions} CustomOptions */
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Module} Module */
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
+
+// eslint-disable-next-line jsdoc/no-restricted-syntax
+/** @typedef {any} EXPECTED_ANY */
 
 /**
  * @template T
@@ -515,9 +517,8 @@ class InvalidConfigError extends Error {
 }
 
 /**
- * @template T
- * @param {ImageminOptions} imageminConfig imagemin configuration
- * @returns {Promise<ImageminOptions>} normalized imagemin configuration
+ * @param {Record<string, EXPECTED_ANY>} imageminConfig imagemin configuration
+ * @returns {Promise<Record<string, EXPECTED_ANY>>} normalized imagemin configuration
  */
 async function imageminNormalizeConfig(imageminConfig) {
   if (
@@ -603,24 +604,28 @@ async function imageminNormalizeConfig(imageminConfig) {
 }
 
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} minimizerOptions minimizer options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} generated result
  */
-async function imageminGenerate(original, minimizerOptions) {
-  const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-    await imageminNormalizeConfig(
-      /** @type {ImageminOptions} */ (minimizerOptions ?? {}),
-    )
-  );
+async function imageminGenerate(original, options) {
+  /** @typedef {import("imagemin").Options} ImageminOptions */
+
+  const optionsNormalized =
+    /** @type {ImageminOptions} */
+    (
+      await imageminNormalizeConfig(
+        /** @type {ImageminOptions} */
+        (options ?? {}),
+      )
+    );
 
   const imagemin = (await import("imagemin")).default;
 
   let result;
 
   try {
-    result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
+    result = await imagemin.buffer(original.data, optionsNormalized);
   } catch (error) {
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
@@ -656,24 +661,28 @@ async function imageminGenerate(original, minimizerOptions) {
 }
 
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} options options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} minified result
  */
 async function imageminMinify(original, options) {
-  const minimizerOptionsNormalized = /** @type {ImageminOptions} */ (
-    await imageminNormalizeConfig(
-      /** @type {ImageminOptions} */ (options ?? {}),
-    )
-  );
+  /** @typedef {import("imagemin").Options} ImageminOptions */
+
+  const optionsNormalized =
+    /** @type {ImageminOptions} */
+    (
+      await imageminNormalizeConfig(
+        /** @type {ImageminOptions} */
+        (options ?? {}),
+      )
+    );
 
   const imagemin = (await import("imagemin")).default;
 
   let result;
 
   try {
-    result = await imagemin.buffer(original.data, minimizerOptionsNormalized);
+    result = await imagemin.buffer(original.data, optionsNormalized);
   } catch (error) {
     const originalError =
       error instanceof Error ? error : new Error(/** @type {string} */ (error));
@@ -783,20 +792,22 @@ async function squooshImagePoolTeardown() {
 }
 
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} minifyOptions minify options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} generated result
  */
-async function squooshGenerate(original, minifyOptions) {
+async function squooshGenerate(original, options) {
+  // eslint-disable-next-line jsdoc/no-restricted-syntax
+  /**
+   * @typedef {{ [key: string]: any }} SquooshOptions
+   */
+
   const squoosh = require("@squoosh/lib");
 
   const isReusePool = Boolean(pool);
   const imagePool = pool || squooshImagePoolCreate();
   const image = imagePool.ingestImage(new Uint8Array(original.data));
-
-  const squooshOptions = /** @type {SquooshOptions} */ (minifyOptions ?? {});
-
+  const squooshOptions = /** @type {SquooshOptions} */ (options ?? {});
   const preprocEntries = Object.entries(squooshOptions).filter(
     ([key, value]) => {
       if (key === "resize" && value?.enabled === false) {
@@ -879,12 +890,16 @@ squooshGenerate.setup = squooshImagePoolSetup;
 squooshGenerate.teardown = squooshImagePoolTeardown;
 
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} options minify options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} minified result
  */
 async function squooshMinify(original, options) {
+  // eslint-disable-next-line jsdoc/no-restricted-syntax
+  /**
+   * @typedef {{ [key: string]: any }} SquooshOptions
+   */
+
   const squoosh = require("@squoosh/lib");
 
   const { encoders } = squoosh;
@@ -979,35 +994,6 @@ squooshMinify.setup = squooshImagePoolSetup;
 
 squooshMinify.teardown = squooshImagePoolTeardown;
 
-/** @typedef {import("sharp")} SharpLib */
-/** @typedef {import("sharp").Sharp} Sharp */
-/** @typedef {import("sharp").ResizeOptions & { enabled?: boolean; unit?: "px" | "percent" }} ResizeOptions */
-
-/**
- * @typedef {object} SharpEncodeOptions
- * @property {import("sharp").AvifOptions=} avif AVIF options
- * @property {import("sharp").GifOptions=} gif GIF options
- * @property {import("sharp").HeifOptions=} heif HEIF options
- * @property {import("sharp").JpegOptions=} jpeg JPEG options
- * @property {import("sharp").JpegOptions=} jpg JPG options
- * @property {import("sharp").PngOptions=} png PNG options
- * @property {import("sharp").WebpOptions=} webp WebP options
- */
-
-/**
- * @typedef SharpFormat
- * @type {keyof SharpEncodeOptions}
- */
-
-// TODO remove the `SizeSuffix` option in the next major release, because we support `[width]` and `[height]`
-/**
- * @typedef {object} SharpOptions
- * @property {ResizeOptions=} resize resize options
- * @property {number | 'auto'=} rotate rotate options
- * @property {SizeSuffix=} sizeSuffix size suffix
- * @property {SharpEncodeOptions=} encodeOptions encode options
- */
-
 /**
  * @typedef SizeSuffix
  * @type {(width: number, height: number) => string}
@@ -1051,17 +1037,15 @@ const SHARP_MINIFY_FORMATS = new Map([
   ["webp", "webp"],
 ]);
 
+/** @typedef {EXPECTED_ANY} CustomSharpFormat */
+
 /**
  * @param {WorkerResult} original original original worker result
- * @param {SharpOptions} minimizerOptions minify options
- * @param {SharpFormat | null} targetFormat target format
+ * @param {CustomOptions=} options options
+ * @param {CustomSharpFormat | null=} targetFormat target format
  * @returns {Promise<WorkerResult | null>} transformed result
  */
-async function sharpTransform(
-  original,
-  minimizerOptions = {},
-  targetFormat = null,
-) {
+async function sharpTransform(original, options = {}, targetFormat = null) {
   const inputExt = path.extname(original.filename).slice(1).toLowerCase();
 
   if (
@@ -1080,23 +1064,23 @@ async function sharpTransform(
     return null;
   }
 
-  /** @type {SharpLib} */
+  /** @type {import("sharp")} */
   const sharp = require("sharp");
 
   const imagePipeline = sharp(original.data, { animated: true });
 
   // ====== rotate ======
 
-  if (typeof minimizerOptions.rotate === "number") {
-    imagePipeline.rotate(minimizerOptions.rotate);
-  } else if (minimizerOptions.rotate === "auto") {
+  if (typeof options.rotate === "number") {
+    imagePipeline.rotate(options.rotate);
+  } else if (options.rotate === "auto") {
     imagePipeline.rotate();
   }
 
   // ====== resize ======
 
-  if (minimizerOptions.resize) {
-    const { enabled = true, unit = "px", ...params } = minimizerOptions.resize;
+  if (options.resize) {
+    const { enabled = true, unit = "px", ...params } = options.resize;
 
     if (
       enabled &&
@@ -1136,10 +1120,26 @@ async function sharpTransform(
 
   const imageMetadata = await imagePipeline.metadata();
 
+  /**
+   * @typedef {object} SharpEncodeOptions
+   * @property {import("sharp").AvifOptions=} avif AVIF options
+   * @property {import("sharp").GifOptions=} gif GIF options
+   * @property {import("sharp").HeifOptions=} heif HEIF options
+   * @property {import("sharp").JpegOptions=} jpeg JPEG options
+   * @property {import("sharp").JpegOptions=} jpg JPG options
+   * @property {import("sharp").PngOptions=} png PNG options
+   * @property {import("sharp").WebpOptions=} webp WebP options
+   */
+
+  /**
+   * @typedef SharpFormat
+   * @type {keyof SharpEncodeOptions}
+   */
+
   const outputFormat =
     targetFormat ?? /** @type {SharpFormat} */ (imageMetadata.format);
 
-  const encodeOptions = minimizerOptions.encodeOptions?.[outputFormat];
+  const encodeOptions = options.encodeOptions?.[outputFormat];
 
   imagePipeline.toFormat(outputFormat, encodeOptions);
 
@@ -1151,8 +1151,8 @@ async function sharpTransform(
   const { width, height } = result.info;
 
   const sizeSuffix =
-    typeof minimizerOptions.sizeSuffix === "function"
-      ? minimizerOptions.sizeSuffix(width, height)
+    typeof options.sizeSuffix === "function"
+      ? options.sizeSuffix(width, height)
       : "";
 
   const dotIndex = original.filename.lastIndexOf(".");
@@ -1183,17 +1183,41 @@ async function sharpTransform(
 }
 
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} minimizerOptions minify options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} generated result
  */
-function sharpGenerate(original, minimizerOptions) {
-  const sharpOptions = /** @type {SharpOptions} */ (minimizerOptions ?? {});
+function sharpGenerate(original, options) {
+  /**
+   * @typedef {object} SharpEncodeOptions
+   * @property {import("sharp").AvifOptions=} avif AVIF options
+   * @property {import("sharp").GifOptions=} gif GIF options
+   * @property {import("sharp").HeifOptions=} heif HEIF options
+   * @property {import("sharp").JpegOptions=} jpeg JPEG options
+   * @property {import("sharp").JpegOptions=} jpg JPG options
+   * @property {import("sharp").PngOptions=} png PNG options
+   * @property {import("sharp").WebpOptions=} webp WebP options
+   */
 
-  const targetFormats = /** @type {SharpFormat[]} */ (
-    Object.keys(sharpOptions.encodeOptions ?? {})
-  );
+  // TODO remove the `SizeSuffix` option in the next major release, because we support `[width]` and `[height]`
+  /**
+   * @typedef {object} SharpOptions
+   * @property {ResizeOptions=} resize resize options
+   * @property {number | 'auto'=} rotate rotate options
+   * @property {SizeSuffix=} sizeSuffix size suffix
+   * @property {SharpEncodeOptions=} encodeOptions encode options
+   */
+
+  const sharpOptions = /** @type {SharpOptions} */ (options ?? {});
+
+  /**
+   * @typedef SharpFormat
+   * @type {keyof SharpEncodeOptions}
+   */
+
+  const targetFormats =
+    /** @type {SharpFormat[]} */
+    (Object.keys(sharpOptions.encodeOptions ?? {}));
 
   if (targetFormats.length === 0) {
     const error = new Error(
@@ -1219,33 +1243,28 @@ function sharpGenerate(original, minimizerOptions) {
 }
 
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} minimizerOptions minify options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} minified result
  */
-function sharpMinify(original, minimizerOptions) {
-  return sharpTransform(
-    original,
-    /** @type {SharpOptions} */ (minimizerOptions),
-  );
+function sharpMinify(original, options) {
+  return sharpTransform(original, options);
 }
 
-/** @typedef {import("svgo")} SvgoLib */
-/** @typedef {Omit<import("svgo").Config, "path" | "datauri">} SvgoEncodeOptions */
-
 /**
- * @typedef {object} SvgoOptions
- * @property {SvgoEncodeOptions=} encodeOptions encode options
- */
-
-/**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} minimizerOptions minify options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} minified result
  */
-async function svgoMinify(original, minimizerOptions) {
+async function svgoMinify(original, options) {
+  /** @typedef {import("svgo")} SvgoLib */
+  /** @typedef {Omit<import("svgo").Config, "path" | "datauri">} SvgoEncodeOptions */
+
+  /**
+   * @typedef {object} SvgoOptions
+   * @property {SvgoEncodeOptions=} encodeOptions encode options
+   */
+
   if (path.extname(original.filename).toLowerCase() !== ".svg") {
     return null;
   }
@@ -1253,7 +1272,7 @@ async function svgoMinify(original, minimizerOptions) {
   /** @type {SvgoLib} */
   const { optimize } = require("svgo");
 
-  const { encodeOptions } = /** @type {SvgoOptions} */ (minimizerOptions ?? {});
+  const { encodeOptions } = /** @type {SvgoOptions} */ (options ?? {});
 
   /** @type {import("svgo").Output} */
   let result;

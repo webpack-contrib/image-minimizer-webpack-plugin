@@ -57,10 +57,10 @@ function processSizeQuery(transformers, widthQuery, heightQuery, unitQuery) {
   return transformers.map((transformer) => {
     const minimizer = { ...transformer };
 
-    const minimizerOptions =
-      /** @type { import("./index").BasicTransformerOptions<T> & { resize?: import("./index").ResizeOptions }} */
-      // @ts-expect-error
-      { ...minimizer.options };
+    const minimizerOptions = {
+      .../** @type {{ options: import("./index").BasicTransformerOptions<T> & { resize?: import("./index").ResizeOptions  }}} */
+      (minimizer).options,
+    };
 
     minimizerOptions.resize = { ...minimizerOptions?.resize };
     minimizer.options = minimizerOptions;

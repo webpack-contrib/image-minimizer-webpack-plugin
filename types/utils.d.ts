@@ -1,19 +1,12 @@
 export type WorkerResult = import("./index").WorkerResult;
-export type SquooshOptions = import("./index").SquooshOptions;
-export type ImageminOptions = import("imagemin").Options;
+export type CustomOptions = import("./index").CustomOptions;
 export type WebpackError = import("webpack").WebpackError;
 export type Module = import("webpack").Module;
 export type AssetInfo = import("webpack").AssetInfo;
+export type EXPECTED_ANY = any;
 export type Task<T> = () => Promise<T>;
 export type FunctionReturning<T> = () => T;
-export type SvgoLib = typeof import("svgo");
-export type SvgoEncodeOptions = Omit<import("svgo").Config, "path" | "datauri">;
-export type SvgoOptions = {
-  /**
-   * encode options
-   */
-  encodeOptions?: SvgoEncodeOptions | undefined;
-};
+export type CustomSharpFormat = EXPECTED_ANY;
 export type Uint8ArrayUtf8ByteString = (
   array: number[] | Uint8Array,
   start: number,
@@ -69,94 +62,36 @@ export type SquooshImagePool = {
    */
   close: () => Promise<void>;
 };
-export type SharpLib = typeof import("sharp");
-export type Sharp = import("sharp").Sharp;
-export type ResizeOptions = import("sharp").ResizeOptions & {
-  enabled?: boolean;
-  unit?: "px" | "percent";
-};
-export type SharpEncodeOptions = {
-  /**
-   * AVIF options
-   */
-  avif?: import("sharp").AvifOptions | undefined;
-  /**
-   * GIF options
-   */
-  gif?: import("sharp").GifOptions | undefined;
-  /**
-   * HEIF options
-   */
-  heif?: import("sharp").HeifOptions | undefined;
-  /**
-   * JPEG options
-   */
-  jpeg?: import("sharp").JpegOptions | undefined;
-  /**
-   * JPG options
-   */
-  jpg?: import("sharp").JpegOptions | undefined;
-  /**
-   * PNG options
-   */
-  png?: import("sharp").PngOptions | undefined;
-  /**
-   * WebP options
-   */
-  webp?: import("sharp").WebpOptions | undefined;
-};
-export type SharpFormat = keyof SharpEncodeOptions;
-export type SharpOptions = {
-  /**
-   * resize options
-   */
-  resize?: ResizeOptions | undefined;
-  /**
-   * rotate options
-   */
-  rotate?: (number | "auto") | undefined;
-  /**
-   * size suffix
-   */
-  sizeSuffix?: SizeSuffix | undefined;
-  /**
-   * encode options
-   */
-  encodeOptions?: SharpEncodeOptions | undefined;
-};
 export type SizeSuffix = (width: number, height: number) => string;
 export const ABSOLUTE_URL_REGEX: RegExp;
 /** @type {WeakMap<Module, AssetInfo>} */
 export const IMAGE_MINIMIZER_PLUGIN_INFO_MAPPINGS: WeakMap<Module, AssetInfo>;
 export const WINDOWS_PATH_REGEX: RegExp;
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} minimizerOptions minimizer options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} generated result
  */
-export function imageminGenerate<T>(
+export function imageminGenerate(
   original: WorkerResult,
-  minimizerOptions: T,
+  options?: CustomOptions | undefined,
 ): Promise<WorkerResult | null>;
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} options options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} minified result
  */
-export function imageminMinify<T>(
+export function imageminMinify(
   original: WorkerResult,
-  options: T,
+  options?: CustomOptions | undefined,
 ): Promise<WorkerResult | null>;
 /**
- * @template T
- * @param {ImageminOptions} imageminConfig imagemin configuration
- * @returns {Promise<ImageminOptions>} normalized imagemin configuration
+ * @param {Record<string, EXPECTED_ANY>} imageminConfig imagemin configuration
+ * @returns {Promise<Record<string, EXPECTED_ANY>>} normalized imagemin configuration
  */
-export function imageminNormalizeConfig<T>(
-  imageminConfig: ImageminOptions,
-): Promise<ImageminOptions>;
+export function imageminNormalizeConfig(
+  imageminConfig: Record<string, EXPECTED_ANY>,
+): Promise<Record<string, EXPECTED_ANY>>;
 /**
  * @param {string} url URL
  * @returns {boolean} true when URL is absolute, otherwise false
@@ -173,11 +108,11 @@ export function isAbsoluteURL(url: string): boolean;
  */
 export function memoize<T>(fn: FunctionReturning<T>): FunctionReturning<T>;
 /** @typedef {import("./index").WorkerResult} WorkerResult */
-/** @typedef {import("./index").SquooshOptions} SquooshOptions */
-/** @typedef {import("imagemin").Options} ImageminOptions */
+/** @typedef {import("./index").CustomOptions} CustomOptions */
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Module} Module */
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
+/** @typedef {any} EXPECTED_ANY */
 /**
  * @template T
  * @typedef {() => Promise<T>} Task
@@ -189,68 +124,57 @@ export function memoize<T>(fn: FunctionReturning<T>): FunctionReturning<T>;
  */
 export function replaceFileExtension(filename: string, ext: string): string;
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} minimizerOptions minify options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} generated result
  */
-export function sharpGenerate<T>(
+export function sharpGenerate(
   original: WorkerResult,
-  minimizerOptions: T,
+  options?: CustomOptions | undefined,
 ): Promise<WorkerResult | null>;
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} minimizerOptions minify options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} minified result
  */
-export function sharpMinify<T>(
+export function sharpMinify(
   original: WorkerResult,
-  minimizerOptions: T,
+  options?: CustomOptions | undefined,
 ): Promise<WorkerResult | null>;
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} minifyOptions minify options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} generated result
  */
-export function squooshGenerate<T>(
+export function squooshGenerate(
   original: WorkerResult,
-  minifyOptions: T,
+  options?: CustomOptions | undefined,
 ): Promise<WorkerResult | null>;
 export namespace squooshGenerate {
   export { squooshImagePoolSetup as setup };
   export { squooshImagePoolTeardown as teardown };
 }
 /**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} options minify options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} minified result
  */
-export function squooshMinify<T>(
+export function squooshMinify(
   original: WorkerResult,
-  options: T,
+  options?: CustomOptions | undefined,
 ): Promise<WorkerResult | null>;
 export namespace squooshMinify {
   export { squooshImagePoolSetup as setup };
   export { squooshImagePoolTeardown as teardown };
 }
-/** @typedef {import("svgo")} SvgoLib */
-/** @typedef {Omit<import("svgo").Config, "path" | "datauri">} SvgoEncodeOptions */
 /**
- * @typedef {object} SvgoOptions
- * @property {SvgoEncodeOptions=} encodeOptions encode options
- */
-/**
- * @template T
  * @param {WorkerResult} original original worker result
- * @param {T} minimizerOptions minify options
+ * @param {CustomOptions=} options options
  * @returns {Promise<WorkerResult | null>} minified result
  */
-export function svgoMinify<T>(
+export function svgoMinify(
   original: WorkerResult,
-  minimizerOptions: T,
+  options?: CustomOptions | undefined,
 ): Promise<WorkerResult | null>;
 /**
  * Run tasks with limited concurrency.
