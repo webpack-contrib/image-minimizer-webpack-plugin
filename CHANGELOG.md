@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.1.4](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v4.1.3...v4.1.4) (2025-08-14)
+
+
+### Bug Fixes
+
+* concurrency default value to avoid overload CPU ([#479](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/479)) ([c6f0ea3](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/c6f0ea3338415519c31efb04515b34fb237ef3d4))
+* types ([#477](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/issues/477)) ([3b61bc8](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/commit/3b61bc8e3e061ebaa4de1211cf3abb45eb453064))
+
 ### [4.1.3](https://github.com/webpack-contrib/image-minimizer-webpack-plugin/compare/v4.1.2...v4.1.3) (2024-12-18)
 
 
