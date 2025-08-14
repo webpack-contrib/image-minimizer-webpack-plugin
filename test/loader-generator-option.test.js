@@ -1,7 +1,7 @@
+import fs from "node:fs/promises";
 import path from "node:path";
-import { promisify } from "node:util";
 import fileType from "file-type";
-import imageSize from "image-size";
+import { imageSize } from "image-size";
 import ImageMinimizerPlugin from "../src";
 
 import { fixturesPath, ifit, needSquooshTest, runWebpack } from "./helpers";
@@ -232,8 +232,7 @@ describe("loader generator option", () => {
       );
 
       const transformedExt = await fileType.fromFile(transformedAsset);
-      const sizeOf = promisify(imageSize);
-      const dimensions = await sizeOf(transformedAsset);
+      const dimensions = imageSize(await fs.readFile(transformedAsset));
 
       expect(dimensions.height).toBe(50);
       expect(dimensions.width).toBe(100);
@@ -283,8 +282,7 @@ describe("loader generator option", () => {
       );
 
       const transformedExt = await fileType.fromFile(transformedAsset);
-      const sizeOf = promisify(imageSize);
-      const dimensions = await sizeOf(transformedAsset);
+      const dimensions = imageSize(await fs.readFile(transformedAsset));
 
       expect(dimensions.height).toBe(1);
       expect(dimensions.width).toBe(1);
@@ -329,8 +327,7 @@ describe("loader generator option", () => {
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
-    const sizeOf = promisify(imageSize);
-    const dimensions = await sizeOf(transformedAsset);
+    const dimensions = imageSize(await fs.readFile(transformedAsset));
 
     expect(dimensions.height).toBe(50);
     expect(dimensions.width).toBe(100);
@@ -374,8 +371,7 @@ describe("loader generator option", () => {
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
-    const sizeOf = promisify(imageSize);
-    const dimensions = await sizeOf(transformedAsset);
+    const dimensions = imageSize(await fs.readFile(transformedAsset));
 
     expect(dimensions.height).toBe(1);
     expect(dimensions.width).toBe(1);
@@ -452,8 +448,7 @@ describe("loader generator option", () => {
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
-    const sizeOf = promisify(imageSize);
-    const dimensions = await sizeOf(transformedAsset);
+    const dimensions = imageSize(await fs.readFile(transformedAsset));
 
     expect(dimensions.height).toBe(50);
     expect(dimensions.width).toBe(100);
@@ -530,8 +525,7 @@ describe("loader generator option", () => {
     );
 
     const transformedExt = await fileType.fromFile(transformedAsset);
-    const sizeOf = promisify(imageSize);
-    const dimensions = await sizeOf(transformedAsset);
+    const dimensions = imageSize(await fs.readFile(transformedAsset));
 
     expect(dimensions.height).toBe(50);
     expect(dimensions.width).toBe(100);

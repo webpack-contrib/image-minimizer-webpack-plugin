@@ -1,6 +1,6 @@
+import fs from "node:fs/promises";
 import path from "node:path";
-import { promisify } from "node:util";
-import imageSize from "image-size";
+import { imageSize } from "image-size";
 
 import ImageMinimizerPlugin from "../src";
 
@@ -469,13 +469,12 @@ describe("loader minimizer option", () => {
       const { compilation } = stats;
       const { errors } = compilation;
 
-      const sizeOf = promisify(imageSize);
       const transformedAsset = path.resolve(
         __dirname,
         compilation.options.output.path,
         "./loader-test.png",
       );
-      const dimensions = await sizeOf(transformedAsset);
+      const dimensions = imageSize(await fs.readFile(transformedAsset));
 
       expect(dimensions.height).toBe(50);
       expect(dimensions.width).toBe(100);
@@ -511,13 +510,12 @@ describe("loader minimizer option", () => {
     const { compilation } = stats;
     const { errors } = compilation;
 
-    const sizeOf = promisify(imageSize);
     const transformedAsset = path.resolve(
       __dirname,
       compilation.options.output.path,
       "./loader-test.png",
     );
-    const dimensions = await sizeOf(transformedAsset);
+    const dimensions = imageSize(await fs.readFile(transformedAsset));
 
     expect(dimensions.height).toBe(50);
     expect(dimensions.width).toBe(100);
