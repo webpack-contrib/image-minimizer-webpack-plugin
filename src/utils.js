@@ -50,15 +50,6 @@ function replaceFileExtension(filename, ext) {
  * @returns {Promise<T[]>} A promise that fulfills to an array of the results
  */
 function throttleAll(limit, tasks) {
-  if (
-    !Array.isArray(tasks) ||
-    !tasks.every((task) => typeof task === "function")
-  ) {
-    throw new TypeError(
-      "Expected 'tasks' to be a list of functions returning a promise",
-    );
-  }
-
   return new Promise((resolve, reject) => {
     const result = /** @type {T[]} */ ([]);
     const entries = tasks.entries();
@@ -1270,6 +1261,7 @@ async function svgoMinify(original, options) {
   }
 
   /** @type {SvgoLib} */
+  // eslint-disable-next-line import/no-unresolved
   const { optimize } = require("svgo");
 
   const { encodeOptions } = /** @type {SvgoOptions} */ (options ?? {});

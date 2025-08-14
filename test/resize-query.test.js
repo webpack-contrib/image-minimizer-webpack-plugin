@@ -1,7 +1,7 @@
+import fs from "node:fs/promises";
 import path from "node:path";
-import { promisify } from "node:util";
 import fileType from "file-type";
-import imageSize from "image-size";
+import { imageSize } from "image-size";
 import ImageMinimizerPlugin from "../src";
 
 import { fixturesPath, ifit, needSquooshTest, runWebpack } from "./helpers";
@@ -50,7 +50,6 @@ describe("resize query (sharp)", () => {
 
     const { compilation } = stats;
     const { warnings, errors } = compilation;
-    const sizeOf = promisify(imageSize);
 
     const assetsList = [
       // asset path, width, height, mime regExp
@@ -79,8 +78,7 @@ describe("resize query (sharp)", () => {
       );
 
       const transformedExt = await fileType.fromFile(transformedAsset);
-
-      const dimensions = await sizeOf(transformedAsset);
+      const dimensions = imageSize(await fs.readFile(transformedAsset));
 
       expect(dimensions.width).toBe(width);
       expect(dimensions.height).toBe(height);
@@ -123,7 +121,6 @@ describe("resize query (sharp)", () => {
 
     const { compilation } = stats;
     const { warnings, errors } = compilation;
-    const sizeOf = promisify(imageSize);
 
     const assetsList = [
       // asset path, width, height, mime regExp
@@ -152,8 +149,7 @@ describe("resize query (sharp)", () => {
       );
 
       const transformedExt = await fileType.fromFile(transformedAsset);
-
-      const dimensions = await sizeOf(transformedAsset);
+      const dimensions = imageSize(await fs.readFile(transformedAsset));
 
       expect(dimensions.width).toBe(width);
       expect(dimensions.height).toBe(height);
@@ -206,7 +202,6 @@ describe("resize query (sharp)", () => {
 
     const { compilation } = stats;
     const { warnings, errors } = compilation;
-    const sizeOf = promisify(imageSize);
 
     const assetsList = [
       // asset path, width, height, mime regExp
@@ -235,8 +230,7 @@ describe("resize query (sharp)", () => {
       );
 
       const transformedExt = await fileType.fromFile(transformedAsset);
-
-      const dimensions = await sizeOf(transformedAsset);
+      const dimensions = imageSize(await fs.readFile(transformedAsset));
 
       expect(dimensions.width).toBe(width);
       expect(dimensions.height).toBe(height);
@@ -279,7 +273,6 @@ describe("resize query (sharp)", () => {
 
     const { compilation } = stats;
     const { warnings, errors } = compilation;
-    const sizeOf = promisify(imageSize);
 
     const assetsList = [
       // asset path, width, height, mime regExp
@@ -308,8 +301,7 @@ describe("resize query (sharp)", () => {
       );
 
       const transformedExt = await fileType.fromFile(transformedAsset);
-
-      const dimensions = await sizeOf(transformedAsset);
+      const dimensions = imageSize(await fs.readFile(transformedAsset));
 
       expect(dimensions.width).toBe(width);
       expect(dimensions.height).toBe(height);
@@ -364,7 +356,6 @@ describe("resize query (squoosh)", () => {
 
       const { compilation } = stats;
       const { warnings, errors } = compilation;
-      const sizeOf = promisify(imageSize);
 
       const assetsList = [
         // asset path, width, height, mime regExp
@@ -393,8 +384,7 @@ describe("resize query (squoosh)", () => {
         );
 
         const transformedExt = await fileType.fromFile(transformedAsset);
-
-        const dimensions = await sizeOf(transformedAsset);
+        const dimensions = imageSize(await fs.readFile(transformedAsset));
 
         expect(dimensions.width).toBe(width);
         expect(dimensions.height).toBe(height);
@@ -440,7 +430,6 @@ describe("resize query (squoosh)", () => {
 
       const { compilation } = stats;
       const { warnings, errors } = compilation;
-      const sizeOf = promisify(imageSize);
 
       const assetsList = [
         // asset path, width, height, mime regExp
@@ -469,8 +458,7 @@ describe("resize query (squoosh)", () => {
         );
 
         const transformedExt = await fileType.fromFile(transformedAsset);
-
-        const dimensions = await sizeOf(transformedAsset);
+        const dimensions = imageSize(await fs.readFile(transformedAsset));
 
         expect(dimensions.width).toBe(width);
         expect(dimensions.height).toBe(height);
